@@ -1,0 +1,84 @@
+# Windsurf Rules — engrama-web
+
+## Contexto obligatorio
+Antes de cualquier tarea, lee en este orden:
+1. ARQUITECTURA.md
+2. WINDSURF.md
+3. SPECS/*.md del módulo a tocar (si existe)
+
+Si falta alguno, pausa y avisa al usuario.
+
+## Stack
+Next.js 14 (App Router), TypeScript strict, Tailwind CSS, shadcn/ui,
+Zustand, TanStack Query, Supabase JS (solo auth), Vitest, Playwright.
+
+## Idioma
+- Hablas conmigo en español.
+- Código, variables, comentarios y commits en inglés.
+- Textos de UI en español.
+
+## Reglas críticas
+1. NUNCA importes de un feature a otro.
+2. Estado compartido entre features: stores de Zustand en stores/.
+3. Llamadas al backend: lib/api-client.ts + tipos de lib/api-types.ts.
+4. Nada de any en TypeScript. Sin excepciones.
+5. Frontend NUNCA tiene SUPABASE_SERVICE_ROLE_KEY ni secretos.
+6. Frontend NUNCA hace queries directo a la DB (salvo auth). TODO pasa por FastAPI.
+7. Toda request al backend: Authorization: Bearer JWT + X-Tenant-Slug header.
+8. Mobile-first siempre. Diseño oscuro por defecto.
+
+## Estructura obligatoria de feature
+features/<dominio>/
+  components/   (componentes React)
+  hooks/        (useQuery/useMutation)
+  a# Windsurf Rules — engrama-web
+
+## Contexto obligatorio
+Antes de cualquier tarea, lee en este orden:
+1. ARQUITECTURA.md (arquitectura completa del proyecto)
+2. WINDSURF.md (reglas operativas detalladas)
+3. SPECS/*.md del módulo que se va a tocar (si existe)
+
+Si uno de esos archivos no existe, pausa y avisa al usuario.
+
+## Stack de este repo
+- Next.js 14 (App Router)
+- TypeScript strict mode
+- Tailwind CSS + shadcn/ui
+- Zustand (estado global)
+- TanStack Query (data fetching)
+- Supabase JS client (solo para auth)
+- Vitest + Playwright para tests
+
+## Idioma
+- Habla conmigo en español.
+- Código, nombres de variables, comentarios de código y commits en inglés.
+- Textos de UI para el usuario final en español.
+
+## Reglas críticas (resumen de WINDSURF.md)
+1. NUNCA importes de un feature a otro (`features/bets` NO importa de `features/engrama_core`).
+2. Para estado compartido entre features, usa stores de Zustand en `stores/`.
+3. Para comunicación con el backend, usa `lib/api-client.ts` y tipos de `lib/api-types.ts`.
+4. Nada de `any` en TypeScript. Sin excepciones.
+5. El frontend NUNCA tiene `SUPABASE_SERVICE_ROLE_KEY` ni ningún secreto.
+6. El frontend NUNCA hace queries directo a la DB (salvo auth). TODO pasa por el backend FastAPI.
+7. Toda request al backend debe llevar JWT en `Authorization` y `X-Tenant-Slug` en headers.
+8. Mobile-first siempre. Diseño oscuro por defecto.
+
+## Estructura de un feature (obligatoria)
+features/<dominio>/
+├── components/   (componentes React)
+├── hooks/        (useQuery/useMutation)
+├── api.ts        (llamadas al backend)
+└── types.ts      (tipos locales)
+
+## Antes de cerrar una tarea
+Verifica:
+- tsc --noEmit no reporta errores.
+- eslint pasa sin warnings.
+- No hay `any` sin justificar.
+- No hay imports cross-feature.
+- No hay secretos en el código.
+
+## Cuando el usuario es ambiguo
+Haz UNA pregunta concreta y espera respuesta. No adivines.
