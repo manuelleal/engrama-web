@@ -5,6 +5,7 @@
 // respondientes ya vienen suprimidos del servidor (privacidad); esta vista solo avisa cuántos.
 import { h, montar } from '../../ui/dom.js';
 import { textos } from '../../textos.js';
+import { tituloLegible } from '../../ui/titulo.js';
 import { leerErroresDeItem } from '../../api/profe.js';
 import { ErrorApi } from '../../api/cliente.js';
 
@@ -20,7 +21,7 @@ function textoDistractor(item) {
 function filaDeItem(item) {
   return h(
     'tr', { 'data-testid': `error-${item.question_id}` },
-    h('td', {}, item.title),
+    h('td', {}, tituloLegible(item.title)),
     h('td', {}, item.question_text),
     h('td', {}, String(item.respondents)),
     h('td', { 'data-testid': `error-${item.question_id}-con-respuesta` }, String(erroresConRespuesta(item))),

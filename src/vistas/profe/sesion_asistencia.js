@@ -51,12 +51,13 @@ function crearFormularioApertura(onAbrir) {
 
 function crearPanelActivo(sesion, onCerrar) {
   const resumen = h('p', { role: 'status', 'aria-live': 'polite', 'data-testid': 'sesion-resumen' }, resumenAsistencia(0, 0));
-  const boton = h('button', { 'data-testid': 'boton-cerrar-sesion' }, textos.profe.sesion.cerrar);
+  const boton = h('button', { class: 'boton-secundario', 'data-testid': 'boton-cerrar-sesion' }, textos.profe.sesion.cerrar);
   const avisoRed = h('p', { role: 'status', 'data-testid': 'sesion-sin-red' });
   const enlace = enlaceDeAsistencia(sesion.session_code);
   const nodo = h(
-    'div', { 'data-testid': 'sesion-panel' },
-    h('p', {}, `${textos.profe.sesion.codigoPrefijo}: `, h('strong', { 'data-testid': 'sesion-codigo' }, sesion.session_code)),
+    'div', { class: 'tarjeta', 'data-testid': 'sesion-panel' },
+    h('p', { class: 'texto-apoyo' }, textos.profe.sesion.codigoPrefijo),
+    h('p', { class: 'codigo-grande' }, h('strong', { 'data-testid': 'sesion-codigo' }, sesion.session_code)),
     h('p', {}, `${textos.profe.sesion.enlacePrefijo}: `, h('a', { href: enlace, 'data-testid': 'sesion-enlace' }, enlace)),
     resumen, boton, avisoRed,
   );

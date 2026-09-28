@@ -8,9 +8,11 @@ import { ErrorApi } from '../../api/cliente.js';
 
 function filaDeGrupo(grupo) {
   return h(
-    'li', { 'data-testid': `grupo-${grupo.id}` },
-    h('a', { href: `#/profe/grupo/${grupo.id}`, 'data-testid': `grupo-${grupo.id}-abrir` }, grupo.group_code),
-    ` · ${textos.profe.grupos.estudiantes(grupo.student_count)}`,
+    'li', { class: 'fila', 'data-testid': `grupo-${grupo.id}` },
+    h('span', { class: 'fila-texto' },
+      h('span', { class: 'fila-titulo' }, grupo.group_code),
+      h('span', { class: 'texto-apoyo' }, textos.profe.grupos.estudiantes(grupo.student_count))),
+    h('a', { href: `#/profe/grupo/${grupo.id}`, class: 'boton-chico', 'data-testid': `grupo-${grupo.id}-abrir` }, textos.profe.grupos.abrirGrupo),
   );
 }
 

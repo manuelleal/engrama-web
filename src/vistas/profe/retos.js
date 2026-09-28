@@ -5,6 +5,7 @@
 // `{status}`) y asignar a un grupo propio (T6; un grupo ajeno lo rechaza el servidor, X4).
 import { h, montar } from '../../ui/dom.js';
 import { textos } from '../../textos.js';
+import { tituloLegible } from '../../ui/titulo.js';
 import { listarTodosLosRetos, cambiarEstadoReto } from '../../api/retos.js';
 import { listarGrupos, asignarReto } from '../../api/profe.js';
 import { accionUnica, ErrorApi } from '../../api/cliente.js';
@@ -17,7 +18,7 @@ export function siguienteEstado(estadoActual) {
 
 function selectorDeGrupo(grupos) {
   return h(
-    'select', { 'data-testid': 'select-grupo' },
+    'select', { class: 'campo-fila', 'data-testid': 'select-grupo' },
     h('option', { value: '' }, textos.profe.retos.elegirGrupo),
     ...grupos.map((g) => h('option', { value: g.id }, g.group_code)),
   );
@@ -64,7 +65,7 @@ async function manejarAsignar(reto, select, boton, ctx, asignarUnaVez, estadoAsi
 /** @param {(cancelar: () => void) => void} registrarCancelable junta los "soltar suscripción" de la fila */
 function filaDeReto(reto, grupos, ctx, avisoRed, registrarCancelable) {
   const botonEstado = h(
-    'button', { 'data-testid': `reto-${reto.id}-estado` },
+    'button', { class: 'boton-chico boton-secundario', 'data-testid': `reto-${reto.id}-estado` },
     reto.status === 'active' ? textos.profe.retos.desactivar : textos.profe.retos.activar,
   );
   const cambiarUnaVez = accionUnica(cambiarEstadoReto);
@@ -72,19 +73,21 @@ function filaDeReto(reto, grupos, ctx, avisoRed, registrarCancelable) {
   registrarCancelable(ligarEscrituraARed(botonEstado, avisoRed, textos.red.sinConexionAccion(textos.profe.retos.accionEscribir)));
 
   const select = selectorDeGrupo(grupos);
-  const botonAsignar = h('button', { 'data-testid': `reto-${reto.id}-asignar` }, textos.profe.retos.asignar);
+  const botonAsignar = h('button', { class: 'boton-chico', 'data-testid': `reto-${reto.id}-asignar` }, textos.profe.retos.asignar);
   const asignarUnaVez = accionUnica(asignarReto);
   const estadoAsignar = { hecho: false };
   botonAsignar.addEventListener('click', () => manejarAsignar(reto, select, botonAsignar, ctx, asignarUnaVez, estadoAsignar));
   registrarCancelable(ligarEscrituraARed(botonAsignar, avisoRed, textos.red.sinConexionAccion(textos.profe.retos.accionEscribir), () => !estadoAsignar.hecho));
 
   return h(
-    'li', { 'data-testid': `reto-${reto.id}` },
-    h('span', {}, reto.title),
-    ` · ${reto.status} · ${textos.profe.retos.grupoAsignado(reto.group_id)} · `,
-    botonEstado,
-    h('label', {}, textos.profe.retos.etiquetaGrupoDestino, select),
-    botonAsignar,
+    'li', { class: 'fila', 'data-testid': `reto-${reto.id}` },
+    h('div', { class: 'fila-texto' },
+      h('span', { class: 'fila-titulo' }, tituloLegible(reto.title)),
+      h('span', { class: 'texto-apoyo' }, `${reto.status} · ${textos.profe.retos.grupoAsignado(reto.group_id)}`)),
+    h('div', { class: 'fila-acciones' },
+      botonEstado,
+      h('label', { class: 'etiqueta-en-linea' }, textos.profe.retos.etiquetaGrupoDestino, select),
+      botonAsignar),
   );
 }
 
