@@ -1,0 +1,7 @@
+{
+  "descripcion": "X12: se envía el value en vez de la label — reto_flujo.js manda \"has worked\" en vez de \"A\"",
+  "archivos": { "src/vistas/estudiante/reto_flujo.js": "reto_flujo.js" },
+  "comando": ["node", "--test", "--test-reporter=tap", "tests/unit/vista_reto_flujo.test.mjs"],
+  "espera_codigo_no_cero": true,
+  "espera_fallan_tests": ["U11: valorAlGuardar() devuelve la label, no el value"]
+}

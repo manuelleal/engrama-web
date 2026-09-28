@@ -27,6 +27,36 @@ export const textos = {
     sinSesion: 'No hay una sesión activa',
     actorDesconocido: (t) => `Actor desconocido: "${t}"`,
   },
+  retos: {
+    titulo: 'Retos',
+    jugar: 'Jugar',
+    repasar: 'Repasar',
+    completado: 'Completado ✓',
+    sinRetos: 'No tienes retos disponibles.',
+    errorGeneral: 'No se pudieron cargar tus retos.',
+  },
+  retoFlujo: {
+    /** @param {number} n @param {number} total */
+    pregunta: (n, total) => `Pregunta ${n} de ${total}`,
+    terminar: 'Terminar',
+    siguiente: 'Siguiente',
+    terminando: 'Enviando…',
+    bannerRepaso: 'Repaso: no suma monedas',
+    faltaRespuesta: 'Elige una opción antes de continuar.',
+    drakoPresenta: 'Drako presenta el reto',
+  },
+  revision: {
+    titulo: 'Revisión',
+    correcta: 'Correcta',
+    incorrecta: 'Esta vez no',
+    /** @param {string} texto */
+    laCorrectaEra: (texto) => `La correcta era: ${texto}`,
+    /** @param {number} n */
+    gananciaMonedas: (n) => `+${n} monedas`,
+    sinGanancia: 'No sumaste monedas esta vez.',
+    volver: 'Volver a mis retos',
+    drakoCelebra: 'Drako celebra contigo',
+  },
   asistencia: {
     titulo: 'Asistencia',
     etiquetaCodigo: 'Código de la sesión',

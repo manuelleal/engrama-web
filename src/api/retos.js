@@ -60,3 +60,24 @@ export async function verReto(id, { token, tenantId }) {
   const datos = await pedirJson(`/challenges/${id}`, { token, tenantId });
   return aplicarFiltro(datos);
 }
+
+/** POST /challenges/{id}/attempt — arranca (o reusa) el intento en curso. */
+export async function arrancarIntento(id, { token, tenantId }) {
+  const datos = await pedirJson(`/challenges/${id}/attempt`, { metodo: 'POST', token, tenantId });
+  return { ...datos, challenge: aplicarFiltro(datos.challenge) };
+}
+
+/**
+ * POST /challenges/attempts/{id}/submit. `respuestas` es `{questionId: label}` — SIEMPRE la
+ * `label` ("A", "B"…), nunca el `value` (§7.2 regla 4; quien arma `respuestas` es reto_flujo.js,
+ * que decide esto al guardar el clic — X12 prueba justo esto).
+ */
+export async function enviarIntento(attemptId, respuestas, { token, tenantId }) {
+  const answers = Object.entries(respuestas).map(([question_id, answer]) => ({ question_id, answer }));
+  return pedirJson(`/challenges/attempts/${attemptId}/submit`, { metodo: 'POST', token, tenantId, cuerpo: { answers } });
+}
+
+/** GET /challenges/attempts/history. */
+export async function historialDeIntentos({ token, tenantId }) {
+  return pedirJson('/challenges/attempts/history', { token, tenantId });
+}

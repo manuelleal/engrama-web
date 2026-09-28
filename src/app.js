@@ -6,6 +6,8 @@ import * as auth from './auth/mock.js'; // ENGRAMA_AUTH=mock (§7.4); perfil_act
 import { renderEntrada } from './vistas/entrada.js';
 import { renderInicio } from './vistas/estudiante/inicio.js';
 import { renderAsistencia } from './vistas/estudiante/asistencia.js';
+import { renderRetos } from './vistas/estudiante/retos.js';
+import { renderRetoFlujo } from './vistas/estudiante/reto_flujo.js';
 
 function registrarServiceWorker() {
   if (!('serviceWorker' in navigator)) return;
@@ -42,18 +44,18 @@ async function iniciarApp() {
   });
 }
 
+// Sin X-Tenant-ID: los actores sintéticos (hito 0-1) tienen un solo colegio, y su id de verdad
+// lo genera mock_api.mjs en cada arranque — mandar el "demo" de mock.js chocaría con el real. El
+// servidor usa la única membresía del actor cuando no se lo mandamos.
+function conCtx(fn) {
+  return async (raiz, params, query) => fn(raiz, params, query, { token: await auth.token() });
+}
+
 function arrancarConSesion(vista, sesion) {
-  ruta('/inicio', async (raiz) => {
-    const token = await auth.token();
-    // Sin X-Tenant-ID: los actores sintéticos (hito 0-1) tienen un solo colegio, y su id de
-    // verdad lo genera mock_api.mjs en cada arranque — mandar el "demo" de mock.js chocaría con
-    // el real. El servidor usa la única membresía del actor cuando no se lo mandamos.
-    await renderInicio(raiz, { sesion, token });
-  });
-  ruta('/asistencia', async (raiz, params, query) => {
-    const token = await auth.token();
-    renderAsistencia(raiz, query, { token });
-  });
+  ruta('/inicio', conCtx((raiz, params, query, ctx) => renderInicio(raiz, { ...ctx, sesion })));
+  ruta('/asistencia', conCtx((raiz, params, query, ctx) => renderAsistencia(raiz, query, ctx)));
+  ruta('/retos', conCtx((raiz, params, query, ctx) => renderRetos(raiz, ctx)));
+  ruta('/retos/:id', conCtx((raiz, params, query, ctx) => renderRetoFlujo(raiz, params, query, ctx)));
   iniciar(vista);
 }
 

@@ -1,0 +1,7 @@
+{
+  "descripcion": "X6: correcto o incorrecto solo con color — ui/retro.js pone solo la clase, sin ícono ni texto",
+  "archivos": { "src/ui/retro.js": "retro.js" },
+  "comando": ["node", "--test", "--test-reporter=tap", "tests/unit/ui_retro.test.mjs"],
+  "espera_codigo_no_cero": true,
+  "espera_fallan_tests": ["U7: correcto trae ícono ✓ y el texto pedido (nunca vacíos)"]
+}

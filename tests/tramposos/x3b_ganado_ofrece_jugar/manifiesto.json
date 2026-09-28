@@ -1,0 +1,7 @@
+{
+  "descripcion": "X3b: un reto ganado se vuelve a jugar — retos.js ofrece \"Jugar\" en un reto ganado",
+  "archivos": { "src/vistas/estudiante/retos.js": "retos.js" },
+  "comando": ["node", "--test", "--test-reporter=tap", "tests/unit/vista_retos.test.mjs"],
+  "espera_codigo_no_cero": true,
+  "espera_fallan_tests": ["U6: un reto ganado ofrece \"Repasar\", nunca \"Jugar\""]
+}

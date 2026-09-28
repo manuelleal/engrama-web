@@ -38,7 +38,12 @@ function pintarContenido(raiz, ctx, datos) {
     h('p', { 'data-testid': 'constancia' }, `${textos.inicio.constanciaPrefijo}: ${ctx.sesion.constancia}`),
     crearEscudo({ nivelConfirmado: null }), // L10 no existe todavía (§4.1): siempre "Por confirmar"
     h('p', { 'data-testid': 'banner-retos', role: 'status' }, textos.inicio.retos(datos.numRetos)),
-    h('nav', {}, h('a', { href: '#/asistencia', 'data-testid': 'ir-a-asistencia' }, textos.asistencia.titulo)),
+    h(
+      'nav', {},
+      h('a', { href: '#/asistencia', 'data-testid': 'ir-a-asistencia' }, textos.asistencia.titulo),
+      ' · ',
+      h('a', { href: '#/retos', 'data-testid': 'ir-a-retos' }, textos.retos.titulo),
+    ),
   );
   montar(raiz, nodo);
   animarConteo(nodoSaldo, datos.balance, textos.inicio.monedas);

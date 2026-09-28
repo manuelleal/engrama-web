@@ -1,0 +1,7 @@
+{
+  "descripcion": "Repaso: un cliente que muestra +N monedas en un repaso (calcula de coins_reward en vez de coins_earned) debe dar ROJO",
+  "archivos": { "src/vistas/estudiante/revision.js": "revision.js" },
+  "comando": ["node", "--test", "--test-reporter=tap", "tests/e2e/reto_flujo.test.mjs"],
+  "espera_codigo_no_cero": true,
+  "espera_fallan_tests": ["reto_flujo: un repaso avisa antes de empezar y nunca muestra monedas ganadas (matiz de F4)"]
+}

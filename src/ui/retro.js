@@ -7,16 +7,23 @@
 import { h } from './dom.js';
 
 /**
+ * Pura, sin DOM (mitad de U7: la otra mitad, que el DOM de verdad tenga ambos nodos, la
+ * prueba el E2E — bajo `node --test` no hay `document`, por regla del stack).
+ * @param {{ok: boolean, texto: string}} datos
+ */
+export function contenidoDelResultado(datos) {
+  return { icono: datos.ok ? '✓' : '✗', texto: datos.texto, clase: datos.ok ? 'resultado resultado-ok' : 'resultado resultado-mal' };
+}
+
+/**
  * @param {{ok: boolean, texto: string, testid?: string}} datos
  */
 export function crearResultado(datos) {
+  const c = contenidoDelResultado(datos);
   return h(
     'p',
-    {
-      role: 'status', 'aria-live': 'polite', 'data-testid': datos.testid || 'resultado',
-      class: datos.ok ? 'resultado resultado-ok' : 'resultado resultado-mal',
-    },
-    h('span', { 'aria-hidden': 'true' }, datos.ok ? '✓' : '✗'),
-    ` ${datos.texto}`,
+    { role: 'status', 'aria-live': 'polite', 'data-testid': datos.testid || 'resultado', class: c.clase },
+    h('span', { 'aria-hidden': 'true' }, c.icono),
+    ` ${c.texto}`,
   );
 }

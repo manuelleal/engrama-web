@@ -1,0 +1,7 @@
+{
+  "descripcion": "X11: Drako califica — revision.js lo pone dentro del bloque de resultado de cada pregunta",
+  "archivos": { "src/vistas/estudiante/revision.js": "revision.js" },
+  "comando": ["node", "--test", "--test-reporter=tap", "tests/e2e/reto_flujo.test.mjs"],
+  "espera_codigo_no_cero": true,
+  "espera_fallan_tests": ["reto_flujo: jugar de punta a punta — sin clave antes, ícono+texto real, sin XSS, Drako fuera del resultado"]
+}
