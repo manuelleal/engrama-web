@@ -6,6 +6,7 @@
 import { h, montar } from '../../ui/dom.js';
 import { crearResultado } from '../../ui/retro.js';
 import { crearDrako } from '../../ui/drako.js';
+import { crearNavInferior } from '../../ui/nav_inferior.js';
 import { textos } from '../../textos.js';
 
 /** Texto legible de una opción por su label ("A" -> su `value`); si no hay opciones, la label tal cual. */
@@ -24,8 +25,8 @@ function filaDeRevision(pregunta, respuestasDadas, correctAnswers) {
   const acerto = acertoPregunta(pregunta.id, respuestasDadas, correctAnswers);
   const correcta = correctAnswers.find((c) => c.question_id === pregunta.id)?.correct_answer;
   return h(
-    'li', { 'data-testid': `revision-${pregunta.id}` },
-    h('p', {}, pregunta.question_text),
+    'li', { class: 'tarjeta', 'data-testid': `revision-${pregunta.id}` },
+    h('p', { class: 'fila-titulo' }, pregunta.question_text),
     crearResultado({ ok: acerto, texto: acerto ? textos.revision.correcta : textos.revision.incorrecta, testid: `revision-${pregunta.id}-resultado` }),
     h('p', { 'data-testid': `revision-${pregunta.id}-correcta` }, textos.revision.laCorrectaEra(textoDeOpcion(pregunta, correcta))),
   );
@@ -39,16 +40,18 @@ export function renderRevision(raiz, datos) {
   const { challenge, resultado, respuestasDadas } = datos;
   const filas = challenge.questions.map((q) => filaDeRevision(q, respuestasDadas, resultado.correct_answers));
   const banner = h(
-    'p', { role: 'status', 'data-testid': 'revision-monedas' },
+    'p', { role: 'status', class: 'aviso-corto', 'data-testid': 'revision-monedas' },
     resultado.coins_earned > 0 ? textos.revision.gananciaMonedas(resultado.coins_earned) : textos.revision.sinGanancia,
   );
   const nodo = h(
     'div', { 'data-testid': 'vista-revision' },
-    crearDrako('celebra', textos.revision.drakoCelebra),
-    h('h1', {}, textos.revision.titulo),
+    h('div', { class: 'encabezado-reto' },
+      crearDrako('celebra', textos.revision.drakoCelebra),
+      h('h1', {}, textos.revision.titulo)),
     banner,
     h('ul', {}, ...filas),
     h('a', { href: '#/retos', 'data-testid': 'revision-volver' }, textos.revision.volver),
+    crearNavInferior('retos'),
   );
   montar(raiz, nodo);
   document.body.dataset.listo = '1';
