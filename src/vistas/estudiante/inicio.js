@@ -5,6 +5,7 @@
 import { h, montar } from '../../ui/dom.js';
 import { crearEscudo } from '../../ui/escudo.js';
 import { crearDrako } from '../../ui/drako.js';
+import { crearNavInferior } from '../../ui/nav_inferior.js';
 import { reproducir } from '../../ui/sonido.js';
 import { textos } from '../../textos.js';
 import { leerSaldo } from '../../api/core.js';
@@ -30,20 +31,24 @@ async function cargarDatos(ctx) {
 }
 
 function pintarContenido(raiz, ctx, datos) {
-  const nodoSaldo = h('p', { 'data-testid': 'saldo' }, `0 ${textos.inicio.monedas}`);
+  const nodoSaldo = h('p', { class: 'saldo', 'data-testid': 'saldo' }, `0 ${textos.inicio.monedas}`);
   const nodo = h('div', { 'data-testid': 'vista-inicio' },
-    crearDrako('presenta', textos.inicio.drakoBienvenida),
-    h('h1', {}, textos.app.titulo),
-    nodoSaldo,
-    h('p', { 'data-testid': 'constancia' }, `${textos.inicio.constanciaPrefijo}: ${ctx.sesion.constancia}`),
+    // Barra superior (sistema visual base): saldo y racha, con los datos que Home YA carga — así
+    // no se agrega ninguna llamada de red nueva (§7.2, ver estilos/componentes.css .barra-superior).
+    h('div', { class: 'barra-superior' },
+      nodoSaldo,
+      h('p', { class: 'constancia', 'data-testid': 'constancia' }, `${textos.inicio.constanciaPrefijo}: ${ctx.sesion.constancia}`)),
+    h('div', { class: 'encabezado-reto' },
+      crearDrako('presenta', textos.inicio.drakoBienvenida),
+      h('h1', {}, textos.app.titulo)),
     crearEscudo({ nivelConfirmado: null }), // L10 no existe todavía (§4.1): siempre "Por confirmar"
     h('p', { 'data-testid': 'banner-retos', role: 'status' }, textos.inicio.retos(datos.numRetos)),
     h(
       'nav', {},
       h('a', { href: '#/asistencia', 'data-testid': 'ir-a-asistencia' }, textos.asistencia.titulo),
-      ' · ',
       h('a', { href: '#/retos', 'data-testid': 'ir-a-retos' }, textos.retos.titulo),
     ),
+    crearNavInferior('inicio'),
   );
   montar(raiz, nodo);
   animarConteo(nodoSaldo, datos.balance, textos.inicio.monedas);
