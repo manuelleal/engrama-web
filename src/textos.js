@@ -16,6 +16,12 @@ export const textos = {
     drakoBienvenida: 'Drako te da la bienvenida',
     errorGeneral: 'No se pudo cargar tu perfil.',
   },
+  nav: {
+    // Pulido visual (2026-09-28): la navegación inferior del estudiante. Retos y Asistencia
+    // reusan sus propios títulos (textos.retos.titulo, textos.asistencia.titulo) — un solo lugar
+    // para cada nombre de pantalla.
+    inicio: 'Inicio',
+  },
   red: {
     sinConexionPrefijo: 'Sin conexión · actualizado',
     // W16 (§7.3, §9.5 E10): una acción del profe o del admin que escribe, deshabilitada sin red.
@@ -80,6 +86,7 @@ export const textos = {
       errorGeneral: 'No se pudieron cargar tus grupos.',
       /** @param {number} n */
       estudiantes: (n) => (n === 1 ? '1 estudiante' : `${n} estudiantes`),
+      abrirGrupo: 'Abrir',
     },
     grupo: {
       /** @param {string} codigo */
