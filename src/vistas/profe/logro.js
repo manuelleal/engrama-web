@@ -5,12 +5,25 @@
 // muestra `status` ni `label` de un eje sin su `cefr_levels` al lado" — por eso `textoEje` SIEMPRE
 // junta los dos, incluso cuando `cefr_levels` está vacío. Sin ranking: los estudiantes se pintan
 // en el orden que manda el servidor, nunca reordenados por desempeño (el saldo no es desempeño).
+//
+// Segunda pasada de diseño (2026-09-28): cada celda repetía ese texto completo a tamaño normal
+// ("datos insuficientes: Comprehension · B1: 2"), ilegible de un vistazo en la galería. Ahora un
+// chip corto (ícono + palabra) arriba, y el texto completo de `textoEje` abajo en chico — P1 se
+// sigue cumpliendo al pie de la letra: el cefr_levels nunca se separa del estado, solo que ahora
+// ambos viven en la misma celda con jerarquía visual.
 import { h, montar } from '../../ui/dom.js';
 import { textos } from '../../textos.js';
 import { leerLogro } from '../../api/profe.js';
 import { ErrorApi } from '../../api/cliente.js';
 
 const EJES = ['Comprehension', 'Expression', 'Accuracy'];
+
+const CHIPS_POR_ESTADO = {
+  logrado: { icono: '✓', texto: textos.profe.logro.chipLogrado },
+  en_desarrollo: { icono: '↗', texto: textos.profe.logro.chipEnDesarrollo },
+  a_reforzar: { icono: '⚠', texto: textos.profe.logro.chipAReforzar },
+  datos_insuficientes: { icono: '–', texto: textos.profe.logro.chipSinDatos },
+};
 
 /** Pura: "B1: 2, sin_nivel: 1" o el texto de "sin niveles" si el eje no tiene retos todavía. */
 export function textoCefrLevels(cefrLevels) {
@@ -24,9 +37,22 @@ export function textoEje(axisOut) {
   return `${axisOut.label} · ${textoCefrLevels(axisOut.cefr_levels)}`;
 }
 
+/** Ícono + palabra corta para un `status` del servidor — pura, sin DOM. Un status desconocido
+ * (que el servidor de hoy nunca manda) cae en "sin datos", nunca en un chip vacío. */
+export function chipDeEstado(status) {
+  return CHIPS_POR_ESTADO[status] || CHIPS_POR_ESTADO.datos_insuficientes;
+}
+
 function celdaDeEje(estudiante, eje) {
   const axisOut = estudiante.axes.find((a) => a.axis === eje);
-  return h('td', { 'data-testid': `logro-${estudiante.profile_id}-${eje}` }, axisOut ? textoEje(axisOut) : textos.profe.logro.sinNivelesCefr);
+  const chip = chipDeEstado(axisOut?.status);
+  return h(
+    'td', { 'data-testid': `logro-${estudiante.profile_id}-${eje}` },
+    h('div', { class: 'celda-logro' },
+      h('span', { class: `chip-estado chip-estado-${axisOut?.status || 'datos_insuficientes'}` },
+        h('span', { 'aria-hidden': 'true' }, chip.icono), chip.texto),
+      h('span', { class: 'detalle-logro' }, axisOut ? textoEje(axisOut) : textos.profe.logro.sinNivelesCefr)),
+  );
 }
 
 function filaDeEstudiante(estudiante) {

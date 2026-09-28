@@ -86,6 +86,19 @@ async function iniciarApp() {
   renderEntrada(vista, modo, entrarUnaVez);
 }
 
+// Segunda pasada de diseño: "Cerrar sesión" del profe/admin (ui/barra_rol.js). Recargar es más
+// simple y más robusto que desenredar el estado del router: iniciarApp() vuelve a correr desde
+// cero, ya sin sesión (authActivo.salir() la borró), y cae directo en renderEntrada().
+async function cerrarSesion() {
+  try {
+    await authActivo.salir();
+  } catch (e) {
+    console.error('app: no se pudo cerrar sesión', e); // nunca un catch mudo
+  } finally {
+    location.reload();
+  }
+}
+
 // Sin X-Tenant-ID: los actores sintéticos (hito 0-1) tienen un solo colegio, y su id de verdad
 // lo genera mock_api.mjs en cada arranque — mandar el "demo" de mock.js chocaría con el real. El
 // servidor usa la única membresía del actor cuando no se lo mandamos.
@@ -95,6 +108,7 @@ function conCtx(fn) {
     // Solo supabase_rest.js la trae (W22): mock.js y perfil_actual.js no soportan cambiar
     // contraseña, y las vistas (inicio.js, perfil.js) usan esto para no ofrecer un enlace muerto.
     cambiarContrasena: typeof authActivo.cambiarContrasena === 'function' ? authActivo.cambiarContrasena : undefined,
+    salir: cerrarSesion,
   });
 }
 

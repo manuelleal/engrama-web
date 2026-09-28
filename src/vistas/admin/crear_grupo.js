@@ -9,6 +9,7 @@ import { crearGrupo } from '../../api/admin.js';
 import { listarGrupos } from '../../api/profe.js';
 import { accionUnica, ErrorApi } from '../../api/cliente.js';
 import { ligarEscrituraARed } from '../../ui/red.js';
+import { crearBarraRol } from '../../ui/barra_rol.js';
 
 function filaDeGrupo(grupo) {
   return h(
@@ -70,6 +71,7 @@ async function pintarVista(raiz, ctx, mensajePrevio) {
   );
   montar(raiz, h(
     'div', { 'data-testid': 'vista-admin-crear-grupo' },
+    crearBarraRol(ctx),
     h('h1', {}, textos.admin.grupos.titulo),
     form,
     listaDeGrupos(grupos),
@@ -79,18 +81,18 @@ async function pintarVista(raiz, ctx, mensajePrevio) {
   window.addEventListener('hashchange', cancelarRed, { once: true });
 }
 
-function pintarError(raiz, mensaje) {
-  montar(raiz, h('div', { 'data-testid': 'vista-admin-crear-grupo' }, h('h1', {}, textos.admin.crearGrupo.titulo), h('p', { role: 'alert' }, mensaje)));
+function pintarError(raiz, mensaje, ctx) {
+  montar(raiz, h('div', { 'data-testid': 'vista-admin-crear-grupo' }, crearBarraRol(ctx), h('h1', {}, textos.admin.crearGrupo.titulo), h('p', { role: 'alert' }, mensaje)));
   document.body.dataset.listo = '1';
 }
 
-/** @param {HTMLElement} raiz @param {{token: string, tenantId?: string}} ctx */
+/** @param {HTMLElement} raiz @param {{token: string, tenantId?: string, salir?: () => Promise<void>}} ctx */
 export async function renderCrearGrupo(raiz, ctx) {
   montar(raiz, h('div', { 'data-testid': 'vista-admin-crear-grupo' }, h('p', { role: 'status' }, textos.inicio.cargando)));
   try {
     await pintarVista(raiz, ctx);
   } catch (e) {
     console.warn('vistas/admin/crear_grupo: no se pudo cargar', e);
-    pintarError(raiz, e instanceof ErrorApi ? e.mensaje : textos.admin.grupos.errorGeneral);
+    pintarError(raiz, e instanceof ErrorApi ? e.mensaje : textos.admin.grupos.errorGeneral, ctx);
   }
 }

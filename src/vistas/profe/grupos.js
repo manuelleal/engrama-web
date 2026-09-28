@@ -5,6 +5,7 @@ import { h, montar } from '../../ui/dom.js';
 import { textos } from '../../textos.js';
 import { listarGrupos } from '../../api/profe.js';
 import { ErrorApi } from '../../api/cliente.js';
+import { crearBarraRol } from '../../ui/barra_rol.js';
 
 function filaDeGrupo(grupo) {
   return h(
@@ -16,12 +17,13 @@ function filaDeGrupo(grupo) {
   );
 }
 
-function pintarLista(raiz, grupos) {
+function pintarLista(raiz, grupos, ctx) {
   const cuerpo = grupos.length === 0
     ? h('p', { role: 'status' }, textos.profe.grupos.sinGrupos)
     : h('ul', {}, ...grupos.map(filaDeGrupo));
   montar(raiz, h(
     'div', { 'data-testid': 'vista-profe-grupos' },
+    crearBarraRol(ctx),
     h('h1', {}, textos.profe.grupos.titulo),
     h('nav', {}, h('a', { href: '#/profe/retos', 'data-testid': 'ir-a-retos-profe' }, textos.profe.grupo.verRetos)),
     cuerpo,
@@ -29,19 +31,19 @@ function pintarLista(raiz, grupos) {
   document.body.dataset.listo = '1';
 }
 
-function pintarError(raiz, mensaje) {
-  montar(raiz, h('div', { 'data-testid': 'vista-profe-grupos' }, h('h1', {}, textos.profe.grupos.titulo), h('p', { role: 'alert' }, mensaje)));
+function pintarError(raiz, mensaje, ctx) {
+  montar(raiz, h('div', { 'data-testid': 'vista-profe-grupos' }, crearBarraRol(ctx), h('h1', {}, textos.profe.grupos.titulo), h('p', { role: 'alert' }, mensaje)));
   document.body.dataset.listo = '1';
 }
 
-/** @param {HTMLElement} raiz @param {{token: string, tenantId?: string}} ctx */
+/** @param {HTMLElement} raiz @param {{token: string, tenantId?: string, salir?: () => Promise<void>}} ctx */
 export async function renderGrupos(raiz, ctx) {
   montar(raiz, h('div', { 'data-testid': 'vista-profe-grupos' }, h('p', { role: 'status' }, textos.inicio.cargando)));
   try {
     const grupos = await listarGrupos(ctx);
-    pintarLista(raiz, grupos);
+    pintarLista(raiz, grupos, ctx);
   } catch (e) {
     console.warn('vistas/profe/grupos: no se pudo cargar', e);
-    pintarError(raiz, e instanceof ErrorApi ? e.mensaje : textos.profe.grupos.errorGeneral);
+    pintarError(raiz, e instanceof ErrorApi ? e.mensaje : textos.profe.grupos.errorGeneral, ctx);
   }
 }

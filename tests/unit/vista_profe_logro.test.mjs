@@ -4,7 +4,7 @@
 // cefr_levels al lado"; y ni la etiqueta del servidor ni esta vista dicen "débil"/"weak".
 import test from 'node:test';
 import assert from 'node:assert/strict';
-import { textoCefrLevels, textoEje } from '../../src/vistas/profe/logro.js';
+import { textoCefrLevels, textoEje, chipDeEstado } from '../../src/vistas/profe/logro.js';
 import { textos } from '../../src/textos.js';
 
 test('textoCefrLevels: con niveles, los lista', () => {
@@ -32,5 +32,25 @@ for (const eje of EJES_DE_MUESTRA) {
 
   test(`textoEje: "${eje.status}" nunca dice "débil" ni "weak"`, () => {
     assert.doesNotMatch(textoEje(eje), /débil|weak/i);
+  });
+}
+
+// Segunda pasada de diseño (2026-09-28): el chip corto (ícono + palabra) de cada estado real del
+// servidor — nunca "débil"/"weak", mismo vocabulario que P1.
+test('chipDeEstado: los 4 estados reales del servidor tienen su propio chip', () => {
+  assert.deepEqual(chipDeEstado('logrado'), { icono: '✓', texto: textos.profe.logro.chipLogrado });
+  assert.deepEqual(chipDeEstado('en_desarrollo'), { icono: '↗', texto: textos.profe.logro.chipEnDesarrollo });
+  assert.deepEqual(chipDeEstado('a_reforzar'), { icono: '⚠', texto: textos.profe.logro.chipAReforzar });
+  assert.deepEqual(chipDeEstado('datos_insuficientes'), { icono: '–', texto: textos.profe.logro.chipSinDatos });
+});
+
+test('chipDeEstado: un status desconocido (o sin eje) cae en "sin datos", nunca en un chip vacío', () => {
+  assert.deepEqual(chipDeEstado(undefined), chipDeEstado('datos_insuficientes'));
+  assert.deepEqual(chipDeEstado('cualquier_cosa'), chipDeEstado('datos_insuficientes'));
+});
+
+for (const eje of EJES_DE_MUESTRA) {
+  test(`chipDeEstado: "${eje.status}" nunca dice "débil" ni "weak"`, () => {
+    assert.doesNotMatch(chipDeEstado(eje.status).texto, /débil|weak/i);
   });
 }

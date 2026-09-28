@@ -1,0 +1,7 @@
+{
+  "descripcion": "Segunda pasada de diseño: el profe ve un uuid como título del grupo — vuelve a `Grupo ${gid}` en vez de resolver el group_code con T1 (listarGrupos)",
+  "archivos": { "src/vistas/profe/grupo.js": "grupo.js" },
+  "comando": ["node", "--test", "--test-reporter=tap", "tests/e2e/profe.test.mjs"],
+  "espera_codigo_no_cero": true,
+  "espera_fallan_tests": ["T1/T2: el profe ve sus grupos y el roster del propio (nombre, constancia, sin saldo)"]
+}

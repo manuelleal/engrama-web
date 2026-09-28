@@ -1,27 +1,18 @@
 // @ts-check
+// TRAMPOSO — versión de antes de la segunda pasada de diseño: el título muestra "Grupo <uuid>"
+// crudo (nunca resuelve el group_code con T1) en vez del código legible del grupo.
 // vistas/profe/grupo.js · W10 (T2): el roster del grupo — nombre, constancia y última asistencia,
 // sin saldo (grupos §2.2). Un grupo ajeno da 404 en el servidor y esta vista SOLO muestra "No
 // encontrado": nunca pinta un nombre de un roster que no le pertenece (X4, la garantía real vive
 // en las 48 celdas prohibidas de F4 — el E2E, no el cliente, es quien detecta la fuga).
-//
-// Segunda pasada de diseño (2026-09-28): el título mostraba "Grupo <uuid>" crudo — T2 no trae el
-// group_code. Se pide T1 (listarGrupos, que ya lo trae) en paralelo con T2 y se busca el `gid` de
-// la URL en esa lista; si por lo que sea no aparece (nunca debería, ver X4 abajo), el título
-// genérico nunca cae al uuid.
 import { h, montar } from '../../ui/dom.js';
 import { textos } from '../../textos.js';
-import { listarEstudiantes, listarGrupos } from '../../api/profe.js';
+import { listarEstudiantes } from '../../api/profe.js';
 import { ErrorApi } from '../../api/cliente.js';
 
 /** Pura: el texto de la última asistencia, o "Sin registro" (U, sin DOM). */
 export function textoUltimaAsistencia(fechaISO) {
   return fechaISO || textos.profe.grupo.sinAsistencia;
-}
-
-/** El group_code de `gid` dentro de la lista de T1 — pura, sin DOM. `null` si no aparece (nunca
- * debería: si T2 respondió, el grupo es visible, y T1 trae los mismos grupos visibles). */
-export function buscarCodigoDeGrupo(grupos, gid) {
-  return grupos.find((g) => g.id === gid)?.group_code ?? null;
 }
 
 function filaDeEstudiante(m) {
@@ -46,10 +37,10 @@ function tablaRoster(estudiantes) {
   );
 }
 
-function pintarGrupo(raiz, gid, codigo, estudiantes) {
+function pintarGrupo(raiz, gid, estudiantes) {
   const nodo = h(
     'div', { 'data-testid': 'vista-profe-grupo' },
-    h('h1', {}, codigo ? textos.profe.grupo.titulo(codigo) : textos.profe.grupo.tituloSinCodigo),
+    h('h1', {}, textos.profe.grupo.titulo(gid)),
     h(
       'nav', {},
       h('a', { href: `#/profe/grupo/${gid}/sesion`, 'data-testid': 'ir-a-sesion' }, textos.profe.grupo.abrirSesion),
@@ -77,8 +68,8 @@ function pintarError(raiz, mensaje) {
 export async function renderGrupo(raiz, params, ctx) {
   montar(raiz, h('div', { 'data-testid': 'vista-profe-grupo' }, h('p', { role: 'status' }, textos.inicio.cargando)));
   try {
-    const [estudiantes, grupos] = await Promise.all([listarEstudiantes(params.gid, ctx), listarGrupos(ctx)]);
-    pintarGrupo(raiz, params.gid, buscarCodigoDeGrupo(grupos, params.gid), estudiantes);
+    const estudiantes = await listarEstudiantes(params.gid, ctx);
+    pintarGrupo(raiz, params.gid, estudiantes);
   } catch (e) {
     console.warn('vistas/profe/grupo: no se pudo cargar', e);
     pintarError(raiz, e instanceof ErrorApi ? e.mensaje : textos.profe.grupo.noEncontrado);

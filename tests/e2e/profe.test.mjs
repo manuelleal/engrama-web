@@ -53,11 +53,15 @@ test(
 
       const r2 = await revisarPagina({
         url: `${url}#/profe/grupo/${propio.id}`, ancho: 375, alto: 812, espera_ms: 5000, pre: YA_ENTRO_DOCENTE,
-        eval: `(async () => { await new Promise((r) => setTimeout(r, 300)); return document.body.textContent; })()`,
+        eval: `(async () => { await new Promise((r) => setTimeout(r, 300)); return { cuerpo: document.body.textContent, h1: document.querySelector('h1')?.textContent ?? null }; })()`,
       });
-      assert.match(r2.eval, /Ana Sintetica/);
-      assert.match(r2.eval, /Beto Sintetico/);
-      assert.doesNotMatch(r2.eval, /\bcoins?\b/i, 'el roster no muestra saldo (grupos §2.2)');
+      assert.match(r2.eval.cuerpo, /Ana Sintetica/);
+      assert.match(r2.eval.cuerpo, /Beto Sintetico/);
+      assert.doesNotMatch(r2.eval.cuerpo, /\bcoins?\b/i, 'el roster no muestra saldo (grupos §2.2)');
+      // Segunda pasada de diseño: el título muestra el código del grupo (T1 ya lo trae), nunca el
+      // uuid crudo — navegación DIRECTA por URL, sin pasar por el enlace de grupos.js.
+      assert.match(r2.eval.h1, /SINT-B1-01/, 'el título debe mostrar el código del grupo, no "Grupo <uuid>"');
+      assert.doesNotMatch(r2.eval.h1, new RegExp(propio.id), 'el uuid del grupo nunca debe aparecer como título');
     }, { estado });
   },
 );
