@@ -5,7 +5,7 @@
 // cómo queda configurado — §12, bloqueo 4).
 import { vaciar } from './ui/dom.js';
 
-/** @typedef {(raiz: HTMLElement, params: Record<string,string>) => void|Promise<void>} Render */
+/** @typedef {(raiz: HTMLElement, params: Record<string,string>, query: Record<string,string>) => void|Promise<void>} Render */
 
 const rutas = []; // { patron: RegExp, nombres: string[], render: Render }
 let porDefecto = '/inicio';
@@ -42,16 +42,17 @@ export function definirPorDefecto(ruta) {
 
 function resolverHash() {
   const crudo = location.hash.replace(/^#/, '') || porDefecto;
-  const [camino] = crudo.split('?');
+  const [camino, cadenaQuery] = crudo.split('?');
+  const query = Object.fromEntries(new URLSearchParams(cadenaQuery || ''));
   for (const r of rutas) {
     const m = r.patron.exec(camino);
     if (m) {
       const params = {};
       r.nombres.forEach((n, i) => { params[n] = decodeURIComponent(m[i + 1]); });
-      return { render: r.render, params };
+      return { render: r.render, params, query };
     }
   }
-  return rutaNoEncontrada ? { render: rutaNoEncontrada, params: {} } : null;
+  return rutaNoEncontrada ? { render: rutaNoEncontrada, params: {}, query } : null;
 }
 
 async function renderizarActual() {
@@ -59,7 +60,7 @@ async function renderizarActual() {
   const resuelto = resolverHash();
   vaciar(raizVista);
   if (!resuelto) return;
-  await resuelto.render(raizVista, resuelto.params);
+  await resuelto.render(raizVista, resuelto.params, resuelto.query);
 }
 
 /**

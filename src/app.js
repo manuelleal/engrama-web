@@ -5,6 +5,7 @@ import { ruta, definirPorDefecto, iniciar } from './rutas.js';
 import * as auth from './auth/mock.js'; // ENGRAMA_AUTH=mock (§7.4); perfil_actual/supabase_rest llegan con W22
 import { renderEntrada } from './vistas/entrada.js';
 import { renderInicio } from './vistas/estudiante/inicio.js';
+import { renderAsistencia } from './vistas/estudiante/asistencia.js';
 
 function registrarServiceWorker() {
   if (!('serviceWorker' in navigator)) return;
@@ -48,6 +49,10 @@ function arrancarConSesion(vista, sesion) {
     // verdad lo genera mock_api.mjs en cada arranque — mandar el "demo" de mock.js chocaría con
     // el real. El servidor usa la única membresía del actor cuando no se lo mandamos.
     await renderInicio(raiz, { sesion, token });
+  });
+  ruta('/asistencia', async (raiz, params, query) => {
+    const token = await auth.token();
+    renderAsistencia(raiz, query, { token });
   });
   iniciar(vista);
 }

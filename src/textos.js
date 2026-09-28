@@ -27,4 +27,17 @@ export const textos = {
     sinSesion: 'No hay una sesión activa',
     actorDesconocido: (t) => `Actor desconocido: "${t}"`,
   },
+  asistencia: {
+    titulo: 'Asistencia',
+    etiquetaCodigo: 'Código de la sesión',
+    marcar: 'Marcar asistencia',
+    marcando: 'Marcando…',
+    sinRed: 'Sin conexión: no puedes marcar asistencia ahora.',
+    /** @param {number} monedas @param {number} racha */
+    exito: (monedas, racha) => `Asistencia marcada · +${monedas} monedas · constancia ${racha}`,
+    codigoInvalido: 'Código no válido para tu grupo.',
+    yaMarcada: 'Ya habías marcado esta sesión.',
+    sesionVencida: 'Esta sesión ya venció.',
+    faltaCodigo: 'Escribe el código de la sesión.',
+  },
 };

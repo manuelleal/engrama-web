@@ -6,7 +6,7 @@
 import { crearServidor } from '../../herramientas/servidor_dev.mjs';
 import { crearMockApi } from '../../herramientas/mock_api.mjs';
 import { crearEstado, ADMIN_BOOTSTRAP_TOKEN } from '../../herramientas/mock/estado.mjs';
-import { crearGrupo, importarCsv } from '../../herramientas/mock/rutas_admin.mjs';
+import { crearGrupo, asignarDocente, importarCsv } from '../../herramientas/mock/rutas_admin.mjs';
 
 function reqAdmin() {
   return { headers: { authorization: `Bearer ${ADMIN_BOOTSTRAP_TOKEN}` } };
@@ -16,6 +16,7 @@ function reqAdmin() {
 export function estadoConEstudiantesSembrados() {
   const estado = crearEstado();
   const { cuerpo: grupo } = crearGrupo(estado, reqAdmin(), { group_code: 'SINT-B1-01' });
+  asignarDocente(estado, reqAdmin(), grupo.id, { documento_id: 'DOCENTE-DEMO' });
   importarCsv(estado, reqAdmin(), grupo.id, 'documento_id,nombre_completo\nest-1,Ana Sintetica\nest-2,Beto Sintetico\n');
   return estado;
 }

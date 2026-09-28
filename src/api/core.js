@@ -17,3 +17,15 @@ export async function leerHistorialMonedas({ token, tenantId, limite = 20 }) {
 export async function leerHistorialAsistencia({ token, tenantId, limite = 30 }) {
   return pedirJson(`/core/attendance/history?limit=${limite}`, { token, tenantId });
 }
+
+/**
+ * POST /core/attendance/check-in → CheckInResult. La ubicación es opcional y nunca bloquea
+ * (§4.4, "el cliente manda la ubicación solo si el estudiante la concede, y nunca bloquea").
+ * @param {{token: string, tenantId?: string, codigo: string, latitud?: number, longitud?: number}} datos
+ */
+export async function marcarAsistencia({ token, tenantId, codigo, latitud, longitud }) {
+  return pedirJson('/core/attendance/check-in', {
+    metodo: 'POST', token, tenantId,
+    cuerpo: { session_code: codigo, latitude: latitud ?? null, longitude: longitud ?? null },
+  });
+}

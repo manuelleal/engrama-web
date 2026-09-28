@@ -8,7 +8,7 @@
 //
 // Súbelo un número cada vez que cambie la lista de precarga o la estrategia; la `activate`
 // borra cualquier caché con otro nombre.
-const VERSION = 'engrama-shell-v3';
+const VERSION = 'engrama-shell-v4';
 
 // Cada encargo agrega los suyos en su propio commit (W7: Inicio + api/cliente,core,retos + los
 // SVG de Drako que usa el estudiante). El shell debe abrir sin red con lo de aquí, nada más.
@@ -31,6 +31,8 @@ const PRECARGA = [
   '/src/auth/mock.js',
   '/src/vistas/entrada.js',
   '/src/vistas/estudiante/inicio.js',
+  '/src/vistas/estudiante/asistencia.js',
+  '/src/ui/retro.js',
   '/src/api/cliente.js',
   '/src/api/core.js',
   '/src/api/retos.js',
