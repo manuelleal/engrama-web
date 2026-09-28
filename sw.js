@@ -8,7 +8,7 @@
 //
 // Súbelo un número cada vez que cambie la lista de precarga o la estrategia; la `activate`
 // borra cualquier caché con otro nombre.
-const VERSION = 'engrama-shell-v11';
+const VERSION = 'engrama-shell-v12';
 
 // Cada encargo agrega los suyos en su propio commit (W7: Inicio + api/cliente,core,retos + los
 // SVG de Drako que usa el estudiante; W10: profe/grupos,grupo,sesion_asistencia + api/profe). El
@@ -42,6 +42,11 @@ const PRECARGA = [
   '/src/ui/sonido.js',
   '/src/ui/titulo.js',
   '/src/ui/nav_inferior.js',
+  // Segunda pasada de diseño (2026-09-28): confeti (inicio/asistencia/revisión) y la barra con
+  // "Cerrar sesión" del profe/admin (grupos, crear_grupo) — nuevos módulos que app.js ya importa
+  // de forma transitiva para cualquier rol, así que van aquí como todos los demás (arriba).
+  '/src/ui/confeti.js',
+  '/src/ui/barra_rol.js',
   '/src/auth/mock.js',
   '/src/vistas/entrada.js',
   '/src/vistas/perfil.js', // W22: import estático de app.js

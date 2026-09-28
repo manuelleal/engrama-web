@@ -414,16 +414,33 @@ nav {
   color: var(--superficie);
 }
 
+/* Segunda pasada de diseño (2026-09-28): antes flotaba a mitad de pantalla (`margin` en vez de
+   `position: fixed`, la galería lo mostraba pegado justo debajo del contenido corto). Ahora
+   queda FIJA abajo con `env(safe-area-inset-bottom)` para no meterse bajo la barra del sistema en
+   un celular con gesto/notch; `#vista:has(.nav-inferior)` (más abajo) reserva el espacio para que
+   el contenido nunca quede tapado detrás. */
 .nav-inferior {
   display: flex;
   justify-content: space-around;
   align-items: center;
   gap: 4px;
+  position: fixed;
+  left: 50%;
+  bottom: 0;
+  transform: translateX(-50%);
+  width: 100%;
+  max-width: 480px;
   background: var(--superficie);
   border-top: 2px solid var(--borde);
   border-radius: var(--radio-md) var(--radio-md) 0 0;
-  padding: 8px 4px;
-  margin: 20px -16px -16px;
+  padding: 8px 4px calc(8px + env(safe-area-inset-bottom));
+  margin: 0;
+  z-index: 10;
+}
+/* El espacio que la nav fija le quita al final del scroll — para toda vista del estudiante que la
+   use (Inicio, Retos, Asistencia, Revisión), sin tocar cada vista.js uno por uno. */
+#vista:has(.nav-inferior) {
+  padding-bottom: calc(88px + env(safe-area-inset-bottom));
 }
 .nav-inferior a {
   display: flex;
@@ -444,3 +461,118 @@ nav {
   color: var(--primario);
   background: color-mix(in srgb, var(--primario) 10%, white);
 }
+
+/* ---------- Segunda pasada de diseño (2026-09-28): panel del profe y del admin en portátil.
+   `#vista` es compartido con el estudiante (375px de referencia, §9.4); estas dos reglas SOLO
+   ensanchan las vistas de esos dos roles, y solo desde 900px — en celular ninguna cambia.
+   `:has()` evita tocar rutas.js o cada vista.js: basta con que la vista traiga su propio
+   data-testid raíz, que todas ya tienen. ---------- */
+@media (min-width: 900px) {
+  #vista:has([data-testid^="vista-profe-"]),
+  #vista:has([data-testid="vista-sesion-asistencia"]),
+  #vista:has([data-testid^="vista-admin-"]) {
+    max-width: 1100px;
+  }
+  /* Con el ancho de sobra ya no hace falta partir "Comprehension" en dos líneas (la galería lo
+     mostraba cortado en "COMPREHENSI/ON"). Solo la tabla de logro (3 columnas anchas): la de
+     errores tiene 6 columnas y un encabezado largo ("Opción más elegida por error") que SÍ
+     necesita envolver, o `nowrap` lo recorta contra el `overflow: hidden` de la tabla — a 375px
+     ninguna de las dos cambia. */
+  #vista [data-testid="tabla-logro"] th {
+    white-space: nowrap;
+  }
+  /* Los chips de logro también pueden ir en una sola línea aquí (ver la nota junto a
+     .chip-estado, más abajo): a 375px se envuelven a propósito. */
+  #vista [data-testid="tabla-logro"] .chip-estado {
+    white-space: nowrap;
+  }
+}
+
+/* Barra de la pantalla de entrada del profe y del admin (Mis grupos, Crear grupo): esos dos roles
+   no tienen la navegación inferior del estudiante, así que este es su único "Cerrar sesión"
+   visible (usa auth/*.salir(), §7.4). */
+.barra-rol {
+  display: flex;
+  justify-content: flex-end;
+  margin-bottom: 12px;
+}
+
+/* ---------- Logro por eje (profe/logro.js): antes cada celda repetía el label crudo del servidor
+   a tamaño normal ("datos insuficientes: Comprehension · B1: 2"), ilegible en la galería. Ahora un
+   chip con ícono + palabra corta para escanear la tabla de un vistazo; el texto completo
+   (textoEje: label + cefr_levels, P1) sigue viviendo debajo en texto chico — nunca se pierde
+   información, solo se jerarquiza. ---------- */
+.celda-logro {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+/* El texto completo de textoEje (label + cefr_levels, P1) bajo el chip: chico, pero en minúsculas
+   normales — a diferencia de .texto-apoyo (mayúsculas, pensado para una etiqueta corta), una
+   frase completa en mayúsculas se lee como si gritara. */
+.detalle-logro {
+  font-size: 0.78rem;
+  color: color-mix(in srgb, var(--texto) 60%, white);
+  margin: 0;
+}
+.chip-estado {
+  display: inline-flex;
+  align-items: center;
+  gap: 5px;
+  width: fit-content;
+  font-family: var(--fuente-titulos);
+  font-weight: 700;
+  font-size: 0.8rem;
+  padding: 3px 10px;
+  border-radius: var(--radio-sm);
+  /* Sin `nowrap` a propósito: a 375px, con 4 columnas de ~85px, un chip como "A reforzar" en una
+     sola línea se sale del borde derecho de la tabla (medido en la galería). Se envuelve a 2
+     líneas ahí; `nowrap` solo se activa desde 900px (misma regla que los encabezados, más abajo),
+     donde ya hay espacio de sobra. */
+}
+.chip-estado-logrado {
+  background: var(--correcto-fondo);
+  color: var(--correcto);
+}
+.chip-estado-en_desarrollo {
+  background: color-mix(in srgb, var(--oro) 30%, white);
+  color: var(--oro-texto);
+}
+.chip-estado-a_reforzar {
+  background: var(--incorrecto-fondo);
+  color: var(--incorrecto);
+}
+.chip-estado-datos_insuficientes {
+  background: color-mix(in srgb, var(--texto) 8%, white);
+  color: color-mix(in srgb, var(--texto) 60%, white);
+}
+
+/* ---------- Confeti sutil (referencia de solo lectura: coins-mvp/student.html,
+   confetti-piece/confetti-burst — acá con los tokens de Navy Real, nunca sus colores) al marcar
+   asistencia o ganar monedas de un reto (ui/confeti.js). Es puro CSS: el apagador global de
+   animaciones de base.css (@media prefers-reduced-motion) ya lo neutraliza sin lógica aparte. ---------- */
+.confeti {
+  position: fixed;
+  inset: 0;
+  overflow: hidden;
+  pointer-events: none;
+  z-index: 30;
+}
+.confeti-pieza {
+  position: absolute;
+  top: -10px;
+  width: 8px;
+  height: 8px;
+  border-radius: 2px;
+  opacity: 0.9;
+  animation: confeti-caida 900ms ease-in forwards;
+}
+@keyframes confeti-caida {
+  to { transform: translateY(140px) rotate(220deg); opacity: 0; }
+}
+.confeti-pieza:nth-child(6n+1) { left: 8%; background: var(--oro); animation-delay: 0ms; }
+.confeti-pieza:nth-child(6n+2) { left: 22%; background: var(--primario); animation-delay: 60ms; }
+.confeti-pieza:nth-child(6n+3) { left: 38%; background: var(--secundario); animation-delay: 30ms; }
+.confeti-pieza:nth-child(6n+4) { left: 55%; background: var(--correcto); animation-delay: 90ms; }
+.confeti-pieza:nth-child(6n+5) { left: 72%; background: var(--oro); animation-delay: 45ms; }
+.confeti-pieza:nth-child(6n) { left: 88%; background: var(--primario); animation-delay: 75ms; }

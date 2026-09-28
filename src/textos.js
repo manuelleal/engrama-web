@@ -15,12 +15,32 @@ export const textos = {
     retos: (n) => (n === 0 ? 'No tienes retos pendientes' : n === 1 ? 'Tienes 1 reto' : `Tienes ${n} retos`),
     drakoBienvenida: 'Drako te da la bienvenida',
     errorGeneral: 'No se pudo cargar tu perfil.',
+    // Segunda pasada de diseño (2026-09-28): saludo sin calificar (010 — Drako presenta, nunca
+    // pone nota) y la tarjeta del reto de hoy. Nunca "Hola, undefined": si el nombre no llegó
+    // (visto contra el backend real, W22, con una membresía sin full_name todavía), un saludo
+    // genérico es mejor que mostrar el hueco del dato.
+    /** @param {string} [nombre] */
+    saludo: (nombre) => (nombre ? `Hola, ${nombre}` : 'Hola'),
+    retoDeHoyTitulo: 'Tu reto de hoy',
+    sinRetoPendiente: 'No tienes retos pendientes. ¡Vas al día!',
+    // Progreso simple de la semana: solo cuenta lo que ya llega del servidor (historial de
+    // intentos y de asistencia); nunca inventa una racha ni un porcentaje que el backend no dé.
+    progresoSemanaTitulo: 'Esta semana',
+    /** @param {number} n */
+    retosEstaSemana: (n) => (n === 1 ? '1 reto completado' : `${n} retos completados`),
+    /** @param {number} n */
+    asistenciasEstaSemana: (n) => (n === 1 ? '1 asistencia marcada' : `${n} asistencias marcadas`),
   },
   nav: {
     // Pulido visual (2026-09-28): la navegación inferior del estudiante. Retos y Asistencia
     // reusan sus propios títulos (textos.retos.titulo, textos.asistencia.titulo) — un solo lugar
     // para cada nombre de pantalla.
     inicio: 'Inicio',
+    // Segunda pasada de diseño: el profe y el admin no tienen navegación inferior — su única
+    // salida visible es este botón en la barra de su pantalla de entrada (usa auth/*.salir(), que
+    // ya existe para los tres proveedores).
+    cerrarSesion: 'Cerrar sesión',
+    cerrandoSesion: 'Cerrando…',
   },
   red: {
     sinConexionPrefijo: 'Sin conexión · actualizado',
@@ -122,6 +142,9 @@ export const textos = {
     grupo: {
       /** @param {string} codigo */
       titulo: (codigo) => `Grupo ${codigo}`,
+      // Segunda pasada de diseño: si por lo que sea el código todavía no llegó (T1 no lo trajo),
+      // NUNCA se cae al uuid crudo — mejor un título genérico que un id ilegible (y filtrable).
+      tituloSinCodigo: 'Grupo',
       noEncontrado: 'No encontrado.',
       sinEstudiantes: 'Este grupo no tiene estudiantes inscritos todavía.',
       columnaNombre: 'Nombre',
@@ -160,6 +183,13 @@ export const textos = {
       // en_desarrollo, logrado, datos_insuficientes) — el cliente solo la muestra tal cual.
       sinNivelesCefr: '(sin retos con nivel)',
       columnaEstudiante: 'Estudiante',
+      // Segunda pasada de diseño: chip corto por eje (ícono + palabra), con el mismo vocabulario
+      // del servidor (P1) — nunca "débil"/"weak". El detalle completo (textoEje: label + niveles)
+      // sigue viviendo debajo, en texto chico, así que nunca se pierde información (P1).
+      chipLogrado: 'Logrado',
+      chipEnDesarrollo: 'En camino',
+      chipAReforzar: 'A reforzar',
+      chipSinDatos: 'Sin datos',
     },
     errores: {
       titulo: 'Errores por ítem',
