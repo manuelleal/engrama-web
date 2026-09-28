@@ -8,7 +8,7 @@
 //
 // Súbelo un número cada vez que cambie la lista de precarga o la estrategia; la `activate`
 // borra cualquier caché con otro nombre.
-const VERSION = 'engrama-shell-v6';
+const VERSION = 'engrama-shell-v7';
 
 // Cada encargo agrega los suyos en su propio commit (W7: Inicio + api/cliente,core,retos + los
 // SVG de Drako que usa el estudiante; W10: profe/grupos,grupo,sesion_asistencia + api/profe). El
@@ -48,6 +48,8 @@ const PRECARGA = [
   '/src/vistas/profe/grupos.js',
   '/src/vistas/profe/grupo.js',
   '/src/vistas/profe/sesion_asistencia.js',
+  '/src/vistas/profe/logro.js',
+  '/src/vistas/profe/errores.js',
 ];
 
 // Nunca se cachea nada bajo estas rutas, ni de lectura: son del profe/admin, no "datos propios

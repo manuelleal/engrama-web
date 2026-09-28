@@ -108,5 +108,31 @@ export const textos = {
       errorCerrar: 'No se pudo cerrar la sesión.',
       volverAlGrupo: 'Volver al grupo',
     },
+    logro: {
+      titulo: 'Logro por eje',
+      volverAlGrupo: 'Volver al grupo',
+      sinEstudiantes: 'Este grupo no tiene estudiantes con retos respondidos todavía.',
+      errorGeneral: 'No se pudo cargar el logro del grupo.',
+      // Nunca "débil": el saldo no es desempeño, y la etiqueta la arma el servidor (a_reforzar,
+      // en_desarrollo, logrado, datos_insuficientes) — el cliente solo la muestra tal cual.
+      sinNivelesCefr: '(sin retos con nivel)',
+      columnaEstudiante: 'Estudiante',
+    },
+    errores: {
+      titulo: 'Errores por ítem',
+      volverAlGrupo: 'Volver al grupo',
+      sinItems: 'Todavía no hay suficientes respuestas para mostrar errores por ítem.',
+      errorGeneral: 'No se pudo cargar los errores del grupo.',
+      columnaReto: 'Reto',
+      columnaPregunta: 'Pregunta',
+      columnaRespondientes: 'Respondientes',
+      /** "errors - blank_answers" (P4 del pedagogo, ESPEC_grupos_y_panel_docente.md §5) */
+      columnaErroresConRespuesta: 'Errores con respuesta',
+      columnaEnBlanco: 'En blanco',
+      columnaDistractorTop: 'Opción más elegida por error',
+      sinDistractor: '—',
+      /** @param {number} n */
+      suprimidos: (n) => (n === 0 ? '' : `${n} ítem(s) sin mostrar por privacidad (menos del mínimo de respondientes).`),
+    },
   },
 };

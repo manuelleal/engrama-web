@@ -31,3 +31,17 @@ export async function abrirSesion(gid, { token, tenantId, duracionMinutos }) {
 export async function cerrarSesion(sid, { token, tenantId }) {
   return pedirJson(`/teachers/attendance-sessions/${sid}/close`, { metodo: 'POST', token, tenantId });
 }
+
+/**
+ * T5 — GET /teachers/groups/{gid}/achievement (W11). Logro por eje, siempre con `cefr_levels`
+ * al lado del estado (P1 del pedagogo); el saldo NO es desempeño, así que esto nunca trae
+ * monedas ni las pide.
+ */
+export async function leerLogro(gid, { token, tenantId }) {
+  return pedirJson(`/teachers/groups/${gid}/achievement`, { token, tenantId });
+}
+
+/** T7 — GET /teachers/groups/{gid}/item-errors (W11): errores por ítem, suprimidos bajo el mínimo de respondientes. */
+export async function leerErroresDeItem(gid, { token, tenantId }) {
+  return pedirJson(`/teachers/groups/${gid}/item-errors`, { token, tenantId });
+}
