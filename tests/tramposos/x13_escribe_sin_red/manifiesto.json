@@ -1,0 +1,7 @@
+{
+  "descripcion": "X13: 'Abrir sesión'/'Cerrar sesión' ignoran la red — sin conexión el botón sigue activo y sin aviso, en silencio (W16, ESPEC_mvp_uis.md §7.3/§9.5, criterio E10)",
+  "archivos": { "src/vistas/profe/sesion_asistencia.js": "sesion_asistencia.js" },
+  "comando": ["node", "--test", "--test-reporter=tap", "tests/e2e/sin_red_profe_admin.test.mjs"],
+  "espera_codigo_no_cero": true,
+  "espera_fallan_tests": ["E10: sesión de asistencia — sin red, \"Cerrar sesión\" se deshabilita y el código/enlace se quedan (último estado conocido)"]
+}

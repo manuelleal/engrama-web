@@ -155,6 +155,11 @@ async function revisarConSesion(cdp, op) {
   // `tras`: para probar "visita con red, después sin red" (E7/E9, W16) en una sola sesión de
   // navegador — el service worker instalado en la primera pasada solo sirve si sigue siendo el
   // mismo perfil, y cada llamada a revisarPagina() usa uno desechable.
+  // `tras.sinNavegar` (W16, E10): corta la red SIN recargar la página — así se prueba "último
+  // estado conocido" de verdad (lo que ya está pintado, no lo que una recarga podría volver a
+  // pedir). Sin esto, cada `tras` recargaba con `Page.navigate`, y el profe/admin nunca cachea su
+  // propia respuesta (§7.3, `NUNCA_CACHEAR` en sw.js): una recarga sin red solo probaría el error
+  // genérico, no que el DOM ya pintado se queda tal cual.
   let tras;
   if (op.tras) {
     const erroresTras = [];
@@ -162,7 +167,7 @@ async function revisarConSesion(cdp, op) {
       await s('Network.emulateNetworkConditions', { offline: true, latency: 0, downloadThroughput: 0, uploadThroughput: 0 });
       await cortarRedEnTrabajadores(cdp);
     }
-    await s('Page.navigate', { url: op.tras.url || op.url });
+    if (!op.tras.sinNavegar) await s('Page.navigate', { url: op.tras.url || op.url });
     tras = { ...(await medirYEvaluar(s, op.tras.espera_ms || op.espera_ms || 8000, op.tras.eval, erroresTras)), errores: erroresTras };
   }
 
@@ -172,8 +177,9 @@ async function revisarConSesion(cdp, op) {
 /**
  * Abre una página en Edge/Chrome headless y la revisa. Ver el uso arriba.
  * @param {{url: string, ancho: number, alto: number, sinRed?: boolean, pre?: string, eval?: string,
- *   espera_ms?: number, tras?: {sinRed?: boolean, url?: string, eval?: string, espera_ms?: number}}} op
- *   `tras`: una segunda navegación en la MISMA sesión (para "con red, luego sin red" — E7/E9).
+ *   espera_ms?: number, tras?: {sinRed?: boolean, sinNavegar?: boolean, url?: string, eval?: string, espera_ms?: number}}} op
+ *   `tras`: una segunda pasada en la MISMA sesión (para "con red, luego sin red" — E7/E9); por
+ *   defecto navega de nuevo (recarga), y con `sinNavegar: true` se queda en la misma página (W16, E10).
  */
 export async function revisarPagina(op) {
   if (!op.url || !op.ancho || !op.alto) throw new Error('faltan url, ancho o alto');

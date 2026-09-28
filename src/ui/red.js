@@ -42,3 +42,29 @@ export function crearBannerRed(formatearHora = horaLocal) {
 function horaLocal() {
   return new Date().toLocaleTimeString('es-CO', { hour: '2-digit', minute: '2-digit' });
 }
+
+/**
+ * W16 (§7.3, §9.5 E10): ata uno o más botones que ESCRIBEN a la red — sin conexión quedan
+ * deshabilitados y `avisoNodo` muestra `texto`; con conexión, vuelven a su estado normal, salvo
+ * que `otraCondicionOk` diga lo contrario (p. ej. importar_csv.js: sin archivo elegido, el botón
+ * sigue deshabilitado aunque vuelva la red). No toca peticiones en vuelo: si un botón ya está
+ * deshabilitado porque su propio `manejarX` lo puso así mientras vuela una petición, esta función
+ * solo decide el estado de REPOSO (antes o después de esa petición) — la garantía de una sola
+ * acción por toque (§7.2, `accionUnica`) sigue siendo quien manda mientras la petición está en
+ * vuelo, esta función solo entra quieta en ese instante y el próximo cambio de red la retoma.
+ * El estudiante ya tenía esta garantía (asistencia.js, W8); W16 la generaliza al profe y al admin,
+ * cuyos datos nunca se guardan en disco (§7.3, último punto): lo único "conocido sin red" que
+ * puede verse es lo que YA está pintado en el DOM de esta sesión, nunca releído de una caché.
+ * @param {HTMLButtonElement | HTMLButtonElement[]} botones
+ * @param {HTMLElement} avisoNodo
+ * @param {string} texto
+ * @param {() => boolean} [otraCondicionOk]
+ * @returns {() => void} para cancelar la suscripción (mismo patrón que `crearBannerRed`)
+ */
+export function ligarEscrituraARed(botones, avisoNodo, texto, otraCondicionOk = () => true) {
+  const lista = Array.isArray(botones) ? botones : [botones];
+  return suscribirRed((enLinea) => {
+    avisoNodo.textContent = enLinea ? '' : texto;
+    for (const boton of lista) boton.disabled = !enLinea || !otraCondicionOk();
+  });
+}

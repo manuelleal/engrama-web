@@ -18,6 +18,9 @@ export const textos = {
   },
   red: {
     sinConexionPrefijo: 'Sin conexión · actualizado',
+    // W16 (§7.3, §9.5 E10): una acción del profe o del admin que escribe, deshabilitada sin red.
+    /** @param {string} accion en infinitivo, p. ej. "abrir la sesión" */
+    sinConexionAccion: (accion) => `Sin conexión: no puedes ${accion} ahora.`,
   },
   entrada: {
     titulo: 'Entrar (demo)',
@@ -97,8 +100,10 @@ export const textos = {
       etiquetaDuracion: 'Duración (minutos)',
       abrir: 'Abrir sesión',
       abriendo: 'Abriendo…',
+      accionAbrir: 'abrir la sesión', // W16: infinitivo para textos.red.sinConexionAccion
       cerrar: 'Cerrar sesión',
       cerrando: 'Cerrando…',
+      accionCerrar: 'cerrar la sesión',
       codigoPrefijo: 'Código',
       enlacePrefijo: 'Enlace para el celular',
       /** @param {number} marcaron @param {number} total */
@@ -153,6 +158,7 @@ export const textos = {
       asignado: 'Asignado ✓',
       errorAsignar: 'No se pudo asignar el reto.',
       elegirGrupo: 'Elige un grupo…',
+      accionEscribir: 'activar, desactivar o asignar un reto', // W16: infinitivo para textos.red.sinConexionAccion
     },
   },
   admin: {
@@ -169,6 +175,7 @@ export const textos = {
       etiquetaCupo: 'Cupo máximo (opcional)',
       crear: 'Crear grupo',
       creando: 'Creando…',
+      accionCrear: 'crear el grupo', // W16: infinitivo para textos.red.sinConexionAccion
       creado: 'Grupo creado.',
       faltaCodigo: 'Escribe el código del grupo.',
       errorGeneral: 'No se pudo crear el grupo.',
@@ -179,6 +186,7 @@ export const textos = {
       etiquetaDocumento: 'Documento del docente',
       asignar: 'Asignar',
       asignando: 'Asignando…',
+      accionAsignar: 'asignar el docente', // W16: infinitivo para textos.red.sinConexionAccion
       faltaDocumento: 'Escribe el documento del docente.',
       /** @param {string} resultado 'asignado' | 'ya_estaba' */
       exito: (resultado) => (resultado === 'ya_estaba' ? 'El docente ya estaba asignado a este grupo.' : 'Docente asignado.'),
@@ -191,6 +199,7 @@ export const textos = {
       vistaPrevia: 'Vista previa',
       importar: 'Importar',
       importando: 'Importando…',
+      accionImportar: 'importar el archivo', // W16: infinitivo para textos.red.sinConexionAccion
       faltaArchivo: 'Elige un archivo CSV.',
       /** @param {{creados: number, ya_estaban: number, total: number}} r */
       exito: (r) => `Importado: ${r.creados} nuevo(s), ${r.ya_estaban} ya estaban, de ${r.total} fila(s).`,

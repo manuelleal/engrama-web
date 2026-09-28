@@ -8,6 +8,7 @@ import { textos } from '../../textos.js';
 import { listarTodosLosRetos, cambiarEstadoReto } from '../../api/retos.js';
 import { listarGrupos, asignarReto } from '../../api/profe.js';
 import { accionUnica, ErrorApi } from '../../api/cliente.js';
+import { ligarEscrituraARed } from '../../ui/red.js';
 
 /** Pura (U, sin DOM): el estado siguiente al activar/desactivar — nunca 'archived' desde aquí. */
 export function siguienteEstado(estadoActual) {
@@ -38,7 +39,8 @@ async function manejarCambiarEstado(reto, boton, ctx, cambiarUnaVez) {
   }
 }
 
-async function manejarAsignar(reto, select, boton, ctx, asignarUnaVez) {
+/** @param {{hecho: boolean}} estadoAsignar terminal tras un éxito: W16 no debe reactivarlo al volver la red */
+async function manejarAsignar(reto, select, boton, ctx, asignarUnaVez, estadoAsignar) {
   const gid = select.value;
   if (!gid) return;
   boton.disabled = true; select.disabled = true;
@@ -46,6 +48,7 @@ async function manejarAsignar(reto, select, boton, ctx, asignarUnaVez) {
   try {
     await asignarUnaVez(gid, reto.id, ctx);
     boton.textContent = textos.profe.retos.asignado;
+    estadoAsignar.hecho = true;
   } catch (e) {
     console.warn('vistas/profe/retos: no se pudo asignar', e);
     boton.textContent = e instanceof ErrorApi ? e.mensaje : textos.profe.retos.errorAsignar;
@@ -53,18 +56,27 @@ async function manejarAsignar(reto, select, boton, ctx, asignarUnaVez) {
   }
 }
 
-function filaDeReto(reto, grupos, ctx) {
+// W16 (§7.3, §9.5 E10): activar/desactivar y asignar escriben — sin red, cada botón de cada fila
+// queda deshabilitado con el mismo aviso, arriba de la lista (una fila puede tener docenas de
+// retos; repetir el aviso por fila no ayuda a nadie). "Asignado ✓" es terminal: al volver la red
+// no debe reactivarse (por eso `estadoAsignar` viaja hasta `ligarEscrituraARed`, no solo hasta el
+// manejador — `otraCondicionOk` es justo el gancho que la firma de `red.js` deja para esto).
+/** @param {(cancelar: () => void) => void} registrarCancelable junta los "soltar suscripción" de la fila */
+function filaDeReto(reto, grupos, ctx, avisoRed, registrarCancelable) {
   const botonEstado = h(
     'button', { 'data-testid': `reto-${reto.id}-estado` },
     reto.status === 'active' ? textos.profe.retos.desactivar : textos.profe.retos.activar,
   );
   const cambiarUnaVez = accionUnica(cambiarEstadoReto);
   botonEstado.addEventListener('click', () => manejarCambiarEstado(reto, botonEstado, ctx, cambiarUnaVez));
+  registrarCancelable(ligarEscrituraARed(botonEstado, avisoRed, textos.red.sinConexionAccion(textos.profe.retos.accionEscribir)));
 
   const select = selectorDeGrupo(grupos);
   const botonAsignar = h('button', { 'data-testid': `reto-${reto.id}-asignar` }, textos.profe.retos.asignar);
   const asignarUnaVez = accionUnica(asignarReto);
-  botonAsignar.addEventListener('click', () => manejarAsignar(reto, select, botonAsignar, ctx, asignarUnaVez));
+  const estadoAsignar = { hecho: false };
+  botonAsignar.addEventListener('click', () => manejarAsignar(reto, select, botonAsignar, ctx, asignarUnaVez, estadoAsignar));
+  registrarCancelable(ligarEscrituraARed(botonAsignar, avisoRed, textos.red.sinConexionAccion(textos.profe.retos.accionEscribir), () => !estadoAsignar.hecho));
 
   return h(
     'li', { 'data-testid': `reto-${reto.id}` },
@@ -77,17 +89,22 @@ function filaDeReto(reto, grupos, ctx) {
 }
 
 function pintarLista(raiz, retos, grupos, ctx) {
+  const avisoRed = h('p', { role: 'status', 'data-testid': 'profe-retos-sin-red' });
+  const cancelables = [];
+  const registrar = (c) => cancelables.push(c);
   const cuerpo = retos.length === 0
     ? h('p', { role: 'status' }, textos.profe.retos.sinRetos)
-    : h('ul', {}, ...retos.map((r) => filaDeReto(r, grupos, ctx)));
+    : h('ul', {}, ...retos.map((r) => filaDeReto(r, grupos, ctx, avisoRed, registrar)));
   const nodo = h(
     'div', { 'data-testid': 'vista-profe-retos' },
     h('h1', {}, textos.profe.retos.titulo),
     h('p', { role: 'status', 'data-testid': 'aviso-todo-el-colegio' }, textos.profe.retos.avisoTodoElColegio),
+    avisoRed,
     cuerpo,
   );
   montar(raiz, nodo);
   document.body.dataset.listo = '1';
+  window.addEventListener('hashchange', () => cancelables.forEach((c) => c()), { once: true });
 }
 
 function pintarError(raiz, mensaje) {

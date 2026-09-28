@@ -1,22 +1,16 @@
+// TRAMPOSO X13 — versión rota a propósito: exactamente el archivo previo a W16, sin
+// `ligarEscrituraARed`. "Abrir sesión" y "Cerrar sesión" quedan ACTIVOS sin red, y sin ningún
+// aviso — en silencio, justo lo que §7.3/§9.5 (E10) prohíbe. Prueba que el E2E
+// (tests/e2e/sin_red_profe_admin.test.mjs, "E10: sesión de asistencia…") SÍ detecta la falta.
 // @ts-check
-// vistas/profe/sesion_asistencia.js · W10 (T3/T4 + sondeo de T2): abrir una sesión de
-// asistencia, con el código grande y el enlace para el celular (§4.2: "código grande, enlace y
-// QR" — el QR de Nayuki es W23, con permiso; hasta entonces solo el código y el enlace, como
-// dice §6.3 "el QR del profe se reemplaza por el código grande y el enlace"). Mientras la sesión
-// sigue activa, sondea T2 cada 10 s y muestra "N de M marcaron" (§4.2); cerrar detiene el
-// sondeo y llama T4.
 import { h, montar } from '../../ui/dom.js';
 import { textos } from '../../textos.js';
 import { abrirSesion, cerrarSesion, listarEstudiantes } from '../../api/profe.js';
 import { accionUnica, ErrorApi } from '../../api/cliente.js';
-import { ligarEscrituraARed } from '../../ui/red.js';
 
 const INTERVALO_SONDEO_MS = 10_000;
 
-/** Cuántos del roster marcaron la sesión de hoy — pura, sin red (U, sin DOM). Compara
- * `last_attendance_date` (lo único que trae T2) contra la fecha de la sesión: es la misma
- * aproximación que fija la espec ("sondeando T2 cada 10 s"), buena mientras solo hay una sesión
- * abierta por día en el grupo. */
+/** Cuántos del roster marcaron la sesión de hoy — pura, sin red (U, sin DOM). */
 export function contarMarcados(estudiantes, fechaSesionISO) {
   return estudiantes.filter((e) => e.last_attendance_date === fechaSesionISO).length;
 }
@@ -30,39 +24,31 @@ function enlaceDeAsistencia(codigo) {
   return `${location.origin}/#/asistencia?codigo=${codigo}`;
 }
 
-// W16 (§7.3, §9.5 E10): "Abrir sesión" y "Cerrar sesión" son las dos acciones que escriben de
-// esta vista — sin red quedan deshabilitadas con su aviso, nunca en silencio. El mismo
-// `data-testid="sesion-sin-red"` sirve para las dos: el formulario y el panel nunca están
-// montados a la vez (uno reemplaza al otro), así que no hay ambigüedad para los E2E.
 function crearFormularioApertura(onAbrir) {
   const campo = h('input', { type: 'number', id: 'duracion', value: '15', min: '1', 'data-testid': 'campo-duracion' });
   const boton = h('button', { type: 'submit', 'data-testid': 'boton-abrir-sesion' }, textos.profe.sesion.abrir);
   const zonaError = h('p', { role: 'alert', 'data-testid': 'sesion-error-abrir' });
-  const avisoRed = h('p', { role: 'status', 'data-testid': 'sesion-sin-red' });
   const form = h(
     'form', { 'data-testid': 'form-abrir-sesion' },
     h('label', { for: 'duracion' }, textos.profe.sesion.etiquetaDuracion),
-    campo, boton, zonaError, avisoRed,
+    campo, boton, zonaError,
   );
   form.addEventListener('submit', (ev) => { ev.preventDefault(); onAbrir(Number(campo.value) || 15, boton, zonaError); });
-  const cancelarRed = ligarEscrituraARed(boton, avisoRed, textos.red.sinConexionAccion(textos.profe.sesion.accionAbrir));
-  return { form, cancelarRed };
+  return form;
 }
 
 function crearPanelActivo(sesion, onCerrar) {
   const resumen = h('p', { role: 'status', 'aria-live': 'polite', 'data-testid': 'sesion-resumen' }, resumenAsistencia(0, 0));
   const boton = h('button', { 'data-testid': 'boton-cerrar-sesion' }, textos.profe.sesion.cerrar);
-  const avisoRed = h('p', { role: 'status', 'data-testid': 'sesion-sin-red' });
   const enlace = enlaceDeAsistencia(sesion.session_code);
   const nodo = h(
     'div', { 'data-testid': 'sesion-panel' },
     h('p', {}, `${textos.profe.sesion.codigoPrefijo}: `, h('strong', { 'data-testid': 'sesion-codigo' }, sesion.session_code)),
     h('p', {}, `${textos.profe.sesion.enlacePrefijo}: `, h('a', { href: enlace, 'data-testid': 'sesion-enlace' }, enlace)),
-    resumen, boton, avisoRed,
+    resumen, boton,
   );
   boton.addEventListener('click', onCerrar);
-  const cancelarRed = ligarEscrituraARed(boton, avisoRed, textos.red.sinConexionAccion(textos.profe.sesion.accionCerrar));
-  return { nodo, resumen, cancelarRed };
+  return { nodo, resumen };
 }
 
 /** Sondea T2, cuenta y actualiza `resumen`; para cuando `activo.valor` se apaga. */
@@ -79,19 +65,18 @@ async function sondear(gid, ctx, sesion, total, resumen, activo) {
   }
 }
 
-async function manejarAbrir(raiz, gid, ctx, duracionMinutos, boton, zonaError, cancelarRedForm) {
+async function manejarAbrir(raiz, gid, ctx, duracionMinutos, boton, zonaError) {
   boton.disabled = true;
   boton.textContent = textos.profe.sesion.abriendo;
   try {
     const sesion = await abrirSesion(gid, { ...ctx, duracionMinutos });
     const total = (await listarEstudiantes(gid, ctx)).length;
     const activo = { valor: true };
-    cancelarRedForm(); // el formulario se reemplaza por el panel: su suscripción a la red ya no sirve
-    const cerrarUnaVez = accionUnica(cerrarSesion); // por sesión (§7.2 "una sola acción por toque"), no a nivel de módulo
-    const { nodo, resumen, cancelarRed } = crearPanelActivo(sesion, () => manejarCerrar(sesion, activo, nodo, ctx, cerrarUnaVez));
+    const cerrarUnaVez = accionUnica(cerrarSesion);
+    const { nodo, resumen } = crearPanelActivo(sesion, () => manejarCerrar(sesion, activo, nodo, ctx, cerrarUnaVez));
     montar(raiz, h('div', { 'data-testid': 'vista-sesion-asistencia' }, h('h1', {}, textos.profe.sesion.titulo), nodo));
     sondear(gid, ctx, sesion, total, resumen, activo);
-    window.addEventListener('hashchange', () => { activo.valor = false; cancelarRed(); }, { once: true });
+    window.addEventListener('hashchange', () => { activo.valor = false; }, { once: true });
   } catch (e) {
     zonaError.textContent = e instanceof ErrorApi ? e.mensaje : textos.profe.sesion.errorAbrir;
     boton.disabled = false;
@@ -115,11 +100,7 @@ async function manejarCerrar(sesion, activo, panelNodo, ctx, cerrarUnaVez) {
 /** @param {HTMLElement} raiz @param {Record<string,string>} params ({gid}) @param {{token: string, tenantId?: string}} ctx */
 export function renderSesionAsistencia(raiz, params, ctx) {
   const { gid } = params;
-  let cancelarRedForm; // asignada abajo; manejarAbrir la necesita para soltar la suscripción del form
-  const { form, cancelarRed } = crearFormularioApertura(
-    (duracion, boton, zonaError) => manejarAbrir(raiz, gid, ctx, duracion, boton, zonaError, cancelarRedForm),
-  );
-  cancelarRedForm = cancelarRed;
+  const form = crearFormularioApertura((duracion, boton, zonaError) => manejarAbrir(raiz, gid, ctx, duracion, boton, zonaError));
   montar(raiz, h(
     'div', { 'data-testid': 'vista-sesion-asistencia' },
     h('h1', {}, textos.profe.sesion.titulo),
@@ -127,5 +108,4 @@ export function renderSesionAsistencia(raiz, params, ctx) {
     form,
   ));
   document.body.dataset.listo = '1';
-  window.addEventListener('hashchange', cancelarRed, { once: true }); // se sale sin abrir sesión
 }
