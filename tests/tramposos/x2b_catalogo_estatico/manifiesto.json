@@ -1,0 +1,7 @@
+{
+  "descripcion": "X2b: la clave viaja en el paquete estático — un publico/catalogo.json con clave (el catálogo sembrado NUNCA debe servirse como archivo estático; sembrar_retos.mjs solo escribe en salida/, fuera de publico/)",
+  "archivos": { "publico/catalogo.json": "catalogo.json" },
+  "comando": ["node", "herramientas/verificar.mjs", "--json"],
+  "espera_codigo_no_cero": true,
+  "espera_contiene_checks": ["V2"]
+}
