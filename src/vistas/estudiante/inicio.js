@@ -47,6 +47,11 @@ function pintarContenido(raiz, ctx, datos) {
       'nav', {},
       h('a', { href: '#/asistencia', 'data-testid': 'ir-a-asistencia' }, textos.asistencia.titulo),
       h('a', { href: '#/retos', 'data-testid': 'ir-a-retos' }, textos.retos.titulo),
+      // W22: solo si el proveedor de auth activo soporta cambiar contraseña (hoy: modo supabase)
+      // — en modo mock/perfil_actual no hay a dónde llevar ese enlace (vistas/perfil.js).
+      typeof ctx.cambiarContrasena === 'function'
+        ? h('a', { href: '#/perfil', 'data-testid': 'ir-a-perfil' }, textos.perfil.titulo)
+        : null,
     ),
     crearNavInferior('inicio'),
   );
@@ -67,7 +72,8 @@ function pintarError(raiz, mensaje) {
 
 /**
  * @param {HTMLElement} raiz
- * @param {{sesion: import('../../auth/interfaz.js').Sesion, token: string, tenantId?: string}} ctx
+ * @param {{sesion: import('../../auth/interfaz.js').Sesion, token: string, tenantId?: string,
+ *   cambiarContrasena?: (nueva: string) => Promise<void>}} ctx
  */
 export async function renderInicio(raiz, ctx) {
   montar(raiz, h('div', { 'data-testid': 'vista-inicio' }, h('p', { role: 'status' }, textos.inicio.cargando)));

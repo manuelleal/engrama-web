@@ -2,9 +2,10 @@
 // app.js · Arranca el shell: registra el service worker, monta el banner de red y el router.
 import { crearBannerRed } from './ui/red.js';
 import { ruta, definirPorDefecto, iniciar } from './rutas.js';
-import * as auth from './auth/mock.js'; // ENGRAMA_AUTH=mock (§7.4); perfil_actual/supabase_rest llegan con W22
+import { accionUnica } from './api/cliente.js';
 import { renderEntrada } from './vistas/entrada.js';
 import { renderInicio } from './vistas/estudiante/inicio.js';
+import { renderPerfil } from './vistas/perfil.js';
 import { renderAsistencia } from './vistas/estudiante/asistencia.js';
 import { renderRetos } from './vistas/estudiante/retos.js';
 import { renderRetoFlujo } from './vistas/estudiante/reto_flujo.js';
@@ -35,8 +36,35 @@ function montarBanner() {
   nodo.id = 'banner-red';
 }
 
-// W5: nada del router arranca sin sesión. Un actor sintético (hito 0) o, más adelante, un login
-// real deja `document.body.dataset.listo = "1"` en la propia pantalla de entrada mientras tanto.
+const MODOS_AUTH_VALIDOS = ['mock', 'perfil_actual', 'supabase'];
+
+// `config.json` lo sirve el servidor (nunca un secreto — ENGRAMA_AUTH=mock|perfil_actual|supabase,
+// §7.4). Por defecto: mock. `servidor_dev.mjs` sirve el `config.json` del propio repo (mock); el
+// despliegue lo reemplaza a nivel de Caddy sin tocar este repo (`despliegue/Caddyfile`,
+// `handle /config.json`) — así el mismo código sirve para desarrollo y para el piloto.
+async function cargarConfig() {
+  try {
+    const resp = await fetch('/config.json');
+    if (resp.ok) return await resp.json();
+    console.error('app: config.json respondió', resp.status, '— uso mock'); // nunca mudo
+  } catch (e) {
+    console.error('app: no pude leer config.json, uso mock', e);
+  }
+  return {};
+}
+
+function cargarAuth(modo) {
+  if (modo === 'supabase') return import('./auth/supabase_rest.js');
+  if (modo === 'perfil_actual') return import('./auth/perfil_actual.js');
+  return import('./auth/mock.js');
+}
+
+// Se resuelve una sola vez, en iniciarApp(), según config.json — conCtx() y arrancarConSesion()
+// lo usan después, así que no puede ser un import estático de un solo módulo (W22).
+let authActivo = null;
+
+// W5: nada del router arranca sin sesión. Un actor sintético (hito 0) o, desde W22, un login real
+// deja `document.body.dataset.listo = "1"` en la propia pantalla de entrada mientras tanto.
 // W7: "#/inicio" ya es la Home real; necesita la Sesion (para el token y la constancia), así que
 // se registra DESPUÉS de saber quién entró, no antes.
 async function iniciarApp() {
@@ -44,19 +72,30 @@ async function iniciarApp() {
   montarBanner();
   const vista = document.getElementById('vista');
   if (!vista) return;
-  const sesion = await auth.iniciar();
+  const config = await cargarConfig();
+  const modo = MODOS_AUTH_VALIDOS.includes(config.ENGRAMA_AUTH) ? config.ENGRAMA_AUTH : 'mock';
+  authActivo = await cargarAuth(modo);
+  const sesion = await authActivo.iniciar();
   if (sesion) { arrancarConSesion(vista, sesion); return; }
-  renderEntrada(vista, async (tokenActor) => {
-    const nuevaSesion = await auth.entrar('sintetico', { token: tokenActor });
+  // accionUnica (§7.2 regla 5): un segundo toque de "Entrar" mientras el primero vuela no dispara
+  // una segunda petición de login.
+  const entrarUnaVez = accionUnica(async (metodoEntrada, datos) => {
+    const nuevaSesion = await authActivo.entrar(metodoEntrada, datos);
     arrancarConSesion(vista, nuevaSesion);
   });
+  renderEntrada(vista, modo, entrarUnaVez);
 }
 
 // Sin X-Tenant-ID: los actores sintéticos (hito 0-1) tienen un solo colegio, y su id de verdad
 // lo genera mock_api.mjs en cada arranque — mandar el "demo" de mock.js chocaría con el real. El
 // servidor usa la única membresía del actor cuando no se lo mandamos.
 function conCtx(fn) {
-  return async (raiz, params, query) => fn(raiz, params, query, { token: await auth.token() });
+  return async (raiz, params, query) => fn(raiz, params, query, {
+    token: await authActivo.token(),
+    // Solo supabase_rest.js la trae (W22): mock.js y perfil_actual.js no soportan cambiar
+    // contraseña, y las vistas (inicio.js, perfil.js) usan esto para no ofrecer un enlace muerto.
+    cambiarContrasena: typeof authActivo.cambiarContrasena === 'function' ? authActivo.cambiarContrasena : undefined,
+  });
 }
 
 // El estudiante entra por Home, el profe por sus grupos y el admin por su lista de grupos —
@@ -69,6 +108,7 @@ function rutaPorDefectoSegunRol(sesion) {
 
 function arrancarConSesion(vista, sesion) {
   ruta('/inicio', conCtx((raiz, params, query, ctx) => renderInicio(raiz, { ...ctx, sesion })));
+  ruta('/perfil', conCtx((raiz, params, query, ctx) => renderPerfil(raiz, ctx)));
   ruta('/asistencia', conCtx((raiz, params, query, ctx) => renderAsistencia(raiz, query, ctx)));
   ruta('/retos', conCtx((raiz, params, query, ctx) => renderRetos(raiz, ctx)));
   ruta('/retos/:id', conCtx((raiz, params, query, ctx) => renderRetoFlujo(raiz, params, query, ctx)));

@@ -24,7 +24,10 @@ function apiUrlActual() {
 // Solo estas rutas se sirven como archivos: nada de listar el proyecto entero (tests/, docs/,
 // herramientas/, .git — nada de eso debe llegar nunca a un navegador).
 const RAICES_ESTATICAS = ['estilos', 'publico', 'src', 'contratos'];
-const ARCHIVOS_SUELTOS = ['index.html', 'manifest.webmanifest', 'sw.js'];
+// config.json (W22): ENGRAMA_AUTH=mock|perfil_actual|supabase, nunca un secreto (§7.4). En
+// desarrollo sirve el del propio repo (mock, el de abajo); el despliegue lo reemplaza a nivel de
+// Caddy sin tocar este repo (despliegue/Caddyfile, `handle /config.json`).
+const ARCHIVOS_SUELTOS = ['index.html', 'manifest.webmanifest', 'sw.js', 'config.json'];
 
 const TIPOS = {
   '.html': 'text/html; charset=utf-8', '.css': 'text/css; charset=utf-8',
@@ -74,9 +77,22 @@ function proxyApi(req, res, rutaConQuery) {
   req.pipe(proxied);
 }
 
+// W22: los E2E que necesitan ENGRAMA_AUTH=supabase (sin tocar el config.json del repo, que se
+// queda en "mock" — §7.4, "nunca un secreto" y default de desarrollo) lo piden con esta variable,
+// leída fresca en cada petición (mismo criterio que apiUrlActual()). Sin ella, se sirve el
+// config.json real del repo tal cual, como cualquier otro estático.
+function configJsonActual() {
+  return process.env.ENGRAMA_AUTH_CONFIG || null;
+}
+
 export function crearServidor() {
   return createServer((req, res) => {
     const url = new URL(req.url || '/', 'http://localhost');
+    if (url.pathname === '/config.json' && configJsonActual()) {
+      res.writeHead(200, { 'Content-Type': 'application/json; charset=utf-8' });
+      res.end(configJsonActual());
+      return;
+    }
     if (url.pathname.startsWith('/api/')) { proxyApi(req, res, url.pathname.slice('/api'.length) + url.search); return; }
     const rutaAbsoluta = resolverArchivo(decodeURIComponent(url.pathname));
     if (!rutaAbsoluta) { res.writeHead(404).end('no encontrado'); return; }

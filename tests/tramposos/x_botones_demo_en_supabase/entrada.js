@@ -65,6 +65,7 @@ function vistaReal(alEntrar) {
  *   escribe (§7.2 regla 5).
  */
 export function renderEntrada(raiz, modo, alEntrar) {
-  montar(raiz, modo === 'mock' ? vistaActores(alEntrar) : vistaReal(alEntrar));
+  // BUG a propósito (tramposo): ignora `modo` y siempre muestra los actores demo.
+  montar(raiz, vistaActores(alEntrar));
   document.body.dataset.listo = '1';
 }

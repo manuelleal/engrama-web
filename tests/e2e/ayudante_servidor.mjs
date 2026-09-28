@@ -24,20 +24,25 @@ export function estadoConEstudiantesSembrados() {
 /**
  * Levanta mock_api.mjs + servidor_dev.mjs (proxy hacia el mock) y llama `fn(urlDelShell, estado)`.
  * @param {(url: string, estado: object) => Promise<any>} fn
- * @param {{estado?: object}} [opciones]
+ * @param {{estado?: object, authConfig?: object}} [opciones] `authConfig` (W22): el config.json
+ *   que debe servir esta app, p. ej. `{ENGRAMA_AUTH: 'supabase'}` — sin tocar el config.json real
+ *   del repo (que se queda en "mock", el default de desarrollo).
  */
 export async function conAppCompleta(fn, opciones = {}) {
   const estado = opciones.estado || estadoConEstudiantesSembrados();
   const mock = crearMockApi(estado);
   await new Promise((ok) => mock.listen(0, '127.0.0.1', ok));
-  const previo = process.env.ENGRAMA_API_URL;
+  const previoApi = process.env.ENGRAMA_API_URL;
+  const previoAuth = process.env.ENGRAMA_AUTH_CONFIG;
   process.env.ENGRAMA_API_URL = `http://127.0.0.1:${mock.address().port}`;
+  if (opciones.authConfig) process.env.ENGRAMA_AUTH_CONFIG = JSON.stringify(opciones.authConfig);
   const dev = crearServidor();
   await new Promise((ok) => dev.listen(0, '127.0.0.1', ok));
   try {
     return await fn(`http://127.0.0.1:${dev.address().port}/`, estado);
   } finally {
-    if (previo === undefined) delete process.env.ENGRAMA_API_URL; else process.env.ENGRAMA_API_URL = previo;
+    if (previoApi === undefined) delete process.env.ENGRAMA_API_URL; else process.env.ENGRAMA_API_URL = previoApi;
+    if (previoAuth === undefined) delete process.env.ENGRAMA_AUTH_CONFIG; else process.env.ENGRAMA_AUTH_CONFIG = previoAuth;
     await new Promise((ok) => dev.close(ok));
     await new Promise((ok) => mock.close(ok));
   }

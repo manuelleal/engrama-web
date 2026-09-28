@@ -31,10 +31,41 @@ export const textos = {
   entrada: {
     titulo: 'Entrar (demo)',
     ayuda: 'Elige un actor de prueba. Datos sintéticos, rotulado "demo" (H0).',
+    // W22 (encargo A): la pantalla de entrada real (ENGRAMA_AUTH=supabase) — correo y contraseña.
+    tituloReal: 'Entrar a ENGRAMA',
+    etiquetaCorreo: 'Correo',
+    etiquetaContrasena: 'Contraseña',
+    entrar: 'Entrar',
+    entrando: 'Entrando…',
+    faltanDatos: 'Escribe tu correo y tu contraseña.',
+    errorGeneral: 'No se pudo entrar. Intenta de nuevo.',
   },
   auth: {
     sinSesion: 'No hay una sesión activa',
     actorDesconocido: (t) => `Actor desconocido: "${t}"`,
+    // W22 (encargo A): mensajes de supabase_rest.js, en español claro y sin el texto crudo del
+    // servidor (§ encargo A: credenciales inválidas, sin red, sesión vencida).
+    credencialesInvalidas: 'Correo o contraseña incorrectos.',
+    sinConexion: 'Sin conexión.',
+    sesionVencida: 'Tu sesión venció. Vuelve a entrar.',
+    demasiadosIntentos: 'Demasiados intentos. Espera un momento y vuelve a intentar.',
+    errorCambiarContrasena: 'No se pudo cambiar la contraseña.',
+  },
+  perfil: {
+    // "Cambia tu contraseña temporal": GoTrue no tiene un campo para marcar una contraseña como
+    // temporal sin tocar el backend, así que esta pantalla queda SIEMPRE visible en el perfil
+    // (nunca condicionada a detectarlo) cuando el proveedor de auth activo la soporta.
+    titulo: 'Tu perfil',
+    cambiarContrasenaTitulo: 'Cambia tu contraseña temporal',
+    etiquetaContrasenaNueva: 'Contraseña nueva',
+    etiquetaContrasenaConfirmar: 'Repite la contraseña nueva',
+    cambiar: 'Cambiar contraseña',
+    cambiando: 'Cambiando…',
+    exito: 'Contraseña cambiada. Úsala la próxima vez que entres.',
+    noCoincide: 'Las dos contraseñas no coinciden.',
+    faltaContrasena: 'Escribe la contraseña nueva.',
+    sinSoporte: 'Cambiar la contraseña no está disponible en este modo.',
+    volver: 'Volver a Inicio',
   },
   retos: {
     titulo: 'Retos',

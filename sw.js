@@ -8,7 +8,7 @@
 //
 // Súbelo un número cada vez que cambie la lista de precarga o la estrategia; la `activate`
 // borra cualquier caché con otro nombre.
-const VERSION = 'engrama-shell-v10';
+const VERSION = 'engrama-shell-v11';
 
 // Cada encargo agrega los suyos en su propio commit (W7: Inicio + api/cliente,core,retos + los
 // SVG de Drako que usa el estudiante; W10: profe/grupos,grupo,sesion_asistencia + api/profe). El
@@ -20,6 +20,10 @@ const PRECARGA = [
   '/',
   '/index.html',
   '/manifest.webmanifest',
+  // W22: app.js lo pide SIEMPRE al arrancar (ENGRAMA_AUTH=mock|perfil_actual|supabase, §7.4) —
+  // tiene que abrir sin red desde el primer reintento offline, no solo después de que una visita
+  // en línea lo haya cacheado de oportunidad (cachePrimeroConRed no tiene reintento sin caché).
+  '/config.json',
   '/estilos/base.css',
   '/estilos/tipografia.css',
   '/estilos/componentes.css',
@@ -40,6 +44,7 @@ const PRECARGA = [
   '/src/ui/nav_inferior.js',
   '/src/auth/mock.js',
   '/src/vistas/entrada.js',
+  '/src/vistas/perfil.js', // W22: import estático de app.js
   '/src/vistas/estudiante/inicio.js',
   '/src/vistas/estudiante/asistencia.js',
   '/src/vistas/estudiante/retos.js',
