@@ -1,0 +1,135 @@
+{
+  "id": "sint-u01",
+  "nivel": "B1",
+  "titulo": "Unidad sintética del humo",
+  "situacion": "Fixture de prueba (W15): nunca se usa con estudiantes reales.",
+  "revisado_por": null,
+  "practicas": [
+    {
+      "familia": "sint-u01-f01",
+      "estructura": "presente perfecto con for / since",
+      "items": [
+        {
+          "id": "sint-u01-f01-1", "rol": "original", "formato": "piensalo",
+          "enunciado": "Ana ___ English since 2020.",
+          "opciones": { "A": "studies", "B": "has studied", "C": "studied", "D": "is studying" },
+          "clave": "B",
+          "explicacion": { "regla": "since + punto de partida = present perfect.", "por_opcion": {}, "ejemplo": "I have lived here since 2019.", "idioma": "en" }
+        },
+        {
+          "id": "sint-u01-f01-2", "rol": "gemela", "formato": "piensalo",
+          "enunciado": "They ___ in this building for three years.",
+          "opciones": { "A": "work", "B": "worked", "C": "have worked", "D": "are working" },
+          "clave": "C",
+          "explicacion": { "regla": "for + periodo = present perfect.", "por_opcion": {}, "ejemplo": "She has worked here for a year.", "idioma": "en" }
+        },
+        {
+          "id": "sint-u01-f01-3", "rol": "repaso", "formato": "piensalo",
+          "enunciado": "How long ___ you ___ at this school?",
+          "opciones": { "A": "did / study", "B": "have / studied", "C": "do / study", "D": "are / studying" },
+          "clave": "B",
+          "explicacion": { "regla": "pregunta con how long = present perfect.", "por_opcion": {}, "ejemplo": "How long have you lived here?", "idioma": "en" }
+        }
+      ]
+    },
+    {
+      "familia": "sint-u01-f02",
+      "estructura": "preguntas indirectas",
+      "items": [
+        {
+          "id": "sint-u01-f02-1", "rol": "original", "formato": "piensalo",
+          "enunciado": "Could you tell me where ___?",
+          "opciones": { "A": "is the library", "B": "the library is", "C": "the library was", "D": "does the library" },
+          "clave": "B",
+          "explicacion": { "regla": "orden de afirmación en preguntas indirectas.", "por_opcion": {}, "ejemplo": "Could you tell me what time it is?", "idioma": "en" }
+        },
+        {
+          "id": "sint-u01-f02-2", "rol": "gemela", "formato": "piensalo",
+          "enunciado": "I'd like to know if ___.",
+          "opciones": { "A": "does she work here", "B": "she works here", "C": "she worked here", "D": "is she working here" },
+          "clave": "B",
+          "explicacion": { "regla": "orden de afirmación tras if.", "por_opcion": {}, "ejemplo": "I'd like to know if he called.", "idioma": "en" }
+        },
+        {
+          "id": "sint-u01-f02-3", "rol": "repaso", "formato": "piensalo",
+          "enunciado": "Do you know what time ___?",
+          "opciones": { "A": "does the class start", "B": "the class starts", "C": "starts the class", "D": "is the class starting" },
+          "clave": "B",
+          "explicacion": { "regla": "orden de afirmación tras what.", "por_opcion": {}, "ejemplo": "Do you know what time it opens?", "idioma": "en" }
+        }
+      ]
+    },
+    {
+      "familia": "sint-u01-f03",
+      "estructura": "vocab: estudio y trabajo (grupo 1)",
+      "items": [
+        {
+          "id": "sint-u01-f03-1", "rol": "original", "formato": "piensalo",
+          "enunciado": "Organization is her biggest ___.",
+          "opciones": { "A": "mistake", "B": "weakness", "C": "fear", "D": "complaint" },
+          "clave": "B",
+          "explicacion": { "regla": "weakness = debilidad.", "por_opcion": {}, "ejemplo": "Public speaking is his weakness.", "idioma": "en" }
+        },
+        {
+          "id": "sint-u01-f03-2", "rol": "gemela", "formato": "piensalo",
+          "enunciado": "The manager is interviewing three ___ this week.",
+          "opciones": { "A": "candidates", "B": "strengths", "C": "internships", "D": "experiences" },
+          "clave": "A",
+          "explicacion": { "regla": "candidate = candidato.", "por_opcion": {}, "ejemplo": "Each candidate answered five questions.", "idioma": "en" }
+        },
+        {
+          "id": "sint-u01-f03-3", "rol": "repaso", "formato": "piensalo",
+          "enunciado": "She has three years of ___ in customer service.",
+          "opciones": { "A": "experience", "B": "weakness", "C": "mistake", "D": "complaint" },
+          "clave": "A",
+          "explicacion": { "regla": "experience = experiencia.", "por_opcion": {}, "ejemplo": "He has a lot of experience.", "idioma": "en" }
+        }
+      ]
+    },
+    {
+      "familia": "sint-u01-f04",
+      "estructura": "vocab: estudio y trabajo (grupo 2)",
+      "items": [
+        {
+          "id": "sint-u01-f04-1", "rol": "original", "formato": "piensalo",
+          "enunciado": "She works as a part-time ___ at the coffee shop.",
+          "opciones": { "A": "cashier", "B": "candidate", "C": "internship", "D": "schedule" },
+          "clave": "A",
+          "explicacion": { "regla": "cashier = cajera.", "por_opcion": {}, "ejemplo": "The cashier gave me the receipt.", "idioma": "en" }
+        },
+        {
+          "id": "sint-u01-f04-2", "rol": "gemela", "formato": "piensalo",
+          "enunciado": "They offered her a six-month ___.",
+          "opciones": { "A": "internship", "B": "cashier", "C": "weakness", "D": "complaint" },
+          "clave": "A",
+          "explicacion": { "regla": "internship = pasantía.", "por_opcion": {}, "ejemplo": "The internship starts in June.", "idioma": "en" }
+        },
+        {
+          "id": "sint-u01-f04-3", "rol": "repaso", "formato": "piensalo",
+          "enunciado": "Could you tell me your work ___ for next week?",
+          "opciones": { "A": "schedule", "B": "internship", "C": "cashier", "D": "candidate" },
+          "clave": "A",
+          "explicacion": { "regla": "schedule = horario.", "por_opcion": {}, "ejemplo": "My schedule changes every week.", "idioma": "en" }
+        }
+      ]
+    },
+    {
+      "id": "sint-u01-l01", "formato": "lo_dice",
+      "texto": "Ana started her new job at the library two weeks ago. She arrives fifteen minutes early every day and organizes the returned books before opening. Her supervisor, Mr. Ortiz, says she is very responsible. Ana still doesn't know how to use the new inventory system, so a coworker is teaching her this week.",
+      "afirmaciones": [
+        { "texto": "Ana arrives fifteen minutes late every day.", "clave": "F", "cita": "She arrives fifteen minutes early every day", "explicacion": "Falso. El texto dice que llega temprano, no tarde." },
+        { "texto": "Ana's supervisor thinks she is very responsible.", "clave": "V", "cita": "Her supervisor, Mr. Ortiz, says she is very responsible", "explicacion": "Verdadero, tal cual lo dice el texto." },
+        { "texto": "Ana studied library science at university.", "clave": "ND", "cita": "Ana started her new job at the library two weeks ago", "explicacion": "No se dice: el texto no menciona sus estudios." }
+      ]
+    },
+    {
+      "id": "sint-u01-l02", "formato": "lo_dice",
+      "texto": "Last month, Ana asked her supervisor an indirect question: 'Could you tell me if I could take next Friday off?' Mr. Ortiz checked the schedule and agreed, as long as she found someone to cover her shift. Ana asked her coworker Beto, and he accepted right away. On Friday, Ana visited her family in another city.",
+      "afirmaciones": [
+        { "texto": "Ana asked for the following Monday off.", "clave": "F", "cita": "if I could take next Friday off", "explicacion": "Falso. Pidió el viernes, no el lunes." },
+        { "texto": "Beto agreed to cover Ana's shift.", "clave": "V", "cita": "Ana asked her coworker Beto, and he accepted right away", "explicacion": "Verdadero, tal cual lo dice el texto." },
+        { "texto": "Ana's family lives in the same city as her.", "clave": "ND", "cita": "Ana visited her family in another city", "explicacion": "No se dice directamente si vive en la misma ciudad o no antes de la visita." }
+      ]
+    }
+  ]
+}
