@@ -4,6 +4,8 @@
 // solo "Repasar" (X3b prueba justo esto).
 import { h, montar } from '../../ui/dom.js';
 import { textos } from '../../textos.js';
+import { tituloLegible } from '../../ui/titulo.js';
+import { crearNavInferior } from '../../ui/nav_inferior.js';
 import { listarRetos, historialDeIntentos } from '../../api/retos.js';
 import { ErrorApi } from '../../api/cliente.js';
 
@@ -26,11 +28,12 @@ export function enlaceParaReto(retoId, ganado) {
 
 function filaDeReto(reto, ganado) {
   const datos = enlaceParaReto(reto.id, ganado);
-  const enlace = h('a', { href: datos.href, 'data-testid': datos.testid }, datos.texto);
+  const enlace = h('a', { href: datos.href, class: 'boton-chico', 'data-testid': datos.testid }, datos.texto);
   return h(
-    'li', { 'data-testid': `reto-${reto.id}` },
-    h('span', {}, reto.title),
-    ganado ? h('span', { 'data-testid': `reto-${reto.id}-estado` }, textos.retos.completado) : null,
+    'li', { class: 'fila', 'data-testid': `reto-${reto.id}` },
+    h('div', { class: 'fila-texto' },
+      h('span', { class: 'fila-titulo' }, tituloLegible(reto.title)),
+      ganado ? h('span', { class: 'insignia', 'data-testid': `reto-${reto.id}-estado` }, textos.retos.completado) : null),
     enlace,
   );
 }
@@ -39,7 +42,7 @@ function pintarLista(raiz, retos, ganados) {
   const cuerpo = retos.length === 0
     ? h('p', { role: 'status' }, textos.retos.sinRetos)
     : h('ul', {}, ...retos.map((r) => filaDeReto(r, ganados.has(r.id))));
-  montar(raiz, h('div', { 'data-testid': 'vista-retos' }, h('h1', {}, textos.retos.titulo), cuerpo));
+  montar(raiz, h('div', { 'data-testid': 'vista-retos' }, h('h1', {}, textos.retos.titulo), cuerpo, crearNavInferior('retos')));
   document.body.dataset.listo = '1';
 }
 
