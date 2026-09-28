@@ -127,16 +127,42 @@ async function medirYEvaluar(s, esperaMs, evalJs, errores) {
   return { listo, eval: evaluado, ...med.result.value };
 }
 
-// El service worker corre en su propio target: cortar la red en la sesión de la página no le
-// llega (su `fetch` seguía saliendo por la red real). Hay que emularla también en cada target
-// service_worker ya adjunto — normalmente el que activó la primera pasada.
-async function cortarRedEnTrabajadores(cdp) {
+// El service worker corre en su propio target: emular la red en la sesión de la página no le
+// llega (su `fetch` seguía saliendo, o quedándose, por la red real). Hay que emularla también en
+// cada target service_worker ya adjunto — normalmente el que activó la primera pasada. `offline`
+// SIEMPRE se manda explícito (también al volver la red, `abrirSesion().redSinConexion(false)`,
+// W16 encargo 2): sin esto, un service worker que quedó sin red se queda así para siempre, aunque
+// la sesión de la página ya esté de vuelta en línea.
+//
+// UNA sola sesión por target, reutilizada (`cdp._sesionesTrabajador`): `Target.attachToTarget`
+// no cierra la sesión anterior al llamarlo de nuevo sobre el MISMO target, así que cortar y
+// luego restaurar con una sesión nueva cada vez deja dos sesiones vivas — y el resultado real
+// (medido) es que la condición de la sesión vieja (la del corte) sigue mandando: restaurar en
+// una sesión nueva no revive al service worker. Adjuntar una sola vez y mandar los dos estados
+// por esa misma sesión sí funciona (medido).
+async function emularRedEnTrabajadores(cdp, offline) {
+  cdp._sesionesTrabajador ||= new Map();
   const { targetInfos } = await cdp.enviar('Target.getTargets');
   for (const info of targetInfos.filter((t) => t.type === 'service_worker')) {
-    const { sessionId } = await cdp.enviar('Target.attachToTarget', { targetId: info.targetId, flatten: true });
-    await cdp.enviar('Network.enable', {}, sessionId);
-    await cdp.enviar('Network.emulateNetworkConditions', { offline: true, latency: 0, downloadThroughput: 0, uploadThroughput: 0 }, sessionId);
+    let sessionId = cdp._sesionesTrabajador.get(info.targetId);
+    if (!sessionId) {
+      ({ sessionId } = await cdp.enviar('Target.attachToTarget', { targetId: info.targetId, flatten: true }));
+      cdp._sesionesTrabajador.set(info.targetId, sessionId);
+      await cdp.enviar('Network.enable', {}, sessionId);
+    }
+    await cdp.enviar('Network.emulateNetworkConditions', condicionesDeRed(offline), sessionId);
   }
+}
+
+// offline: false con downloadThroughput/uploadThroughput en 0 NO significa "en línea": para CDP
+// es una conexión con ancho de banda cero, que en la práctica se cuelga igual que sin red. -1
+// apaga el límite (documentado así en el dominio Network) — hace falta para poder RESTAURAR la
+// red de verdad (`redSinConexion(false)`, W16 encargo 2); cortarla siempre usó 0 y nunca se
+// restauraba en el mismo proceso, así que ese caso nunca lo había ejercitado nadie.
+function condicionesDeRed(offline) {
+  return offline
+    ? { offline: true, latency: 0, downloadThroughput: 0, uploadThroughput: 0 }
+    : { offline: false, latency: 0, downloadThroughput: -1, uploadThroughput: -1 };
 }
 
 async function revisarConSesion(cdp, op) {
@@ -165,13 +191,41 @@ async function revisarConSesion(cdp, op) {
     const erroresTras = [];
     if (op.tras.sinRed) {
       await s('Network.emulateNetworkConditions', { offline: true, latency: 0, downloadThroughput: 0, uploadThroughput: 0 });
-      await cortarRedEnTrabajadores(cdp);
+      await emularRedEnTrabajadores(cdp, true);
     }
     if (!op.tras.sinNavegar) await s('Page.navigate', { url: op.tras.url || op.url });
     tras = { ...(await medirYEvaluar(s, op.tras.espera_ms || op.espera_ms || 8000, op.tras.eval, erroresTras)), errores: erroresTras };
   }
 
   return { url: op.url, ancho: op.ancho, alto: op.alto, errores, peticiones, ...primera, tras };
+}
+
+// Arranca Edge/Chrome headless y abre el WebSocket de DevTools — el arranque que comparten
+// `revisarPagina` (un solo vistazo, perfil desechable) y `abrirSesion` (W16, encargo 2: varios
+// pasos y capturas en la MISMA pestaña, para herramientas/galeria.mjs).
+async function lanzarNavegador(ancho, alto, prefijoPerfil) {
+  const navegador = RUTAS_NAVEGADOR.find((r) => existsSync(r));
+  if (!navegador) throw new Error('no encontré msedge.exe ni chrome.exe (usa EDGE_PATH o CHROME_PATH)');
+  const perfil = join(RAIZ, 'salida', 'navegador', `${prefijoPerfil}-${process.pid}-${Date.now()}`);
+  mkdirSync(perfil, { recursive: true });
+  const args = [
+    '--headless=new', '--remote-debugging-port=0', `--user-data-dir=${perfil}`, '--no-first-run',
+    '--no-default-browser-check', '--disable-extensions', '--disable-sync', '--disable-gpu',
+    '--disable-background-networking', '--disable-component-update', '--mute-audio',
+    `--window-size=${ancho},${alto}`, 'about:blank',
+  ];
+  const proc = spawn(navegador, args, { stdio: 'ignore' });
+  const ws = await abrirWs(await puertoDevTools(perfil, 20000));
+  return { proc, cdp: new CDP(ws), ws, perfil };
+}
+
+async function cerrarNavegador({ proc, cdp, ws, perfil }) {
+  try { await cdp.enviar('Browser.close'); } catch { /* ya puede estar cerrado */ }
+  await esperar(200);
+  ws.close();
+  proc.kill();
+  await esperar(400);
+  try { rmSync(perfil, { recursive: true, force: true, maxRetries: 10, retryDelay: 200 }); } catch { /* Windows a veces tarda en soltar el perfil; no es fatal */ }
 }
 
 /**
@@ -183,30 +237,60 @@ async function revisarConSesion(cdp, op) {
  */
 export async function revisarPagina(op) {
   if (!op.url || !op.ancho || !op.alto) throw new Error('faltan url, ancho o alto');
-  const navegador = RUTAS_NAVEGADOR.find((r) => existsSync(r));
-  if (!navegador) throw new Error('no encontré msedge.exe ni chrome.exe (usa EDGE_PATH o CHROME_PATH)');
-  const perfil = join(RAIZ, 'salida', 'navegador', `perfil-${process.pid}-${Date.now()}`);
-  mkdirSync(perfil, { recursive: true });
-  const args = [
-    '--headless=new', '--remote-debugging-port=0', `--user-data-dir=${perfil}`, '--no-first-run',
-    '--no-default-browser-check', '--disable-extensions', '--disable-sync', '--disable-gpu',
-    '--disable-background-networking', '--disable-component-update', '--mute-audio',
-    `--window-size=${op.ancho},${op.alto}`, 'about:blank',
-  ];
-  const proc = spawn(navegador, args, { stdio: 'ignore' });
+  const nav = await lanzarNavegador(op.ancho, op.alto, 'perfil');
   try {
-    const ws = await abrirWs(await puertoDevTools(perfil, 20000));
-    const cdp = new CDP(ws);
-    const salida = await revisarConSesion(cdp, op);
-    cdp.enviar('Browser.close').catch(() => {});
-    await esperar(200);
-    ws.close();
-    return salida;
+    return await revisarConSesion(nav.cdp, op);
   } finally {
-    proc.kill();
-    await esperar(400);
-    try { rmSync(perfil, { recursive: true, force: true, maxRetries: 10, retryDelay: 200 }); } catch { /* Windows a veces tarda en soltar el perfil; no es fatal */ }
+    await cerrarNavegador(nav);
   }
+}
+
+/**
+ * Sesión de navegador para VARIOS pasos seguidos en la MISMA pestaña (cookies, localStorage y el
+ * service worker se conservan entre pasos) — a diferencia de `revisarPagina`, pensada para un
+ * solo vistazo. La usa `herramientas/galeria.mjs` (W16, encargo 2): entra, navega, hace clic,
+ * llena formularios y toma una captura PNG cuando se le pide. Quien la abre debe llamar
+ * `cerrar()` al final.
+ * @param {{ancho: number, alto: number}} op
+ */
+export async function abrirSesion(op) {
+  const nav = await lanzarNavegador(op.ancho, op.alto, 'sesion');
+  const { targetId } = await nav.cdp.enviar('Target.createTarget', { url: 'about:blank' });
+  const { sessionId } = await nav.cdp.enviar('Target.attachToTarget', { targetId, flatten: true });
+  const s = (m, p) => nav.cdp.enviar(m, p, sessionId);
+  const errores = []; const peticiones = [];
+  escuchar(nav.cdp, sessionId, errores, peticiones);
+  for (const dominio of ['Runtime', 'Network', 'Page']) await s(`${dominio}.enable`);
+  await redimensionar(s, op.ancho, op.alto);
+  return {
+    errores, peticiones,
+    navegar: (url, esperaMs = 8000) => s('Page.navigate', { url }).then(() => esperarListo(s, esperaMs)),
+    // Una recarga de VERDAD (a diferencia de `navegar` a solo un hash distinto, que en un
+    // documento ya cargado no dispara una recarga real): la usa quien necesita que el gate de
+    // login de app.js (`iniciarApp()`, que solo corre una vez por carga) vuelva a correr — p. ej.
+    // `herramientas/galeria.mjs` cambiando de actor sintético a mitad de sesión.
+    recargar: (esperaMs = 8000) => s('Page.reload', {}).then(() => esperarListo(s, esperaMs)),
+    evaluar: (expresion) => evaluarEnSesion(s, expresion),
+    redimensionar: (ancho, alto) => redimensionar(s, ancho, alto),
+    redSinConexion: (offline) => redSinConexion(nav.cdp, s, offline),
+    capturar: async () => Buffer.from((await s('Page.captureScreenshot', { format: 'png' })).data, 'base64'),
+    cerrar: () => cerrarNavegador(nav),
+  };
+}
+
+function redimensionar(s, ancho, alto) {
+  return s('Emulation.setDeviceMetricsOverride', { width: ancho, height: alto, deviceScaleFactor: 1, mobile: ancho < 600 });
+}
+
+async function redSinConexion(cdp, s, offline) {
+  await s('Network.emulateNetworkConditions', condicionesDeRed(offline));
+  await emularRedEnTrabajadores(cdp, offline);
+}
+
+async function evaluarEnSesion(s, expresion) {
+  const r = await s('Runtime.evaluate', { expression: expresion, returnByValue: true, awaitPromise: true });
+  if (r.exceptionDetails) throw new Error(`abrirSesion.evaluar: ${r.exceptionDetails.text}`);
+  return r.result.value ?? null;
 }
 
 async function main() {
