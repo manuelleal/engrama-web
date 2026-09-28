@@ -8,6 +8,9 @@ import { renderInicio } from './vistas/estudiante/inicio.js';
 import { renderAsistencia } from './vistas/estudiante/asistencia.js';
 import { renderRetos } from './vistas/estudiante/retos.js';
 import { renderRetoFlujo } from './vistas/estudiante/reto_flujo.js';
+import { renderGrupos } from './vistas/profe/grupos.js';
+import { renderGrupo } from './vistas/profe/grupo.js';
+import { renderSesionAsistencia } from './vistas/profe/sesion_asistencia.js';
 
 function registrarServiceWorker() {
   if (!('serviceWorker' in navigator)) return;
@@ -33,7 +36,6 @@ function montarBanner() {
 async function iniciarApp() {
   registrarServiceWorker();
   montarBanner();
-  definirPorDefecto('/inicio');
   const vista = document.getElementById('vista');
   if (!vista) return;
   const sesion = await auth.iniciar();
@@ -51,11 +53,21 @@ function conCtx(fn) {
   return async (raiz, params, query) => fn(raiz, params, query, { token: await auth.token() });
 }
 
+// El estudiante entra por Home; el profe (y, hasta que W13 traiga "/admin", el admin) por sus
+// grupos — nunca por una pantalla de estudiante que no le sirve de nada (§4.2 y §4.3).
+function rutaPorDefectoSegunRol(sesion) {
+  return sesion.rol === 'student' ? '/inicio' : '/profe/grupos';
+}
+
 function arrancarConSesion(vista, sesion) {
   ruta('/inicio', conCtx((raiz, params, query, ctx) => renderInicio(raiz, { ...ctx, sesion })));
   ruta('/asistencia', conCtx((raiz, params, query, ctx) => renderAsistencia(raiz, query, ctx)));
   ruta('/retos', conCtx((raiz, params, query, ctx) => renderRetos(raiz, ctx)));
   ruta('/retos/:id', conCtx((raiz, params, query, ctx) => renderRetoFlujo(raiz, params, query, ctx)));
+  ruta('/profe/grupos', conCtx((raiz, params, query, ctx) => renderGrupos(raiz, ctx)));
+  ruta('/profe/grupo/:gid', conCtx((raiz, params, query, ctx) => renderGrupo(raiz, params, ctx)));
+  ruta('/profe/grupo/:gid/sesion', conCtx((raiz, params, query, ctx) => renderSesionAsistencia(raiz, params, ctx)));
+  definirPorDefecto(rutaPorDefectoSegunRol(sesion));
   iniciar(vista);
 }
 

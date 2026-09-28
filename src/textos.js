@@ -70,4 +70,43 @@ export const textos = {
     sesionVencida: 'Esta sesión ya venció.',
     faltaCodigo: 'Escribe el código de la sesión.',
   },
+  profe: {
+    grupos: {
+      titulo: 'Mis grupos',
+      sinGrupos: 'No tienes grupos asignados.',
+      errorGeneral: 'No se pudieron cargar tus grupos.',
+      /** @param {number} n */
+      estudiantes: (n) => (n === 1 ? '1 estudiante' : `${n} estudiantes`),
+    },
+    grupo: {
+      /** @param {string} codigo */
+      titulo: (codigo) => `Grupo ${codigo}`,
+      noEncontrado: 'No encontrado.',
+      sinEstudiantes: 'Este grupo no tiene estudiantes inscritos todavía.',
+      columnaNombre: 'Nombre',
+      columnaConstancia: 'Constancia',
+      columnaUltimaAsistencia: 'Última asistencia',
+      sinAsistencia: 'Sin registro',
+      abrirSesion: 'Abrir sesión de asistencia',
+      verLogro: 'Logro por eje',
+      verErrores: 'Errores por ítem',
+      verRetos: 'Retos',
+    },
+    sesion: {
+      titulo: 'Sesión de asistencia',
+      etiquetaDuracion: 'Duración (minutos)',
+      abrir: 'Abrir sesión',
+      abriendo: 'Abriendo…',
+      cerrar: 'Cerrar sesión',
+      cerrando: 'Cerrando…',
+      codigoPrefijo: 'Código',
+      enlacePrefijo: 'Enlace para el celular',
+      /** @param {number} marcaron @param {number} total */
+      resumen: (marcaron, total) => `${marcaron} de ${total} marcaron`,
+      cerrada: 'Sesión cerrada.',
+      errorAbrir: 'No se pudo abrir la sesión.',
+      errorCerrar: 'No se pudo cerrar la sesión.',
+      volverAlGrupo: 'Volver al grupo',
+    },
+  },
 };

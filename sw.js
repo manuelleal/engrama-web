@@ -8,10 +8,14 @@
 //
 // Súbelo un número cada vez que cambie la lista de precarga o la estrategia; la `activate`
 // borra cualquier caché con otro nombre.
-const VERSION = 'engrama-shell-v5';
+const VERSION = 'engrama-shell-v6';
 
 // Cada encargo agrega los suyos en su propio commit (W7: Inicio + api/cliente,core,retos + los
-// SVG de Drako que usa el estudiante). El shell debe abrir sin red con lo de aquí, nada más.
+// SVG de Drako que usa el estudiante; W10: profe/grupos,grupo,sesion_asistencia + api/profe). El
+// shell debe abrir sin red con lo de aquí, nada más — TODO lo que `src/app.js` importe estática-
+// mente, para cualquier rol, tiene que estar aquí (§7.3): la primera visita de verdad no pasa por
+// el service worker (todavía no ha terminado de instalarse), así que si un módulo no está en esta
+// lista, la segunda visita sin red lo pierde en silencio.
 const PRECARGA = [
   '/',
   '/index.html',
@@ -40,6 +44,10 @@ const PRECARGA = [
   '/src/api/cliente.js',
   '/src/api/core.js',
   '/src/api/retos.js',
+  '/src/api/profe.js',
+  '/src/vistas/profe/grupos.js',
+  '/src/vistas/profe/grupo.js',
+  '/src/vistas/profe/sesion_asistencia.js',
 ];
 
 // Nunca se cachea nada bajo estas rutas, ni de lectura: son del profe/admin, no "datos propios

@@ -1,0 +1,7 @@
+{
+  "descripcion": "X4: el profe ve un grupo ajeno — un mock que filtra como X1 de grupos (visible_groups sin mirar teacherGroups): devuelve el roster de B para el gid de B a un docente que no está asignado",
+  "archivos": { "herramientas/mock/rutas_teachers.mjs": "rutas_teachers.mjs" },
+  "comando": ["node", "--test", "--test-reporter=tap", "tests/e2e/profe.test.mjs"],
+  "espera_codigo_no_cero": true,
+  "espera_fallan_tests": ["E4 (X4): el profe NUNCA ve un grupo ajeno — \"No encontrado\", ningún nombre de B en el DOM"]
+}
