@@ -8,7 +8,7 @@
 //
 // Súbelo un número cada vez que cambie la lista de precarga o la estrategia; la `activate`
 // borra cualquier caché con otro nombre.
-const VERSION = 'engrama-shell-v1';
+const VERSION = 'engrama-shell-v2';
 
 // Solo lo que existe hoy (W3): W7+ irá agregando sus propios archivos en su propio commit.
 const PRECARGA = [
@@ -23,6 +23,8 @@ const PRECARGA = [
   '/src/textos.js',
   '/src/ui/dom.js',
   '/src/ui/red.js',
+  '/src/auth/mock.js',
+  '/src/vistas/entrada.js',
 ];
 
 // Nunca se cachea nada bajo estas rutas, ni de lectura: son del profe/admin, no "datos propios

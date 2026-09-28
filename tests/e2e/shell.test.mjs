@@ -23,13 +23,18 @@ async function conServidor(fn) {
   try { return await fn(`http://127.0.0.1:${port}/`); } finally { await new Promise((ok) => servidor.close(ok)); }
 }
 
+// Desde W5 hay una pantalla de entrada antes del shell (§11): estas dos pruebas son del SHELL,
+// no del login, así que se saltan la entrada dejando ya elegido un actor sintético antes de que
+// corra el primer script de la página (mismo truco que usa auth/mock.js para "recordar" sesión).
+const YA_ENTRO = "localStorage.setItem('engrama_actor_sintetico', 'est-1')";
+
 test(
   'E9: el shell no tiene scroll horizontal a 375x812 ni a 1280x800',
   { skip: !HAY_NAVEGADOR && 'no hay Edge ni Chrome instalado en esta máquina' },
   async () => {
     await conServidor(async (url) => {
       for (const [ancho, alto] of [[375, 812], [1280, 800]]) {
-        const r = await revisarPagina({ url, ancho, alto, espera_ms: 5000 });
+        const r = await revisarPagina({ url, ancho, alto, espera_ms: 5000, pre: YA_ENTRO });
         assert.deepEqual(r.errores, [], `sin errores a ${ancho}px`);
         assert.ok(r.scroll_ancho <= ancho, `scrollWidth ${r.scroll_ancho} debe ser <= ${ancho}`);
         assert.ok(r.testids.includes('vista-inicio'), 'el shell debe haber montado la vista');
@@ -44,7 +49,7 @@ test(
   async () => {
     await conServidor(async (url) => {
       const r = await revisarPagina({
-        url, ancho: 375, alto: 812, espera_ms: 6000,
+        url, ancho: 375, alto: 812, espera_ms: 6000, pre: YA_ENTRO,
         eval: 'navigator.serviceWorker.ready.then(() => true)',
         tras: { sinRed: true, espera_ms: 5000, eval: 'document.querySelector("h1")?.textContent ?? null' },
       });

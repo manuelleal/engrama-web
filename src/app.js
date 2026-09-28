@@ -6,6 +6,8 @@ import { h, montar } from './ui/dom.js';
 import { crearBannerRed } from './ui/red.js';
 import { ruta, definirPorDefecto, iniciar } from './rutas.js';
 import { textos } from './textos.js';
+import * as auth from './auth/mock.js'; // ENGRAMA_AUTH=mock (§7.4); perfil_actual/supabase_rest llegan con W22
+import { renderEntrada } from './vistas/entrada.js';
 
 function registrarServiceWorker() {
   if (!('serviceWorker' in navigator)) return;
@@ -35,13 +37,21 @@ function vistaInicioPlaceholder(raiz) {
   document.body.dataset.listo = '1';
 }
 
-function iniciarApp() {
+// W5: nada del router arranca sin sesión. Un actor sintético (hito 0) o, más adelante, un login
+// real deja `document.body.dataset.listo = "1"` en la propia pantalla de entrada mientras tanto.
+async function iniciarApp() {
   registrarServiceWorker();
   montarBanner();
   definirPorDefecto('/inicio');
   ruta('/inicio', vistaInicioPlaceholder);
   const vista = document.getElementById('vista');
-  if (vista) iniciar(vista);
+  if (!vista) return;
+  const sesion = await auth.iniciar();
+  if (sesion) { iniciar(vista); return; }
+  renderEntrada(vista, async (tokenActor) => {
+    await auth.entrar('sintetico', { token: tokenActor });
+    iniciar(vista);
+  });
 }
 
 iniciarApp();

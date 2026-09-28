@@ -13,4 +13,12 @@ export const textos = {
   red: {
     sinConexionPrefijo: 'Sin conexión · actualizado',
   },
+  entrada: {
+    titulo: 'Entrar (demo)',
+    ayuda: 'Elige un actor de prueba. Datos sintéticos, rotulado "demo" (H0).',
+  },
+  auth: {
+    sinSesion: 'No hay una sesión activa',
+    actorDesconocido: (t) => `Actor desconocido: "${t}"`,
+  },
 };

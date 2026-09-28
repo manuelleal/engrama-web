@@ -1,0 +1,7 @@
+{
+  "descripcion": "W5: el cliente recalcula la racha localmente (constancia + 1) en vez de mostrar el valor del servidor tal cual",
+  "archivos": { "src/auth/mock.js": "mock.js" },
+  "comando": ["node", "--test", "--test-reporter=tap", "tests/unit/auth_mock.test.mjs"],
+  "espera_codigo_no_cero": true,
+  "espera_fallan_tests": ["auth/mock: la constancia de la Sesion es la del actor, tal cual — nunca recalculada"]
+}
