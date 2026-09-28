@@ -14,6 +14,9 @@ import { renderSesionAsistencia } from './vistas/profe/sesion_asistencia.js';
 import { renderLogro } from './vistas/profe/logro.js';
 import { renderErrores } from './vistas/profe/errores.js';
 import { renderRetosProfe } from './vistas/profe/retos.js';
+import { renderCrearGrupo } from './vistas/admin/crear_grupo.js';
+import { renderAsignarDocente } from './vistas/admin/asignar_docente.js';
+import { renderImportarCsv } from './vistas/admin/importar_csv.js';
 
 function registrarServiceWorker() {
   if (!('serviceWorker' in navigator)) return;
@@ -56,10 +59,12 @@ function conCtx(fn) {
   return async (raiz, params, query) => fn(raiz, params, query, { token: await auth.token() });
 }
 
-// El estudiante entra por Home; el profe (y, hasta que W13 traiga "/admin", el admin) por sus
-// grupos — nunca por una pantalla de estudiante que no le sirve de nada (§4.2 y §4.3).
+// El estudiante entra por Home, el profe por sus grupos y el admin por su lista de grupos —
+// nunca por una pantalla que no le sirve de nada (§4.2 y §4.3).
 function rutaPorDefectoSegunRol(sesion) {
-  return sesion.rol === 'student' ? '/inicio' : '/profe/grupos';
+  if (sesion.rol === 'student') return '/inicio';
+  if (sesion.rol === 'admin') return '/admin';
+  return '/profe/grupos';
 }
 
 function arrancarConSesion(vista, sesion) {
@@ -73,6 +78,9 @@ function arrancarConSesion(vista, sesion) {
   ruta('/profe/grupo/:gid/logro', conCtx((raiz, params, query, ctx) => renderLogro(raiz, params, ctx)));
   ruta('/profe/grupo/:gid/errores', conCtx((raiz, params, query, ctx) => renderErrores(raiz, params, ctx)));
   ruta('/profe/retos', conCtx((raiz, params, query, ctx) => renderRetosProfe(raiz, ctx)));
+  ruta('/admin', conCtx((raiz, params, query, ctx) => renderCrearGrupo(raiz, ctx)));
+  ruta('/admin/asignar-docente/:gid', conCtx((raiz, params, query, ctx) => renderAsignarDocente(raiz, params, ctx)));
+  ruta('/admin/importar-csv/:gid', conCtx((raiz, params, query, ctx) => renderImportarCsv(raiz, params, ctx)));
   definirPorDefecto(rutaPorDefectoSegunRol(sesion));
   iniciar(vista);
 }

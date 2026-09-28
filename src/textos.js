@@ -155,4 +155,48 @@ export const textos = {
       elegirGrupo: 'Elige un grupo…',
     },
   },
+  admin: {
+    grupos: {
+      titulo: 'Grupos',
+      sinGrupos: 'Todavía no hay grupos.',
+      errorGeneral: 'No se pudieron cargar los grupos.',
+      irAAsignarDocente: 'Asignar docente',
+      irAImportarCsv: 'Importar estudiantes',
+    },
+    crearGrupo: {
+      titulo: 'Crear grupo',
+      etiquetaCodigo: 'Código del grupo',
+      etiquetaCupo: 'Cupo máximo (opcional)',
+      crear: 'Crear grupo',
+      creando: 'Creando…',
+      creado: 'Grupo creado.',
+      faltaCodigo: 'Escribe el código del grupo.',
+      errorGeneral: 'No se pudo crear el grupo.',
+    },
+    asignarDocente: {
+      titulo: 'Asignar docente',
+      volverAAdmin: 'Volver a Grupos',
+      etiquetaDocumento: 'Documento del docente',
+      asignar: 'Asignar',
+      asignando: 'Asignando…',
+      faltaDocumento: 'Escribe el documento del docente.',
+      /** @param {string} resultado 'asignado' | 'ya_estaba' */
+      exito: (resultado) => (resultado === 'ya_estaba' ? 'El docente ya estaba asignado a este grupo.' : 'Docente asignado.'),
+      errorGeneral: 'No se pudo asignar el docente.',
+    },
+    importarCsv: {
+      titulo: 'Importar estudiantes (CSV)',
+      volverAAdmin: 'Volver a Grupos',
+      etiquetaArchivo: 'Archivo CSV (documento_id, nombre_completo)',
+      vistaPrevia: 'Vista previa',
+      importar: 'Importar',
+      importando: 'Importando…',
+      faltaArchivo: 'Elige un archivo CSV.',
+      /** @param {{creados: number, ya_estaban: number, total: number}} r */
+      exito: (r) => `Importado: ${r.creados} nuevo(s), ${r.ya_estaban} ya estaban, de ${r.total} fila(s).`,
+      // M4 es todo o nada (§4.3): un 422 nunca escribió ninguna fila — se lo decimos explícito.
+      encabezadoErrores: 'No se escribió nada. Corrige estas filas y vuelve a intentar:',
+      errorGeneral: 'No se pudo importar el archivo.',
+    },
+  },
 };
