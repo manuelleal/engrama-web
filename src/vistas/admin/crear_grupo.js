@@ -12,12 +12,11 @@ import { ligarEscrituraARed } from '../../ui/red.js';
 
 function filaDeGrupo(grupo) {
   return h(
-    'li', { 'data-testid': `admin-grupo-${grupo.id}` },
-    h('span', {}, grupo.group_code),
-    ' · ',
-    h('a', { href: `#/admin/asignar-docente/${grupo.id}`, 'data-testid': `admin-grupo-${grupo.id}-docente` }, textos.admin.grupos.irAAsignarDocente),
-    ' · ',
-    h('a', { href: `#/admin/importar-csv/${grupo.id}`, 'data-testid': `admin-grupo-${grupo.id}-csv` }, textos.admin.grupos.irAImportarCsv),
+    'li', { class: 'fila', 'data-testid': `admin-grupo-${grupo.id}` },
+    h('span', { class: 'fila-titulo' }, grupo.group_code),
+    h('div', { class: 'fila-acciones' },
+      h('a', { href: `#/admin/asignar-docente/${grupo.id}`, class: 'boton-chico', 'data-testid': `admin-grupo-${grupo.id}-docente` }, textos.admin.grupos.irAAsignarDocente),
+      h('a', { href: `#/admin/importar-csv/${grupo.id}`, class: 'boton-chico', 'data-testid': `admin-grupo-${grupo.id}-csv` }, textos.admin.grupos.irAImportarCsv)),
   );
 }
 

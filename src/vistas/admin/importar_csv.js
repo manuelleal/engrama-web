@@ -32,22 +32,22 @@ function leerArchivoComoTexto(archivo) {
 function pintarPrevia(zonaPrevia, textoCsv) {
   const lineas = lineasDePrevia(textoCsv);
   montar(zonaPrevia, h(
-    'div', { 'data-testid': 'csv-previa' },
+    'div', { class: 'tarjeta', 'data-testid': 'csv-previa' },
     h('h2', {}, textos.admin.importarCsv.vistaPrevia),
-    h('ul', {}, ...lineas.map((l, i) => h('li', { 'data-testid': `csv-previa-fila-${i}` }, l))),
+    h('ul', {}, ...lineas.map((l, i) => h('li', { class: 'linea-csv', 'data-testid': `csv-previa-fila-${i}` }, l))),
   ));
 }
 
 function pintarResultadoOk(zonaResultado, r) {
-  montar(zonaResultado, h('p', { role: 'status', 'data-testid': 'csv-resultado-ok' }, textos.admin.importarCsv.exito(r)));
+  montar(zonaResultado, h('p', { role: 'status', class: 'resultado resultado-ok', 'data-testid': 'csv-resultado-ok' }, textos.admin.importarCsv.exito(r)));
 }
 
 function pintarErrores422(zonaResultado, e) {
   const filas = filasDeError(e.cuerpo);
   montar(zonaResultado, h(
-    'div', { role: 'alert', 'data-testid': 'csv-resultado-error' },
-    h('p', {}, textos.admin.importarCsv.encabezadoErrores),
-    h('ul', {}, ...filas.map((f, i) => h('li', { 'data-testid': `csv-error-fila-${i}` }, f))),
+    'div', { role: 'alert', class: 'tarjeta', 'data-testid': 'csv-resultado-error' },
+    h('p', { class: 'fila-titulo' }, textos.admin.importarCsv.encabezadoErrores),
+    h('ul', {}, ...filas.map((f, i) => h('li', { class: 'linea-csv', 'data-testid': `csv-error-fila-${i}` }, f))),
   ));
 }
 
