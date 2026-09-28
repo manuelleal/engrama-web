@@ -38,6 +38,27 @@ test(
 );
 
 test(
+  'segunda pasada de diseño: la navegación inferior del estudiante queda FIJA abajo, no flotando a mitad de pantalla',
+  { skip: !HAY_NAVEGADOR && 'no hay Edge ni Chrome instalado en esta máquina' },
+  async () => {
+    await conAppCompleta(async (url) => {
+      const r = await revisarPagina({
+        url, ancho: 375, alto: 812, espera_ms: 5000, pre: YA_ENTRO,
+        eval: `(() => {
+          const nav = document.querySelector('.nav-inferior');
+          const cs = getComputedStyle(nav);
+          const rect = nav.getBoundingClientRect();
+          return { position: cs.position, bottomGap: Math.round(window.innerHeight - rect.bottom) };
+        })()`,
+      });
+      assert.deepEqual(r.errores, []);
+      assert.equal(r.eval.position, 'fixed', 'la nav inferior debe estar en position:fixed, no en el flujo normal del documento');
+      assert.ok(Math.abs(r.eval.bottomGap) <= 2, `la nav debe tocar el borde inferior del viewport (gap medido: ${r.eval.bottomGap}px)`);
+    });
+  },
+);
+
+test(
   'E7: tras una visita con red, el shell abre sin red (precarga de sw.js)',
   { skip: !HAY_NAVEGADOR && 'no hay Edge ni Chrome instalado en esta máquina' },
   async () => {

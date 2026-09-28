@@ -5,6 +5,7 @@
 import { h, montar } from '../../ui/dom.js';
 import { crearResultado } from '../../ui/retro.js';
 import { suscribirRed } from '../../ui/red.js';
+import { lanzarConfeti } from '../../ui/confeti.js';
 import { textos } from '../../textos.js';
 import { marcarAsistencia } from '../../api/core.js';
 import { accionUnica, ErrorApi } from '../../api/cliente.js';
@@ -65,6 +66,9 @@ export function renderAsistencia(raiz, query, ctx) {
       if (!codigo) { montar(zonaResultado, crearResultado({ ok: false, texto: textos.asistencia.faltaCodigo })); return; }
       const r = await marcarAsistencia({ token: ctx.token, tenantId: ctx.tenantId, codigo });
       montar(zonaResultado, crearResultado({ ok: true, texto: textos.asistencia.exito(r.coins_awarded, r.streak) }));
+      // Game feel (referencia de solo lectura: coins-mvp/student.html) — confeti sutil solo si de
+      // verdad ganó algo; el CSS ya respeta prefers-reduced-motion (ui/confeti.js).
+      if (r.coins_awarded > 0) lanzarConfeti();
     } catch (e) {
       const mensaje = e instanceof ErrorApi ? mensajeDeAsistencia(e) : textos.asistencia.codigoInvalido;
       montar(zonaResultado, crearResultado({ ok: false, texto: mensaje }));

@@ -7,6 +7,7 @@ import { h, montar } from '../../ui/dom.js';
 import { crearResultado } from '../../ui/retro.js';
 import { crearDrako } from '../../ui/drako.js';
 import { crearNavInferior } from '../../ui/nav_inferior.js';
+import { lanzarConfeti } from '../../ui/confeti.js';
 import { textos } from '../../textos.js';
 
 /** Texto legible de una opción por su label ("A" -> su `value`); si no hay opciones, la label tal cual. */
@@ -54,5 +55,8 @@ export function renderRevision(raiz, datos) {
     crearNavInferior('retos'),
   );
   montar(raiz, nodo);
+  // Game feel (referencia de solo lectura: coins-mvp/student.html) — confeti sutil solo si de
+  // verdad ganó monedas; el CSS ya respeta prefers-reduced-motion (ui/confeti.js).
+  if (resultado.coins_earned > 0) lanzarConfeti();
   document.body.dataset.listo = '1';
 }

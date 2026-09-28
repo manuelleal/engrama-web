@@ -1,0 +1,7 @@
+{
+  "descripcion": "Segunda pasada de diseño: la navegación inferior del estudiante deja de estar fija abajo (position:fixed) y vuelve a flotar a mitad de pantalla, como se veía en la galería antes del pulido",
+  "archivos": { "estilos/componentes.css": "componentes.css" },
+  "comando": ["node", "--test", "--test-reporter=tap", "tests/e2e/shell.test.mjs"],
+  "espera_codigo_no_cero": true,
+  "espera_fallan_tests": ["segunda pasada de diseño: la navegación inferior del estudiante queda FIJA abajo, no flotando a mitad de pantalla"]
+}

@@ -6,6 +6,7 @@ import assert from 'node:assert/strict';
 import { existsSync } from 'node:fs';
 import { revisarPagina } from '../../herramientas/cdp.mjs';
 import { conAppCompleta } from './ayudante_servidor.mjs';
+import { textos } from '../../src/textos.js';
 
 const HAY_NAVEGADOR = [
   process.env.EDGE_PATH,
@@ -34,7 +35,9 @@ test(
       assert.ok(r.testids.includes('vista-entrada'), 'primero se ve la entrada, sin sesión');
       assert.deepEqual(r.errores, []);
       assert.ok(r.eval.testids.includes('vista-inicio'), 'tras elegir un actor, se ve el shell');
-      assert.equal(r.eval.h1, 'ENGRAMA');
+      // Segunda pasada de diseño: el h1 de Inicio ya no repite el nombre de la app (fijo en
+      // <title>) sino el saludo sin calificar (010) — "Ana Sintética" es el nombre de est-1.
+      assert.equal(r.eval.h1, textos.inicio.saludo('Ana Sintética'));
       assert.match(r.eval.saldo, /^\d+ monedas$/, 'el saldo viene del servidor, no del cliente');
     });
   },
