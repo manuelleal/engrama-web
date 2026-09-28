@@ -90,6 +90,12 @@ Estas decisiones están **cerradas**. Cambiarlas requiere reescribir este docume
 
 ### 4.1 Frontend — Web (estudiantes + profesores + admins)
 
+> **SUPERADO (2026-09-28, decisión 009, `docs/ESPEC_mvp_uis.md` §6.1):** esta tabla
+> queda desactualizada. npm no está autorizado y el MVP para la UIS pide una PWA que
+> abra sin red; el stack real es JavaScript ESM sin build, sin framework y sin
+> paquetes npm, ver `docs/ESPEC_mvp_uis.md` §6.2 y `CLAUDE.md`. Se deja la tabla
+> original como registro de la decisión anterior, no como plan vigente.
+
 | Tecnología | Propósito |
 |---|---|
 | **Next.js 14** (App Router) | Framework React con server components y server actions |

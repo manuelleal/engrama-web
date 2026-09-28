@@ -1,0 +1,12 @@
+# Salida de scripts (humo, retos sembrados, capturas de prueba): nunca se commitea.
+salida/
+
+# Por si algún día hay paquetes de desarrollo (Playwright, axe, tsc) con el permiso de Christiam.
+node_modules/
+
+# Perfiles temporales de Edge/Chrome headless usados por herramientas/cdp.mjs.
+.perfil-navegador/
+
+# Variables de entorno reales (ENGRAMA_API_URL, ENGRAMA_JWT_SECRET_LOCAL, ENGRAMA_TOKEN_PROFE...).
+.env
+.env.local

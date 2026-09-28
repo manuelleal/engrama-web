@@ -1,122 +1,98 @@
 # Engrama — Web
 
-> **Status:** 🔴 Planned / not yet implemented — architecture and design system
-> defined, application code not started. This repository currently holds the
-> project scaffold and the decisions that will guide the build.
+> **Estado:** en construcción. MVP para la UIS: Lingo Coins (el MVP viejo, hoy
+> dormido) portado sobre `engrama-backend`. Espec commiteada:
+> [`docs/ESPEC_mvp_uis.md`](docs/ESPEC_mvp_uis.md).
 
-Engrama is an early-stage **EdTech platform for gamified English learning**. This
-repository is the **web client**: the student- and teacher-facing app that will
-consume the [Engrama backend](https://github.com/manuelleal/engrama-backend) API.
+Engrama es una plataforma EdTech gamificada para aprender inglés. Este repo es
+el **cliente web**: la app que ven el estudiante, el profe y el admin del
+colegio, consumiendo la API de
+[`engrama-backend`](https://github.com/manuelleal/engrama-backend).
 
-It is the front end of the evolution of **Lingo-Coins**, a vanilla-JavaScript MVP
-that ran in a real university classroom (~97 students at Universidad Industrial de
-Santander, Colombia). Engrama Web is where that MVP's proven "game feel" —
-animated coins, confetti, streaks, sound — gets rebuilt on a modern,
-component-based, typed foundation.
-
-📖 The full story: [**From Lingo-Coins MVP to Engrama**](https://github.com/manuelleal) *(portfolio narrative)*.
+Es la evolución de **Lingo Coins**, el MVP en JavaScript vanilla que corrió en
+un salón real (~97 estudiantes, Universidad Industrial de Santander). Este
+cliente porta su comportamiento probado — asistencia, retos, monedas, racha,
+panel del profe — con los arreglos de la auditoría UX y sobre un backend nuevo.
 
 ---
 
-## Honest status
+## Stack: sin build, sin framework, sin npm
 
-There is **no application code yet.** The repository contains the folder
-structure, the documented architecture, and a **decided design system** (colors,
-typography, tokens). The first milestone is a *walking skeleton* — login → home
-with wallet → QR check-in → leaderboard — consuming the live backend endpoints.
+**Decisión 009** (`docs/ESPEC_mvp_uis.md` §6): se descartó Next.js. El stack
+real es JavaScript ESM moderno, sin build, con `// @ts-check` + JSDoc para que
+los tipos queden listos para `tsc` el día que haya permiso de npm.
 
-Being explicit about this matters: the value on show here is **product and UX
-decision-making for education**, not a shipped interface. The backend that this
-client will call is real and tested; the client is the next build.
+| Pieza | Elección |
+|---|---|
+| Lenguaje | JS ESM + JSDoc, sin build |
+| Vistas | ayudante `h(tag, attrs, ...hijos)` solo con `textContent` (nunca `innerHTML`) |
+| Estilos | CSS propio con los tokens de `diseno/tokens.json` (decisión 001, Navy Real) |
+| Rutas | hash (`#/inicio`, `#/retos/:id`…) |
+| Estado | módulo propio de publicar/suscribir |
+| PWA | `sw.js` a mano: el shell abre sin red tras la primera visita |
+| Tests | `node:test` + E2E por CDP (Edge/Chrome headless), sin dependencias |
 
----
+`package.json` existe con `"dependencies": {}`. Playwright, axe-core y
+TypeScript entran como dependencias de **desarrollo** solo con el sí de
+Christiam (§6.3 de la espec); el cliente en producción no descarga nada de
+npm.
 
-## Planned architecture
-
-The stack is decided and documented; the reasoning is intentionally conservative
-so the founder (an English teacher, not a career developer) can maintain it.
-
-| Concern | Choice | Why |
-|---|---|---|
-| Framework | Next.js 14 (App Router) | Mobile-first, server components, one hosting story |
-| Language | TypeScript (strict) | Types auto-generated from the backend's OpenAPI schema |
-| Styling | Tailwind CSS + shadcn/ui | Design tokens as the single source of visual truth |
-| State | Zustand | Small, explicit global state |
-| Data fetching | TanStack Query | Caching + optimistic UI for the coin economy |
-| Auth | Supabase JS client (auth only) | JWT issuance; all business logic stays in the backend |
-| Icons | Phosphor (navigation) + Lucide | Inherited from the MVP's visual language |
-| Testing | Vitest + Playwright | Unit + end-to-end |
-
-**Design boundary:** the web client never talks to the database directly (the
-MVP's biggest architectural weakness). It only calls the typed backend API and
-uses Supabase solely to obtain a JWT.
-
-### Design system — "Midnight Blue + Gold"
-
-The palette is decided: it evolves the exact colors that ~97 students already
-recognized in the MVP. Gold *is* the coin — the brand's whole identity — and
-sets Engrama apart from Duolingo (green) and Kahoot/Quizizz (purple).
-
-```css
-:root {
-  --eng-bg: #0B1221;         /* base background */
-  --eng-surface: #161F30;    /* glassmorphism cards (85% alpha + blur) */
-  --eng-gold: #F5A623;       /* brand: coins, primary CTA, streaks, achievements */
-  --eng-teal: #00F5D4;       /* success / positive feedback */
-  --eng-blue: #2B7FE8;       /* info / links */
-  --eng-red:  #FF4D6D;       /* error / loss */
-  --eng-text: #E8EFF8;
-}
-```
-
-Rule of thumb baked into the system: **gold is scarce on purpose** — only coins,
-the one primary CTA per screen, streaks and achievements. If everything glows,
-nothing does. Typography: Lexend (headings) + Inter (body).
+Por qué: pide una PWA que abra sin red (un service worker escrito a mano se
+audita mejor que el plugin de Next.js), un solo cliente que luego sumará el
+modo en vivo de EVAGAME (ya ESM puro), npm no está autorizado hoy, y lo
+mantiene una persona que es profe — sin build, lo que está en disco es lo que
+corre.
 
 ---
 
-## Planned structure
+## Cómo se relaciona con el backend
+
+- Todo pasa por `/api/...` en el mismo origen (el servidor de desarrollo hace
+  de proxy; en producción, un reverse proxy). **Nunca** hay CORS ni acceso
+  directo a la base (`/rest/v1`, `service_role`): decisión 005.
+- La auth vive detrás de una interfaz (`src/auth/interfaz.js`) con tres
+  implementaciones: `mock` (hitos 0-1, sin backend), `perfil_actual` (contra
+  `/auth/me` de hoy) y `supabase_rest` (login real, hito 3).
+- El backend estable montado hoy: `/admin`, `/auth`, `/challenges`, `/core`,
+  `/teachers`. Lo que falta lo pide `docs/ENCARGO_F4_lingo.md`.
+
+---
+
+## Estructura
 
 ```
-app/            # Next.js App Router — routes & layouts
-lib/            # api-client, generated api-types, supabase, utils
-stores/         # Zustand stores (user, ui)
+engrama-web/
+  index.html  manifest.webmanifest  sw.js
+  estilos/{base,componentes}.css
+  publico/diseno/{tokens.css, drako/*.svg}   # copias idénticas de diseno/ (R1)
+  src/app.js  src/rutas.js  src/estado.js  src/textos.js
+  src/api/{cliente,auth,retos,core,profe,admin}.js
+  src/auth/{interfaz,mock,perfil_actual,supabase_rest}.js
+  src/ui/{dom,retro,sonido,drako,escudo,red}.js
+  src/vistas/{estudiante,profe,admin}/...
+  herramientas/{servidor_dev,mock_api,sembrar_retos,sincronizar_diseno,humo,cdp,verificar}.mjs
+  tests/{unit,e2e}/  tests/tramposos/<nombre>/  tests/correr_tramposos.mjs
+  contratos/openapi_<sha-backend>.json         # copia de solo lectura (R2)
 ```
-
-*(These directories exist as scaffolding; implementation is pending.)*
 
 ---
 
-## Getting started (once implemented)
+## Desarrollo local
 
 ```bash
-npm install
-cp .env.local.example .env.local     # NEXT_PUBLIC_SUPABASE_* + API base URL
-npm run dev                          # → http://localhost:3000
+node herramientas/servidor_dev.mjs   # estáticos + proxy /api → ENGRAMA_API_URL (o mock)
+node --test                          # tests unitarios y de contrato
+node tests/correr_tramposos.mjs      # cada tramposo debe salir en rojo
+node herramientas/verificar.mjs      # análisis estático (tokens, DOM prohibido, tamaños)
+node herramientas/humo.mjs --contra mock   # humo de sintéticos, escribe salida/humo_mvp_uis.mock.json
 ```
 
----
-
-## First milestone — walking skeleton
-
-1. Initialize Next.js 14 + Tailwind + shadcn with the design tokens above.
-2. Login (Supabase JWT) → home with coin wallet → QR check-in → leaderboard,
-   all consuming the backend API.
-3. Port the MVP's game feel: animated coin counting, confetti, streak sounds
-   (reference implementation lives in the original Lingo-Coins MVP).
+Detalle completo de cada comando y del guion del humo en `docs/ESPEC_mvp_uis.md` §9.
 
 ---
 
-## My role in this project
+## Qué no se toca desde aquí
 
-I own the **product, learning design and educational UX** of Engrama, and drive
-implementation with an **AI-assisted workflow** (Claude Code against written
-specs). For the web client specifically, my contribution so far is the decided
-architecture and the design system — the choices that determine how the interface
-will teach and feel — ahead of writing the code. See the portfolio narrative for
-the full breakdown.
-
----
-
-*Engrama is a work in progress and is not affiliated with any commercial release.
-Built in Bucaramanga, Colombia.*
+`engrama-backend` (solo lectura, salvo exportar su OpenAPI), `coins-mvp`
+(dormido, decisión 004, solo lectura), `contenido/`, `diseno/` — ver
+`docs/ESPEC_mvp_uis.md` §14.

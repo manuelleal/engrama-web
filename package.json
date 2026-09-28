@@ -1,0 +1,20 @@
+{
+  "name": "engrama-web",
+  "version": "0.0.0",
+  "private": true,
+  "description": "Cliente PWA de ENGRAMA (MVP para la UIS). ESM sin build, sin framework, sin paquetes npm. Ver docs/ESPEC_mvp_uis.md §6.",
+  "type": "module",
+  "engines": {
+    "node": ">=24"
+  },
+  "scripts": {
+    "dev": "node herramientas/servidor_dev.mjs",
+    "test": "node --test",
+    "test:tramposos": "node tests/correr_tramposos.mjs",
+    "verificar": "node herramientas/verificar.mjs",
+    "humo": "node herramientas/humo.mjs --contra mock",
+    "sincronizar-diseno": "node herramientas/sincronizar_diseno.mjs"
+  },
+  "dependencies": {},
+  "devDependencies": {}
+}
