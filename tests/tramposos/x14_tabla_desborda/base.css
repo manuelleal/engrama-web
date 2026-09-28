@@ -1,4 +1,9 @@
-/* base.css · Reset y fondo del shell. Solo var(--token) de tokens.css o color-mix() con
+/* TRAMPOSO X14 — versión rota a propósito: exactamente base.css antes del arreglo de W16 (la
+   galería de capturas, encargo 2), sin las reglas de `table`. Sin `table-layout: fixed` y sin
+   `overflow-wrap`, el navegador no envuelve las columnas angostas de "logro por eje" y "errores
+   por ítem" a 375 px, y el contenido se sale por la derecha. Prueba que el E2E nuevo
+   (tests/e2e/profe_logro_errores.test.mjs, "E: la tabla de errores no desborda…") SÍ lo detecta.
+   base.css · Reset y fondo del shell. Solo var(--token) de tokens.css o color-mix() con
    transparent/white/black (§6.2, V3 en herramientas/verificar.mjs); nunca un color propio. */
 
 *, *::before, *::after { box-sizing: border-box; }
@@ -57,23 +62,6 @@ a { color: var(--primario); }
   max-width: 480px;
   margin: 0 auto;
   padding: 16px;
-}
-
-/* Tablas (profe: roster, logro por eje, errores por ítem): sin esto, el layout automático del
-   navegador no envuelve columnas angostas y el contenido se sale por la derecha a 375 px (§9.4;
-   medido en la galería de capturas de W16 — "profe-logro" y "profe-errores" desbordaban). Ancho
-   fijo, repartido por igual entre columnas, y el texto largo se envuelve dentro de su celda. */
-table {
-  width: 100%;
-  table-layout: fixed;
-  border-collapse: collapse;
-}
-th, td {
-  overflow-wrap: break-word;
-  word-break: break-word;
-  padding: 4px 8px;
-  text-align: left;
-  vertical-align: top;
 }
 
 /* El banner de red (ui/red.js) es una región aria-live: nunca se anima con parpadeo. */

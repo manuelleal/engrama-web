@@ -11,7 +11,8 @@ import { revisarPagina } from '../../herramientas/cdp.mjs';
 import { conAppCompleta } from './ayudante_servidor.mjs';
 import { crearChallenge } from '../../herramientas/mock/rutas_challenges.mjs';
 import { arrancarIntento, enviarIntento } from '../../herramientas/mock/rutas_intentos.mjs';
-import { DOCENTE_BOOTSTRAP_TOKEN } from '../../herramientas/mock/estado.mjs';
+import { importarCsv } from '../../herramientas/mock/rutas_admin.mjs';
+import { ADMIN_BOOTSTRAP_TOKEN, DOCENTE_BOOTSTRAP_TOKEN } from '../../herramientas/mock/estado.mjs';
 
 const HAY_NAVEGADOR = [
   process.env.EDGE_PATH,
@@ -23,6 +24,7 @@ const HAY_NAVEGADOR = [
 
 const YA_ENTRO_DOCENTE = "localStorage.setItem('engrama_actor_sintetico', 'docente-demo')";
 
+function reqAdmin() { return { headers: { authorization: `Bearer ${ADMIN_BOOTSTRAP_TOKEN}` } }; }
 function reqDocente() { return { headers: { authorization: `Bearer ${DOCENTE_BOOTSTRAP_TOKEN}` } }; }
 function reqEstudiante(token) { return { headers: { authorization: `Bearer ${token}` } }; }
 
@@ -67,6 +69,7 @@ test(
         })()`,
       });
       assert.deepEqual(r.errores, []);
+      assert.ok(r.scroll_ancho <= 375, `E9: scrollWidth ${r.scroll_ancho} debe ser <= 375 (la tabla no debe desbordar)`);
       assert.equal(r.eval.filas, 2, 'las dos estudiantes deben aparecer, en el orden del servidor (sin ranking)');
       assert.doesNotMatch(r.eval.cuerpo, /débil|weak/i, 'la interfaz nunca dice "débil" ni "weak" (P1/P4)');
       // "datos_insuficientes" con pocos retos: AUN así debe verse junto a la info de nivel MCER.
@@ -97,6 +100,34 @@ test(
       // Solo 2 respondientes (< mínimo de 5): los dos ítems quedan suprimidos por privacidad.
       assert.equal(r.eval.filas, 0);
       assert.match(r.eval.suprimidos, /2 ítem/);
+    });
+  },
+);
+
+// Con solo 2 respondientes (arriba), los ítems quedan suprimidos y la tabla casi no tiene texto
+// largo — no alcanza a mostrar el desborde que sí se vio en la galería de capturas (W16, encargo
+// 2: "profe-errores" desbordaba a 375 px con datos reales). Este test agrega 3 respondientes más
+// (5 en total, por encima del mínimo) para que las filas SÍ se vean, con su `question_text` y su
+// `title` largos — el caso que de verdad ejercita el ancho de la tabla.
+test(
+  'E: la tabla de errores no desborda a 375 px con datos reales (5 respondientes, sin supresión)',
+  { skip: !HAY_NAVEGADOR && 'no hay Edge ni Chrome instalado en esta máquina' },
+  async () => {
+    await conAppCompleta(async (url, estado) => {
+      const grupoId = [...estado.groups.values()][0].id;
+      importarCsv(estado, reqAdmin(), grupoId, 'documento_id,nombre_completo\nest-3,Est Tres\nest-4,Est Cuatro\nest-5,Est Cinco\n');
+      const reto = sembrarYResponder(estado, grupoId);
+      for (const token of ['est-3', 'est-4', 'est-5']) {
+        const { cuerpo: inicio } = arrancarIntento(estado, reqEstudiante(token), reto.id);
+        const answers = reto.questions.map((q) => ({ question_id: q.id, answer: 'A' }));
+        enviarIntento(estado, reqEstudiante(token), inicio.attempt_id, { answers });
+      }
+      const r = await revisarPagina({
+        url: `${url}#/profe/grupo/${grupoId}/errores`, ancho: 375, alto: 812, espera_ms: 5000, pre: YA_ENTRO_DOCENTE,
+      });
+      assert.deepEqual(r.errores, []);
+      assert.ok(r.testids.some((t) => t.startsWith('error-')), 'con 5 respondientes, la fila ya no debe estar suprimida');
+      assert.ok(r.scroll_ancho <= 375, `scrollWidth ${r.scroll_ancho} debe ser <= 375 (la tabla no debe desbordar)`);
     });
   },
 );

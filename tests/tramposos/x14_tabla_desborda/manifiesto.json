@@ -1,0 +1,7 @@
+{
+  "descripcion": "X14: sin las reglas de `table` en base.css (table-layout: fixed, overflow-wrap), las columnas angostas de logro/errores no se envuelven y desbordan a 375 px (encontrado en la galería de capturas de W16, encargo 2)",
+  "archivos": { "estilos/base.css": "base.css" },
+  "comando": ["node", "--test", "--test-reporter=tap", "tests/e2e/profe_logro_errores.test.mjs"],
+  "espera_codigo_no_cero": true,
+  "espera_fallan_tests": ["E: la tabla de errores no desborda a 375 px con datos reales (5 respondientes, sin supresión)"]
+}
