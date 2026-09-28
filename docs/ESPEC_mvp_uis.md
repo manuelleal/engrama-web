@@ -203,7 +203,7 @@ Hay tres implementaciones, que se eligen con `ENGRAMA_AUTH=mock|perfil_actual|su
    "modules": ["engrama"],
    "profile_id": "<uuid>", "full_name": "Ana Sintética", "group_code": "SINT-B1-01", "current_streak": 3}
   ```
-  Las tres primeras claves son de la 008 §1.2. `profile_id`, `full_name` (de la membresía, BUG-11), `group_code` y `current_streak` son **supuestos del cliente**: F4 los confirma o los corrige en la espec del login (migración 033), y el mock se ajusta en un commit aparte.
+  Las tres primeras claves son de la 008 §1.2. `profile_id`, `full_name` (de la membresía, BUG-11), `group_code` y `current_streak` son **supuestos del cliente**: F4 los confirma o los corrige en la espec del login (migración 034; la 033 es BUG-13), y el mock se ajusta en un commit aparte.
   - Contra el backend local, el mock firma un JWT HS256 con el secreto **local** de Supabase, que llega por la variable `ENGRAMA_JWT_SECRET_LOCAL` y nunca a un archivo. Si la URL de la API no es `127.0.0.1` ni `localhost`, se niega a firmar.
 - **`perfil_actual.js`:** adapta el `ProfileOut` de hoy (`src/auth/schemas.py:34`) a `Sesion`. Nunca lee `level` ni `xp`.
 - **`supabase_rest.js`** (hito 3): GoTrue por REST con correo y contraseña, enlace mágico, y Google y Microsoft (`/auth/v1/authorize?provider=…` con PKCE en WebCrypto). Guarda el refresh token en IndexedDB y el access token solo en memoria. Muestra un mensaje propio para `over_email_send_rate_limit` (login §5, H3).

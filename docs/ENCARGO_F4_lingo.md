@@ -12,7 +12,7 @@ Cerrar las brechas entre lo que Lingo Coins hacía en clase y lo que engrama-bac
 - `ENGRAMA/coins-mvp/app.js:2769-2938` (submitChallenge) y `:4024-4060` (computeChallengeRewards). Solo lectura: es la referencia de comportamiento.
 
 ## Orden propuesto (lo reordena el coordinador o Christiam)
-Van primero dos bugs chicos, luego la regla de la casa y después el resto: **L2 → L6 → L1 → L4 → L3 → L7 → L5 → L8**. **L9** va dentro de la espec del login 008 (migración 033). **L10** es opcional.
+Van primero dos bugs chicos, luego la regla de la casa y después el resto: **L2 → L6 → L1 → L4 → L3 → L7 → L5 → L8**. **L9** va dentro de la espec del login 008 (migración 034; la 033 es BUG-13, según F4 68c42ad). **L10** es opcional.
 
 Para el hito 2 del cliente hacen falta L1-L4 y L6 (L5 y L7 son deseables). Para el piloto (hito 3) hacen falta además L8, L9 y el login 008.
 
