@@ -1,0 +1,7 @@
+{
+  "descripcion": "X3: monedas acreditadas dos veces (cliente) — se quita la guarda de un solo envío",
+  "archivos": { "src/api/cliente.js": "cliente.js" },
+  "comando": ["node", "--test", "--test-reporter=tap", "tests/unit/api_cliente.test.mjs"],
+  "espera_codigo_no_cero": true,
+  "espera_fallan_tests": ["U5: accionUnica — dos toques rápidos disparan una sola petición"]
+}

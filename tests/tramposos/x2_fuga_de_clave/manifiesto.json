@@ -1,0 +1,7 @@
+{
+  "descripcion": "X2: la clave se ve antes de responder — el filtro de fuga de clave queda de adorno",
+  "archivos": { "src/api/retos.js": "retos.js" },
+  "comando": ["node", "--test", "--test-reporter=tap", "tests/unit/api_retos.test.mjs"],
+  "espera_codigo_no_cero": true,
+  "espera_fallan_tests": ["U4: verReto() nunca devuelve una clave, aunque el servidor la mande"]
+}
