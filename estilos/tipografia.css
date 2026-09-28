@@ -1,0 +1,40 @@
+/* tipografia.css · Pulido visual para el piloto UIS (encargo de Christiam, 2026-09-28): pila de
+   fuentes del SISTEMA con forma redondeada, sin fuentes externas (§6.3: sin npm, descargas ni
+   CDN) — el CSP de index.html ya prohibía cargar una fuente que no sea de este origen
+   (font-src 'self'), así que 'Nunito Sans'/'Baloo 2' de tokens.css nunca se cargaron de verdad;
+   esto solo hace explícita la intención y evita que el navegador las busque en vano.
+   NO toca publico/diseno/tokens.css (R1, byte a byte): redefine las DOS variables de fuente acá,
+   después de que tokens.css ya cargó, y dejar los colores y radios tal cual salen del token. Un
+   color no es una fuente, así que V3 (herramientas/verificar.mjs) no aplica a esta regla. */
+:root {
+  --fuente-cuerpo: ui-rounded, "SF Pro Rounded", "Segoe UI", system-ui, sans-serif;
+  --fuente-titulos: ui-rounded, "SF Pro Rounded", "Segoe UI", system-ui, sans-serif;
+}
+
+/* Escala tipográfica (§9.4: mínimo 16px de cuerpo; nada de encabezados pequeños que hoy se ven
+   "sin terminar" a 375px). Sobrescribe el h1 suelto de base.css con peso y tamaño consistentes. */
+h1 {
+  font-size: 1.6rem;
+  font-weight: 800;
+  line-height: 1.18;
+  letter-spacing: -0.01em;
+}
+h2 {
+  font-size: 1.15rem;
+  font-weight: 800;
+  line-height: 1.2;
+}
+h3 {
+  font-size: 1rem;
+  font-weight: 700;
+}
+
+/* Texto de apoyo (contadores, etiquetas de estado): más chico, mayúsculas discretas. */
+.texto-apoyo {
+  font-size: 0.82rem;
+  font-weight: 700;
+  letter-spacing: 0.03em;
+  text-transform: uppercase;
+  color: color-mix(in srgb, var(--texto) 55%, white);
+  margin: 0;
+}

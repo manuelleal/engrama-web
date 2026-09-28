@@ -1,0 +1,446 @@
+/* componentes.css · Sistema visual base del pulido para el piloto UIS (encargo de Christiam,
+   2026-09-28): botones chunky, fichas de opción con escudo de letra, tarjetas, filas de lista,
+   barra superior, navegación inferior y el resultado con ícono+texto+color. Solo var(--token) de
+   tokens.css o color-mix() con transparent/white/black (§6.2, V3). Nada de esto cambia
+   comportamiento: son clases nuevas que las vistas agregan de forma aditiva (ver ARQUITECTURA del
+   encargo), y selectores por atributo (data-testid, que ya existía) para no tocar cada vista. */
+
+/* ---------- Listas: sin viñetas en ningún lado de la app (antes: <li> con bullet por defecto,
+   el bug más visible de "opciones de respuesta con viñetas") ---------- */
+#vista ul {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+}
+
+/* ---------- Botones "chunky" (decisión 001 §4): sombra sólida inferior + efecto de presionado,
+   como una tecla física. Usa el token --boton-borde-inferior que ya trae tokens.css. Por defecto
+   TODO <button> del cliente se ve así — es el botón primario; .boton-secundario lo suaviza para
+   acciones de menor peso (cerrar, cambiar estado en una fila...). ---------- */
+button {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  font-family: var(--fuente-titulos);
+  font-weight: 700;
+  font-size: 1rem;
+  background: var(--primario);
+  color: var(--superficie);
+  border: none;
+  border-radius: var(--radio-md);
+  border-bottom: var(--boton-borde-inferior);
+  padding: 12px 20px;
+  cursor: pointer;
+  transition: transform 0.05s ease, border-bottom-width 0.05s ease;
+}
+button:hover:not(:disabled) {
+  filter: brightness(1.05);
+}
+button:active:not(:disabled) {
+  transform: translateY(3px);
+  border-bottom-width: 1px;
+}
+button:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+  transform: none;
+}
+
+/* Variante secundaria: superficie clara, borde en vez de relleno. */
+button.boton-secundario {
+  background: var(--superficie);
+  color: var(--primario);
+  border: 2px solid var(--borde);
+  border-bottom: 4px solid var(--borde);
+  padding: 10px 18px;
+}
+
+/* Variante compacta: para botones dentro de una fila de lista o tabla, donde el chunky completo
+   pesa demasiado (encontrado en la galería: filas de retos y de grupos). */
+button.boton-chico,
+a.boton-chico {
+  padding: 8px 14px;
+  font-size: 0.9rem;
+  border-bottom-width: 3px;
+}
+button.boton-chico:active:not(:disabled) {
+  border-bottom-width: 1px;
+}
+
+/* ---------- Enlaces con data-testid: son acciones (navegar, jugar, repasar, volver), no prosa —
+   se ven como chips, nunca como texto azul subrayado. Se excluye el enlace del código de
+   asistencia (es una URL real para copiar, no una acción). La navegación inferior (más abajo) NO
+   lleva data-testid a propósito, para no pelear con esta regla por especificidad. ---------- */
+#vista a[data-testid]:not([data-testid="sesion-enlace"]) {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  font-family: var(--fuente-titulos);
+  font-weight: 700;
+  font-size: 0.92rem;
+  color: var(--primario);
+  text-decoration: none;
+  background: var(--superficie);
+  border: 2px solid var(--borde);
+  border-bottom: 4px solid var(--borde);
+  border-radius: var(--radio-sm);
+  padding: 8px 14px;
+}
+#vista a[data-testid]:not([data-testid="sesion-enlace"]):hover {
+  border-color: var(--secundario);
+}
+#vista a[data-testid]:not([data-testid="sesion-enlace"]):active {
+  transform: translateY(2px);
+  border-bottom-width: 2px;
+}
+
+nav {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 10px;
+  margin: 12px 0;
+}
+
+/* Entrada (demo): la lista de actores sintéticos, sin estilo hasta hoy. */
+.lista-actores {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  margin-top: 16px;
+}
+
+/* ---------- Fila de lista (retos, grupos, roster de retos del profe): tarjeta con la misma
+   "sombra inferior" que los botones, para que la app se sienta de una sola pieza. Arregla el bug
+   de la galería: título y botón pegados sin separador. ---------- */
+.fila {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  flex-wrap: wrap;
+  background: var(--superficie);
+  border: 2px solid var(--borde);
+  border-bottom: 4px solid var(--borde);
+  border-radius: var(--radio-md);
+  padding: 14px 16px;
+  margin-bottom: 10px;
+}
+.fila:last-child {
+  margin-bottom: 0;
+}
+.fila-texto {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  min-width: 0;
+}
+.fila-titulo {
+  font-family: var(--fuente-titulos);
+  font-weight: 700;
+  color: var(--texto);
+}
+.fila-acciones {
+  display: flex;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: 8px;
+}
+
+/* Una etiqueta + su campo fuera de un <form> (p. ej. "Asignar a" + el <select> de grupo, dentro
+   de una fila de la lista de retos del profe): mismo espacio que formularios.css, sin depender
+   de estar dentro de un <form>. */
+.etiqueta-en-linea {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  font-family: var(--fuente-titulos);
+  font-weight: 700;
+  font-size: 0.85rem;
+}
+.campo-fila {
+  font-family: var(--fuente-cuerpo);
+  font-size: 0.95rem;
+  color: var(--texto);
+  background: var(--superficie);
+  border: 2px solid var(--borde);
+  border-radius: var(--radio-sm);
+  padding: 6px 10px;
+}
+
+/* Insignia pequeña (completado, repaso, etc.), siempre junto a su texto. */
+.insignia {
+  display: inline-flex;
+  width: fit-content;
+  background: var(--correcto-fondo);
+  color: var(--correcto);
+  font-size: 0.78rem;
+  font-weight: 700;
+  padding: 3px 9px;
+  border-radius: var(--radio-sm);
+}
+
+/* Aviso corto (p. ej. "Repaso: no suma monedas"): chip dorado, nunca un párrafo suelto. */
+.aviso-corto {
+  display: inline-block;
+  background: var(--oro);
+  color: var(--oro-texto);
+  font-weight: 800;
+  font-size: 0.8rem;
+  padding: 4px 12px;
+  border-radius: var(--radio-sm);
+  margin: 4px 0 12px;
+}
+
+/* El código de la sesión de asistencia (profe/sesion_asistencia.js): grande a propósito, pensado
+   para proyectar en el salón (§4.2 de la espec del MVP). */
+.codigo-grande {
+  font-family: var(--fuente-titulos);
+  font-weight: 800;
+  font-size: 2.2rem;
+  letter-spacing: 0.08em;
+  color: var(--primario);
+  margin: 0 0 12px;
+}
+
+/* ---------- Tarjeta genérica (formularios, previas de CSV...). ---------- */
+.tarjeta {
+  background: var(--superficie);
+  border: 2px solid var(--borde);
+  border-radius: var(--radio-md);
+  padding: 16px;
+  margin: 16px 0;
+}
+
+/* Una línea de la vista previa de un CSV (admin/importar_csv.js): monoespaciada, tal cual llegó
+   (§9.6: nunca se recodifica ni se recorta lo que muestra). */
+.linea-csv {
+  font-family: ui-monospace, "Cascadia Code", "SF Mono", Consolas, monospace;
+  font-size: 0.85rem;
+  padding: 3px 0;
+  border-bottom: 1px solid var(--borde);
+}
+.linea-csv:last-child {
+  border-bottom: none;
+}
+
+/* ---------- Tablas (roster, logro, errores): fondo propio y encabezado en navy, sin tocar el
+   table-layout:fixed de base.css (regla dura contra el desborde a 375px, ya medida en W16). ---------- */
+#vista table {
+  background: var(--superficie);
+  border: 2px solid var(--borde);
+  border-radius: var(--radio-md);
+  overflow: hidden;
+  margin: 16px 0;
+}
+#vista thead {
+  background: var(--primario);
+}
+#vista th {
+  font-family: var(--fuente-titulos);
+  font-weight: 700;
+  font-size: 0.78rem;
+  text-transform: uppercase;
+  letter-spacing: 0.02em;
+  color: var(--superficie);
+}
+#vista tbody tr:nth-child(even) {
+  background: color-mix(in srgb, var(--primario) 4%, white);
+}
+
+/* ---------- El resultado (ui/retro.js): ícono + texto YA existían (regla dura §5); se agrega el
+   color de fondo en chip, nunca solo el color como única señal. ---------- */
+#vista .resultado {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  font-family: var(--fuente-titulos);
+  font-weight: 700;
+  border-radius: var(--radio-md);
+  padding: 12px 16px;
+  margin: 12px 0;
+}
+#vista .resultado span[aria-hidden] {
+  font-size: 1.25em;
+  line-height: 1;
+  flex: none;
+}
+#vista .resultado-ok {
+  background: var(--correcto-fondo);
+  color: var(--correcto);
+}
+#vista .resultado-mal {
+  background: var(--incorrecto-fondo);
+  color: var(--incorrecto);
+}
+
+/* ---------- Drako: presenta y nunca ocupa la pantalla (010, §5 — antes sin límite de tamaño,
+   se veía a tamaño natural del SVG y ocupaba media pantalla en la galería). Nunca > 64px. ---------- */
+.drako {
+  display: block;
+  width: 56px;
+  height: 56px;
+  object-fit: contain;
+  flex: none;
+}
+
+/* ---------- El escudo de nivel MCER (ui/escudo.js): insignia navy con letra dorada. ---------- */
+.escudo {
+  display: inline-flex;
+  align-items: center;
+  background: var(--primario);
+  color: var(--oro);
+  font-family: var(--fuente-titulos);
+  font-weight: 800;
+  font-size: 0.85rem;
+  padding: 6px 14px;
+  border-radius: var(--radio-sm);
+  border-bottom: 3px solid var(--primario-oscuro);
+}
+
+/* ---------- Ficha de opción de respuesta (reto_flujo.js): antes era un <button> desnudo dentro
+   de una viñeta. Ahora una tarjeta blanca con el mismo lenguaje "chunky" y la letra en un escudo
+   dorado (referencia: investigacion/evagame/pantallas-modo-en-vivo.html, .opt/.let). ---------- */
+#vista [data-testid="opciones"] {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  margin: 16px 0;
+}
+#vista [data-testid^="opcion-"] {
+  width: 100%;
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  background: var(--superficie);
+  color: var(--texto);
+  border: 2px solid var(--borde);
+  border-bottom: 4px solid var(--borde);
+  border-radius: var(--radio-md);
+  padding: 12px 16px;
+  font-family: var(--fuente-titulos);
+  font-weight: 700;
+  font-size: 1.02rem;
+  text-align: left;
+}
+#vista [data-testid^="opcion-"]:hover:not(:disabled) {
+  border-color: var(--secundario);
+}
+#vista [data-testid^="opcion-"][aria-pressed="true"] {
+  border-color: var(--primario);
+  background: color-mix(in srgb, var(--primario) 8%, white);
+}
+#vista [data-testid^="opcion-"]:active:not(:disabled) {
+  transform: translateY(2px);
+  border-bottom-width: 2px;
+}
+.escudo-letra {
+  display: inline-grid;
+  place-items: center;
+  flex: none;
+  width: 1.7em;
+  height: 1.7em;
+  background: var(--oro);
+  color: var(--oro-texto);
+  font-family: var(--fuente-titulos);
+  font-weight: 800;
+  font-size: 0.95rem;
+  border-radius: var(--radio-sm);
+  clip-path: polygon(0 0, 100% 0, 100% 64%, 50% 100%, 0 64%);
+  padding-bottom: 0.2em;
+}
+.texto-opcion {
+  flex: 1;
+  min-width: 0;
+}
+
+/* ---------- La pregunta (reto_flujo.js): encabezado chico (Drako + título limpio) y el
+   enunciado como protagonista de la pantalla — antes el enunciado se veía chico y el título
+   crudo del contenido ("[BORRADOR] sint-u01 · ...") dominaba arriba. ---------- */
+.encabezado-reto {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  margin-bottom: 4px;
+}
+.encabezado-reto .drako {
+  width: 44px;
+  height: 44px;
+}
+.titulo-reto {
+  font-size: 1rem;
+  font-weight: 700;
+  color: color-mix(in srgb, var(--texto) 75%, white);
+  margin: 0;
+}
+.enunciado {
+  font-family: var(--fuente-titulos);
+  font-weight: 700;
+  font-size: 1.4rem;
+  line-height: 1.28;
+  color: var(--texto);
+  margin: 14px 0 18px;
+}
+
+/* ---------- Barra superior del estudiante (saldo + racha) y navegación inferior. Ambas son
+   parte del sistema visual base (§1 del encargo); la barra se usa en Inicio, donde el saldo y la
+   racha ya se cargan — así no se agregan llamadas nuevas a la red en el resto de pantallas. ---------- */
+.barra-superior {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  background: var(--primario);
+  color: var(--superficie);
+  padding: 10px 16px;
+  margin: -16px -16px 16px;
+  border-bottom: 4px solid var(--primario-oscuro);
+  border-radius: 0 0 var(--radio-md) var(--radio-md);
+}
+.barra-superior .saldo {
+  margin: 0;
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  font-family: var(--fuente-titulos);
+  font-weight: 800;
+  color: var(--oro);
+}
+.barra-superior .constancia {
+  margin: 0;
+  font-family: var(--fuente-titulos);
+  font-weight: 700;
+  font-size: 0.85rem;
+  color: var(--superficie);
+}
+
+.nav-inferior {
+  display: flex;
+  justify-content: space-around;
+  align-items: center;
+  gap: 4px;
+  background: var(--superficie);
+  border-top: 2px solid var(--borde);
+  border-radius: var(--radio-md) var(--radio-md) 0 0;
+  padding: 8px 4px;
+  margin: 20px -16px -16px;
+}
+.nav-inferior a {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 2px;
+  font-family: var(--fuente-titulos);
+  font-weight: 700;
+  font-size: 0.72rem;
+  color: color-mix(in srgb, var(--texto) 55%, white);
+  text-decoration: none;
+  padding: 6px 12px;
+  border-radius: var(--radio-sm);
+  background: none;
+  border: none;
+}
+.nav-inferior a[aria-current="page"] {
+  color: var(--primario);
+  background: color-mix(in srgb, var(--primario) 10%, white);
+}

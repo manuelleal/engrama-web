@@ -8,7 +8,7 @@
 //
 // Súbelo un número cada vez que cambie la lista de precarga o la estrategia; la `activate`
 // borra cualquier caché con otro nombre.
-const VERSION = 'engrama-shell-v9';
+const VERSION = 'engrama-shell-v10';
 
 // Cada encargo agrega los suyos en su propio commit (W7: Inicio + api/cliente,core,retos + los
 // SVG de Drako que usa el estudiante; W10: profe/grupos,grupo,sesion_asistencia + api/profe). El
@@ -21,6 +21,9 @@ const PRECARGA = [
   '/index.html',
   '/manifest.webmanifest',
   '/estilos/base.css',
+  '/estilos/tipografia.css',
+  '/estilos/componentes.css',
+  '/estilos/formularios.css',
   '/publico/diseno/tokens.css',
   '/publico/diseno/drako/icono-32.svg',
   '/publico/diseno/drako/presenta.svg',
@@ -33,6 +36,8 @@ const PRECARGA = [
   '/src/ui/escudo.js',
   '/src/ui/drako.js',
   '/src/ui/sonido.js',
+  '/src/ui/titulo.js',
+  '/src/ui/nav_inferior.js',
   '/src/auth/mock.js',
   '/src/vistas/entrada.js',
   '/src/vistas/estudiante/inicio.js',

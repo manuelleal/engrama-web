@@ -1,0 +1,42 @@
+/* formularios.css · Pulido de formularios para el piloto UIS: espacio entre etiqueta y campo
+   (antes se tocaban: <label> e <input> seguidos, sin margen ni gap) y una sola línea visual por
+   campo. No cambia el DOM (cada vista ya pone <label for> justo antes de su <input>/<select>): el
+   espaciado sale entero de aquí. */
+#vista form {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  margin: 18px 0;
+}
+#vista form label {
+  font-family: var(--fuente-titulos);
+  font-weight: 700;
+  font-size: 0.85rem;
+  color: var(--texto);
+  margin-top: 6px;
+}
+#vista form label:first-child {
+  margin-top: 0;
+}
+#vista form input,
+#vista form select {
+  font-family: var(--fuente-cuerpo);
+  font-size: 1rem;
+  color: var(--texto);
+  background: var(--superficie);
+  border: 2px solid var(--borde);
+  border-radius: var(--radio-sm);
+  padding: 10px 12px;
+}
+#vista form input:focus-visible,
+#vista form select:focus-visible {
+  border-color: var(--secundario);
+}
+#vista form input[type="file"] {
+  border-style: dashed;
+  padding: 16px 12px;
+}
+#vista form button[type="submit"] {
+  align-self: flex-start;
+  margin-top: 8px;
+}
