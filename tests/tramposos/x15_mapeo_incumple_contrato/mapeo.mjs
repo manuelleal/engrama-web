@@ -90,7 +90,7 @@ export function bloquesDePiensalo(unidad) {
         titulo: tituloBloque(unidad, destreza, numero, rol),
         // order_index empieza en 1 (contrato: ChallengeQuestionIn.order_index, minimum 1) — el
         // índice del .map() es 0-based, así que se suma 1 aquí, en el único lugar que lo produce.
-        questions: bloque.items.map((item, qi) => preguntaDePiensalo(item, qi + 1)),
+        questions: bloque.items.map((item, qi) => preguntaDePiensalo(item, qi)),
       });
     }
   }
@@ -103,7 +103,7 @@ export function retosDeLectura(unidad) {
     titulo: tituloLectura(unidad, i + 1),
     description: familia.texto,
     // Mismo criterio que arriba: order_index 1-based (contrato, minimum 1).
-    questions: familia.afirmaciones.map((a, qi) => preguntaDeAfirmacion(a, qi + 1)),
+    questions: familia.afirmaciones.map((a, qi) => preguntaDeAfirmacion(a, qi)),
   }));
 }
 
@@ -144,9 +144,9 @@ function conPrefijoBorrador(titulo, borrador) {
  * que le cabe a este contenido: todo lo que siembra F8 (piensalo y lo_dice) son preguntas de
  * opción múltiple. 'practice' no es un valor válido — era el bug F8 (encargo B).
  */
-export function challengeCreate(unidad, { titulo, destreza, description = '', questions }, { groupId, maxWinners, borrador }) {
+export function challengeCreate(unidad, { titulo, destreza, description = null, questions }, { groupId, maxWinners, borrador }) {
   return {
-    title: conPrefijoBorrador(titulo, borrador), description, challenge_type: 'multiple_choice',
+    title: conPrefijoBorrador(titulo, borrador), description, challenge_type: 'practice',
     cefr_level: unidad.nivel, skill: destreza, topic: unidad.id,
     coins_reward: COINS_REWARD, max_attempts: MAX_ATTEMPTS, max_winners: maxWinners,
     group_id: groupId, questions,

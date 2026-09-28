@@ -1,0 +1,7 @@
+{
+  "descripcion": "Encargo B (F9): mapeo.mjs vuelve a violar el contrato real (description null, order_index 0-based, challenge_type 'practice'). Con el mock YA estricto, sembrar_retos.mjs debe reventar contra /challenges/ en vez de colarse.",
+  "archivos": { "herramientas/sembrar/mapeo.mjs": "mapeo.mjs" },
+  "comando": ["node", "--test", "--test-reporter=tap", "tests/unit/sembrar_retos.test.mjs"],
+  "espera_codigo_no_cero": true,
+  "espera_fallan_tests": ["sembrar(): con --borrador contra la API local, siembra los 7 retos (6 Accuracy + 1 lectura) con max_winners = tamaño del grupo"]
+}

@@ -106,6 +106,33 @@ test('challengeCreate: con borrador, antepone "[BORRADOR] " al título', () => {
   assert.match(cuerpo.title, /^\[BORRADOR\] /);
 });
 
+// Encargo B (F9): el mapeo violaba el contrato real (contratos/openapi_c7a8b89.json) en tres
+// campos — description llegaba null, order_index empezaba en 0, challenge_type era 'practice'
+// (no existe en el enum del backend). Estos tres tests fijan el arreglo.
+test('challengeCreate: un bloque de Accuracy (sin texto propio) manda description "" en vez de null', () => {
+  const [bloque] = bloquesDePiensalo(unidadSintetica());
+  const cuerpo = challengeCreate(unidadSintetica(), bloque, { groupId: 'g1', maxWinners: 1, borrador: false });
+  assert.equal(typeof cuerpo.description, 'string');
+  assert.notEqual(cuerpo.description, null);
+});
+
+test('challengeCreate: challenge_type es un valor del enum del backend ("multiple_choice"), nunca "practice"', () => {
+  const [bloque] = bloquesDePiensalo(unidadSintetica());
+  const cuerpo = challengeCreate(unidadSintetica(), bloque, { groupId: 'g1', maxWinners: 1, borrador: false });
+  assert.equal(cuerpo.challenge_type, 'multiple_choice');
+  assert.notEqual(cuerpo.challenge_type, 'practice');
+});
+
+test('bloquesDePiensalo/retosDeLectura: order_index de cada bloque empieza en 1, nunca en 0 (contrato: minimum 1)', () => {
+  for (const bloque of bloquesDePiensalo(unidadSintetica())) {
+    assert.equal(bloque.questions[0].order_index, 1);
+    assert.deepEqual(bloque.questions.map((q) => q.order_index), bloque.questions.map((_, i) => i + 1));
+  }
+  for (const reto of retosDeLectura(unidadSintetica())) {
+    assert.equal(reto.questions[0].order_index, 1);
+  }
+});
+
 test('verificarFirma: firmada -> ok, sin borrador aunque se pida', () => {
   const r = verificarFirma(unidadSintetica('Christiam'), { borrador: true, apiEsLocal: true });
   assert.deepEqual(r, { ok: true, borrador: false });
