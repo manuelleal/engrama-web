@@ -1,0 +1,7 @@
+{
+  "descripcion": "X8: contenido como HTML (XSS) — ui/dom.js usa innerHTML en vez de textContent",
+  "archivos": { "src/ui/dom_prueba.js": "archivo.mjs" },
+  "comando": ["node", "herramientas/verificar.mjs", "--json"],
+  "espera_codigo_no_cero": true,
+  "espera_contiene_checks": ["V4"]
+}

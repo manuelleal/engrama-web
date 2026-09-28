@@ -1,0 +1,23 @@
+/* Generado por herramientas/generar_tokens.py — no editar a mano. */
+:root {
+  --borde: #E3E3E3;
+  --correcto: #0F5C33;
+  --correcto-fondo: #D6F5E0;
+  --fondo: #FAF7F0;
+  --incorrecto: #A3231B;
+  --incorrecto-fondo: #FDE1DE;
+  --oro: #F0A500;
+  --oro-texto: #2A1E00;
+  --primario: #003366;
+  --primario-oscuro: #002347;
+  --secundario: #2E8B8B;
+  --superficie: #FFFFFF;
+  --texto: #1B1F27;
+  --fuente-cuerpo: 'Nunito Sans', system-ui, sans-serif;
+  --fuente-titulos: 'Baloo 2', system-ui, sans-serif;
+  --radio-lg: 24px;
+  --radio-md: 16px;
+  --radio-sm: 12px;
+  --boton-borde-inferior: 4px solid var(--primario-oscuro);
+  --boton-estilo: chunky;
+}

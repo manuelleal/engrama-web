@@ -1,0 +1,7 @@
+{
+  "descripcion": "X1: el cliente consulta la base directo (api/core.js pide /rest/v1 con apikey, en vez de pasar por /api)",
+  "archivos": { "src/api/core.js": "archivo.mjs" },
+  "comando": ["node", "herramientas/verificar.mjs", "--json"],
+  "espera_codigo_no_cero": true,
+  "espera_contiene_checks": ["V1"]
+}
