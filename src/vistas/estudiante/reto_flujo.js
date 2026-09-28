@@ -8,6 +8,7 @@
 import { h, montar } from '../../ui/dom.js';
 import { textos } from '../../textos.js';
 import { crearDrako } from '../../ui/drako.js';
+import { tituloLegible } from '../../ui/titulo.js';
 import { arrancarIntento, enviarIntento, historialDeIntentos } from '../../api/retos.js';
 import { accionUnica, ErrorApi } from '../../api/cliente.js';
 import { renderRevision } from './revision.js';
@@ -53,13 +54,19 @@ export function valorAlGuardar(opcion) {
   return opcion.label;
 }
 
+// Ficha de opción: la letra en un escudo (referencia visual: investigacion/evagame,
+// pantallas-modo-en-vivo.html .opt/.let) y el texto aparte. El escudo lleva aria-hidden porque el
+// texto solo (op.value) ya basta para el lector de pantalla — mismo patrón que ui/retro.js con su
+// ícono ✓/✗ aria-hidden y el texto real al lado.
 function nodoOpciones(pregunta, respuestas, onElegir) {
   const opciones = (pregunta.options_json || []).map((op) => h('li', {},
     h('button', {
       'data-testid': `opcion-${op.label}`,
       'aria-pressed': String(respuestas[pregunta.id] === op.label),
       onClick: () => onElegir(valorAlGuardar(op)),
-    }, `${op.label}. ${op.value}`),
+    },
+    h('span', { class: 'escudo-letra', 'aria-hidden': 'true' }, op.label),
+    h('span', { class: 'texto-opcion' }, op.value)),
   ));
   return h('ul', { 'data-testid': 'opciones' }, ...opciones);
 }
@@ -80,11 +87,12 @@ function pintarPregunta(raiz, estado, callbacks) {
   const onElegir = (label) => { respuestas[pregunta.id] = label; guardarRespuestas(estado.attemptId, respuestas); pintarPregunta(raiz, estado, callbacks); };
   const nodo = h(
     'div', { 'data-testid': 'vista-reto-flujo' },
-    crearDrako('presenta', textos.retoFlujo.drakoPresenta),
-    esRepaso ? h('p', { role: 'status', 'data-testid': 'banner-repaso' }, textos.retoFlujo.bannerRepaso) : null,
-    h('h1', {}, challenge.title),
-    h('p', { 'data-testid': 'contador-pregunta' }, textos.retoFlujo.pregunta(indice + 1, challenge.questions.length)),
-    h('p', { 'data-testid': 'enunciado' }, pregunta.question_text),
+    h('div', { class: 'encabezado-reto' },
+      crearDrako('presenta', textos.retoFlujo.drakoPresenta),
+      h('h1', { class: 'titulo-reto' }, tituloLegible(challenge.title))),
+    esRepaso ? h('p', { role: 'status', class: 'aviso-corto', 'data-testid': 'banner-repaso' }, textos.retoFlujo.bannerRepaso) : null,
+    h('p', { class: 'texto-apoyo', 'data-testid': 'contador-pregunta' }, textos.retoFlujo.pregunta(indice + 1, challenge.questions.length)),
+    h('p', { class: 'enunciado', 'data-testid': 'enunciado' }, pregunta.question_text),
     nodoOpciones(pregunta, respuestas, onElegir),
     nodoBotonAvanzar(estado, callbacks),
   );
