@@ -1,0 +1,73 @@
+/* base.css · Reset y fondo del shell. Solo var(--token) de tokens.css o color-mix() con
+   transparent/white/black (§6.2, V3 en herramientas/verificar.mjs); nunca un color propio. */
+
+*, *::before, *::after { box-sizing: border-box; }
+
+html {
+  /* 375 px es el ancho de referencia (§9.4); nada de zoom fijo ni ancho mínimo mayor. */
+  -webkit-text-size-adjust: 100%;
+}
+
+body {
+  margin: 0;
+  min-height: 100vh;
+  background: var(--fondo);
+  color: var(--texto);
+  font-family: var(--fuente-cuerpo);
+  font-size: 16px; /* mínimo del §9.4 */
+  line-height: 1.5;
+}
+
+h1, h2, h3, h4 {
+  font-family: var(--fuente-titulos);
+  margin: 0 0 0.5em;
+}
+
+button, input, select, textarea {
+  font: inherit;
+  color: inherit;
+}
+
+/* Blanco táctil mínimo 44x44 (§9.4) para todo control interactivo. */
+button, a, input, select {
+  min-height: 44px;
+}
+
+a { color: var(--primario); }
+
+/* Foco visible siempre (§9.4): nunca se quita el contorno sin poner otra marca. */
+:focus-visible {
+  outline: 3px solid var(--secundario);
+  outline-offset: 2px;
+}
+
+/* prefers-reduced-motion apaga animaciones y transiciones (§9.4, fricción 2 de la auditoría UX). */
+@media (prefers-reduced-motion: reduce) {
+  *, *::before, *::after {
+    animation-duration: 0.001ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.001ms !important;
+    scroll-behavior: auto !important;
+  }
+}
+
+#vista {
+  display: block;
+  width: 100%;
+  max-width: 480px;
+  margin: 0 auto;
+  padding: 16px;
+}
+
+/* El banner de red (ui/red.js) es una región aria-live: nunca se anima con parpadeo. */
+#banner-red[data-visible="1"] {
+  display: block;
+  background: var(--oro);
+  color: var(--oro-texto);
+  text-align: center;
+  padding: 8px 16px;
+  font-weight: 600;
+}
+#banner-red:not([data-visible="1"]) {
+  display: none;
+}

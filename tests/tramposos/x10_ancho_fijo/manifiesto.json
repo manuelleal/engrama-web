@@ -1,0 +1,7 @@
+{
+  "descripcion": "X10: se rompe a 375 px — un contenedor con width: 420px",
+  "archivos": { "estilos/base.css": "base.css" },
+  "comando": ["node", "--test", "--test-reporter=tap", "tests/e2e/shell.test.mjs"],
+  "espera_codigo_no_cero": true,
+  "espera_fallan_tests": ["E9: el shell no tiene scroll horizontal a 375x812 ni a 1280x800"]
+}

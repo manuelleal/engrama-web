@@ -1,0 +1,15 @@
+{
+  "name": "ENGRAMA",
+  "short_name": "ENGRAMA",
+  "description": "Retos, monedas y racha para aprender inglés.",
+  "start_url": "/#/inicio",
+  "scope": "/",
+  "display": "standalone",
+  "orientation": "portrait",
+  "lang": "es",
+  "background_color": "#FAF7F0",
+  "theme_color": "#003366",
+  "icons": [
+    { "src": "/publico/diseno/drako/icono-32.svg", "sizes": "any", "type": "image/svg+xml", "purpose": "any" }
+  ]
+}

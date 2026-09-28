@@ -61,9 +61,13 @@ function evaluar(manifiesto, codigo, stdout) {
     const checks = (jsonSalida?.violaciones || []).map((v) => v.check);
     if (!checks.includes(check)) motivos.push(`esperaba el check ${check} entre las violaciones, y no salió`);
   }
+  // Formato TAP (`node --test --test-reporter=tap`): una línea "not ok N - <nombre>" por test
+  // que falló. Exigimos esa línea exacta, no solo que el nombre aparezca en algún lado del
+  // stdout (podría aparecer en un test que SÍ pasó, si dos nombres se parecen).
   for (const nombre of manifiesto.espera_fallan_tests || []) {
-    if (!stdout.includes(nombre) || !/not ok/i.test(stdout)) {
-      motivos.push(`esperaba que fallara el test "${nombre}"`);
+    const escapado = nombre.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
+    if (!new RegExp(`^not ok \\d+ - .*${escapado}`, 'm').test(stdout)) {
+      motivos.push(`esperaba la línea TAP "not ok ... ${nombre}", y no salió`);
     }
   }
   return motivos;

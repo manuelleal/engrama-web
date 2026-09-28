@@ -1,0 +1,7 @@
+{
+  "descripcion": "X9: sw.js sin precarga — sin red, el shell no abre (se pierde en silencio)",
+  "archivos": { "sw.js": "sw.js" },
+  "comando": ["node", "--test", "--test-reporter=tap", "tests/e2e/shell.test.mjs"],
+  "espera_codigo_no_cero": true,
+  "espera_fallan_tests": ["E7: tras una visita con red, el shell abre sin red (precarga de sw.js)"]
+}

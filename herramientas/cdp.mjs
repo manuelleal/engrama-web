@@ -110,6 +110,35 @@ async function esperarListo(s, limiteMs) {
   return false;
 }
 
+// Mide el DOM y corre `evalJs` tras una navegación; empuja a `errores` si el eval revienta.
+async function medirYEvaluar(s, esperaMs, evalJs, errores) {
+  const listo = await esperarListo(s, esperaMs);
+  await esperar(300);
+  const med = await s('Runtime.evaluate', {
+    expression: '({scroll_ancho: document.documentElement.scrollWidth, innerWidth: window.innerWidth, testids: [...document.querySelectorAll("[data-testid]")].map((e) => e.dataset.testid)})',
+    returnByValue: true,
+  });
+  let evaluado = null;
+  if (evalJs) {
+    const r = await s('Runtime.evaluate', { expression: evalJs, returnByValue: true, awaitPromise: true });
+    if (r.exceptionDetails) errores.push(`eval: ${r.exceptionDetails.text}`);
+    else evaluado = r.result.value ?? null;
+  }
+  return { listo, eval: evaluado, ...med.result.value };
+}
+
+// El service worker corre en su propio target: cortar la red en la sesión de la página no le
+// llega (su `fetch` seguía saliendo por la red real). Hay que emularla también en cada target
+// service_worker ya adjunto — normalmente el que activó la primera pasada.
+async function cortarRedEnTrabajadores(cdp) {
+  const { targetInfos } = await cdp.enviar('Target.getTargets');
+  for (const info of targetInfos.filter((t) => t.type === 'service_worker')) {
+    const { sessionId } = await cdp.enviar('Target.attachToTarget', { targetId: info.targetId, flatten: true });
+    await cdp.enviar('Network.enable', {}, sessionId);
+    await cdp.enviar('Network.emulateNetworkConditions', { offline: true, latency: 0, downloadThroughput: 0, uploadThroughput: 0 }, sessionId);
+  }
+}
+
 async function revisarConSesion(cdp, op) {
   const { targetId } = await cdp.enviar('Target.createTarget', { url: 'about:blank' });
   const { sessionId } = await cdp.enviar('Target.attachToTarget', { targetId, flatten: true });
@@ -121,24 +150,30 @@ async function revisarConSesion(cdp, op) {
   if (op.sinRed) await s('Network.emulateNetworkConditions', { offline: true, latency: 0, downloadThroughput: 0, uploadThroughput: 0 });
   if (op.pre) await s('Page.addScriptToEvaluateOnNewDocument', { source: op.pre });
   await s('Page.navigate', { url: op.url });
-  const listo = await esperarListo(s, op.espera_ms || 8000);
-  await esperar(300);
-  const med = await s('Runtime.evaluate', {
-    expression: '({scroll_ancho: document.documentElement.scrollWidth, innerWidth: window.innerWidth, testids: [...document.querySelectorAll("[data-testid]")].map((e) => e.dataset.testid)})',
-    returnByValue: true,
-  });
-  let evaluado = null;
-  if (op.eval) {
-    const r = await s('Runtime.evaluate', { expression: op.eval, returnByValue: true, awaitPromise: true });
-    if (r.exceptionDetails) errores.push(`eval: ${r.exceptionDetails.text}`);
-    else evaluado = r.result.value ?? null;
+  const primera = await medirYEvaluar(s, op.espera_ms || 8000, op.eval, errores);
+
+  // `tras`: para probar "visita con red, después sin red" (E7/E9, W16) en una sola sesión de
+  // navegador — el service worker instalado en la primera pasada solo sirve si sigue siendo el
+  // mismo perfil, y cada llamada a revisarPagina() usa uno desechable.
+  let tras;
+  if (op.tras) {
+    const erroresTras = [];
+    if (op.tras.sinRed) {
+      await s('Network.emulateNetworkConditions', { offline: true, latency: 0, downloadThroughput: 0, uploadThroughput: 0 });
+      await cortarRedEnTrabajadores(cdp);
+    }
+    await s('Page.navigate', { url: op.tras.url || op.url });
+    tras = { ...(await medirYEvaluar(s, op.tras.espera_ms || op.espera_ms || 8000, op.tras.eval, erroresTras)), errores: erroresTras };
   }
-  return { url: op.url, ancho: op.ancho, alto: op.alto, listo, errores, peticiones, ...med.result.value, eval: evaluado };
+
+  return { url: op.url, ancho: op.ancho, alto: op.alto, errores, peticiones, ...primera, tras };
 }
 
 /**
  * Abre una página en Edge/Chrome headless y la revisa. Ver el uso arriba.
- * @param {{url: string, ancho: number, alto: number, sinRed?: boolean, pre?: string, eval?: string, espera_ms?: number}} op
+ * @param {{url: string, ancho: number, alto: number, sinRed?: boolean, pre?: string, eval?: string,
+ *   espera_ms?: number, tras?: {sinRed?: boolean, url?: string, eval?: string, espera_ms?: number}}} op
+ *   `tras`: una segunda navegación en la MISMA sesión (para "con red, luego sin red" — E7/E9).
  */
 export async function revisarPagina(op) {
   if (!op.url || !op.ancho || !op.alto) throw new Error('faltan url, ancho o alto');
