@@ -1,0 +1,7 @@
+{
+  "descripcion": "X7: el juego infla el nivel — ui/escudo.js deriva un nivel de `level` (XP) en vez de mostrar solo el confirmado",
+  "archivos": { "src/ui/escudo.js": "escudo.js" },
+  "comando": ["node", "--test", "--test-reporter=tap", "tests/unit/ui_escudo.test.mjs"],
+  "espera_codigo_no_cero": true,
+  "espera_fallan_tests": ["U8: sin nivel confirmado, el escudo dice \"Por confirmar\" aunque level y monedas sean altos"]
+}

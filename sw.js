@@ -8,9 +8,10 @@
 //
 // Súbelo un número cada vez que cambie la lista de precarga o la estrategia; la `activate`
 // borra cualquier caché con otro nombre.
-const VERSION = 'engrama-shell-v2';
+const VERSION = 'engrama-shell-v3';
 
-// Solo lo que existe hoy (W3): W7+ irá agregando sus propios archivos en su propio commit.
+// Cada encargo agrega los suyos en su propio commit (W7: Inicio + api/cliente,core,retos + los
+// SVG de Drako que usa el estudiante). El shell debe abrir sin red con lo de aquí, nada más.
 const PRECARGA = [
   '/',
   '/index.html',
@@ -18,13 +19,21 @@ const PRECARGA = [
   '/estilos/base.css',
   '/publico/diseno/tokens.css',
   '/publico/diseno/drako/icono-32.svg',
+  '/publico/diseno/drako/presenta.svg',
   '/src/app.js',
   '/src/rutas.js',
   '/src/textos.js',
   '/src/ui/dom.js',
   '/src/ui/red.js',
+  '/src/ui/escudo.js',
+  '/src/ui/drako.js',
+  '/src/ui/sonido.js',
   '/src/auth/mock.js',
   '/src/vistas/entrada.js',
+  '/src/vistas/estudiante/inicio.js',
+  '/src/api/cliente.js',
+  '/src/api/core.js',
+  '/src/api/retos.js',
 ];
 
 // Nunca se cachea nada bajo estas rutas, ni de lectura: son del profe/admin, no "datos propios

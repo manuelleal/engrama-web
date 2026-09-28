@@ -9,6 +9,12 @@ export const textos = {
     // Placeholder del esqueleto (W3): W7 lo reemplaza por la pantalla real (saldo, constancia,
     // escudo y banner de retos).
     cargando: 'Cargando tu perfil…',
+    monedas: 'monedas',
+    constanciaPrefijo: 'Constancia',
+    /** @param {number} n */
+    retos: (n) => (n === 0 ? 'No tienes retos pendientes' : n === 1 ? 'Tienes 1 reto' : `Tienes ${n} retos`),
+    drakoBienvenida: 'Drako te da la bienvenida',
+    errorGeneral: 'No se pudo cargar tu perfil.',
   },
   red: {
     sinConexionPrefijo: 'Sin conexión · actualizado',

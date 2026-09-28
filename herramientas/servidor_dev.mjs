@@ -15,7 +15,11 @@ import { fileURLToPath } from 'node:url';
 const AQUI = fileURLToPath(new URL('.', import.meta.url));
 export const RAIZ = resolve(AQUI, '..');
 const PUERTO = Number(process.env.PUERTO || 8080);
-const API_URL = process.env.ENGRAMA_API_URL || '';
+// Se lee en cada petición (no una vez al cargar el módulo): así los tests pueden apuntar el
+// proxy a un mock_api.mjs propio sin reiniciar el proceso ni pelear con el orden de los imports.
+function apiUrlActual() {
+  return process.env.ENGRAMA_API_URL || '';
+}
 
 // Solo estas rutas se sirven como archivos: nada de listar el proyecto entero (tests/, docs/,
 // herramientas/, .git — nada de eso debe llegar nunca a un navegador).
@@ -50,12 +54,13 @@ function servirEstatico(res, rutaAbsoluta) {
 }
 
 function proxyApi(req, res, rutaConQuery) {
-  if (!API_URL) {
+  const apiUrl = apiUrlActual();
+  if (!apiUrl) {
     res.writeHead(502, { 'Content-Type': 'application/json; charset=utf-8' });
     res.end(JSON.stringify({ error: 'ENGRAMA_API_URL no está configurada (o usa mock_api.mjs, W4)' }));
     return;
   }
-  const destino = new URL(rutaConQuery, API_URL);
+  const destino = new URL(rutaConQuery, apiUrl);
   const cabeceras = { ...req.headers, host: destino.host };
   const proxied = httpRequest(destino, { method: req.method, headers: cabeceras }, (respBackend) => {
     res.writeHead(respBackend.statusCode || 502, respBackend.headers);
@@ -82,7 +87,7 @@ export function crearServidor() {
 function main() {
   const servidor = crearServidor();
   servidor.listen(PUERTO, () => {
-    console.log(`servidor_dev: http://127.0.0.1:${PUERTO}  (ENGRAMA_API_URL=${API_URL || '(sin configurar)'})`);
+    console.log(`servidor_dev: http://127.0.0.1:${PUERTO}  (ENGRAMA_API_URL=${apiUrlActual() || '(sin configurar)'})`);
   });
 }
 

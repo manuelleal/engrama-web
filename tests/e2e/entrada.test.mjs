@@ -1,10 +1,11 @@
 // @ts-check
-// W5: sin sesión se ve la pantalla de entrada; al elegir un actor sintético, arranca el shell.
+// W5: sin sesión se ve la pantalla de entrada; al elegir un actor sintético, arranca el shell
+// (desde W7, con datos reales de Inicio).
 import test from 'node:test';
 import assert from 'node:assert/strict';
 import { existsSync } from 'node:fs';
-import { crearServidor } from '../../herramientas/servidor_dev.mjs';
 import { revisarPagina } from '../../herramientas/cdp.mjs';
+import { conAppCompleta } from './ayudante_servidor.mjs';
 
 const HAY_NAVEGADOR = [
   process.env.EDGE_PATH,
@@ -16,26 +17,25 @@ const HAY_NAVEGADOR = [
 
 const CLIC_Y_ESPERAR = `(async () => {
   document.querySelector('[data-testid="entrar-est-1"]').click();
-  await new Promise((r) => setTimeout(r, 400));
+  await new Promise((r) => setTimeout(r, 800));
   return {
     testids: [...document.querySelectorAll('[data-testid]')].map((e) => e.dataset.testid),
     h1: document.querySelector('h1')?.textContent ?? null,
+    saldo: document.querySelector('[data-testid="saldo"]')?.textContent ?? null,
   };
 })()`;
 
 test(
-  'entrada: sin sesión se ve el picker; al elegir un actor arranca el shell',
+  'entrada: sin sesión se ve el picker; al elegir un actor arranca el shell con datos reales',
   { skip: !HAY_NAVEGADOR && 'no hay Edge ni Chrome instalado en esta máquina' },
   async () => {
-    const servidor = crearServidor();
-    await new Promise((ok) => servidor.listen(0, '127.0.0.1', ok));
-    const { port } = servidor.address();
-    try {
-      const r = await revisarPagina({ url: `http://127.0.0.1:${port}/`, ancho: 375, alto: 812, espera_ms: 5000, eval: CLIC_Y_ESPERAR });
+    await conAppCompleta(async (url) => {
+      const r = await revisarPagina({ url, ancho: 375, alto: 812, espera_ms: 5000, eval: CLIC_Y_ESPERAR });
       assert.ok(r.testids.includes('vista-entrada'), 'primero se ve la entrada, sin sesión');
       assert.deepEqual(r.errores, []);
       assert.ok(r.eval.testids.includes('vista-inicio'), 'tras elegir un actor, se ve el shell');
       assert.equal(r.eval.h1, 'ENGRAMA');
-    } finally { await new Promise((ok) => servidor.close(ok)); }
+      assert.match(r.eval.saldo, /^\d+ monedas$/, 'el saldo viene del servidor, no del cliente');
+    });
   },
 );
