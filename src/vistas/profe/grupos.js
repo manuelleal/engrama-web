@@ -18,7 +18,12 @@ function pintarLista(raiz, grupos) {
   const cuerpo = grupos.length === 0
     ? h('p', { role: 'status' }, textos.profe.grupos.sinGrupos)
     : h('ul', {}, ...grupos.map(filaDeGrupo));
-  montar(raiz, h('div', { 'data-testid': 'vista-profe-grupos' }, h('h1', {}, textos.profe.grupos.titulo), cuerpo));
+  montar(raiz, h(
+    'div', { 'data-testid': 'vista-profe-grupos' },
+    h('h1', {}, textos.profe.grupos.titulo),
+    h('nav', {}, h('a', { href: '#/profe/retos', 'data-testid': 'ir-a-retos-profe' }, textos.profe.grupo.verRetos)),
+    cuerpo,
+  ));
   document.body.dataset.listo = '1';
 }
 

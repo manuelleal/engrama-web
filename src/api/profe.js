@@ -45,3 +45,12 @@ export async function leerLogro(gid, { token, tenantId }) {
 export async function leerErroresDeItem(gid, { token, tenantId }) {
   return pedirJson(`/teachers/groups/${gid}/item-errors`, { token, tenantId });
 }
+
+/**
+ * T6 — PUT /teachers/groups/{gid}/challenges/{cid} (W12): asigna un reto (de `/challenges/all`,
+ * BUG-10) al grupo `gid`. El servidor es quien decide si el profe puede asignar a ese grupo
+ * (visible_groups); un `gid` ajeno da 404, igual que en T2 (X4).
+ */
+export async function asignarReto(gid, cid, { token, tenantId }) {
+  return pedirJson(`/teachers/groups/${gid}/challenges/${cid}`, { metodo: 'PUT', token, tenantId });
+}

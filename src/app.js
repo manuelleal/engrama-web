@@ -13,6 +13,7 @@ import { renderGrupo } from './vistas/profe/grupo.js';
 import { renderSesionAsistencia } from './vistas/profe/sesion_asistencia.js';
 import { renderLogro } from './vistas/profe/logro.js';
 import { renderErrores } from './vistas/profe/errores.js';
+import { renderRetosProfe } from './vistas/profe/retos.js';
 
 function registrarServiceWorker() {
   if (!('serviceWorker' in navigator)) return;
@@ -71,6 +72,7 @@ function arrancarConSesion(vista, sesion) {
   ruta('/profe/grupo/:gid/sesion', conCtx((raiz, params, query, ctx) => renderSesionAsistencia(raiz, params, ctx)));
   ruta('/profe/grupo/:gid/logro', conCtx((raiz, params, query, ctx) => renderLogro(raiz, params, ctx)));
   ruta('/profe/grupo/:gid/errores', conCtx((raiz, params, query, ctx) => renderErrores(raiz, params, ctx)));
+  ruta('/profe/retos', conCtx((raiz, params, query, ctx) => renderRetosProfe(raiz, ctx)));
   definirPorDefecto(rutaPorDefectoSegunRol(sesion));
   iniciar(vista);
 }

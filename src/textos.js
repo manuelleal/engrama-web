@@ -134,5 +134,25 @@ export const textos = {
       /** @param {number} n */
       suprimidos: (n) => (n === 0 ? '' : `${n} ítem(s) sin mostrar por privacidad (menos del mínimo de respondientes).`),
     },
+    retos: {
+      titulo: 'Retos',
+      // BUG-10 (§3, §11 W12): /challenges/all no filtra por grupo — se lo decimos al profe en vez
+      // de esconderlo o fingir que la lista sí está filtrada.
+      avisoTodoElColegio: 'Estos son los retos de todo el colegio, no solo de tus grupos (el servidor todavía no los filtra por grupo).',
+      sinRetos: 'Este colegio no tiene retos todavía.',
+      errorGeneral: 'No se pudieron cargar los retos.',
+      /** @param {string|null} groupId */
+      grupoAsignado: (groupId) => (groupId ? `Asignado a un grupo` : 'Sin grupo asignado'),
+      activar: 'Activar',
+      desactivar: 'Desactivar',
+      cambiando: 'Cambiando…',
+      errorCambiarEstado: 'No se pudo cambiar el estado.',
+      etiquetaGrupoDestino: 'Asignar a',
+      asignar: 'Asignar',
+      asignando: 'Asignando…',
+      asignado: 'Asignado ✓',
+      errorAsignar: 'No se pudo asignar el reto.',
+      elegirGrupo: 'Elige un grupo…',
+    },
   },
 };

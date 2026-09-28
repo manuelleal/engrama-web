@@ -81,3 +81,24 @@ export async function enviarIntento(attemptId, respuestas, { token, tenantId }) 
 export async function historialDeIntentos({ token, tenantId }) {
   return pedirJson('/challenges/attempts/history', { token, tenantId });
 }
+
+/**
+ * GET /challenges/all (W12, vista del profe) — BUG-10: todo el colegio, sin filtrar por grupo
+ * (`ChallengeOut` no trae `group_id` filtrable del lado del cliente); la vista avisa esto, nunca
+ * lo esconde. Mismo filtro de fuga de clave que el feed del estudiante (defensa en profundidad:
+ * el profe tampoco debe ver una clave antes de que alguien responda).
+ */
+export async function listarTodosLosRetos({ token, tenantId }) {
+  const datos = await pedirJson('/challenges/all', { token, tenantId });
+  return datos.map(aplicarFiltro);
+}
+
+/**
+ * PATCH /challenges/{id}/status (W12, T6 del profe: activar/desactivar). Manda SOLO `{status}` —
+ * nunca el resto del `ChallengeOut` — para que el servidor nunca reciba, por accidente, un campo
+ * que el profe no editó (E del criterio del commit).
+ * @param {string} id @param {'active'|'inactive'|'archived'} status
+ */
+export async function cambiarEstadoReto(id, status, { token, tenantId }) {
+  return pedirJson(`/challenges/${id}/status`, { metodo: 'PATCH', token, tenantId, cuerpo: { status } });
+}
