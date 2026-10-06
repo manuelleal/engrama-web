@@ -1,0 +1,59 @@
+/* juego.css · El "game feel" del estudiante (encargo de Christiam, 2026-10-06: "animación plena;
+   quienes la van a usar son los chicos"). Referencia de solo lectura: coins-mvp/student.html y
+   styles.css (ver docs/INVENTARIO_game_feel.md). Reglas de esta hoja:
+   - solo var(--token) de tokens.css o color-mix() con transparent/white/black (V3);
+   - solo se anima transform y opacity (nada que bloquee el hilo principal);
+   - el apagador global de base.css (@media prefers-reduced-motion) deja TODO en 0,001 ms: aquí no
+     se repite esa lógica, pero sí se garantiza que el estado final sea legible sin animación;
+   - la animación plena es del estudiante: el panel del profe y del admin no carga nada de esto
+     (los selectores cuelgan de .juego, que solo ponen las vistas del estudiante). */
+
+/* ---------- Monedas que vuelan (ui/monedas.js) ---------- */
+.ficha-moneda {
+  position: fixed;
+  left: 0;
+  top: 0;
+  width: 22px;
+  height: 22px;
+  border-radius: 50%;
+  background: radial-gradient(circle at 35% 30%, color-mix(in srgb, var(--oro) 35%, white), var(--oro) 65%);
+  border: 2px solid color-mix(in srgb, var(--oro) 65%, black);
+  pointer-events: none;
+  z-index: 40;
+  will-change: transform, opacity;
+}
+.ficha-moneda::after {
+  content: "";
+  position: absolute;
+  inset: 4px;
+  border-radius: 50%;
+  border: 2px solid color-mix(in srgb, var(--oro) 60%, black);
+  opacity: 0.45;
+}
+
+/* ---------- Golpe de oro sobre un contador (ui/monedas.js: pulsoOro) ---------- */
+.pulso-oro {
+  position: relative;
+  transform-origin: left center;
+  animation: pulso-oro 800ms cubic-bezier(0.2, 1.5, 0.4, 1) 1;
+}
+.pulso-oro::before {
+  content: "";
+  position: absolute;
+  inset: -6px -10px;
+  border-radius: var(--radio-md);
+  box-shadow: 0 0 0 3px var(--oro), 0 0 20px color-mix(in srgb, var(--oro) 70%, transparent);
+  pointer-events: none;
+  animation: halo-oro 800ms ease-out 1 both;
+}
+@keyframes pulso-oro {
+  0% { transform: scale(1); }
+  35% { transform: scale(1.4); }
+  60% { transform: scale(0.94); }
+  100% { transform: scale(1); }
+}
+@keyframes halo-oro {
+  0% { opacity: 0; }
+  30% { opacity: 1; }
+  100% { opacity: 0; }
+}

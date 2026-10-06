@@ -1,0 +1,16 @@
+{
+  "descripcion": "Game feel: el conteo animado termina en un valor distinto al del servidor (redondeo hacia arriba +1)",
+  "archivos": {
+    "src/ui/conteo.js": "conteo.js"
+  },
+  "comando": [
+    "node",
+    "--test",
+    "--test-reporter=tap",
+    "tests/unit/ui_monedas_conteo.test.mjs"
+  ],
+  "espera_codigo_no_cero": true,
+  "espera_fallan_tests": [
+    "conteo: arranca en lo anterior, termina EXACTO en el valor del servidor y nunca se pasa"
+  ]
+}

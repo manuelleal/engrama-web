@@ -1,0 +1,16 @@
+{
+  "descripcion": "Game feel: con prefers-reduced-motion las monedas siguen volando 850 ms",
+  "archivos": {
+    "src/ui/monedas.js": "monedas.js"
+  },
+  "comando": [
+    "node",
+    "--test",
+    "--test-reporter=tap",
+    "tests/unit/ui_monedas_conteo.test.mjs"
+  ],
+  "espera_codigo_no_cero": true,
+  "espera_fallan_tests": [
+    "monedas: con reduced-motion no vuela ninguna ficha y nada dura más del mínimo"
+  ]
+}

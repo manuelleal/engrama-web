@@ -28,6 +28,7 @@ const PRECARGA = [
   '/estilos/tipografia.css',
   '/estilos/componentes.css',
   '/estilos/formularios.css',
+  '/estilos/juego.css', // game feel del estudiante
   '/publico/diseno/tokens.css',
   '/publico/diseno/drako/icono-32.svg',
   '/publico/diseno/drako/presenta.svg',
@@ -42,6 +43,9 @@ const PRECARGA = [
   '/src/ui/sonido.js',
   '/src/ui/movimiento.js', // game feel: la duración de todo efecto (reduced-motion)
   '/src/ui/boton_sonido.js',
+  '/src/ui/conteo.js',
+  '/src/ui/monedas.js',
+  '/src/ui/ultimo_visto.js',
   '/src/ui/titulo.js',
   '/src/ui/nav_inferior.js',
   // Segunda pasada de diseño (2026-09-28): confeti (inicio/asistencia/revisión) y la barra con

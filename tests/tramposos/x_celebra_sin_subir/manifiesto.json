@@ -1,0 +1,16 @@
+{
+  "descripcion": "Game feel: se celebra aunque el valor del servidor no haya subido",
+  "archivos": {
+    "src/ui/ultimo_visto.js": "ultimo_visto.js"
+  },
+  "comando": [
+    "node",
+    "--test",
+    "--test-reporter=tap",
+    "tests/unit/ui_monedas_conteo.test.mjs"
+  ],
+  "espera_codigo_no_cero": true,
+  "espera_fallan_tests": [
+    "ultimo visto: solo se celebra cuando el valor del servidor SUBE"
+  ]
+}

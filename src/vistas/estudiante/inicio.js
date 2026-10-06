@@ -10,7 +10,10 @@ import { crearEscudo } from '../../ui/escudo.js';
 import { crearDrako } from '../../ui/drako.js';
 import { crearNavInferior } from '../../ui/nav_inferior.js';
 import { crearSelectorColegio } from '../../ui/selector_colegio.js';
-import { reproducir } from '../../ui/sonido.js';
+import { senal } from '../../ui/sonido.js';
+import { animarConteo } from '../../ui/conteo.js';
+import { celebrarMonedas, planDeMonedas, duracionTotal } from '../../ui/monedas.js';
+import { leerUltimo, guardarUltimo, compararConUltimo } from '../../ui/ultimo_visto.js';
 import { tituloLegible } from '../../ui/titulo.js';
 import { textos } from '../../textos.js';
 import { leerSaldo, leerHistorialAsistencia } from '../../api/core.js';
@@ -19,17 +22,28 @@ import { ErrorApi } from '../../api/cliente.js';
 
 const SIETE_DIAS_MS = 7 * 24 * 60 * 60 * 1000;
 
-function animarConteo(nodo, hasta, sufijo) {
-  const sinAnimacion = globalThis.matchMedia?.('(prefers-reduced-motion: reduce)').matches;
-  if (sinAnimacion || hasta === 0) { nodo.textContent = `${hasta} ${sufijo}`; return; }
-  const inicio = performance.now();
-  const duracionMs = 500;
-  const paso = (ahora) => {
-    const t = Math.min(1, (ahora - inicio) / duracionMs);
-    nodo.textContent = `${Math.round(hasta * t)} ${sufijo}`;
-    if (t < 1) requestAnimationFrame(paso);
-  };
-  requestAnimationFrame(paso);
+/**
+ * El saldo llega del servidor y SOLO se anima: si subió desde lo último que vio este estudiante, las
+ * monedas vuelan al contador, cuenta, late en oro y suena (Lingo: setCoins, student.html:2022-2040);
+ * si es la primera vez o no cambió, cuenta suave hasta el valor. Nunca calcula nada.
+ */
+async function animarSaldo(nodoSaldo, balance, ctx) {
+  const quien = ctx.sesion.profileId;
+  const previo = leerUltimo('saldo', quien);
+  const que = compararConUltimo(previo, balance);
+  guardarUltimo('saldo', quien, balance);
+  const formato = (n) => `${n} ${textos.inicio.monedas}`;
+  if (que !== 'sube') {
+    await animarConteo(nodoSaldo, { desde: que === 'primera' ? 0 : balance, hasta: balance, formato });
+    if (que === 'primera' && balance > 0) senal('moneda');
+    return;
+  }
+  const ganado = balance - /** @type {number} */ (previo);
+  nodoSaldo.textContent = formato(/** @type {number} */ (previo));
+  await Promise.all([
+    celebrarMonedas({ hasta: nodoSaldo, cantidad: ganado }),
+    animarConteo(nodoSaldo, { desde: /** @type {number} */ (previo), hasta: balance, formato, golpe: false, duracionMs: Math.max(900, duracionTotal(planDeMonedas(ganado))) }),
+  ]);
 }
 
 /**
@@ -131,8 +145,7 @@ function pintarContenido(raiz, ctx, datos) {
     crearNavInferior('inicio'),
   );
   montar(raiz, nodo);
-  animarConteo(nodoSaldo, datos.balance, textos.inicio.monedas);
-  if (datos.balance > 0) reproducir('moneda');
+  animarSaldo(nodoSaldo, datos.balance, ctx);
   document.body.dataset.listo = '1';
 }
 

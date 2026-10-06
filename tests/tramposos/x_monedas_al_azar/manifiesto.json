@@ -1,0 +1,16 @@
+{
+  "descripcion": "Game feel: la cantidad de fichas sale de un random (como el Math.random de Lingo), no de las monedas del servidor",
+  "archivos": {
+    "src/ui/monedas.js": "monedas.js"
+  },
+  "comando": [
+    "node",
+    "--test",
+    "--test-reporter=tap",
+    "tests/unit/ui_monedas_conteo.test.mjs"
+  ],
+  "espera_codigo_no_cero": true,
+  "espera_fallan_tests": [
+    "monedas: las fichas salen de lo que mandó el servidor, nunca de un azar"
+  ]
+}

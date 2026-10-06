@@ -1,0 +1,16 @@
+{
+  "descripcion": "Game feel: ganar monedas queda en silencio visual: lanzarMonedas no lanza ninguna ficha",
+  "archivos": {
+    "src/ui/monedas.js": "monedas.js"
+  },
+  "comando": [
+    "node",
+    "--test",
+    "--test-reporter=tap",
+    "tests/e2e/game_feel.test.mjs"
+  ],
+  "espera_codigo_no_cero": true,
+  "espera_fallan_tests": [
+    "game feel: en Inicio, si el saldo del servidor subió, las monedas vuelan y el contador termina en el valor real"
+  ]
+}

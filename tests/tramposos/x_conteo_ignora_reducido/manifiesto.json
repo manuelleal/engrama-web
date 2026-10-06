@@ -1,0 +1,16 @@
+{
+  "descripcion": "Game feel: el conteo largo sigue largo con prefers-reduced-motion activo",
+  "archivos": {
+    "src/ui/conteo.js": "conteo.js"
+  },
+  "comando": [
+    "node",
+    "--test",
+    "--test-reporter=tap",
+    "tests/unit/ui_monedas_conteo.test.mjs"
+  ],
+  "espera_codigo_no_cero": true,
+  "espera_fallan_tests": [
+    "conteo: con reduced-motion la duración del conteo no pasa del mínimo"
+  ]
+}
