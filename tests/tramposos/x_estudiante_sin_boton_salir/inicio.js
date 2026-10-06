@@ -143,7 +143,6 @@ function navDeAccesos(ctx) {
       ? h('a', { href: '#/perfil', 'data-testid': 'ir-a-perfil' }, textos.perfil.titulo)
       : null,
     // Un equipo compartido: el estudiante también puede cerrar su sesión (antes solo el profe y el admin).
-    crearBotonSalir(ctx),
   );
 }
 

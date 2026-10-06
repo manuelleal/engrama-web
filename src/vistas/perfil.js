@@ -7,6 +7,7 @@
 import { h, montar } from '../ui/dom.js';
 import { textos } from '../textos.js';
 import { crearFormularioContrasena } from './formulario_contrasena.js';
+import { crearBotonSalir } from '../ui/boton_salir.js';
 
 // Siempre disponible en los modos con cuentas reales (Ley 1581): el aviso de tratamiento de datos.
 function enlaceAviso(ctx) {
@@ -19,11 +20,12 @@ function pintarSinSoporte(raiz, ctx) {
     h('p', { role: 'status', 'data-testid': 'perfil-sin-soporte' }, textos.perfil.sinSoporte),
     enlaceAviso(ctx),
     h('a', { href: '#/inicio', 'data-testid': 'perfil-volver' }, textos.perfil.volver),
+    crearBotonSalir(ctx),
   ));
   document.body.dataset.listo = '1';
 }
 
-/** @param {HTMLElement} raiz @param {{cambiarContrasena?: (nueva: string) => Promise<void>, avisoDatos?: boolean}} ctx */
+/** @param {HTMLElement} raiz @param {{cambiarContrasena?: (nueva: string) => Promise<void>, avisoDatos?: boolean, salir?: () => Promise<void>}} ctx */
 export function renderPerfil(raiz, ctx) {
   if (typeof ctx.cambiarContrasena !== 'function') { pintarSinSoporte(raiz, ctx); return; }
   const form = crearFormularioContrasena({
@@ -34,6 +36,7 @@ export function renderPerfil(raiz, ctx) {
     form,
     enlaceAviso(ctx),
     h('a', { href: '#/inicio', 'data-testid': 'perfil-volver' }, textos.perfil.volver),
+    crearBotonSalir(ctx),
   ));
   document.body.dataset.listo = '1';
 }

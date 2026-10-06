@@ -123,7 +123,7 @@ async function cerrarSesion() {
   } finally {
     // A la URL limpia (sin el `#/inicio` de quien salió): una recarga conservaba esa ruta en el historial, y
     // el botón "atrás" podía llevar a una pantalla con datos de esa persona. Sin `#`, es una carga nueva.
-    location.replace(location.pathname + location.search);
+    location.reload();
   }
 }
 

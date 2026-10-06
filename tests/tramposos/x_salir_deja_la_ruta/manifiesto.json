@@ -1,0 +1,16 @@
+{
+  "descripcion": "Cerrar sesión recarga con la ruta de quien salió en la URL (el historial conserva #/inicio)",
+  "archivos": {
+    "src/app.js": "app.js"
+  },
+  "comando": [
+    "node",
+    "--test",
+    "--test-reporter=tap",
+    "tests/e2e/cerrar_sesion.test.mjs"
+  ],
+  "espera_codigo_no_cero": true,
+  "espera_fallan_tests": [
+    "cerrar sesión (estudiante): sale de verdad, limpia lo local, avisa al SW y \"atrás\" no muestra sus datos"
+  ]
+}

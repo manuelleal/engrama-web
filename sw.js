@@ -68,6 +68,7 @@ const PRECARGA = [
   // de forma transitiva para cualquier rol, así que van aquí como todos los demás (arriba).
   '/src/ui/confeti.js',
   '/src/ui/barra_rol.js',
+  '/src/ui/boton_salir.js',
   '/src/auth/mock.js',
   '/src/vistas/entrada.js',
   '/src/vistas/perfil.js', // W22: import estático de app.js

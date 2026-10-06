@@ -7,20 +7,11 @@
 import { h } from './dom.js';
 import { textos } from '../textos.js';
 import { crearSelectorColegio } from './selector_colegio.js';
+import { crearBotonSalir } from './boton_salir.js';
 
 /** @param {{salir?: () => Promise<void>, avisoDatos?: boolean, colegios?: {id: string, nombre: string}[], colegioActivo?: string, cambiarColegio?: (id: string) => Promise<void>}} ctx */
 export function crearBarraRol(ctx) {
-  const boton = h('button', { class: 'boton-secundario boton-chico', 'data-testid': 'boton-cerrar-sesion' }, textos.nav.cerrarSesion);
-  boton.addEventListener('click', () => {
-    if (typeof ctx.salir !== 'function') return;
-    boton.disabled = true;
-    boton.textContent = textos.nav.cerrandoSesion;
-    Promise.resolve(ctx.salir()).catch((e) => {
-      console.error('ui/barra_rol: no se pudo cerrar sesión', e); // nunca un catch mudo
-      boton.disabled = false;
-      boton.textContent = textos.nav.cerrarSesion;
-    });
-  });
+  const boton = crearBotonSalir(ctx);
   // Un docente de dos instituciones elige aquí en cuál está (login piloto, B); con una sola, no se pinta.
   // Ley 1581: el aviso de tratamiento de datos se puede leer SIEMPRE, también el profe y el admin (con
   // cuentas reales). El estudiante lo tiene en su perfil; ellos no tienen perfil, así que va aquí.
