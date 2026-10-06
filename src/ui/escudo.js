@@ -20,5 +20,7 @@ export function textoDelEscudo(datos) {
 /** @param {{nivelConfirmado?: string|null}} [datos] */
 export function crearEscudo(datos) {
   const texto = textoDelEscudo(datos);
-  return h('div', { class: 'escudo', 'data-testid': 'escudo', role: 'img', 'aria-label': `Nivel: ${texto}` }, texto);
+  // `escudo-brillo`: un destello que cruza al aparecer (juego.css). La animación de "subiste de nivel"
+  // (`escudo-sube`) queda preparada en el CSS, pero hoy nada la dispara: el nivel MCER lo confirma L10.
+  return h('div', { class: 'escudo escudo-brillo', 'data-testid': 'escudo', role: 'img', 'aria-label': `Nivel: ${texto}` }, texto);
 }

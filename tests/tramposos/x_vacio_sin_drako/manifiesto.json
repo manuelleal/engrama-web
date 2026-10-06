@@ -1,0 +1,16 @@
+{
+  "descripcion": "Game feel: el estado vacío pierde a Drako (queda un texto plano)",
+  "archivos": {
+    "src/ui/estados.js": "estados.js"
+  },
+  "comando": [
+    "node",
+    "--test",
+    "--test-reporter=tap",
+    "tests/e2e/game_feel.test.mjs"
+  ],
+  "espera_codigo_no_cero": true,
+  "espera_fallan_tests": [
+    "game feel: la carga y el vacío tienen personalidad (Drako en espera + esqueleto, con su texto), no un párrafo mudo"
+  ]
+}

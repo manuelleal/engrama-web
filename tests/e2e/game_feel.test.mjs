@@ -233,3 +233,33 @@ test('game feel: marcar asistencia estampa el sello, cuenta las monedas del serv
     assert.equal(r.eval.fichasQuedan, 0);
   });
 });
+
+test('game feel: la carga y el vacío tienen personalidad (Drako en espera + esqueleto, con su texto), no un párrafo mudo', { skip: SKIP }, async () => {
+  await conAppCompleta(async (url) => {
+    const r = await revisarPagina({
+      url, ancho: 375, alto: 812, espera_ms: 5000, pre: YA_ENTRO,
+      eval: `(async () => {
+        const esperar = (ms) => new Promise((r) => setTimeout(r, ms));
+        let carga = null;
+        const ver = () => {
+          const c = document.querySelector('[data-testid="cargando"]');
+          if (c && !carga) carga = { drako: !!c.querySelector('[data-testid="drako-espera"]'), esqueletos: c.querySelectorAll('.esqueleto').length, texto: c.textContent.trim(), role: c.getAttribute('role') };
+        };
+        new MutationObserver(ver).observe(document.body, { childList: true, subtree: true });
+        location.hash = '#/retos';
+        await esperar(1500);
+        const vacio = document.querySelector('[data-testid="retos-vacio"]');
+        return { carga, vacio: vacio ? { drako: !!vacio.querySelector('[data-testid="drako-espera"]'), texto: vacio.textContent } : null };
+      })()`,
+    });
+    assert.deepEqual(r.errores, []);
+    assert.ok(r.eval.carga, 'mientras llegan los retos se vio el estado de carga');
+    assert.equal(r.eval.carga.drako, true);
+    assert.ok(r.eval.carga.esqueletos >= 2);
+    assert.match(r.eval.carga.texto, /Cargando/, 'el esqueleto nunca va sin su texto');
+    assert.equal(r.eval.carga.role, 'status');
+    assert.ok(r.eval.vacio, 'sin retos se ve el vacío con personalidad');
+    assert.equal(r.eval.vacio.drako, true);
+    assert.match(r.eval.vacio.texto, /Aún no hay retos/);
+  });
+});

@@ -684,3 +684,156 @@ body {
   color: var(--primario);
   animation: medalla-pop 600ms cubic-bezier(0.2, 1.9, 0.4, 1) 650ms backwards;
 }
+
+/* ---------- Cargas y vacíos con personalidad (ui/estados.js): Drako en espera y esqueletos con un brillo que
+   pasa (solo transform). Siempre llevan su texto: el esqueleto es adorno. ---------- */
+.estado-carga {
+  padding: 8px 0;
+}
+.estado-cabecera {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+.estado-cabecera .drako,
+.estado-vacio .drako {
+  width: 68px;
+  height: 68px;
+}
+.estado-texto {
+  margin: 0;
+  font-family: var(--fuente-titulos);
+  font-weight: 700;
+}
+.esqueletos {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  margin-top: 16px;
+}
+.esqueleto {
+  position: relative;
+  overflow: hidden;
+  height: 56px;
+  border-radius: var(--radio-md);
+  background: color-mix(in srgb, var(--primario) 8%, white);
+}
+.esqueleto-1 { width: 88%; }
+.esqueleto-2 { width: 68%; height: 40px; }
+.esqueleto::after {
+  content: "";
+  position: absolute;
+  inset: 0;
+  background: linear-gradient(90deg, transparent, color-mix(in srgb, var(--superficie) 80%, transparent), transparent);
+  transform: translateX(-100%);
+  animation: esqueleto-brilla 1.3s ease-in-out infinite;
+}
+@keyframes esqueleto-brilla {
+  to { transform: translateX(100%); }
+}
+.estado-vacio {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 4px;
+  padding: 18px 12px;
+  text-align: center;
+  background: var(--superficie);
+  border: 2px dashed var(--borde);
+  border-radius: var(--radio-md);
+}
+.estado-vacio .drako {
+  width: 88px;
+  height: 88px;
+}
+.estado-titulo {
+  margin: 0;
+  font-family: var(--fuente-titulos);
+  font-weight: 800;
+  color: var(--primario);
+}
+
+/* ---------- Inicio con vida: Drako saluda y luego respira; la tarjeta del reto de hoy late como invitación;
+   el escudo brilla al aparecer (y deja lista la animación de "subiste", que hoy nada dispara). ---------- */
+.juego [data-testid="vista-inicio"] .drako,
+[data-testid="vista-inicio"].juego .drako {
+  animation: drako-saluda 1.5s cubic-bezier(0.2, 1.6, 0.4, 1) 400ms 1, drako-respira 3.4s ease-in-out 1.9s infinite;
+}
+@keyframes drako-saluda {
+  0% { transform: rotate(0deg) translateY(0); }
+  20% { transform: rotate(-14deg) translateY(-10px) scale(1.1); }
+  40% { transform: rotate(12deg) translateY(-4px) scale(1.08); }
+  60% { transform: rotate(-10deg) translateY(-8px); }
+  80% { transform: rotate(6deg) translateY(0); }
+  100% { transform: rotate(0deg) translateY(0); }
+}
+.fila-invitacion {
+  position: relative;
+}
+.fila-invitacion::after {
+  content: "";
+  position: absolute;
+  inset: -5px;
+  border-radius: calc(var(--radio-md) + 4px);
+  border: 3px solid var(--oro);
+  pointer-events: none;
+  animation: invitacion-late 1.8s ease-in-out infinite;
+}
+@keyframes invitacion-late {
+  0%, 100% { opacity: 0; transform: scale(0.985); }
+  50% { opacity: 1; transform: scale(1.02); }
+}
+.fila-invitacion [data-testid="jugar-reto-hoy"] {
+  animation: boton-menea 2.4s ease-in-out 1.2s infinite;
+}
+@keyframes boton-menea {
+  0%, 82%, 100% { transform: translateX(0) rotate(0deg); }
+  86% { transform: translateX(-4px) rotate(-3deg); }
+  90% { transform: translateX(4px) rotate(3deg); }
+  94% { transform: translateX(-3px) rotate(-2deg); }
+  98% { transform: translateX(2px) rotate(1deg); }
+}
+.escudo-brillo {
+  position: relative;
+  overflow: hidden;
+}
+.escudo-brillo::after {
+  content: "";
+  position: absolute;
+  inset: 0;
+  background: linear-gradient(105deg, transparent 30%, color-mix(in srgb, var(--oro) 55%, transparent) 50%, transparent 70%);
+  transform: translateX(-130%);
+  animation: escudo-brilla 1.4s ease-out 700ms 1 forwards;
+}
+@keyframes escudo-brilla {
+  to { transform: translateX(130%); }
+}
+.escudo-sube {
+  animation: escudo-sube 900ms cubic-bezier(0.2, 1.9, 0.4, 1) 1;
+}
+@keyframes escudo-sube {
+  0% { transform: scale(1) rotate(0deg); }
+  30% { transform: scale(1.5) rotate(-6deg); }
+  60% { transform: scale(0.9) rotate(3deg); }
+  100% { transform: scale(1) rotate(0deg); }
+}
+
+/* ---------- Listas del estudiante (retos): las filas entran escalonadas. ---------- */
+.juego li.fila {
+  animation: fila-sube 440ms cubic-bezier(0.2, 1.4, 0.4, 1) backwards;
+}
+.juego li.fila:nth-child(1) { animation-delay: 120ms; }
+.juego li.fila:nth-child(2) { animation-delay: 190ms; }
+.juego li.fila:nth-child(3) { animation-delay: 260ms; }
+.juego li.fila:nth-child(4) { animation-delay: 330ms; }
+.juego li.fila:nth-child(5) { animation-delay: 400ms; }
+.juego li.fila:nth-child(n+6) { animation-delay: 470ms; }
+@keyframes fila-sube {
+  from { opacity: 0; transform: translateY(26px) scale(0.97); }
+}
+.juego li.fila .insignia {
+  animation: insignia-pop 520ms cubic-bezier(0.2, 1.9, 0.4, 1) 600ms backwards;
+}
+@keyframes insignia-pop {
+  from { opacity: 0; transform: scale(0.3); }
+}

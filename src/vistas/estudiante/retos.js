@@ -6,6 +6,8 @@ import { h, montar } from '../../ui/dom.js';
 import { textos } from '../../textos.js';
 import { tituloLegible } from '../../ui/titulo.js';
 import { crearNavInferior } from '../../ui/nav_inferior.js';
+import { crearCargando, crearVacio } from '../../ui/estados.js';
+import { crearBotonSonido } from '../../ui/boton_sonido.js';
 import { listarRetos, historialDeIntentos } from '../../api/retos.js';
 import { ErrorApi } from '../../api/cliente.js';
 
@@ -40,9 +42,10 @@ function filaDeReto(reto, ganado) {
 
 function pintarLista(raiz, retos, ganados) {
   const cuerpo = retos.length === 0
-    ? h('p', { role: 'status' }, textos.retos.sinRetos)
+    ? crearVacio({ titulo: textos.estados.retosVacioTitulo, texto: textos.estados.retosVacio, testid: 'retos-vacio' })
     : h('ul', {}, ...retos.map((r) => filaDeReto(r, ganados.has(r.id))));
-  montar(raiz, h('div', { 'data-testid': 'vista-retos' }, h('h1', {}, textos.retos.titulo), cuerpo, crearNavInferior('retos')));
+  montar(raiz, h('div', { 'data-testid': 'vista-retos', class: 'juego' },
+    h('div', { class: 'encabezado-reto' }, h('h1', {}, textos.retos.titulo), crearBotonSonido()), cuerpo, crearNavInferior('retos')));
   document.body.dataset.listo = '1';
 }
 
@@ -53,7 +56,7 @@ function pintarError(raiz, mensaje) {
 
 /** @param {HTMLElement} raiz @param {{token: string, tenantId?: string}} ctx */
 export async function renderRetos(raiz, ctx) {
-  montar(raiz, h('div', { 'data-testid': 'vista-retos' }, h('p', { role: 'status' }, textos.inicio.cargando)));
+  montar(raiz, h('div', { 'data-testid': 'vista-retos', class: 'juego' }, crearCargando(textos.inicio.cargando)));
   try {
     const { retos, ganados } = await cargar(ctx);
     pintarLista(raiz, retos, ganados);

@@ -39,6 +39,12 @@ export const textos = {
     activar: 'Activar el sonido y la vibración',
   },
   // Game feel: la constancia que sube (ui/racha.js). El número es el del servidor, tal cual.
+  // Game feel: cargas y vacíos con Drako en espera (ui/estados.js).
+  estados: {
+    drakoEspera: 'Drako espera contigo',
+    retosVacioTitulo: 'Aún no hay retos',
+    retosVacio: 'Cuando tu profe active uno, aparecerá aquí para que lo juegues.',
+  },
   racha: {
     /** @param {number} n */
     sube: (n) => `¡Constancia ${n}!`,

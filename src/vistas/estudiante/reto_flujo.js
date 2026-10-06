@@ -16,6 +16,7 @@ import { crearPanelResultado } from '../../ui/panel_resultado.js';
 import { avanceDelReto, crearBarraProgreso, senalDeSeleccion } from '../../ui/progreso.js';
 import { crearBotonSonido } from '../../ui/boton_sonido.js';
 import { marcarCargando } from '../../ui/boton.js';
+import { crearCargando } from '../../ui/estados.js';
 import { senal } from '../../ui/sonido.js';
 
 function claveLocal(attemptId) {
@@ -168,7 +169,7 @@ async function manejarTerminar(raiz, estado, enviarUnaVez) {
  * @param {{token: string, tenantId?: string}} ctx
  */
 export async function renderRetoFlujo(raiz, params, query, ctx) {
-  montar(raiz, h('div', { 'data-testid': 'vista-reto-flujo' }, h('p', { role: 'status' }, textos.inicio.cargando)));
+  montar(raiz, h('div', { 'data-testid': 'vista-reto-flujo', class: 'juego' }, crearCargando(textos.inicio.cargando)));
   const challengeId = params.id;
   try {
     const esRepaso = query.repaso === '1' || (await yaGanado(challengeId, ctx));
