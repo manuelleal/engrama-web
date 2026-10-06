@@ -1,0 +1,7 @@
+{
+  "descripcion": "H-9: innerHTML escrito con corchetes (el con corchetes) no lo veía el regex de solo-punto",
+  "archivos": { "src/ui/dom_prueba.js": "archivo.mjs" },
+  "comando": ["node", "herramientas/verificar.mjs", "--json"],
+  "espera_codigo_no_cero": true,
+  "espera_contiene_checks": ["V4"]
+}

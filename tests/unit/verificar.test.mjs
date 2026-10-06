@@ -140,3 +140,46 @@ test('un proyecto limpio no tiene violaciones', () => {
     assert.equal(r.ok, true);
   } finally { rmSync(raiz, { recursive: true, force: true }); }
 });
+
+// ---- H-9 (auditoría de seguridad 02): V4 más difícil de esquivar ----
+const FORMAS_PROHIBIDAS = {
+  'innerHTML con corchetes': "const k = el['innerHTML'];\nel['innerHTML'] = x;",
+  'outerHTML con corchetes': 'el["outerHTML"] = x;',
+  'insertAdjacentHTML': "el.insertAdjacentHTML('beforeend', x);",
+  'createContextualFragment': 'const f = document.createRange().createContextualFragment(x);',
+  'DOMParser': "const d = new DOMParser().parseFromString(x, 'text/html');",
+  'document.write': 'document.write(x);',
+  'document.writeln con corchetes': "document['writeln'](x);",
+};
+
+for (const [nombre, codigo] of Object.entries(FORMAS_PROHIBIDAS)) {
+  test(`H-9: V4 marca ${nombre}`, () => {
+    const raiz = proyectoDePrueba({ 'src/ui/malo.js': codigo });
+    try {
+      assert.ok(violacionesDe(verificar(raiz), 'V4').length >= 1, `no marcó: ${codigo}`);
+    } finally { rmSync(raiz, { recursive: true, force: true }); }
+  });
+}
+
+test('H-9: un "//" dentro de una cadena no esconde el código que sigue (const a="//"; el.innerHTML=x)', () => {
+  const raiz = proyectoDePrueba({
+    'src/ui/escondido.js': 'const a = "//"; el.innerHTML = x;',
+    'src/ui/escondido2.js': "const u = 'http://ejemplo.org'; document.write(u);",
+    'src/ui/escondido3.js': 'const t = `//`; el.outerHTML = t;',
+  });
+  try {
+    const v4 = violacionesDe(verificar(raiz), 'V4');
+    for (const archivo of ['escondido.js', 'escondido2.js', 'escondido3.js']) {
+      assert.ok(v4.some((v) => v.archivo.endsWith(archivo)), `V4 no vio ${archivo}`);
+    }
+  } finally { rmSync(raiz, { recursive: true, force: true }); }
+});
+
+test('H-9: un comentario sigue sin disparar V4, y el texto "innerHTML" en prosa tampoco', () => {
+  const raiz = proyectoDePrueba({
+    'src/ui/limpio.js': "// no usar el.innerHTML = x\n/* ni document.write(x) */\nconst frase = 'no se usa innerHTML aquí';\nexport const ok = frase;",
+  });
+  try {
+    assert.equal(violacionesDe(verificar(raiz), 'V4').length, 0);
+  } finally { rmSync(raiz, { recursive: true, force: true }); }
+});

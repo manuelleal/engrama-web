@@ -43,10 +43,29 @@ function listarArchivos(carpeta, filtro) {
   return encontrados.sort();
 }
 
+// Quita SOLO los comentarios, respetando cadenas, plantillas y regex: un `//` dentro de una cadena
+// ("http://…", `const a = "//"`) no es un comentario, y borrar lo que sigue escondía justo el código
+// que V4 busca (H-9 de la auditoría de seguridad: `const a="//"; el.innerHTML = x` pasaba limpio).
+// Usa el mismo reconocedor de tokens que el medidor de tamaños (`finDeToken`, más abajo).
 function quitarComentarios(codigo) {
-  return codigo
-    .replace(/\/\*[\s\S]*?\*\//g, (m) => m.replace(/[^\n]/g, ' '))
-    .replace(/(^|[^:])\/\/.*$/gm, '$1');
+  let salida = '';
+  let i = 0;
+  let anterior = '';
+  while (i < codigo.length) {
+    const token = finDeToken(codigo, i, anterior);
+    if (!token) {
+      salida += codigo[i];
+      if (!/\s/.test(codigo[i])) anterior = codigo[i];
+      i++;
+      continue;
+    }
+    const trozo = codigo.slice(i, token.fin);
+    salida += token.tipo === 'comentario' ? trozo.replace(/[^\n]/g, ' ') : trozo;
+    if (token.tipo === 'cadena') anterior = codigo[i];
+    else if (token.tipo === 'regex') anterior = '/';
+    i = token.fin;
+  }
+  return salida;
 }
 
 // ---------- V1: acceso directo a la base ----------
@@ -158,11 +177,16 @@ function chequearV3Svg(violaciones, raiz) {
 }
 
 // ---------- V4: API de DOM prohibida ----------
+// Cada API que convierte texto en HTML, en sus dos formas de escribirla: con punto (`el.innerHTML`) y con
+// corchetes (`el['innerHTML']`), que el regex de solo-punto no veía (H-9). `DOMParser` y
+// `createContextualFragment` también convierten texto en nodos y quedan prohibidos.
 const PATRONES_DOM_PROHIBIDO = [
-  { re: /\.innerHTML\b/, etiqueta: 'innerHTML' },
-  { re: /\.outerHTML\b/, etiqueta: 'outerHTML' },
-  { re: /\.insertAdjacentHTML\b/, etiqueta: 'insertAdjacentHTML' },
-  { re: /document\.write\b/, etiqueta: 'document.write' },
+  { re: /(?:\.\s*|\[\s*['"`])innerHTML\b/, etiqueta: 'innerHTML' },
+  { re: /(?:\.\s*|\[\s*['"`])outerHTML\b/, etiqueta: 'outerHTML' },
+  { re: /(?:\.\s*|\[\s*['"`])insertAdjacentHTML\b/, etiqueta: 'insertAdjacentHTML' },
+  { re: /(?:\.\s*|\[\s*['"`])createContextualFragment\b/, etiqueta: 'createContextualFragment' },
+  { re: /\bDOMParser\b/, etiqueta: 'DOMParser' },
+  { re: /\bdocument\s*(?:\.\s*|\[\s*['"`])write(?:ln)?\b/, etiqueta: 'document.write' },
   { re: /\beval\s*\(/, etiqueta: 'eval(' },
   { re: /\bnew\s+Function\s*\(/, etiqueta: 'new Function(' },
 ];
