@@ -178,7 +178,10 @@ test(
     const retos = retosDeLectura(unidad);
     assert.equal(retos.length, 2);
     assert.ok(retos.every((r) => r.questions.length === 3));
-    // Sin firma todavía (§3, medido): el script se niega salvo --borrador.
-    assert.equal(verificarFirma(unidad, { borrador: false, apiEsLocal: true }).ok, false);
+    // Firmada desde el 2026-10-06 (contenido `74e13c1`): el script la acepta sin --borrador.
+    assert.equal(verificarFirma(unidad, { borrador: false, apiEsLocal: true }).ok, true);
+    // Y la misma unidad sin su firma se sigue rechazando (la guarda no quedó decorativa).
+    const sinFirma = { ...unidad, revisado_por: null };
+    assert.equal(verificarFirma(sinFirma, { borrador: false, apiEsLocal: true }).ok, false);
   },
 );
