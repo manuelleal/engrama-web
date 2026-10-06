@@ -234,7 +234,7 @@ function arrancarConSesion(desdeElPrincipio = false) {
   ruta('/inicio', conCtx((raiz, params, query, ctx) => renderInicio(raiz, ctx)));
   ruta('/perfil', conCtx((raiz, params, query, ctx) => renderPerfil(raiz, ctx)));
   ruta('/datos', conCtx((raiz) => (leerAviso().ok
-    ? renderLeerAviso(raiz, { aviso: leerAviso(), alVolver: () => navegar('/perfil') })
+    ? renderLeerAviso(raiz, { aviso: leerAviso(), alVolver: () => navegar(sesionActual.rol === 'student' ? '/perfil' : rutaPorDefectoSegunRol(sesionActual)) })
     : renderErrorAviso(raiz, leerAviso().faltan))));
   ruta('/asistencia', conCtx((raiz, params, query, ctx) => renderAsistencia(raiz, query, ctx)));
   ruta('/retos', conCtx((raiz, params, query, ctx) => renderRetos(raiz, ctx)));

@@ -128,6 +128,7 @@ export const textos = {
     derechos: 'Puedes conocer qué datos tuyos guardamos, actualizarlos, rectificarlos y pedir que se supriman.',
     /** @param {string} contacto */
     contacto: (contacto) => `Para ejercer tus derechos, escribe a ${contacto}.`,
+    contactoPrefijo: 'Para ejercer tus derechos, escribe a ',
     /** @param {string} version */
     version: (version) => `Versión del aviso: ${version}`,
     acepto: 'He leído y acepto el tratamiento de mis datos',

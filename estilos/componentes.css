@@ -605,3 +605,10 @@ nav {
 }
 
 /* El confeti, las monedas, la llama y el resto del game feel viven en estilos/juego.css. */
+
+/* El correo de contacto del aviso de datos: texto que se selecciona entero con un toque (y se copia). */
+.correo-copiable {
+  user-select: all;
+  -webkit-user-select: all;
+  overflow-wrap: anywhere;
+}

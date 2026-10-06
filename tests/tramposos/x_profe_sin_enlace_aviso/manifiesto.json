@@ -1,0 +1,16 @@
+{
+  "descripcion": "Ley 1581: el profe y el admin no tienen ningún enlace al aviso de datos",
+  "archivos": {
+    "src/ui/barra_rol.js": "barra_rol.js"
+  },
+  "comando": [
+    "node",
+    "--test",
+    "--test-reporter=tap",
+    "tests/e2e/aviso_profe.test.mjs"
+  ],
+  "espera_codigo_no_cero": true,
+  "espera_fallan_tests": [
+    "aviso: el profe ve el enlace al aviso en su barra, lo abre, el correo es texto seleccionable y puede volver"
+  ]
+}

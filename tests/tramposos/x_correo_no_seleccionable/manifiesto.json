@@ -1,0 +1,16 @@
+{
+  "descripcion": "Aviso de datos: el correo de contacto no se reconoce (queda como texto corrido, sin selección de un toque)",
+  "archivos": {
+    "src/vistas/aviso_datos.js": "aviso_datos.js"
+  },
+  "comando": [
+    "node",
+    "--test",
+    "--test-reporter=tap",
+    "tests/e2e/aviso_profe.test.mjs"
+  ],
+  "espera_codigo_no_cero": true,
+  "espera_fallan_tests": [
+    "aviso: un correo dentro del contacto se separa del resto del texto; sin correo, todo es texto"
+  ]
+}

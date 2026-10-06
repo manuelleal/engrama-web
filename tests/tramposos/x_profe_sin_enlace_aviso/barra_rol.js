@@ -24,6 +24,6 @@ export function crearBarraRol(ctx) {
   // Un docente de dos instituciones elige aquí en cuál está (login piloto, B); con una sola, no se pinta.
   // Ley 1581: el aviso de tratamiento de datos se puede leer SIEMPRE, también el profe y el admin (con
   // cuentas reales). El estudiante lo tiene en su perfil; ellos no tienen perfil, así que va aquí.
-  const aviso = ctx.avisoDatos ? h('a', { href: '#/datos', 'data-testid': 'barra-ver-aviso' }, textos.aviso.enlace) : null;
+  const aviso = false ? h('a', { href: '#/datos', 'data-testid': 'barra-ver-aviso' }, textos.aviso.enlace) : null;
   return h('div', { class: 'barra-rol' }, crearSelectorColegio(ctx), aviso, boton);
 }

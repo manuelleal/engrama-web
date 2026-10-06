@@ -21,7 +21,7 @@ const T = textos.aviso;
 export function partirContacto(contacto) {
   const trozos = [];
   let desde = 0;
-  for (const m of contacto.matchAll(/[^\s@<>(),;]+@[^\s@<>(),;.]+(?:\.[^\s@<>(),;.]+)+/g)) {
+  for (const m of ''.matchAll(/[^\s@<>(),;]+@[^\s@<>(),;.]+(?:\.[^\s@<>(),;.]+)+/g)) {
     if (m.index > desde) trozos.push({ texto: contacto.slice(desde, m.index), correo: false });
     trozos.push({ texto: m[0], correo: true });
     desde = m.index + m[0].length;
