@@ -10,7 +10,7 @@
 //
 // Súbelo un número cada vez que cambie la lista de precarga o la estrategia; la `activate`
 // borra cualquier caché con otro nombre.
-const VERSION = 'engrama-shell-v18';
+const VERSION = 'engrama-shell-v17';
 
 // Cada encargo agrega los suyos en su propio commit (W7: Inicio + api/cliente,core,retos + los
 // SVG de Drako que usa el estudiante; W10: profe/grupos,grupo,sesion_asistencia + api/profe). El
@@ -69,10 +69,6 @@ const PRECARGA = [
   '/src/ui/confeti.js',
   '/src/ui/barra_rol.js',
   '/src/ui/boton_salir.js',
-  // Animación (vendor/PROCEDENCIA.md, autorizada por Christiam el 2026-10-06): anime.js mueve a Drako por partes y la
-  // línea de tiempo del fin de reto; canvas-confetti dibuja el confeti. Mismo origen, sin tocar la CSP.
-  '/vendor/animejs@4.5.0/anime.esm.min.js',
-  '/vendor/canvas-confetti@1.9.4/confetti.module.mjs',
   '/src/auth/mock.js',
   '/src/vistas/entrada.js',
   '/src/vistas/perfil.js', // W22: import estático de app.js

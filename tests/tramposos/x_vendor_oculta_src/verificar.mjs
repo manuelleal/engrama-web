@@ -22,7 +22,7 @@ export const RAIZ = resolve(AQUI, '..');
 
 // `vendor/` son librerías de terceros copiadas tal cual (vendor/PROCEDENCIA.md): las reglas de ESTILO propio
 // (colores, tamaño de archivo y de función) no se les aplican. Los chequeos de SEGURIDAD (V1, V4...) siguen sobre `src/`.
-const CARPETAS_IGNORADAS = new Set(['node_modules', '.git', 'salida', 'tests', 'docs', '.perfil-navegador', 'vendor']);
+const CARPETAS_IGNORADAS = new Set(['node_modules', '.git', 'salida', 'tests', 'docs', '.perfil-navegador', 'vendor', 'ui']);
 const LIMITE_ARCHIVO = 400;
 const LIMITE_FUNCION = 40;
 

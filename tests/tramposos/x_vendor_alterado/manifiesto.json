@@ -1,0 +1,11 @@
+{
+  "descripcion": "vendor: anime.js editado a mano (ya no es el archivo descargado); el sha256 de PROCEDENCIA.md no coincide",
+  "archivos": {
+    "vendor/animejs@4.5.0/anime.esm.min.js": "anime.esm.min.js"
+  },
+  "comando": ["node", "--test", "--test-reporter=tap", "tests/unit/vendor_procedencia.test.mjs"],
+  "espera_codigo_no_cero": true,
+  "espera_fallan_tests": [
+    "vendor: el sha256 y el tamaño de cada archivo coinciden con PROCEDENCIA.md (un archivo alterado da ROJO)"
+  ]
+}

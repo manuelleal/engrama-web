@@ -1,0 +1,11 @@
+{
+  "descripcion": "Una librería pidió 'unsafe-eval' y alguien relajó la CSP de index.html en vez de dejar la alternativa propia",
+  "archivos": {
+    "index.html": "index.html"
+  },
+  "comando": ["node", "--test", "--test-reporter=tap", "tests/unit/csp_sin_relajar.test.mjs"],
+  "espera_codigo_no_cero": true,
+  "espera_fallan_tests": [
+    "CSP: script-src, style-src y default-src siguen EXACTAMENTE en 'self' (sin unsafe-eval, unsafe-inline, blob: ni orígenes externos)"
+  ]
+}

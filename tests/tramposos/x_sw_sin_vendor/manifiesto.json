@@ -1,0 +1,7 @@
+{
+  "descripcion": "sw.js sin las librerías de vendor/ en la precarga (y sin subir VERSION): sin red, la animación no carga",
+  "archivos": { "sw.js": "sw.js" },
+  "comando": ["node", "--test", "--test-reporter=tap", "tests/unit/sw_precarga.test.mjs"],
+  "espera_codigo_no_cero": true,
+  "espera_fallan_tests": ["sw.js: anime.js y canvas-confetti se precargan, y la VERSION subió al cambiar la lista (v18 o más)"]
+}

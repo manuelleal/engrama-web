@@ -1,0 +1,12 @@
+{
+  "descripcion": "El servidor de desarrollo no lista vendor/ entre los estáticos: /vendor/* da 404 y las animaciones no cargarían",
+  "archivos": {
+    "herramientas/servidor_dev.mjs": "servidor_dev.mjs"
+  },
+  "comando": ["node", "--test", "--test-reporter=tap", "tests/unit/servidor_dev_vendor.test.mjs"],
+  "espera_codigo_no_cero": true,
+  "espera_fallan_tests": [
+    "servidor_dev: /vendor/* se resuelve; lo que no es de las raíces estáticas sigue sin servirse",
+    "servidor_dev: por HTTP, las dos librerías llegan idénticas a PROCEDENCIA.md y con tipo JavaScript"
+  ]
+}

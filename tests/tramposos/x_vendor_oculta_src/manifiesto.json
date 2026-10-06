@@ -1,0 +1,7 @@
+{
+  "descripcion": "Para dejar pasar vendor/ alguien dejó la exclusión demasiado ancha (también ignora src/ui/): los chequeos de seguridad (V4) dejan de ver código propio",
+  "archivos": { "herramientas/verificar.mjs": "verificar.mjs" },
+  "comando": ["node", "--test", "--test-reporter=tap", "tests/unit/verificar.test.mjs"],
+  "espera_codigo_no_cero": true,
+  "espera_fallan_tests": ["vendor/: las reglas de estilo propio no se le aplican, pero src/ sigue revisándose con todo (V4, V1, tamaños)"]
+}

@@ -1,0 +1,34 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<!--
+  CSP restrictiva (§11 W3): todo sale del mismo origen, nada de inline ni de orígenes externos.
+  script-src/style-src sin 'unsafe-inline' porque src/ui/dom.js nunca escribe HTML (regla §6.2:
+  prohibidos innerHTML/eval/new Function) y los estilos viven en archivos .css, no en atributos.
+-->
+<meta http-equiv="Content-Security-Policy" content="default-src 'self'; script-src 'self' 'unsafe-eval'; style-src 'self'; img-src 'self' data:; connect-src 'self'; font-src 'self'; base-uri 'none'; form-action 'self'; frame-ancestors 'none'; object-src 'none'">
+<title>ENGRAMA</title>
+<meta name="description" content="ENGRAMA — retos, monedas y racha para aprender inglés.">
+<meta name="theme-color" content="#003366">
+<link rel="manifest" href="/manifest.webmanifest">
+<link rel="icon" href="/publico/diseno/drako/icono-32.svg" type="image/svg+xml">
+<link rel="stylesheet" href="/publico/diseno/tokens.css">
+<link rel="stylesheet" href="/estilos/tipografia.css">
+<link rel="stylesheet" href="/estilos/base.css">
+<link rel="stylesheet" href="/estilos/componentes.css">
+<link rel="stylesheet" href="/estilos/formularios.css">
+<link rel="stylesheet" href="/estilos/juego.css">
+</head>
+<body>
+<!--
+  #banner-red (ui/red.js) y #vista (rutas.js) son los dos huecos fijos del shell. Cada pantalla
+  que rutas.js monta dentro de #vista marca document.body.dataset.listo = "1" cuando ya tiene
+  datos (regla §7.2; lo leen los E2E por CDP esperando ese valor).
+-->
+<div id="banner-red" data-testid="banner-red"></div>
+<main id="vista" data-testid="vista"></main>
+<script type="module" src="/src/app.js"></script>
+</body>
+</html>

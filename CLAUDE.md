@@ -30,6 +30,12 @@ Paquetes de desarrollo (Playwright, axe, TypeScript) y el QR de Nayuki solo
 **después** del sí de Christiam (§6.3 de la espec); ninguna dependencia de
 ejecución por npm.
 
+**Excepción autorizada (2026-10-06, §6.4 de la espec): `vendor/`.** Dos librerías de animación copiadas TAL CUAL
+(no por npm): `animejs@4.5.0` (MIT) y `canvas-confetti@1.9.4` (ISC). `vendor/PROCEDENCIA.md` trae URL, versión, fecha,
+tamaño, sha256 y licencia; `tests/unit/vendor_procedencia.test.mjs` los compara. No se editan. La CSP sigue en `'self'`:
+si una librería necesitara relajarla, no se usa (queda la alternativa propia). `verificar.mjs` no aplica el estilo propio
+a `vendor/`, pero V1/V4 y los tamaños siguen sobre `src/`. Cualquier librería nueva pide otro sí de Christiam.
+
 ## Reglas del cliente (§7.2 de la espec)
 
 1. Toda llamada pasa por `src/api/cliente.js`: ruta `/api/...`, `Authorization:

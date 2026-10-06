@@ -183,3 +183,18 @@ test('H-9: un comentario sigue sin disparar V4, y el texto "innerHTML" en prosa 
     assert.equal(violacionesDe(verificar(raiz), 'V4').length, 0);
   } finally { rmSync(raiz, { recursive: true, force: true }); }
 });
+
+test('vendor/: las reglas de estilo propio no se le aplican, pero src/ sigue revisándose con todo (V4, V1, tamaños)', () => {
+  const grande = Array.from({ length: 450 }, (_, i) => `var a${i} = ${i};`).join('\n');
+  const raiz = proyectoDePrueba({
+    'vendor/lib@1/lib.js': `${grande}\nel.innerHTML = x; eval('1'); const c = '#ff0000';`,
+    'vendor/lib@1/lib.css': '.a { color: #ff0000; }',
+    'src/ui/malo.js': 'export function f(el, x) { el.innerHTML = x; }',
+  });
+  try {
+    const r = verificar(raiz);
+    assert.deepEqual(r.violaciones.filter((v) => v.archivo.startsWith('vendor')), [], 'vendor/ no se revisa');
+    assert.equal(violacionesDe(r, 'V4').length, 1, 'src/ sigue con V4');
+    assert.match(violacionesDe(r, 'V4')[0].archivo, /malo\.js$/);
+  } finally { rmSync(raiz, { recursive: true, force: true }); }
+});

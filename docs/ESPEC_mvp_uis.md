@@ -150,6 +150,15 @@ Siempre: correcto e incorrecto **con ícono y texto** ("✓ Correcta" / "✗ Est
 
 Las versiones exactas se fijan con `package-lock.json` en el mismo commit de la instalación. Ninguna dependencia de ejecución por npm.
 
+### 6.4 Librerías vendorizadas (autorizadas el 2026-10-06)
+Christiam autorizó dos librerías de animación para el game feel y Drako por partes. **No son paquetes npm:** el coordinador las descargó y las revisó (sin `fetch`, sin `eval`, sin `new Function`) y se copian tal cual a `vendor/`.
+| Librería | Versión | Licencia | Para qué | Viaja al navegador |
+|---|---|---|---|---|
+| `animejs` | 4.5.0 (118.678 bytes, ESM minificado) | MIT | Drako por partes (transiciones entre poses, reposo, salto), línea de tiempo del fin de reto | Sí |
+| `canvas-confetti` | 1.9.4 (24.924 bytes, módulo ESM) | ISC | El confeti del fin de reto y la asistencia, en un solo `<canvas>` | Sí |
+
+Reglas: (1) `vendor/PROCEDENCIA.md` es la fuente de verdad (URL, versión, fecha, tamaño, sha256, licencia) y un test compara el sha256 de cada archivo; un archivo alterado se pone ROJO. (2) La CSP no se relaja (`script-src 'self'`, `style-src 'self'`): anime.js escribe por CSSOM y canvas-confetti va con `useWorker: false` y su propio lienzo (su instancia por defecto usa un worker desde `blob:` y la CSP lo bloquea: medido). (3) El service worker las precarga; el servidor de desarrollo y el Caddyfile del despliegue sirven `/vendor/*`. (4) `verificar.mjs` no les aplica las reglas de estilo propio; los chequeos de seguridad siguen sobre `src/`. (5) Si alguna exigiera relajar la CSP no se usa: `ui/confeti.js` conserva el confeti propio de piezas de CSS como respaldo.
+
 ## 7. Arquitectura del cliente
 ### 7.1 Árbol (cada archivo ≤ 400 líneas)
 ```

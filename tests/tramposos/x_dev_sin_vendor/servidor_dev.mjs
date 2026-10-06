@@ -22,9 +22,8 @@ function apiUrlActual() {
 }
 
 // Solo estas rutas se sirven como archivos: nada de listar el proyecto entero (tests/, docs/,
-// herramientas/, .git — nada de eso debe llegar nunca a un navegador). `vendor` son las dos librerías de
-// animación copiadas tal cual (vendor/PROCEDENCIA.md); el Caddyfile del despliegue tiene que listar `/vendor/*`.
-const RAICES_ESTATICAS = ['estilos', 'publico', 'src', 'contratos', 'vendor'];
+// herramientas/, .git — nada de eso debe llegar nunca a un navegador).
+const RAICES_ESTATICAS = ['estilos', 'publico', 'src', 'contratos'];
 // config.json (W22): ENGRAMA_AUTH=mock|perfil_actual|supabase, nunca un secreto (§7.4). En
 // desarrollo sirve el del propio repo (mock, el de abajo); el despliegue lo reemplaza a nivel de
 // Caddy sin tocar este repo (despliegue/Caddyfile, `handle /config.json`).
