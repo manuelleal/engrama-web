@@ -604,3 +604,83 @@ body {
   60% { transform: translateX(-3px); }
   80% { transform: translateX(3px); }
 }
+
+/* ---------- Asistencia marcada (ui/sello.js): el sello se estampa con rebote y una onda; las monedas del
+   chip cuentan y la llama de la constancia late. Sin movimiento queda un sello quieto, igual de claro. ---------- */
+.sello-zona {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 10px;
+  margin: 18px 0 8px;
+}
+.sello {
+  position: relative;
+  display: grid;
+  place-items: center;
+  align-content: center;
+  width: 136px;
+  height: 136px;
+  border: 6px double var(--primario);
+  border-radius: 50%;
+  color: var(--primario);
+  font-family: var(--fuente-titulos);
+  font-weight: 800;
+  background: color-mix(in srgb, var(--oro) 14%, white);
+  rotate: -8deg;
+  animation: sello-estampa 720ms cubic-bezier(0.2, 1.5, 0.35, 1) backwards;
+}
+.sello::after {
+  content: "";
+  position: absolute;
+  inset: -8px;
+  border-radius: 50%;
+  border: 3px solid var(--oro);
+  animation: sello-onda 900ms ease-out 420ms 1 both;
+}
+.sello-marca {
+  font-size: 3rem;
+  line-height: 1;
+}
+.sello-texto {
+  font-size: 1.15rem;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+}
+@keyframes sello-estampa {
+  0% { opacity: 0; transform: scale(2.6); }
+  55% { opacity: 1; transform: scale(0.88); }
+  75% { transform: scale(1.06); }
+  100% { transform: scale(1); }
+}
+@keyframes sello-onda {
+  0% { opacity: 0.9; transform: scale(0.9); }
+  100% { opacity: 0; transform: scale(1.5); }
+}
+.chip-monedas {
+  display: inline-flex;
+  align-items: baseline;
+  gap: 6px;
+  margin: 0;
+  padding: 6px 20px;
+  background: var(--primario);
+  color: var(--oro);
+  font-family: var(--fuente-titulos);
+  font-weight: 800;
+  border-radius: var(--radio-lg);
+  border-bottom: 4px solid var(--primario-oscuro);
+  animation: medalla-pop 600ms cubic-bezier(0.2, 1.9, 0.4, 1) 300ms backwards;
+}
+.chip-num {
+  display: inline-block;
+  font-size: 1.8rem;
+  min-width: 2ch;
+  text-align: right;
+}
+.constancia-asistencia {
+  margin: 0;
+  font-family: var(--fuente-titulos);
+  font-weight: 800;
+  color: var(--primario);
+  animation: medalla-pop 600ms cubic-bezier(0.2, 1.9, 0.4, 1) 650ms backwards;
+}

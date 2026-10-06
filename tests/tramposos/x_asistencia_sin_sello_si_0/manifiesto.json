@@ -1,0 +1,16 @@
+{
+  "descripcion": "Game feel: sin monedas ganadas la asistencia queda en silencio (sin sello)",
+  "archivos": {
+    "src/ui/sello.js": "sello.js"
+  },
+  "comando": [
+    "node",
+    "--test",
+    "--test-reporter=tap",
+    "tests/unit/ui_sello.test.mjs"
+  ],
+  "espera_codigo_no_cero": true,
+  "espera_fallan_tests": [
+    "asistencia: el sello siempre; las monedas y la llama solo si el servidor las dio"
+  ]
+}

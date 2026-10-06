@@ -4,8 +4,11 @@
 // y el botón deshabilitado (con su mensaje) mientras no hay red — nunca en silencio (§7.3, E8).
 import { h, montar } from '../../ui/dom.js';
 import { crearResultado } from '../../ui/retro.js';
+import { crearNavInferior } from '../../ui/nav_inferior.js';
 import { suscribirRed } from '../../ui/red.js';
-import { lanzarConfeti } from '../../ui/confeti.js';
+import { celebrarAsistencia } from '../../ui/sello.js';
+import { crearBotonSonido } from '../../ui/boton_sonido.js';
+import { marcarCargando, destelloExito } from '../../ui/boton.js';
 import { textos } from '../../textos.js';
 import { marcarAsistencia } from '../../api/core.js';
 import { accionUnica, ErrorApi } from '../../api/cliente.js';
@@ -54,26 +57,30 @@ function actualizarBotonPorRed(boton, avisoRed, enLinea) {
  */
 export function renderAsistencia(raiz, query, ctx) {
   const { form, campo, boton, avisoRed, zonaResultado } = crearFormulario({ codigoInicial: query.codigo || '' });
-  montar(raiz, h('div', { 'data-testid': 'vista-asistencia' }, h('h1', {}, textos.asistencia.titulo), form));
+  montar(raiz, h('div', { 'data-testid': 'vista-asistencia', class: 'juego' },
+    h('div', { class: 'encabezado-reto' }, h('h1', {}, textos.asistencia.titulo), crearBotonSonido()), form, crearNavInferior('asistencia')));
 
   const cancelarRed = suscribirRed((enLinea) => actualizarBotonPorRed(boton, avisoRed, enLinea));
 
   const marcarUnaVez = accionUnica(async () => {
     boton.disabled = true;
+    marcarCargando(boton, true);
     boton.textContent = textos.asistencia.marcando;
     try {
       const codigo = campo.value.trim();
       if (!codigo) { montar(zonaResultado, crearResultado({ ok: false, texto: textos.asistencia.faltaCodigo })); return; }
       const r = await marcarAsistencia({ token: ctx.token, tenantId: ctx.tenantId, codigo });
       montar(zonaResultado, crearResultado({ ok: true, texto: textos.asistencia.exito(r.coins_awarded, r.streak) }));
-      // Game feel (referencia de solo lectura: coins-mvp/student.html) — confeti sutil solo si de
-      // verdad ganó algo; el CSS ya respeta prefers-reduced-motion (ui/confeti.js).
-      if (r.coins_awarded > 0) lanzarConfeti();
+      // Game feel: el sello se estampa, las monedas vuelan a su contador, suena y vibra; la constancia
+      // que llega del servidor se celebra solo si subió (ui/sello.js).
+      celebrarAsistencia({ zona: zonaResultado, monedas: r.coins_awarded, racha: r.streak, quien: ctx.sesion?.profileId });
+      destelloExito(boton);
     } catch (e) {
       const mensaje = e instanceof ErrorApi ? mensajeDeAsistencia(e) : textos.asistencia.codigoInvalido;
       montar(zonaResultado, crearResultado({ ok: false, texto: mensaje }));
     } finally {
       boton.textContent = textos.asistencia.marcar;
+      marcarCargando(boton, false);
       boton.disabled = false;
     }
   });

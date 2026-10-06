@@ -1,0 +1,16 @@
+{
+  "descripcion": "Game feel: el chip de la asistencia cuenta una moneda más de las que dio el servidor",
+  "archivos": {
+    "src/ui/sello.js": "sello.js"
+  },
+  "comando": [
+    "node",
+    "--test",
+    "--test-reporter=tap",
+    "tests/e2e/game_feel.test.mjs"
+  ],
+  "espera_codigo_no_cero": true,
+  "espera_fallan_tests": [
+    "game feel: marcar asistencia estampa el sello, cuenta las monedas del servidor y deja el resultado con ícono y texto"
+  ]
+}

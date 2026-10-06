@@ -202,3 +202,34 @@ test('game feel: un reto con todo fallado anima (Drako "ups", sin confeti, sin m
     assert.match(r.eval.titulo, /Buen intento/);
   });
 });
+
+test('game feel: marcar asistencia estampa el sello, cuenta las monedas del servidor y deja el resultado con ícono y texto', { skip: SKIP }, async () => {
+  const { abrirSesion } = await import('../../herramientas/mock/rutas_teachers.mjs');
+  await conAppCompleta(async (url, estado) => {
+    const { cuerpo: sesion } = abrirSesion(estado, { headers: { authorization: `Bearer ${DOCENTE_BOOTSTRAP_TOKEN}` } }, [...estado.groups.values()][0].id, {});
+    const r = await revisarPagina({
+      url: `${url}#/asistencia?codigo=${sesion.session_code}`, ancho: 375, alto: 812, espera_ms: 5000, pre: YA_ENTRO,
+      eval: `(async () => {
+        const esperar = (ms) => new Promise((r) => setTimeout(r, ms));
+        await esperar(500);
+        const temprano = { sello: !!document.querySelector('[data-testid="sello"]'), sonido: !!document.querySelector('[data-testid="boton-sonido"]') };
+        await esperar(3200);
+        return {
+          temprano,
+          resultado: document.querySelector('[data-testid="asistencia-resultado"] [data-testid="resultado"]').textContent,
+          chip: document.querySelector('[data-testid="chip-monedas"]')?.textContent ?? null,
+          fichasQuedan: document.querySelectorAll('.ficha-moneda').length,
+        };
+      })()`,
+    });
+    assert.deepEqual(r.errores, []);
+    assert.equal(r.eval.temprano.sello, true, 'el sello aparece al instante');
+    assert.equal(r.eval.temprano.sonido, true);
+    assert.match(r.eval.resultado, /✓/);
+    const m = r.eval.resultado.match(/\+(\d+) monedas/);
+    assert.ok(m, 'el resultado dice cuántas monedas dio el servidor');
+    if (Number(m[1]) > 0) assert.equal(r.eval.chip, `+${m[1]} monedas`, 'el chip cuenta hasta lo que dio el servidor, ni una más');
+    else assert.equal(r.eval.chip, null);
+    assert.equal(r.eval.fichasQuedan, 0);
+  });
+});
