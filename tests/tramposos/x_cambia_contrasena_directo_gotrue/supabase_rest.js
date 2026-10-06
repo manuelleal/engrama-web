@@ -1,4 +1,6 @@
-// TRAMPOSO x_token_origen_externo — versión rota a propósito: construirUrlAuth ignora raizAuth y manda todo a un host externo fijo.
+// TRAMPOSO (login piloto, A) — versión rota a propósito: cambiarContrasena vuelve a PUT /auth/v1/user directo a GoTrue
+// en vez de POST /api/auth/contrasena. GoTrue acepta la clave, pero la bandera force_password_reset del backend nunca baja.
+// Debe quedar en rojo en el test del cambio de contraseña.
 // @ts-check
 // auth/supabase_rest.js · ProveedorAuth del hito 3 (§7.4), encargo A (W22 acotado): GoTrue por
 // REST con correo y contraseña, detrás de Caddy en el MISMO origen (`/auth/v1/*` — ver
@@ -72,7 +74,7 @@ function borrarRefreshToken() {
  */
 export function construirUrlAuth(ruta) {
   if (!ruta.startsWith('/auth/v1/')) throw new Error(`auth/supabase_rest: ruta inválida "${ruta}" (debe empezar con /auth/v1/)`);
-  return `https://auth-externo.invalid${ruta}`; // <- el error
+  return `${raizAuth}${ruta}`;
 }
 
 /** Traduce el status HTTP de GoTrue a un mensaje en español claro (encargo A: credenciales
@@ -206,7 +208,7 @@ export async function token() {
  * bandera se quedaría en true. Ver auth/cambio_contrasena.js. */
 export async function cambiarContrasena(nuevaContrasena) {
   if (!accessTokenEnMemoria) throw new Error(textos.auth.sinSesion);
-  await cambiarContrasenaConToken(await token(), nuevaContrasena);
+  await peticionAuth('/auth/v1/user', { metodo: 'PUT', token: accessTokenEnMemoria, cuerpo: { password: nuevaContrasena }, contexto: 'login' }); // <- el error
 }
 
 /** Borra la sesión local PRIMERO (lo que importa en un equipo compartido) y solo después avisa al

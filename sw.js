@@ -8,7 +8,7 @@
 //
 // Súbelo un número cada vez que cambie la lista de precarga o la estrategia; la `activate`
 // borra cualquier caché con otro nombre.
-const VERSION = 'engrama-shell-v12';
+const VERSION = 'engrama-shell-v13';
 
 // Cada encargo agrega los suyos en su propio commit (W7: Inicio + api/cliente,core,retos + los
 // SVG de Drako que usa el estudiante; W10: profe/grupos,grupo,sesion_asistencia + api/profe). El
@@ -50,6 +50,11 @@ const PRECARGA = [
   '/src/auth/mock.js',
   '/src/vistas/entrada.js',
   '/src/vistas/perfil.js', // W22: import estático de app.js
+  // Login piloto: la pantalla obligatoria "Crea tu contraseña" (import estático de app.js), el
+  // formulario que comparte con el perfil y las reglas de la contraseña nueva.
+  '/src/vistas/crear_contrasena.js',
+  '/src/vistas/formulario_contrasena.js',
+  '/src/auth/clave.js',
   '/src/vistas/estudiante/inicio.js',
   '/src/vistas/estudiante/asistencia.js',
   '/src/vistas/estudiante/retos.js',

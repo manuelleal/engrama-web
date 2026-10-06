@@ -59,6 +59,20 @@ export function montar(raiz, nodo) {
   raiz.appendChild(nodo);
 }
 
+/**
+ * Cambia el contenedor de las vistas por uno nuevo, vacío y con los mismos atributos (id, data-
+ * testid), y lo devuelve. Lo que alguien siga pintando en el viejo (una petición que vuela cuando
+ * llega una pantalla obligatoria) cae en un nodo desprendido del documento: nunca pisa la pantalla.
+ * @param {HTMLElement} vieja
+ * @returns {HTMLElement}
+ */
+export function reemplazarRaiz(vieja) {
+  const nueva = document.createElement(vieja.tagName);
+  for (const { name, value } of [...vieja.attributes]) nueva.setAttribute(name, value);
+  vieja.replaceWith(nueva);
+  return nueva;
+}
+
 /** @param {HTMLElement} raiz */
 export function vaciar(raiz) {
   while (raiz.firstChild) raiz.removeChild(raiz.firstChild);

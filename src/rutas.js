@@ -11,6 +11,7 @@ const rutas = []; // { patron: RegExp, nombres: string[], render: Render }
 let porDefecto = '/inicio';
 let raizVista = null;
 let rutaNoEncontrada = null;
+let hashRenderizado = null; // el hash que se pintó por última vez: un `hashchange` repetido no vuelve a pintar
 
 /**
  * Registra una ruta. `patron` usa `:nombre` para params, p. ej. "/retos/:id".
@@ -57,6 +58,7 @@ function resolverHash() {
 
 async function renderizarActual() {
   if (!raizVista) return;
+  hashRenderizado = location.hash;
   const resuelto = resolverHash();
   vaciar(raizVista);
   if (!resuelto) return;
@@ -70,7 +72,36 @@ async function renderizarActual() {
 export function iniciar(raiz) {
   raizVista = raiz;
   if (!location.hash) location.hash = `#${porDefecto}`;
-  window.addEventListener('hashchange', renderizarActual);
+  window.removeEventListener('hashchange', alCambiarHash); // iniciar() puede repetirse (tras el cambio de contraseña o de colegio)
+  window.addEventListener('hashchange', alCambiarHash);
+  renderizarActual();
+}
+
+function alCambiarHash() {
+  if (location.hash === hashRenderizado) return; // ya está pintado (p. ej. el hash por defecto recién puesto)
+  renderizarActual();
+}
+
+/**
+ * Deja de escuchar el hash y suelta la raíz: ninguna vista se pinta más hasta el próximo
+ * `iniciar()`. Es lo que hace una pantalla obligatoria (contraseña temporal, cuenta sin inscribir):
+ * mientras dure, no se puede navegar a otra vista.
+ */
+export function detener() {
+  window.removeEventListener('hashchange', alCambiarHash);
+  raizVista = null;
+  hashRenderizado = null;
+}
+
+/** Olvida todas las rutas registradas, para volver a registrarlas con una sesión nueva. */
+export function reiniciarRutas() {
+  rutas.length = 0;
+}
+
+/** Vuelve a la ruta por defecto (la del rol) y la pinta de nuevo, aunque el hash ya sea ese. */
+export function recargarEnRutaPorDefecto() {
+  location.hash = `#${porDefecto}`;
+  hashRenderizado = null;
   renderizarActual();
 }
 

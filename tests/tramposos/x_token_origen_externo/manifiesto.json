@@ -1,7 +1,16 @@
 {
   "descripcion": "Encargo A (W22): supabase_rest.js manda las peticiones de auth a un host externo fijo en vez de la ruta relativa /auth/v1 en el mismo origen.",
-  "archivos": { "src/auth/supabase_rest.js": "supabase_rest.js" },
-  "comando": ["node", "--test", "--test-reporter=tap", "tests/unit/auth_supabase_rest.test.mjs"],
+  "archivos": {
+    "src/auth/supabase_rest.js": "supabase_rest.js"
+  },
+  "comando": [
+    "node",
+    "--test",
+    "--test-reporter=tap",
+    "tests/unit/auth_supabase_rest.test.mjs"
+  ],
   "espera_codigo_no_cero": true,
-  "espera_fallan_tests": ["TRAMPOSO x_token_origen_externo: la petición de login va a una ruta relativa /auth/v1, nunca a otro host"]
+  "espera_fallan_tests": [
+    "TRAMPOSO x_token_origen_externo: la petición de login va a una ruta relativa /auth/v1, nunca a otro host"
+  ]
 }

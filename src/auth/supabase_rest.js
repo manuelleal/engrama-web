@@ -3,7 +3,7 @@
 // REST con correo y contraseña, detrás de Caddy en el MISMO origen (`/auth/v1/*` — ver
 // `despliegue/Caddyfile`, `uri strip_prefix /auth/v1` hacia `gotrue:9999`). Enlace mágico, Google
 // y Microsoft (el resto de §7.4) quedan para un encargo aparte; este archivo solo implementa lo
-// que pidió el encargo: entrar, renovar, salir y cambiar contraseña.
+// que pidió el encargo: entrar, renovar, salir y cambiar contraseña (por el backend, no por GoTrue).
 //
 // GUARDADO DE TOKENS (decisión de este encargo, documentada aquí porque acota §7.4 completo):
 //   - El ACCESS token vive SOLO EN MEMORIA (nunca en ningún storage). Es el que abre puertas
@@ -21,6 +21,9 @@
 //   - La CONTRASEÑA en sí nunca se guarda en ningún storage: solo viaja en el cuerpo JSON de la
 //     petición de login, una vez, por HTTPS (o HTTP en desarrollo local).
 import { textos } from '../textos.js';
+import { pedirJson } from '../api/cliente.js';
+import { perfilAJson } from './perfil_actual.js';
+import { cambiarContrasenaConToken } from './cambio_contrasena.js';
 
 const CLAVE_REFRESH = 'engrama_refresh_token';
 // GOTRUE_JWT_EXP por defecto es 3600s (docker-compose.yml del despliegue); renovar 60s antes de
@@ -82,7 +85,7 @@ function mensajeDeErrorAuth(status, contexto) {
 
 /**
  * @param {string} ruta empieza con "/auth/v1/"
- * @param {{metodo?: string, token?: string, cuerpo?: unknown, contexto: 'login'|'refresh'|'user'|'logout'}} opciones
+ * @param {{metodo?: string, token?: string, cuerpo?: unknown, contexto: 'login'|'refresh'|'logout'}} opciones
  */
 async function peticionAuth(ruta, opciones) {
   const { metodo = 'POST', token, cuerpo, contexto } = opciones;
@@ -140,12 +143,18 @@ async function renovar() {
 }
 
 /** Adapta el `/auth/me` del backend (mismo ProfileOut que perfil_actual.js, W4) a Sesion —
- * reutiliza `perfilAJson`, que ya sabe resolver el nombre por la membresía activa (BUG-11). */
+ * reutiliza `perfilAJson`, que ya sabe resolver el nombre por la membresía activa (BUG-11) y
+ * trae la bandera `must_change_password`. */
 async function sesionDesdeMe() {
-  const { pedirJson } = await import('../api/cliente.js');
-  const { perfilAJson } = await import('./perfil_actual.js');
-  const profileOut = await pedirJson('/auth/me', { token: accessTokenEnMemoria });
+  const profileOut = await pedirJson('/auth/me', { token: await token() });
   return perfilAJson(profileOut);
+}
+
+/** Vuelve a pedir /auth/me con el token (y el colegio activo de api/cliente.js) — después de cambiar
+ * la contraseña o de elegir otra institución. */
+export async function recargarSesion() {
+  if (!accessTokenEnMemoria) throw new Error(textos.auth.sinSesion);
+  return sesionDesdeMe();
 }
 
 /**
@@ -191,12 +200,12 @@ export async function token() {
   return accessTokenEnMemoria;
 }
 
-/** Cambia la contraseña (PUT /auth/v1/user). GoTrue no tiene un campo para marcar una contraseña
- * como "temporal" sin tocar el backend (fuera de este encargo) — por eso `vistas/perfil.js` deja
- * esta acción como una opción SIEMPRE visible en el perfil, nunca condicionada a detectarlo. */
+/** Cambia la contraseña por el BACKEND (`POST /api/auth/contrasena`, que llama a GoTrue por dentro y
+ * baja la bandera de contraseña temporal): ya NO se usa `PUT /auth/v1/user` directo, porque así la
+ * bandera se quedaría en true. Ver auth/cambio_contrasena.js. */
 export async function cambiarContrasena(nuevaContrasena) {
   if (!accessTokenEnMemoria) throw new Error(textos.auth.sinSesion);
-  await peticionAuth('/auth/v1/user', { metodo: 'PUT', token: accessTokenEnMemoria, cuerpo: { password: nuevaContrasena }, contexto: 'user' });
+  await cambiarContrasenaConToken(await token(), nuevaContrasena);
 }
 
 /** Borra la sesión local PRIMERO (lo que importa en un equipo compartido) y solo después avisa al

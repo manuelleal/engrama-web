@@ -1,0 +1,16 @@
+{
+  "descripcion": "Login piloto (A): la pantalla obligatoria comparte contenedor con las vistas y una respuesta tardía la pisa.",
+  "archivos": {
+    "src/app.js": "app.js"
+  },
+  "comando": [
+    "node",
+    "--test",
+    "--test-reporter=tap",
+    "tests/e2e/login_piloto.test.mjs"
+  ],
+  "espera_codigo_no_cero": true,
+  "espera_fallan_tests": [
+    "A: si la bandera aparece a mitad de la sesión (un 403 must_change_password en cualquier llamada), vuelve la pantalla obligatoria"
+  ]
+}

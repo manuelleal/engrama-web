@@ -25,7 +25,7 @@ globalThis.localStorage = localStorageDeMentira;
 globalThis.sessionStorage = sessionStorageDeMentira;
 
 const {
-  entrar, iniciar, token, salir, cambiarContrasena, configurarRaizAuth, construirUrlAuth,
+  entrar, iniciar, token, salir, cambiarContrasena, recargarSesion, configurarRaizAuth, construirUrlAuth,
   calcularRetrasoRenovacionMs, ErrorAuth,
 } = await import('../../src/auth/supabase_rest.js');
 
@@ -35,6 +35,10 @@ const PROFILE_OUT = {
   current_streak: 4, longest_streak: 9, xp: 10, level: 2, is_active: true, last_attendance_date: null,
   memberships: [{ tenant_id: 't1', tenant_name: 'UIS', tenant_slug: 'uis', role: 'student', group_code: 'B1-01', is_active: true, full_name: 'Estudiante Real' }],
 };
+
+// Lo que contesta `/api/auth/me`: un test puede cambiarlo (la bandera de contraseña temporal) y lo
+// devuelve a PROFILE_OUT en `conServidorFalso`.
+let meActual = PROFILE_OUT;
 
 /** GoTrue + backend de mentira: token (login y refresh), user (cambiar contraseña), logout, y
  * /api/auth/me — todo en el MISMO servidor, como detrás de Caddy en el despliegue real. */
@@ -75,11 +79,19 @@ function manejar(url, req, res, cuerpo) {
   if (req.method === 'PUT' && url.pathname === '/auth/v1/user') {
     return responderJson(res, 200, { id: 'uuid-est-1' });
   }
+  // Login piloto: el cambio de contraseña va por el BACKEND (que llama a GoTrue por dentro).
+  if (req.method === 'POST' && url.pathname === '/api/auth/contrasena') {
+    if (cuerpo?.nueva === 'repetida-123') return responderJson(res, 422, { detail: 'password_rejected' });
+    if (cuerpo?.nueva === 'gotrue-caido-1') return responderJson(res, 502, { detail: 'password_change_failed' });
+    if (cuerpo?.nueva === 'sin-gotrue-001') return responderJson(res, 503, { detail: 'password_change_not_configured' });
+    res.writeHead(204);
+    return res.end();
+  }
   if (req.method === 'POST' && url.pathname === '/auth/v1/logout') {
     res.writeHead(204); return res.end();
   }
   if (req.method === 'GET' && url.pathname === '/api/auth/me') {
-    return responderJson(res, 200, PROFILE_OUT);
+    return responderJson(res, 200, meActual);
   }
   responderJson(res, 404, { detail: `sin ruta: ${req.method} ${url.pathname}` });
 }
@@ -93,6 +105,7 @@ async function conServidorFalso(fn) {
   try { return await fn(peticiones); } finally {
     await salir(); // limpia accessToken/refresh/temporizador entre pruebas
     configurarRaizAuth(''); configurarRaizApi('');
+    meActual = PROFILE_OUT;
     localStorageDeMentira.datos.clear(); sessionStorageDeMentira.datos.clear();
     await new Promise((ok) => servidor.close(ok));
   }
@@ -190,14 +203,55 @@ test('cambiarContrasena: sin sesión, rechaza con un mensaje claro (nunca en sil
   await assert.rejects(() => cambiarContrasena('nueva-clave-10'), /sesión/i);
 });
 
-test('cambiarContrasena: con sesión, manda PUT /auth/v1/user con el Bearer y la contraseña nueva', async () => {
+test('cambiarContrasena (A): va por el backend, POST /api/auth/contrasena {nueva} con el Bearer, y NUNCA por PUT /auth/v1/user', async () => {
   await conServidorFalso(async (peticiones) => {
     await entrar('password', { correo: 'ana@uis.edu.co', contrasena: 'correcta-10' });
     await cambiarContrasena('otra-clave-nueva-10');
-    const req = peticiones.find((p) => p.metodo === 'PUT' && p.ruta === '/auth/v1/user');
+    const req = peticiones.find((p) => p.metodo === 'POST' && p.ruta === '/api/auth/contrasena');
     assert.equal(req.auth, 'Bearer acceso-1');
-    assert.deepEqual(req.cuerpo, { password: 'otra-clave-nueva-10' });
+    assert.deepEqual(req.cuerpo, { nueva: 'otra-clave-nueva-10' });
+    assert.equal(peticiones.some((p) => p.ruta === '/auth/v1/user'), false, 'con PUT /auth/v1/user directo la bandera de contraseña temporal no baja');
   });
+});
+
+test('cambiarContrasena (A): 422, 502, 503 y sin red se traducen a un mensaje claro, nunca al detail crudo', async () => {
+  await conServidorFalso(async () => {
+    await entrar('password', { correo: 'ana@uis.edu.co', contrasena: 'correcta-10' });
+    for (const [nueva, status, mensaje] of [
+      ['repetida-123', 422, 'No se aceptó esa contraseña. Prueba con otra, distinta de la que tenías.'],
+      ['gotrue-caido-1', 502, 'No pudimos cambiar tu contraseña ahora. Intenta de nuevo en unos minutos.'],
+      ['sin-gotrue-001', 503, 'El cambio de contraseña no está disponible por ahora. Avísale a tu profe.'],
+    ]) {
+      await assert.rejects(() => cambiarContrasena(nueva), (e) => {
+        assert.equal(e.status, status);
+        assert.equal(e.mensaje, mensaje);
+        assert.doesNotMatch(e.mensaje, /password_|change_/);
+        return true;
+      });
+    }
+    const fetchOriginal = globalThis.fetch;
+    globalThis.fetch = async () => { throw new Error('ECONNREFUSED de mentira'); };
+    try {
+      await assert.rejects(() => cambiarContrasena('otra-clave-nueva-10'), (e) => { assert.equal(e.mensaje, 'Sin conexión.'); return true; });
+    } finally { globalThis.fetch = fetchOriginal; }
+  });
+});
+
+test('la bandera de contraseña temporal (A): /auth/me con must_change_password da debeCambiarContrasena; sin ella, false', async () => {
+  await conServidorFalso(async () => {
+    const normal = await entrar('password', { correo: 'ana@uis.edu.co', contrasena: 'correcta-10' });
+    assert.equal(normal.debeCambiarContrasena, false);
+    meActual = { ...PROFILE_OUT, must_change_password: true };
+    const temporal = await recargarSesion();
+    assert.equal(temporal.debeCambiarContrasena, true, 'la bandera sale de /auth/me, nunca se deduce en el cliente');
+    assert.deepEqual(validarSesion(temporal), []);
+    meActual = { ...PROFILE_OUT, must_change_password: false };
+    assert.equal((await recargarSesion()).debeCambiarContrasena, false, 'tras cambiarla, se vuelve a pedir /auth/me y la bandera baja');
+  });
+});
+
+test('recargarSesion: sin sesión, rechaza con un mensaje claro', async () => {
+  await assert.rejects(() => recargarSesion(), /sesión/i);
 });
 
 // --- Los tres tramposos del encargo A: cada uno prueba justo lo contrario de una regla ---

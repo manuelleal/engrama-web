@@ -13,6 +13,7 @@
 // `perfilAJson`, que es puro y no toca la red. El JWT vive SOLO en memoria (mismo criterio que
 // supabase_rest.js, §7.4): nada de streaks ni tokens en localStorage aquí.
 import { textos } from '../textos.js';
+import { cambiarContrasenaConToken } from './cambio_contrasena.js';
 
 let jwtEnMemoria = null;
 
@@ -30,6 +31,8 @@ export function perfilAJson(profileOut, tenantIdActivo) {
     colegio: { id: membresia.tenant_id, nombre: membresia.tenant_name, tipo: 'school' },
     grupo: membresia.group_code ?? null, modulos: ['engrama'],
     constancia: profileOut.current_streak, // el servidor manda; nunca se recalcula aquí
+    // Login piloto: la bandera viene del servidor (`profiles.force_password_reset`); el cliente nunca la deduce.
+    debeCambiarContrasena: profileOut.must_change_password === true,
   };
 }
 
@@ -44,6 +47,19 @@ export async function entrar(metodo, datos) {
   const { pedirJson } = await import('../api/cliente.js');
   const profileOut = await pedirJson('/auth/me', { token: datos.jwt, tenantId: datos.tenantId });
   return perfilAJson(profileOut, datos.tenantId);
+}
+
+/** Vuelve a pedir /auth/me con el mismo JWT (después de cambiar la contraseña). */
+export async function recargarSesion() {
+  if (!jwtEnMemoria) throw new Error(textos.auth.sinSesion);
+  const { pedirJson } = await import('../api/cliente.js');
+  return perfilAJson(await pedirJson('/auth/me', { token: jwtEnMemoria }));
+}
+
+/** @param {string} nueva */
+export async function cambiarContrasena(nueva) {
+  if (!jwtEnMemoria) throw new Error(textos.auth.sinSesion);
+  await cambiarContrasenaConToken(jwtEnMemoria, nueva);
 }
 
 export async function token() {

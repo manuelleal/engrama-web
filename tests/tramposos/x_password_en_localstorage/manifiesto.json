@@ -1,7 +1,16 @@
 {
   "descripcion": "Encargo A (W22): supabase_rest.js guarda la contraseña en localStorage tras un login exitoso (\"para no pedirla de nuevo\") — nunca debe pasar.",
-  "archivos": { "src/auth/supabase_rest.js": "supabase_rest.js" },
-  "comando": ["node", "--test", "--test-reporter=tap", "tests/unit/auth_supabase_rest.test.mjs"],
+  "archivos": {
+    "src/auth/supabase_rest.js": "supabase_rest.js"
+  },
+  "comando": [
+    "node",
+    "--test",
+    "--test-reporter=tap",
+    "tests/unit/auth_supabase_rest.test.mjs"
+  ],
   "espera_codigo_no_cero": true,
-  "espera_fallan_tests": ["TRAMPOSO x_password_en_localstorage: ni el access token ni la contraseña tocan localStorage jamás"]
+  "espera_fallan_tests": [
+    "TRAMPOSO x_password_en_localstorage: ni el access token ni la contraseña tocan localStorage jamás"
+  ]
 }

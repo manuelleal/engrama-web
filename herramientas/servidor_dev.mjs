@@ -56,14 +56,22 @@ function servirEstatico(res, rutaAbsoluta) {
   res.end(readFileSync(rutaAbsoluta));
 }
 
-function proxyApi(req, res, rutaConQuery) {
-  const apiUrl = apiUrlActual();
+// ENGRAMA_AUTH_URL (login piloto): el GoTrue al que van las rutas `/auth/v1/*`, igual que Caddy en el
+// despliegue (`uri strip_prefix /auth/v1` hacia `gotrue:9999`). Sin ella, esas rutas dan 502 — en el
+// modo mock el cliente nunca las pide. Los E2E del login real la apuntan al GoTrue falso de
+// mock_api.mjs (`<mock>/gotrue`).
+function authUrlActual() {
+  return process.env.ENGRAMA_AUTH_URL || '';
+}
+
+function proxyApi(req, res, rutaConQuery, baseUrl = apiUrlActual(), aviso = 'ENGRAMA_API_URL no está configurada (o usa mock_api.mjs, W4)') {
+  const apiUrl = baseUrl;
   if (!apiUrl) {
     res.writeHead(502, { 'Content-Type': 'application/json; charset=utf-8' });
-    res.end(JSON.stringify({ error: 'ENGRAMA_API_URL no está configurada (o usa mock_api.mjs, W4)' }));
+    res.end(JSON.stringify({ error: aviso }));
     return;
   }
-  const destino = new URL(rutaConQuery, apiUrl);
+  const destino = new URL(apiUrl.replace(/\/$/, '') + rutaConQuery);
   const cabeceras = { ...req.headers, host: destino.host };
   const proxied = httpRequest(destino, { method: req.method, headers: cabeceras }, (respBackend) => {
     res.writeHead(respBackend.statusCode || 502, respBackend.headers);
@@ -94,6 +102,10 @@ export function crearServidor() {
       return;
     }
     if (url.pathname.startsWith('/api/')) { proxyApi(req, res, url.pathname.slice('/api'.length) + url.search); return; }
+    if (url.pathname.startsWith('/auth/v1/')) {
+      proxyApi(req, res, url.pathname.slice('/auth/v1'.length) + url.search, authUrlActual(), 'ENGRAMA_AUTH_URL no está configurada (GoTrue)');
+      return;
+    }
     const rutaAbsoluta = resolverArchivo(decodeURIComponent(url.pathname));
     if (!rutaAbsoluta) { res.writeHead(404).end('no encontrado'); return; }
     servirEstatico(res, rutaAbsoluta);

@@ -1,3 +1,6 @@
+// TRAMPOSO (login piloto, A) — versión rota a propósito: entrarConSesion ignora must_change_password y arranca el router,
+// así que una cuenta con contraseña temporal entra a Inicio (el 403 de la primera llamada la saca después, pero Inicio ya se pintó).
+// Debe quedar en rojo en el E2E de la pantalla obligatoria.
 // @ts-check
 // app.js · Arranca el shell: registra el service worker, monta el banner de red y el router.
 import { crearBannerRed } from './ui/red.js';
@@ -135,8 +138,7 @@ function rutaPorDefectoSegunRol(sesion) {
 // contraseña temporal NO arranca el router: el estudiante ve solo "Crea tu contraseña".
 function entrarConSesion(sesion) {
   sesionActual = sesion;
-  if (sesion.debeCambiarContrasena) { bloquear(BLOQUEO_DEBE_CAMBIAR); return; }
-  arrancarConSesion();
+  arrancarConSesion(); // <- el error: la bandera no se mira
 }
 
 // Una pantalla obligatoria (api/cliente.js avisa de un 403 `must_change_password`, o el /auth/me del

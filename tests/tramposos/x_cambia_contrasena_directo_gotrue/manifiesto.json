@@ -1,0 +1,16 @@
+{
+  "descripcion": "Login piloto (A): el cliente cambia la contraseña con PUT /auth/v1/user directo (la bandera del backend no baja).",
+  "archivos": {
+    "src/auth/supabase_rest.js": "supabase_rest.js"
+  },
+  "comando": [
+    "node",
+    "--test",
+    "--test-reporter=tap",
+    "tests/unit/auth_supabase_rest.test.mjs"
+  ],
+  "espera_codigo_no_cero": true,
+  "espera_fallan_tests": [
+    "cambiarContrasena (A): va por el backend, POST /api/auth/contrasena {nueva} con el Bearer, y NUNCA por PUT /auth/v1/user"
+  ]
+}

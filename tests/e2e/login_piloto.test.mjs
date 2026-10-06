@@ -1,0 +1,170 @@
+// @ts-check
+// Login piloto (ESPEC_login_piloto.md del backend), en el navegador de verdad y en modo supabase:
+// el GoTrue falso y el contrato nuevo de mock_api.mjs (`herramientas/mock/gotrue.mjs` y
+// `login_piloto.mjs`), sin Docker. A: la contraseña temporal bloquea todo hasta crear la propia.
+import test from 'node:test';
+import assert from 'node:assert/strict';
+import { existsSync } from 'node:fs';
+import { abrirSesion } from '../../herramientas/cdp.mjs';
+import { conAppCompleta, estadoConEstudiantesSembrados } from './ayudante_servidor.mjs';
+import { sembrarLoginPiloto, CORREOS_PILOTO, CLAVE_DEMO, CLAVE_TEMPORAL } from '../../herramientas/mock/login_piloto.mjs';
+
+const HAY_NAVEGADOR = [
+  process.env.EDGE_PATH,
+  'C:/Program Files (x86)/Microsoft/Edge/Application/msedge.exe',
+  'C:/Program Files/Microsoft/Edge/Application/msedge.exe',
+  process.env.CHROME_PATH,
+  'C:/Program Files/Google/Chrome/Application/chrome.exe',
+].filter(Boolean).some((r) => existsSync(r));
+const OMITIR = !HAY_NAVEGADOR && 'no hay Edge ni Chrome instalado en esta máquina';
+
+const esperar = (ms) => new Promise((r) => setTimeout(r, ms));
+
+/** El mock de siempre (grupo SINT-B1-01 con est-1 y est-2) más las cuentas del login piloto. */
+function estadoPiloto() {
+  const estado = estadoConEstudiantesSembrados();
+  const ids = sembrarLoginPiloto(estado);
+  return { estado, ids };
+}
+
+/** Anota todo `[data-testid^="vista-"]` que alguna vez aparezca en el documento, aunque dure un instante. */
+const OBSERVAR_VISTAS = `(() => {
+  window.__vistas = new Set();
+  const anotar = () => document.querySelectorAll('[data-testid^="vista-"]').forEach((e) => window.__vistas.add(e.dataset.testid));
+  new MutationObserver(anotar).observe(document.body, { subtree: true, childList: true });
+  anotar();
+})()`;
+
+const vistasVistas = (sesion) => sesion.evaluar('JSON.stringify([...window.__vistas])').then(JSON.parse);
+const hay = (sesion, testid) => sesion.evaluar(`Boolean(document.querySelector('[data-testid="${testid}"]'))`);
+const texto = (sesion, testid) => sesion.evaluar(`document.querySelector('[data-testid="${testid}"]')?.textContent ?? null`);
+
+async function esperarVista(sesion, testid, limiteMs = 7000) {
+  const fin = Date.now() + limiteMs;
+  while (Date.now() < fin) {
+    if (await hay(sesion, testid)) return true;
+    await esperar(100);
+  }
+  return false;
+}
+
+/** Llena el formulario de entrada y lo envía (desde la pantalla de entrada en modo supabase). */
+const entrarCon = (sesion, correo, clave) => sesion.evaluar(`(() => {
+  document.querySelector('[data-testid="campo-correo"]').value = ${JSON.stringify(correo)};
+  document.querySelector('[data-testid="campo-contrasena"]').value = ${JSON.stringify(clave)};
+  document.querySelector('[data-testid="boton-entrar"]').click();
+})()`);
+
+const crearClave = (sesion, nueva, repetida) => sesion.evaluar(`(() => {
+  document.querySelector('[data-testid="campo-contrasena-nueva"]').value = ${JSON.stringify(nueva)};
+  document.querySelector('[data-testid="campo-contrasena-confirmar"]').value = ${JSON.stringify(repetida)};
+  document.querySelector('[data-testid="boton-cambiar-contrasena"]').click();
+})()`);
+
+/** Arranca la app en modo supabase y la deja en la pantalla de entrada, con el observador de vistas puesto. */
+async function abrirEntrada(url) {
+  const sesion = await abrirSesion({ ancho: 375, alto: 812 });
+  await sesion.navegar(url);
+  assert.ok(await hay(sesion, 'form-entrada'), 'modo supabase: el formulario de correo y contraseña');
+  await sesion.evaluar(OBSERVAR_VISTAS);
+  return sesion;
+}
+
+const MODO_SUPABASE = { authConfig: { ENGRAMA_AUTH: 'supabase' } };
+
+test(
+  'A: con contraseña temporal, la app lleva a "Crea tu contraseña" y no deja entrar a Inicio ni navegar a otra vista',
+  { skip: OMITIR },
+  async () => {
+    const { estado } = estadoPiloto();
+    await conAppCompleta(async (url) => {
+      const sesion = await abrirEntrada(url);
+      try {
+        await entrarCon(sesion, CORREOS_PILOTO.temporal, CLAVE_TEMPORAL);
+        assert.ok(await esperarVista(sesion, 'vista-crear-contrasena'), 'la pantalla obligatoria');
+        assert.match(await texto(sesion, 'vista-crear-contrasena'), /Crea tu contraseña/);
+
+        // Navegar a otra vista (a mano, por el hash) no funciona mientras la bandera esté activa.
+        for (const hash of ['#/inicio', '#/retos', '#/asistencia', '#/perfil']) {
+          await sesion.evaluar(`location.hash = ${JSON.stringify(hash)}`);
+          await esperar(400);
+          assert.ok(await hay(sesion, 'vista-crear-contrasena'), `sigue la pantalla obligatoria tras ir a ${hash}`);
+        }
+        const vistas = (await vistasVistas(sesion)).filter((v) => v !== 'vista-entrada').sort();
+        assert.deepEqual(vistas, ['vista-crear-contrasena'], 'después del formulario de entrada, ninguna otra vista llegó a pintarse, ni un instante (Inicio incluido)');
+
+        // El servidor tampoco vio ninguna llamada de datos: solo /auth/me (que la bandera permite).
+        const llamadas = estado.registro.filter((r) => r.estado !== 204).map((r) => `${r.metodo} ${r.ruta}`);
+        assert.ok(!llamadas.some((l) => /challenges|core\/|teachers|admin\/groups/.test(l)), `solo rutas de /auth: ${llamadas.join(', ')}`);
+      } finally { await sesion.cerrar(); }
+    }, { estado, ...MODO_SUPABASE });
+  },
+);
+
+test(
+  'A: crear la contraseña (nueva + repetir, mínimo 10) pide POST /auth/contrasena, vuelve a pedir /auth/me y entra a Inicio',
+  { skip: OMITIR },
+  async () => {
+    const { estado } = estadoPiloto();
+    await conAppCompleta(async (url) => {
+      const sesion = await abrirEntrada(url);
+      try {
+        await entrarCon(sesion, CORREOS_PILOTO.temporal, CLAVE_TEMPORAL);
+        assert.ok(await esperarVista(sesion, 'vista-crear-contrasena'));
+        const antes = estado.registro.length;
+
+        // Mensajes claros, y NINGUNA petición al servidor mientras la contraseña no cumple.
+        await crearClave(sesion, 'corta', 'corta');
+        assert.equal(await texto(sesion, 'perfil-mensaje'), 'Usa al menos 10 caracteres.');
+        await crearClave(sesion, 'una-clave-larga-1', 'una-clave-larga-2');
+        assert.equal(await texto(sesion, 'perfil-mensaje'), 'Las dos contraseñas no coinciden.');
+        await crearClave(sesion, '', '');
+        assert.equal(await texto(sesion, 'perfil-mensaje'), 'Escribe la contraseña nueva.');
+        assert.equal(estado.registro.length, antes, 'una contraseña inválida no sale del navegador');
+
+        // La misma temporal la rechaza el servidor (GoTrue: igual a la anterior): mensaje en español.
+        await crearClave(sesion, CLAVE_TEMPORAL, CLAVE_TEMPORAL);
+        await esperar(500);
+        assert.match(await texto(sesion, 'perfil-mensaje'), /No se aceptó esa contraseña/);
+        assert.ok(await hay(sesion, 'vista-crear-contrasena'), 'sigue ahí: nada se desbloqueó');
+
+        await crearClave(sesion, 'mi-clave-nueva-2026', 'mi-clave-nueva-2026');
+        assert.ok(await esperarVista(sesion, 'vista-inicio'), 'con la contraseña creada, entra normal');
+        assert.equal(await hay(sesion, 'vista-crear-contrasena'), false);
+
+        const aviso = estado.registro.slice(antes).map((r) => `${r.metodo} ${r.ruta} ${r.estado}`);
+        const iPost = aviso.indexOf('POST /auth/contrasena 204');
+        assert.ok(iPost >= 0, `POST /auth/contrasena 204 en: ${aviso.join(' | ')}`);
+        assert.ok(aviso.slice(iPost + 1).includes('GET /auth/me 200'), 'después de cambiarla, vuelve a pedir /auth/me');
+        const peticiones = sesion.peticiones.map((p) => p.url);
+        assert.ok(!peticiones.some((u) => u.includes('/auth/v1/user')), 'nunca PUT /auth/v1/user directo a GoTrue');
+
+        // Ya definitiva: el mismo flujo de datos funciona, y la temporal no vuelve a entrar.
+        assert.ok(estado.registro.some((r) => r.ruta === '/core/coins/balance' && r.estado === 200));
+        assert.equal(estado.cuentas.get(CORREOS_PILOTO.temporal).password, 'mi-clave-nueva-2026');
+      } finally { await sesion.cerrar(); }
+    }, { estado, ...MODO_SUPABASE });
+  },
+);
+
+test(
+  'A: si la bandera aparece a mitad de la sesión (un 403 must_change_password en cualquier llamada), vuelve la pantalla obligatoria',
+  { skip: OMITIR },
+  async () => {
+    const { estado, ids } = estadoPiloto();
+    await conAppCompleta(async (url) => {
+      const sesion = await abrirEntrada(url);
+      try {
+        await entrarCon(sesion, CORREOS_PILOTO.estudiante, CLAVE_DEMO);
+        assert.ok(await esperarVista(sesion, 'vista-inicio'));
+        // El operador restablece su contraseña: la bandera vuelve a true mientras ella usa la app.
+        estado.profiles.get(ids.estudiante).force_password_reset = true;
+        await sesion.evaluar("location.hash = '#/retos'");
+        assert.ok(await esperarVista(sesion, 'vista-crear-contrasena'), 'el 403 de /challenges/ la lleva a la pantalla obligatoria');
+        await esperar(500);
+        assert.equal(await hay(sesion, 'vista-retos'), false, 'la lista de retos (o su error) no se queda pintada encima');
+        assert.equal(await hay(sesion, 'vista-inicio'), false);
+      } finally { await sesion.cerrar(); }
+    }, { estado, ...MODO_SUPABASE });
+  },
+);

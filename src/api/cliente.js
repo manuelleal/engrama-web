@@ -14,13 +14,40 @@ export function configurarRaizApi(url) {
   raizApi = url;
 }
 
+// Los 403 que NO son "no tienes permiso": la cuenta está bien pero hay algo que resolver antes de
+// usar la app (ESPEC_login_piloto, backend). Se distinguen por el `detail`, no por el status.
+export const BLOQUEO_DEBE_CAMBIAR = 'must_change_password';
+
+/** @returns {string|null} el código de bloqueo si este error es uno de esos 403, o null */
+function codigoDeBloqueo(status, cuerpo) {
+  if (status !== 403) return null;
+  const detalle = cuerpo?.detail;
+  if (detalle === 'must_change_password') return BLOQUEO_DEBE_CAMBIAR;
+  return null;
+}
+
 export class ErrorApi extends Error {
   constructor(status, mensaje, cuerpo) {
     super(mensaje);
     this.status = status;
     this.mensaje = mensaje;
     this.cuerpo = cuerpo;
+    this.codigo = codigoDeBloqueo(status, cuerpo); // null en todo lo demás
   }
+}
+
+// Quién se entera de un bloqueo (app.js lo conecta): una pantalla obligatoria que reemplaza la vista.
+// Se avisa ANTES de lanzar el error, una vez por petición fallida; quien llama lo recibe igual.
+let alBloqueo = null;
+
+/** @param {((codigo: string) => void)|null} fn */
+export function configurarAlBloqueo(fn) {
+  alBloqueo = fn;
+}
+
+function avisarBloqueo(error) {
+  if (!error.codigo || !alBloqueo) return;
+  try { alBloqueo(error.codigo); } catch (e) { console.error('api/cliente: el manejador de bloqueo falló', e); } // nunca mudo
 }
 
 const MENSAJES_FIJOS = { 401: 'Vuelve a entrar.', 403: 'No tienes permiso.', 404: 'No encontrado.' };
@@ -63,7 +90,11 @@ export async function pedirJson(ruta, opciones = {}) {
 
   const texto = await resp.text();
   const json = texto ? JSON.parse(texto) : null;
-  if (!resp.ok) throw new ErrorApi(resp.status, mensajeDeError(resp.status, json?.detail ?? json), json);
+  if (!resp.ok) {
+    const error = new ErrorApi(resp.status, mensajeDeError(resp.status, json?.detail ?? json), json);
+    avisarBloqueo(error);
+    throw error;
+  }
   return json;
 }
 

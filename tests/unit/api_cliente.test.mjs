@@ -4,7 +4,7 @@
 import test from 'node:test';
 import assert from 'node:assert/strict';
 import { createServer } from 'node:http';
-import { pedirJson, ErrorApi, accionUnica, configurarRaizApi } from '../../src/api/cliente.js';
+import { pedirJson, ErrorApi, accionUnica, configurarRaizApi, configurarAlBloqueo } from '../../src/api/cliente.js';
 
 async function conServidorFalso(manejador, fn) {
   const servidor = createServer(manejador);
@@ -89,4 +89,40 @@ test('accionUnica: tras resolver, un tercer toque sí dispara una petición nuev
       assert.equal(llamadas, 2);
     },
   );
+});
+
+// A (login piloto): un 403 `must_change_password` NO es "no tienes permiso": la cuenta está bien y
+// falta crear la contraseña. El cliente lo reconoce por el `detail` y avisa a app.js UNA vez por
+// petición fallida (la pantalla obligatoria), sin dejar de lanzar el error a quien llamó.
+test('A: un 403 must_change_password avisa al manejador de bloqueo y sigue lanzando; otro 403 no', async () => {
+  const avisos = [];
+  configurarAlBloqueo((codigo) => avisos.push(codigo));
+  try {
+    await conServidorFalso((req, res) => responderJson(res, 403, { detail: 'must_change_password' }), async () => {
+      await assert.rejects(() => pedirJson('/challenges/', { token: 't' }), (e) => {
+        assert.ok(e instanceof ErrorApi);
+        assert.equal(e.status, 403);
+        assert.equal(e.codigo, 'must_change_password');
+        return true;
+      });
+    });
+    assert.deepEqual(avisos, ['must_change_password']);
+
+    avisos.length = 0;
+    await conServidorFalso((req, res) => responderJson(res, 403, { detail: 'Teacher role required' }), async () => {
+      await assert.rejects(() => pedirJson('/teachers/groups', { token: 't' }), (e) => { assert.equal(e.codigo, null); return true; });
+    });
+    assert.deepEqual(avisos, [], 'un 403 de rol no es un bloqueo');
+  } finally { configurarAlBloqueo(null); }
+});
+
+test('A: si el manejador de bloqueo revienta, la petición igual lanza su ErrorApi (nunca se traga el error)', async () => {
+  configurarAlBloqueo(() => { throw new Error('manejador roto'); });
+  const consola = console.error;
+  console.error = () => {};
+  try {
+    await conServidorFalso((req, res) => responderJson(res, 403, { detail: 'must_change_password' }), async () => {
+      await assert.rejects(() => pedirJson('/challenges/', { token: 't' }), (e) => e instanceof ErrorApi && e.codigo === 'must_change_password');
+    });
+  } finally { console.error = consola; configurarAlBloqueo(null); }
 });

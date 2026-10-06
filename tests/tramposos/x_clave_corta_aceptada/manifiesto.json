@@ -1,0 +1,16 @@
+{
+  "descripcion": "Login piloto (A): una contraseña de menos de 10 caracteres pasa la validación del cliente.",
+  "archivos": {
+    "src/auth/clave.js": "clave.js"
+  },
+  "comando": [
+    "node",
+    "--test",
+    "--test-reporter=tap",
+    "tests/unit/auth_clave.test.mjs"
+  ],
+  "espera_codigo_no_cero": true,
+  "espera_fallan_tests": [
+    "validarClaveNueva: vacía, corta, larga y distinta dan su propia regla, en ese orden"
+  ]
+}

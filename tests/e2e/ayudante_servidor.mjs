@@ -34,7 +34,10 @@ export async function conAppCompleta(fn, opciones = {}) {
   await new Promise((ok) => mock.listen(0, '127.0.0.1', ok));
   const previoApi = process.env.ENGRAMA_API_URL;
   const previoAuth = process.env.ENGRAMA_AUTH_CONFIG;
+  const previoAuthUrl = process.env.ENGRAMA_AUTH_URL;
   process.env.ENGRAMA_API_URL = `http://127.0.0.1:${mock.address().port}`;
+  // El GoTrue falso del mock (mock/gotrue.mjs) cuelga de `/gotrue`: así el modo supabase entra sin Docker.
+  process.env.ENGRAMA_AUTH_URL = `${process.env.ENGRAMA_API_URL}/gotrue`;
   if (opciones.authConfig) process.env.ENGRAMA_AUTH_CONFIG = JSON.stringify(opciones.authConfig);
   const dev = crearServidor();
   await new Promise((ok) => dev.listen(0, '127.0.0.1', ok));
@@ -43,6 +46,7 @@ export async function conAppCompleta(fn, opciones = {}) {
   } finally {
     if (previoApi === undefined) delete process.env.ENGRAMA_API_URL; else process.env.ENGRAMA_API_URL = previoApi;
     if (previoAuth === undefined) delete process.env.ENGRAMA_AUTH_CONFIG; else process.env.ENGRAMA_AUTH_CONFIG = previoAuth;
+    if (previoAuthUrl === undefined) delete process.env.ENGRAMA_AUTH_URL; else process.env.ENGRAMA_AUTH_URL = previoAuthUrl;
     await new Promise((ok) => dev.close(ok));
     await new Promise((ok) => mock.close(ok));
   }

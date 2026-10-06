@@ -1,3 +1,5 @@
+// TRAMPOSO (login piloto, A) — versión rota a propósito: la pantalla obligatoria se monta en el MISMO contenedor, sin
+// reemplazarlo. Una petición en vuelo que termina después (el error de la lista de retos) la pisa. Debe quedar en rojo en el E2E del 403 a mitad de sesión.
 // @ts-check
 // app.js · Arranca el shell: registra el service worker, monta el banner de red y el router.
 import { crearBannerRed } from './ui/red.js';
@@ -146,7 +148,7 @@ function bloquear(codigo) {
   if (bloqueoActual === codigo) return; // varias llamadas en vuelo dan el mismo 403: una sola pantalla
   bloqueoActual = codigo;
   detener();
-  vistaRaiz = reemplazarRaiz(vistaRaiz);
+  // <- el error: no se reemplaza el contenedor
   renderCrearContrasena(vistaRaiz, {
     cambiarContrasena: authActivo.cambiarContrasena, alTerminar: terminarBloqueo, salir: cerrarSesion,
   });

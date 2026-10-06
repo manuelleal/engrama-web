@@ -70,20 +70,41 @@ export const textos = {
     sesionVencida: 'Tu sesión venció. Vuelve a entrar.',
     demasiadosIntentos: 'Demasiados intentos. Espera un momento y vuelve a intentar.',
     errorCambiarContrasena: 'No se pudo cambiar la contraseña.',
+    // Login piloto: las respuestas de POST /auth/contrasena (el backend llama a GoTrue por dentro).
+    claveRechazada: 'No se aceptó esa contraseña. Prueba con otra, distinta de la que tenías.',
+    cambioFallo: 'No pudimos cambiar tu contraseña ahora. Intenta de nuevo en unos minutos.',
+    cambioNoDisponible: 'El cambio de contraseña no está disponible por ahora. Avísale a tu profe.',
+  },
+  // Las reglas de la contraseña nueva (auth/clave.js): el mínimo es el del backend (10), el máximo
+  // el de bcrypt (72 bytes).
+  clave: {
+    requisito: 'Mínimo 10 caracteres.',
+    falta: 'Escribe la contraseña nueva.',
+    corta: 'Usa al menos 10 caracteres.',
+    larga: 'Esa contraseña es demasiado larga. Usa máximo 72 caracteres.',
+    noCoincide: 'Las dos contraseñas no coinciden.',
+  },
+  // La pantalla obligatoria del primer ingreso (vistas/crear_contrasena.js): el estudiante entra con la
+  // contraseña temporal que le dio su profe y no puede ver nada más hasta crear la suya.
+  crearContrasena: {
+    titulo: 'Crea tu contraseña',
+    ayuda: 'Entraste con una contraseña temporal. Crea la tuya para continuar.',
+    drako: 'Drako te recibe',
+    continuar: 'Continuar',
+    guardando: 'Guardando…',
+    entrando: 'Entrando…',
+    errorAlEntrar: 'Tu contraseña ya cambió, pero no pudimos abrir tu cuenta. Toca Continuar para reintentar.',
   },
   perfil: {
-    // "Cambia tu contraseña temporal": GoTrue no tiene un campo para marcar una contraseña como
-    // temporal sin tocar el backend, así que esta pantalla queda SIEMPRE visible en el perfil
-    // (nunca condicionada a detectarlo) cuando el proveedor de auth activo la soporta.
+    // El primer ingreso con contraseña temporal ya lo cubre `crearContrasena` (pantalla obligatoria);
+    // esto es el cambio voluntario, siempre visible cuando el proveedor de auth activo lo soporta.
     titulo: 'Tu perfil',
-    cambiarContrasenaTitulo: 'Cambia tu contraseña temporal',
+    cambiarContrasenaTitulo: 'Cambia tu contraseña',
     etiquetaContrasenaNueva: 'Contraseña nueva',
     etiquetaContrasenaConfirmar: 'Repite la contraseña nueva',
     cambiar: 'Cambiar contraseña',
     cambiando: 'Cambiando…',
     exito: 'Contraseña cambiada. Úsala la próxima vez que entres.',
-    noCoincide: 'Las dos contraseñas no coinciden.',
-    faltaContrasena: 'Escribe la contraseña nueva.',
     sinSoporte: 'Cambiar la contraseña no está disponible en este modo.',
     volver: 'Volver a Inicio',
   },
