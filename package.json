@@ -9,6 +9,7 @@
   },
   "scripts": {
     "dev": "node herramientas/servidor_dev.mjs",
+    "demo": "node herramientas/demo.mjs",
     "test": "node --test",
     "test:tramposos": "node tests/correr_tramposos.mjs",
     "verificar": "node herramientas/verificar.mjs",

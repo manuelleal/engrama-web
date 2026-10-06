@@ -24,6 +24,7 @@ import { sembrarLoginPiloto, CORREOS_PILOTO, CLAVE_DEMO, CLAVE_TEMPORAL, CONFIG_
 import { configurarRaizApi } from '../src/api/cliente.js';
 import { pasoAdmin, pasoSembrar, pasoResolverRetos } from './humo/flujo.mjs';
 import { abrirSesion } from './cdp.mjs';
+import { faseJuego } from './galeria_juego.mjs';
 
 const AQUI = fileURLToPath(new URL('.', import.meta.url));
 const RAIZ = resolve(AQUI, '..');
@@ -333,6 +334,7 @@ async function main() {
     await faseAdmin(sesion, urlBase, carpeta, registro, estado);
     await faseAsistencia(sesion, urlBase, carpeta, registro, grupoId);
     await faseRetosEstudiante(sesion, urlBase, carpeta, registro, estado, retos, retoRepaso);
+    await faseJuego(sesion, urlBase, carpeta, registro, estado); // game feel: pregunta, celebraciones, secuencias
     await faseProfeLogroErrores(sesion, urlBase, carpeta, registro, grupoId);
     await faseProfeDesktop(sesion, urlBase, carpeta, registro, grupoId);
   } finally {

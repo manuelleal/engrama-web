@@ -843,3 +843,12 @@ body {
 .hero-puntaje-num {
   contain: layout paint;
 }
+
+/* El botón de silencio y el aviso de constancia nunca parten su texto en dos renglones. */
+.boton-sonido,
+.celebra-racha {
+  white-space: nowrap;
+}
+.boton-sonido {
+  flex: none;
+}

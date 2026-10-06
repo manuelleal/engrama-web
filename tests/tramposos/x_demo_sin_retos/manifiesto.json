@@ -1,0 +1,16 @@
+{
+  "descripcion": "La demo local arranca sin retos: Christiam abre ENGRAMA y no hay nada que jugar",
+  "archivos": {
+    "herramientas/demo.mjs": "demo.mjs"
+  },
+  "comando": [
+    "node",
+    "--test",
+    "--test-reporter=tap",
+    "tests/unit/demo.test.mjs"
+  ],
+  "espera_codigo_no_cero": true,
+  "espera_fallan_tests": [
+    "demo: siembra un grupo, dos estudiantes, tres retos de tres preguntas y un código de asistencia"
+  ]
+}
