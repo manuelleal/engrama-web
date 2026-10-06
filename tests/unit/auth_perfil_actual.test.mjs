@@ -3,6 +3,7 @@ import test from 'node:test';
 import assert from 'node:assert/strict';
 import { perfilAJson } from '../../src/auth/perfil_actual.js';
 import { validarSesion } from '../../src/auth/interfaz.js';
+import { textos } from '../../src/textos.js';
 
 // Forma real de ProfileOut (confirmada en W4): el nombre "global" del perfil puede venir de otro
 // colegio (BUG-11) — perfilAJson debe usar el de la MEMBRESÍA activa, nunca profileOut.full_name.
@@ -42,4 +43,25 @@ test('perfil_actual: la constancia es current_streak tal cual, nunca recalculada
 
 test('perfil_actual: sin membresías, revienta con un mensaje claro (nunca en silencio)', () => {
   assert.throws(() => perfilAJson({ ...PROFILE_OUT, memberships: [] }, 'tenant-A'), /ninguna membresía/);
+});
+
+// D (login piloto): el saludo usa el nombre de /auth/me. En el backend nuevo `full_name` de la raíz
+// ya ES el de la membresía activa (o el propio de la cuenta si esa no tiene), y una membresía puede
+// traer `full_name: null` (docente o admin creado antes del login piloto).
+test('perfil_actual: sin nombre en la membresía usa el full_name de /auth/me; sin ninguno, "" y el saludo dice solo "Hola"', () => {
+  const conRaiz = perfilAJson({ ...PROFILE_OUT, full_name: 'Paula Profe', memberships: [{ ...PROFILE_OUT.memberships[1], full_name: null }] }, 'tenant-B');
+  assert.equal(conRaiz.nombre, 'Paula Profe', 'la membresía no tiene nombre: cae al de /auth/me, no a null');
+  assert.equal(textos.inicio.saludo(conRaiz.nombre), 'Hola, Paula Profe');
+
+  for (const raiz of [null, undefined, '']) {
+    const vacio = perfilAJson({ ...PROFILE_OUT, full_name: raiz, memberships: [{ ...PROFILE_OUT.memberships[1], full_name: null }] }, 'tenant-B');
+    assert.equal(vacio.nombre, '');
+    assert.equal(textos.inicio.saludo(vacio.nombre), 'Hola', `raíz ${JSON.stringify(raiz)}: nunca "Hola, null" ni "Hola, undefined"`);
+    assert.deepEqual(validarSesion(vacio), [], 'un nombre vacío no invalida la Sesion');
+  }
+});
+
+test('textos.inicio.saludo: un nombre de puros espacios también dice solo "Hola"', () => {
+  assert.equal(textos.inicio.saludo('   '), 'Hola');
+  assert.equal(textos.inicio.saludo(null), 'Hola');
 });

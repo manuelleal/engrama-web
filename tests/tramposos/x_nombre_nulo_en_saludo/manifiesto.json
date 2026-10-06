@@ -1,0 +1,16 @@
+{
+  "descripcion": "Login piloto (D): el nombre ignora el full_name de /auth/me cuando la membresía no tiene nombre — el saludo mostraría un hueco.",
+  "archivos": {
+    "src/auth/perfil_actual.js": "perfil_actual.js"
+  },
+  "comando": [
+    "node",
+    "--test",
+    "--test-reporter=tap",
+    "tests/unit/auth_perfil_actual.test.mjs"
+  ],
+  "espera_codigo_no_cero": true,
+  "espera_fallan_tests": [
+    "perfil_actual: sin nombre en la membresía usa el full_name de /auth/me; sin ninguno, \"\" y el saludo dice solo \"Hola\""
+  ]
+}

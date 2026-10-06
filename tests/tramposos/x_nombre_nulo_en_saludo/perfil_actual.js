@@ -1,3 +1,5 @@
+// TRAMPOSO (login piloto, D) — versión rota a propósito: el nombre sale SOLO de la membresía, así que una membresía con full_name null
+// deja el saludo en "Hola, null" en vez de caer al nombre de /auth/me. Debe quedar en rojo en el test del nombre.
 // @ts-check
 // auth/perfil_actual.js · Adapta el `ProfileOut` de hoy (`src/auth/schemas.py:34` del backend,
 // confirmado en W4) a Sesion. Nunca lee `level` ni `xp`: ese nivel sale de las monedas, no es
@@ -26,7 +28,7 @@ export function perfilAJson(profileOut, tenantIdActivo) {
   const membresia = membresias.find((m) => m.tenant_id === tenantIdActivo) || membresias[0];
   if (!membresia) throw new Error('auth/perfil_actual: el perfil no tiene ninguna membresía');
   return {
-    profileId: profileOut.id, nombre: membresia.full_name ?? profileOut.full_name ?? '', rol: membresia.role,
+    profileId: profileOut.id, nombre: membresia.full_name, rol: membresia.role,
     colegio: { id: membresia.tenant_id, nombre: membresia.tenant_name, tipo: 'school' },
     grupo: membresia.group_code ?? null, modulos: ['engrama'],
     constancia: profileOut.current_streak, // el servidor manda; nunca se recalcula aquí

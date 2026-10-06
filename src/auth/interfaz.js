@@ -34,7 +34,8 @@ export function validarSesion(sesion) {
   if (typeof sesion !== 'object' || sesion === null) return ['la sesión no es un objeto'];
   const s = /** @type {Record<string, unknown>} */ (sesion);
   if (typeof s.profileId !== 'string' || !s.profileId) errores.push('falta profileId');
-  if (typeof s.nombre !== 'string' || !s.nombre) errores.push('falta nombre');
+  // Puede ser '' (una institución que aún no escribió el nombre): el saludo dice "Hola". Lo que no vale es no ser texto.
+  if (typeof s.nombre !== 'string') errores.push('falta nombre');
   if (!ROLES_VALIDOS.has(/** @type {string} */ (s.rol))) errores.push(`rol inválido: ${s.rol}`);
   if (typeof s.colegio !== 'object' || s.colegio === null) errores.push('falta colegio');
   if (s.grupo !== null && typeof s.grupo !== 'string') errores.push('grupo debe ser string o null');

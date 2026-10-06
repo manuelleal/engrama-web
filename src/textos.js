@@ -20,7 +20,7 @@ export const textos = {
     // (visto contra el backend real, W22, con una membresía sin full_name todavía), un saludo
     // genérico es mejor que mostrar el hueco del dato.
     /** @param {string} [nombre] */
-    saludo: (nombre) => (nombre ? `Hola, ${nombre}` : 'Hola'),
+    saludo: (nombre) => (nombre && nombre.trim() ? `Hola, ${nombre.trim()}` : 'Hola'),
     retoDeHoyTitulo: 'Tu reto de hoy',
     sinRetoPendiente: 'No tienes retos pendientes. ¡Vas al día!',
     // Progreso simple de la semana: solo cuenta lo que ya llega del servidor (historial de
