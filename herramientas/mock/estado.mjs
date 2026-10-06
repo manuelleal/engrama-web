@@ -12,17 +12,18 @@ import { randomUUID } from 'node:crypto';
 export const ADMIN_BOOTSTRAP_TOKEN = 'admin-demo';
 export const DOCENTE_BOOTSTRAP_TOKEN = 'docente-demo';
 
-function crearProfile(estado, { documentoId, nombre }) {
+export function crearProfile(estado, { documentoId, nombre }) {
   const id = randomUUID();
   estado.profiles.set(id, {
     id, documento_id: documentoId, current_streak: 0, longest_streak: 0,
     xp: 0, is_active: true, last_attendance_date: null,
+    force_password_reset: false, // contraseña temporal (login piloto §1.5): solo el alta la pone en true
   });
   estado.nombresPorProfile.set(id, nombre); // nombre "global" de respaldo, solo para depurar
   return id;
 }
 
-function agregarMembresia(estado, { tenantId, profileId, role, fullName, groupCode = null }) {
+export function agregarMembresia(estado, { tenantId, profileId, role, fullName, groupCode = null }) {
   const tenant = estado.tenants.get(tenantId);
   estado.memberships.push({
     tenant_id: tenantId, tenant_name: tenant.name, tenant_slug: tenant.slug,
@@ -39,6 +40,9 @@ export function crearEstado() {
     attendanceSessions: new Map(), attendanceRecords: [],
     balances: new Map(), poolBalances: new Map(), ledger: [], llavesUsadas: new Set(),
     tokens: new Map(), nombresPorProfile: new Map(),
+    cuentas: new Map(), // correo -> {profileId, password}: el GoTrue falso (mock/gotrue.mjs)
+    refrescos: new Map(), // refresh_token -> profileId
+    registro: [], // cada petición que vio mock_api.mjs: {metodo, ruta, tenant, estado} (la leen los tests)
   };
 
   const tenantId = randomUUID();
@@ -57,17 +61,12 @@ export function crearEstado() {
   return estado;
 }
 
-/** @returns {{profileId: string, tenantId: string}|null} */
-export function resolverActor(estado, token, tenantIdPedido) {
-  const profileId = estado.tokens.get(token);
-  if (!profileId) return null;
-  const propias = estado.memberships.filter((m) => m.profile_id === profileId && m.is_active);
-  if (propias.length === 0) return null;
-  const membresia = tenantIdPedido
-    ? propias.find((m) => m.tenant_id === tenantIdPedido)
-    : propias[0];
-  if (!membresia) return null;
-  return { profileId, tenantId: membresia.tenant_id };
+/** Un colegio nuevo (solo para sembrar el login piloto: más de una institución, UIS/SENA/UNAD). */
+export function crearTenant(estado, { name, slug }) {
+  const id = randomUUID();
+  estado.tenants.set(id, { id, name, slug });
+  estado.poolBalances.set(id, 1_000_000);
+  return id;
 }
 
 export function membresiaDe(estado, profileId, tenantId) {

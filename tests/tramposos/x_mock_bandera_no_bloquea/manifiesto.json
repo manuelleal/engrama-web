@@ -1,0 +1,16 @@
+{
+  "descripcion": "Login piloto (E): el mock no bloquea con must_change_password — un cliente que nunca recibe el 403 jamás ejercita la pantalla obligatoria.",
+  "archivos": {
+    "herramientas/mock/auth.mjs": "auth.mjs"
+  },
+  "comando": [
+    "node",
+    "--test",
+    "--test-reporter=tap",
+    "tests/contrato/mock_login_piloto.test.mjs"
+  ],
+  "espera_codigo_no_cero": true,
+  "espera_fallan_tests": [
+    "mock: con contraseña temporal, toda ruta da 403 must_change_password salvo las 4 de /auth"
+  ]
+}

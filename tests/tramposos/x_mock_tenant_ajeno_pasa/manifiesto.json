@@ -1,0 +1,16 @@
+{
+  "descripcion": "Login piloto (E): el mock no valida X-Tenant-ID contra las membresías — el cliente nunca se enteraría de que manda un colegio ajeno.",
+  "archivos": {
+    "herramientas/mock/auth.mjs": "auth.mjs"
+  },
+  "comando": [
+    "node",
+    "--test",
+    "--test-reporter=tap",
+    "tests/contrato/mock_login_piloto.test.mjs"
+  ],
+  "espera_codigo_no_cero": true,
+  "espera_fallan_tests": [
+    "mock: X-Tenant-ID se valida contra las membresías (400, 403) y sin él manda la más antigua"
+  ]
+}

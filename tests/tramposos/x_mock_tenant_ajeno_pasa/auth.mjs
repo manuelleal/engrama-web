@@ -1,3 +1,5 @@
+// TRAMPOSO (login piloto, E) — versión rota a propósito: el mock acepta un X-Tenant-ID que no está en las membresías y usa la primera.
+// El backend real responde 403. Debe quedar en rojo en el test del colegio activo.
 // @ts-check
 // mock/auth.mjs · Extrae el actor de `Authorization: Bearer <token>` + `X-Tenant-ID` (§7.2 del
 // cliente: toda llamada manda los dos). Sin JWT de verdad — ver la nota en estado.mjs.
@@ -32,8 +34,8 @@ function colegioActivo(propias, tenantPedido) {
   if (!tenantPedido) return propias[0];
   if (!UUID_RE.test(tenantPedido)) fallar(400, 'X-Tenant-ID header is not a valid UUID');
   const elegida = propias.find((m) => m.tenant_id === tenantPedido);
-  if (!elegida) fallar(403, NO_ES_MIEMBRO);
-  return elegida;
+  return elegida ?? propias[0]; // <- el error: un colegio ajeno cae a la primera membresía
+
 }
 
 /** @returns {{profileId: string, tenantId: string, membresia: object}} */

@@ -1,3 +1,5 @@
+// TRAMPOSO (login piloto, E) — versión rota a propósito: el mock deja pasar a una cuenta con contraseña temporal a cualquier ruta.
+// El backend real responde 403 must_change_password. Debe quedar en rojo en el test del bloqueo.
 // @ts-check
 // mock/auth.mjs · Extrae el actor de `Authorization: Bearer <token>` + `X-Tenant-ID` (§7.2 del
 // cliente: toda llamada manda los dos). Sin JWT de verdad — ver la nota en estado.mjs.
@@ -45,7 +47,7 @@ export function autenticar(estado, req) {
   if (!profileId) fallar(401, 'Not authenticated');
   const perfil = estado.profiles.get(profileId);
   if (!perfil) fallar(403, SIN_PERFIL);
-  if (perfil.force_password_reset && !puedeConContrasenaTemporal(req.method, req.url)) fallar(403, DEBE_CAMBIAR);
+  // <- el error: la bandera ya no bloquea nada
   const propias = estado.memberships.filter((m) => m.profile_id === profileId && m.is_active);
   if (propias.length === 0) fallar(403, SIN_MEMBRESIAS);
   const membresia = colegioActivo(propias, req.headers['x-tenant-id'] || undefined);

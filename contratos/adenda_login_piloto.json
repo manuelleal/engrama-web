@@ -1,0 +1,215 @@
+{
+  "_nota": "ADENDA A MANO, NO es una exportación. Derivada de engrama-backend/src/auth/schemas.py (commit 7e69e3e, ESPEC_login_piloto.md §1.4 y §1.5) al leerlo; no se ejecutó el backend. Reemplazar por contratos/openapi_<sha>.json cuando alguien exporte el OpenAPI del backend final (ver contratos/LEEME.md). Un esquema de aquí reemplaza al del mismo nombre en openapi_c7a8b89.json.",
+  "fuente": {
+    "repo": "engrama-backend",
+    "commit": "7e69e3e",
+    "archivos": [
+      "src/auth/schemas.py",
+      "src/auth/router.py",
+      "src/auth/service.py"
+    ]
+  },
+  "components": {
+    "schemas": {
+      "ProfileOut": {
+        "additionalProperties": false,
+        "description": "Respuesta de /auth/me y /auth/session. full_name es el de la membresía activa (ESPEC_login_piloto §1.4).",
+        "properties": {
+          "current_streak": {
+            "title": "Current Streak",
+            "type": "integer"
+          },
+          "documento_id": {
+            "title": "Documento Id",
+            "type": "string"
+          },
+          "full_name": {
+            "title": "Full Name",
+            "type": "string"
+          },
+          "id": {
+            "format": "uuid",
+            "title": "Id",
+            "type": "string"
+          },
+          "is_active": {
+            "title": "Is Active",
+            "type": "boolean"
+          },
+          "last_attendance_date": {
+            "anyOf": [
+              {
+                "format": "date",
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Last Attendance Date"
+          },
+          "level": {
+            "title": "Level",
+            "type": "integer"
+          },
+          "longest_streak": {
+            "title": "Longest Streak",
+            "type": "integer"
+          },
+          "memberships": {
+            "items": {
+              "$ref": "#/components/schemas/MembershipOut"
+            },
+            "title": "Memberships",
+            "type": "array"
+          },
+          "role": {
+            "title": "Role",
+            "type": "string"
+          },
+          "xp": {
+            "title": "Xp",
+            "type": "integer"
+          },
+          "active_tenant_id": {
+            "format": "uuid",
+            "title": "Active Tenant Id",
+            "type": "string",
+            "description": "El colegio que resolvió build_auth_context para ESTA petición."
+          },
+          "must_change_password": {
+            "title": "Must Change Password",
+            "type": "boolean",
+            "description": "profiles.force_password_reset: hay que cambiar la contraseña con POST /auth/contrasena."
+          }
+        },
+        "required": [
+          "id",
+          "documento_id",
+          "full_name",
+          "role",
+          "current_streak",
+          "longest_streak",
+          "xp",
+          "level",
+          "is_active",
+          "active_tenant_id",
+          "must_change_password"
+        ],
+        "title": "ProfileOut",
+        "type": "object"
+      },
+      "MembershipOut": {
+        "additionalProperties": false,
+        "description": "Una membresía activa del usuario en un tenant específico.",
+        "properties": {
+          "group_code": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Group Code"
+          },
+          "is_active": {
+            "title": "Is Active",
+            "type": "boolean"
+          },
+          "role": {
+            "description": "'student' | 'teacher' | 'admin' | 'super_admin'",
+            "title": "Role",
+            "type": "string"
+          },
+          "tenant_id": {
+            "format": "uuid",
+            "title": "Tenant Id",
+            "type": "string"
+          },
+          "tenant_name": {
+            "title": "Tenant Name",
+            "type": "string"
+          },
+          "tenant_slug": {
+            "title": "Tenant Slug",
+            "type": "string"
+          },
+          "full_name": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Full Name",
+            "description": "El nombre que escribió ESTA institución (BUG-11, 032). NULL en docentes y admins creados antes del login piloto."
+          }
+        },
+        "required": [
+          "tenant_id",
+          "tenant_name",
+          "tenant_slug",
+          "role",
+          "is_active"
+        ],
+        "title": "MembershipOut",
+        "type": "object"
+      },
+      "CambioDeClaveIn": {
+        "additionalProperties": false,
+        "properties": {
+          "nueva": {
+            "maxLength": 72,
+            "minLength": 10,
+            "title": "Nueva",
+            "type": "string"
+          }
+        },
+        "required": [
+          "nueva"
+        ],
+        "title": "CambioDeClaveIn",
+        "type": "object"
+      }
+    }
+  },
+  "rutas": {
+    "POST /auth/contrasena": {
+      "cuerpo": "CambioDeClaveIn",
+      "respuestas": {
+        "204": "sin cuerpo; bandera en false; el mismo token sigue sirviendo",
+        "422": "password_rejected (GoTrue) o el 422 de largo de pydantic (arreglo)",
+        "502": "password_change_failed",
+        "503": "password_change_not_configured"
+      }
+    },
+    "bloqueo con contraseña temporal": {
+      "status": 403,
+      "detail": "must_change_password",
+      "permitidas": [
+        "GET /auth/me",
+        "POST /auth/session",
+        "POST /auth/logout",
+        "POST /auth/contrasena"
+      ]
+    },
+    "sin perfil": {
+      "status": 403,
+      "detail": "Account has no ENGRAMA profile"
+    },
+    "sin membresías activas": {
+      "status": 403,
+      "detail": "User has no active tenant memberships"
+    },
+    "X-Tenant-ID": {
+      "noEsUuid": 400,
+      "noEsMiembro": 403,
+      "detalle403": "User is not a member of the requested tenant",
+      "sinEncabezado": "la membresía activa más antigua"
+    }
+  }
+}

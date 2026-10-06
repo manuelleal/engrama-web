@@ -9,13 +9,15 @@
 // contrato corregido (BUG-13/14/15: una sola paga, check-in y retos solo del propio grupo), el
 // mock lo hace — así el cliente no tiene que reescribirse cuando F4 lo despliegue.
 //
-// Uso: node herramientas/mock_api.mjs [--puerto 8090]
+// Uso: node herramientas/mock_api.mjs [--puerto 8090] [--piloto]   (--piloto siembra las cuentas del login piloto)
 // Actores de arranque (Bearer <token>): "admin-demo" y "docente-demo" (ver mock/estado.mjs).
 // Cada estudiante inscrito (M3/M4) queda con token = su documento_id.
 import { createServer } from 'node:http';
 import { crearEstado } from './mock/estado.mjs';
 import { ErrorHTTP } from './mock/errores.mjs';
-import { leerMe } from './mock/rutas_auth.mjs';
+import { leerMe, cambiarContrasena } from './mock/rutas_auth.mjs';
+import { pedirToken, cerrarSesionGoTrue } from './mock/gotrue.mjs';
+import { sembrarLoginPiloto } from './mock/login_piloto.mjs';
 import { crearGrupo, asignarDocente, inscribirUnEstudiante, importarCsv } from './mock/rutas_admin.mjs';
 import {
   listarGrupos, listarEstudiantes, abrirSesion, cerrarSesion, leerLogro, asignarReto, leerErroresDeItem,
@@ -34,6 +36,10 @@ function construirRutas() {
     r('GET', '/health', () => ({ status: 200, cuerpo: { status: 'ok' } })),
     r('GET', '/auth/me', (estado, req) => leerMe(estado, req)),
     r('POST', '/auth/session', (estado, req) => leerMe(estado, req)),
+    r('POST', '/auth/contrasena', (estado, req, p, body) => cambiarContrasena(estado, req, body)),
+    // GoTrue de mentira (mock/gotrue.mjs): el servidor de desarrollo lo ve como ENGRAMA_AUTH_URL=<mock>/gotrue.
+    r('POST', '/gotrue/token', (estado, req, p, body, url) => pedirToken(estado, url, body)),
+    r('POST', '/gotrue/logout', () => cerrarSesionGoTrue()),
 
     r('POST', '/admin/groups', (estado, req, p, body) => crearGrupo(estado, req, body)),
     r('POST', '/admin/groups/:gid/teachers', (estado, req, p, body) => asignarDocente(estado, req, p.gid, body)),
@@ -105,16 +111,23 @@ export function crearMockApi(estado = crearEstado()) {
       const crudo = await leerCuerpo(req);
       const body = emparejado.ruta.textoCrudo ? crudo : (crudo ? JSON.parse(crudo) : undefined);
       const { status, cuerpo } = await emparejado.ruta.manejador(estado, req, emparejado.params, body, url);
+      anotar(estado, req, url, status);
       responder(res, status, cuerpo);
     } catch (e) {
-      if (e instanceof ErrorHTTP) { responder(res, e.status, e.cuerpo); return; }
+      if (e instanceof ErrorHTTP) { anotar(estado, req, url, e.status); responder(res, e.status, e.cuerpo); return; }
       console.error('mock_api: error no controlado', e); // nunca un catch mudo (REGLAS.md §4)
       responder(res, 500, { detail: 'internal error' });
     }
   });
 }
 
+/** Deja constancia de cada petición con el `X-Tenant-ID` que llegó: así un test comprueba qué colegio mandó el cliente. */
+function anotar(estado, req, url, status) {
+  estado.registro?.push({ metodo: req.method, ruta: url.pathname, tenant: req.headers['x-tenant-id'] || null, estado: status });
+}
+
 function responder(res, status, cuerpo) {
+  if (status === 204) { res.writeHead(204); res.end(); return; } // un 204 no lleva cuerpo
   res.writeHead(status, { 'Content-Type': 'application/json; charset=utf-8' });
   res.end(JSON.stringify(cuerpo));
 }
@@ -122,7 +135,9 @@ function responder(res, status, cuerpo) {
 function main() {
   const iPuerto = process.argv.indexOf('--puerto');
   const puerto = iPuerto >= 0 ? Number(process.argv[iPuerto + 1]) : 8090;
-  const servidor = crearMockApi();
+  const estado = crearEstado();
+  if (process.argv.includes('--piloto')) sembrarLoginPiloto(estado); // cuentas del login piloto (mock/login_piloto.mjs)
+  const servidor = crearMockApi(estado);
   servidor.listen(puerto, () => console.log(`mock_api: http://127.0.0.1:${puerto}  (actores: admin-demo, docente-demo)`));
 }
 
