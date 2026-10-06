@@ -1,0 +1,16 @@
+{
+  "descripcion": "Game feel: el botón de silencio queda solo con ícono, sin palabra",
+  "archivos": {
+    "src/ui/boton_sonido.js": "boton_sonido.js"
+  },
+  "comando": [
+    "node",
+    "--test",
+    "--test-reporter=tap",
+    "tests/unit/ui_sonido.test.mjs"
+  ],
+  "espera_codigo_no_cero": true,
+  "espera_fallan_tests": [
+    "boton sonido: ícono y palabra en ambos estados, nunca solo el ícono"
+  ]
+}

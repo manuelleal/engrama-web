@@ -34,6 +34,8 @@ function listarTramposos() {
   if (!existsSync(CARPETA_TRAMPOSOS)) return [];
   return readdirSync(CARPETA_TRAMPOSOS)
     .filter((n) => statSync(join(CARPETA_TRAMPOSOS, n)).isDirectory())
+    // `node tests/correr_tramposos.mjs <texto>`: solo los tramposos cuyo nombre contiene <texto>.
+    .filter((n) => !process.argv[2] || n.includes(process.argv[2]))
     .sort();
 }
 

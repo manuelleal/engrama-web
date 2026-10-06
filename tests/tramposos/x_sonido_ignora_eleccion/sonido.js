@@ -58,7 +58,6 @@ export function planDeSonido(tipo) {
 /** Qué manda cuando no hay nada guardado: silencio solo si pidió menos movimiento. Pura. @param {string|null} guardado @param {boolean} reducido */
 export function preferenciaInicial(guardado, reducido) {
   if (guardado === '1') return true;
-  if (guardado === '0') return false;
   return reducido;
 }
 

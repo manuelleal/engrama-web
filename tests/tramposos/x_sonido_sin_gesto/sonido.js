@@ -64,7 +64,7 @@ export function preferenciaInicial(guardado, reducido) {
 
 /** ¿Puede sonar ahora? Pura. @param {{silenciado: boolean, gesto: boolean}} e */
 export function puedeSonar({ silenciado, gesto }) {
-  return !silenciado && gesto;
+  return !silenciado;
 }
 
 function leerGuardado() {

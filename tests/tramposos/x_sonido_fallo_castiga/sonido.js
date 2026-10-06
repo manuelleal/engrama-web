@@ -31,7 +31,7 @@ export const PERFILES = {
     vibracion: [18],
   },
   fallo: {
-    notas: [{ f: 392, t: 0, d: 0.16, onda: 'sine', g: 0.08 }, { f: 330, t: 0.12, d: 0.22, onda: 'sine', g: 0.07 }],
+    notas: [{ f: 110, t: 0, d: 0.3, onda: 'sawtooth', g: 0.5 }, { f: 90, t: 0.12, d: 0.3, onda: 'sawtooth', g: 0.5 }],
     vibracion: [14],
   },
   moneda: {

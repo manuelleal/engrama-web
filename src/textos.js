@@ -31,6 +31,13 @@ export const textos = {
     /** @param {number} n */
     asistenciasEstaSemana: (n) => (n === 1 ? '1 asistencia marcada' : `${n} asistencias marcadas`),
   },
+  // Game feel: el interruptor único de sonido y vibración (ui/boton_sonido.js).
+  sonido: {
+    conSonido: 'Con sonido',
+    silenciado: 'Silencio',
+    silenciar: 'Silenciar el sonido y la vibración',
+    activar: 'Activar el sonido y la vibración',
+  },
   nav: {
     // Pulido visual (2026-09-28): la navegación inferior del estudiante. Retos y Asistencia
     // reusan sus propios títulos (textos.retos.titulo, textos.asistencia.titulo) — un solo lugar

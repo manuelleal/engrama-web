@@ -1,0 +1,16 @@
+{
+  "descripcion": "Game feel: reduced-motion silencia aunque el estudiante haya activado el sonido a propósito",
+  "archivos": {
+    "src/ui/sonido.js": "sonido.js"
+  },
+  "comando": [
+    "node",
+    "--test",
+    "--test-reporter=tap",
+    "tests/unit/ui_sonido.test.mjs"
+  ],
+  "espera_codigo_no_cero": true,
+  "espera_fallan_tests": [
+    "sonido: la elección guardada manda; sin elección, solo reduced-motion silencia"
+  ]
+}

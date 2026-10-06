@@ -1,0 +1,16 @@
+{
+  "descripcion": "Game feel: el sonido de fallo es un zumbido grave, fuerte y áspero (castiga)",
+  "archivos": {
+    "src/ui/sonido.js": "sonido.js"
+  },
+  "comando": [
+    "node",
+    "--test",
+    "--test-reporter=tap",
+    "tests/unit/ui_sonido.test.mjs"
+  ],
+  "espera_codigo_no_cero": true,
+  "espera_fallan_tests": [
+    "sonido: el fallo es suave y descendente, nunca castigador"
+  ]
+}
