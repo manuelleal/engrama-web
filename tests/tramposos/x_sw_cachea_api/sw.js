@@ -119,7 +119,7 @@ self.addEventListener('fetch', (ev) => {
   if (url.origin !== location.origin) return; // nada cruza de origen (decisión 005).
   // H-4: la API pasa derecho a la red, sin respondWith: este service worker no la ve, no la guarda y
   // no la sirve nunca de respaldo. (Las cachés viejas, que SÍ la guardaban, se borran en `activate`.)
-  if (url.pathname.startsWith('/api/')) return;
+  if (url.pathname.startsWith('/api/')) { ev.respondWith(fetch(request).then(async (r) => { if (r.ok) (await caches.open(VERSION)).put(request, r.clone()); return r; }).catch(() => caches.match(request))); return; }
   ev.respondWith(cachePrimeroConRed(request));
 });
 

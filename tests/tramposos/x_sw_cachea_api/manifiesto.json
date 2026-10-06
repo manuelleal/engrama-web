@@ -1,0 +1,17 @@
+{
+  "descripcion": "H-4: el service worker vuelve a guardar /api y la sirve de respaldo: B ve los datos de A sin red",
+  "archivos": {
+    "sw.js": "sw.js"
+  },
+  "comando": [
+    "node",
+    "--test",
+    "--test-reporter=tap",
+    "tests/e2e/sw_privacidad.test.mjs"
+  ],
+  "espera_codigo_no_cero": true,
+  "espera_fallan_tests": [
+    "H-4: con el service worker activo, nada de /api queda en ninguna caché",
+    "H-4: A sale, B entra sin red, y B nunca ve datos de A (solo \"Sin conexión\")"
+  ]
+}
