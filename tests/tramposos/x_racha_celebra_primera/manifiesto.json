@@ -1,0 +1,16 @@
+{
+  "descripcion": "Game feel: se celebra la racha en la primera visita, aunque no haya subido",
+  "archivos": {
+    "src/ui/racha.js": "racha.js"
+  },
+  "comando": [
+    "node",
+    "--test",
+    "--test-reporter=tap",
+    "tests/unit/ui_racha.test.mjs"
+  ],
+  "espera_codigo_no_cero": true,
+  "espera_fallan_tests": [
+    "racha: solo se celebra cuando el valor del servidor sube, y no en la primera visita"
+  ]
+}

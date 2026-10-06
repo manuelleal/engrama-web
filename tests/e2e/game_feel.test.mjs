@@ -55,3 +55,37 @@ test('game feel: sin visita anterior (o sin que suba) Inicio no lanza fichas', {
     assert.equal(r.eval, 0);
   });
 });
+
+test('game feel: si la constancia del servidor subió, Inicio la celebra (llama, aviso y confeti) mostrando el número tal cual', { skip: SKIP }, async () => {
+  await conAppCompleta(async (url) => {
+    const r = await revisarPagina({
+      url, ancho: 375, alto: 812, espera_ms: 5000,
+      pre: `${YA_ENTRO}; localStorage.setItem('engrama_ultimo_constancia_est-1', '1')`,
+      eval: `(async () => {
+        await new Promise((r) => setTimeout(r, 400));
+        return {
+          aviso: document.querySelector('[data-testid="celebra-racha"]')?.textContent ?? null,
+          llamas: document.querySelectorAll('[data-testid="constancia"] .llama').length,
+          confeti: document.querySelectorAll('[data-testid="confeti"] .confeti-pieza').length,
+          constancia: document.querySelector('[data-testid="constancia"]').textContent,
+        };
+      })()`,
+    });
+    assert.deepEqual(r.errores, []);
+    assert.equal(r.eval.aviso, '¡Constancia 3!', 'est-1 llega con constancia 3 del servidor: se celebra ese número, no otro');
+    assert.equal(r.eval.llamas, 1, 'la constancia lleva su llama dibujada');
+    assert.ok(r.eval.confeti > 0, 'la racha que sube suelta confeti suave');
+    assert.match(r.eval.constancia, /Constancia: 3$/);
+  });
+});
+
+test('game feel: con la misma constancia que la última vez, Inicio no celebra', { skip: SKIP }, async () => {
+  await conAppCompleta(async (url) => {
+    const r = await revisarPagina({
+      url, ancho: 375, alto: 812, espera_ms: 5000,
+      pre: `${YA_ENTRO}; localStorage.setItem('engrama_ultimo_constancia_est-1', '3')`,
+      eval: "document.querySelectorAll('[data-testid=\"celebra-racha\"]').length",
+    });
+    assert.equal(r.eval, 0);
+  });
+});

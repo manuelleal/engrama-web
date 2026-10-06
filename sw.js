@@ -46,6 +46,7 @@ const PRECARGA = [
   '/src/ui/conteo.js',
   '/src/ui/monedas.js',
   '/src/ui/ultimo_visto.js',
+  '/src/ui/racha.js',
   '/src/ui/titulo.js',
   '/src/ui/nav_inferior.js',
   // Segunda pasada de diseño (2026-09-28): confeti (inicio/asistencia/revisión) y la barra con

@@ -1,0 +1,16 @@
+{
+  "descripcion": "Game feel: el aviso suma 1 a la constancia del servidor (calcula la racha en el cliente)",
+  "archivos": {
+    "src/ui/racha.js": "racha.js"
+  },
+  "comando": [
+    "node",
+    "--test",
+    "--test-reporter=tap",
+    "tests/unit/ui_racha.test.mjs"
+  ],
+  "espera_codigo_no_cero": true,
+  "espera_fallan_tests": [
+    "racha: el texto muestra el número del servidor tal cual, sin sumarle nada"
+  ]
+}

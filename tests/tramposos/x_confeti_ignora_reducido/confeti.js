@@ -23,7 +23,6 @@ const PROPORCION_AUREA = 0.6180339887;
  * @param {NivelConfeti} nivel @param {boolean} [reducido]
  */
 export function planDeConfeti(nivel, reducido = reducirMovimiento()) {
-  if (reducido) return { piezas: 0, duracionMs: 0, alto: 0 };
   return NIVELES[nivel] || NIVELES.normal;
 }
 

@@ -57,7 +57,7 @@ function celebrarConstancia(nodoConstancia, ctx) {
   const valor = ctx.sesion.constancia;
   const previo = leerUltimo('constancia', quien);
   guardarUltimo('constancia', quien, valor);
-  if (compararConUltimo(previo, valor) === 'sube') celebrarRacha({ contador: nodoConstancia, valor });
+  if (compararConUltimo(previo, valor) === 'nunca') celebrarRacha({ contador: nodoConstancia, valor });
 }
 
 /**

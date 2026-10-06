@@ -38,6 +38,11 @@ export const textos = {
     silenciar: 'Silenciar el sonido y la vibración',
     activar: 'Activar el sonido y la vibración',
   },
+  // Game feel: la constancia que sube (ui/racha.js). El número es el del servidor, tal cual.
+  racha: {
+    /** @param {number} n */
+    sube: (n) => `¡Constancia ${n}!`,
+  },
   nav: {
     // Pulido visual (2026-09-28): la navegación inferior del estudiante. Retos y Asistencia
     // reusan sus propios títulos (textos.retos.titulo, textos.asistencia.titulo) — un solo lugar

@@ -57,3 +57,124 @@
   30% { opacity: 1; }
   100% { opacity: 0; }
 }
+
+/* ---------- Confeti (ui/confeti.js): tres fuerzas, mismas piezas. Cada pieza trae su posición, deriva,
+   giro, retraso, duración y caída por variables CSS que pone el módulo (nada es azar). ---------- */
+.confeti {
+  position: fixed;
+  inset: 0;
+  overflow: hidden;
+  pointer-events: none;
+  z-index: 50;
+}
+.confeti-pieza {
+  position: absolute;
+  top: -14px;
+  left: var(--x, 50%);
+  width: var(--tam, 9px);
+  height: calc(var(--tam, 9px) * 1.5);
+  border-radius: 2px;
+  opacity: 0.95;
+  will-change: transform, opacity;
+  animation: confeti-cae var(--dur, 1800ms) cubic-bezier(0.25, 0.6, 0.5, 1) var(--retraso, 0ms) both;
+}
+@keyframes confeti-cae {
+  0% { transform: translate3d(0, 0, 0) rotate(0deg); opacity: 1; }
+  80% { opacity: 1; }
+  100% { transform: translate3d(var(--dx, 0px), var(--caida, 400px), 0) rotate(var(--giro, 360deg)); opacity: 0; }
+}
+.confeti-pieza:nth-child(6n+1) { background: var(--oro); }
+.confeti-pieza:nth-child(6n+2) { background: var(--primario); }
+.confeti-pieza:nth-child(6n+3) { background: var(--secundario); }
+.confeti-pieza:nth-child(6n+4) { background: var(--correcto); }
+.confeti-pieza:nth-child(6n+5) { background: color-mix(in srgb, var(--oro) 50%, white); }
+.confeti-pieza:nth-child(6n) { background: color-mix(in srgb, var(--primario) 45%, white); }
+
+/* ---------- La llama de la constancia (ui/racha.js): dibujada con CSS en oro, nunca con un emoji.
+   Sin animación (reduced-motion) queda como una llama quieta, igual de legible. ---------- */
+.llama {
+  position: relative;
+  display: inline-block;
+  width: 0.95em;
+  height: 1.3em;
+  vertical-align: -0.2em;
+  margin-right: 4px;
+  transform-origin: 50% 100%;
+  animation: llama-parpadea 1.15s ease-in-out infinite;
+}
+.llama-cuerpo,
+.llama-nucleo {
+  position: absolute;
+  inset: 0;
+  clip-path: polygon(50% 0%, 66% 24%, 90% 50%, 94% 76%, 74% 98%, 26% 98%, 6% 76%, 10% 50%, 34% 26%, 40% 12%);
+}
+.llama-cuerpo {
+  background: linear-gradient(to top, var(--oro), color-mix(in srgb, var(--oro) 55%, white));
+}
+.llama-nucleo {
+  inset: 38% 22% 0;
+  background: linear-gradient(to top, color-mix(in srgb, var(--oro) 25%, white), color-mix(in srgb, var(--oro) 4%, white));
+  transform-origin: 50% 100%;
+  animation: llama-nucleo 0.7s ease-in-out infinite;
+}
+@keyframes llama-parpadea {
+  0%, 100% { transform: scale(1, 1) rotate(-2deg); }
+  25% { transform: scale(1.07, 0.93) rotate(2deg); }
+  50% { transform: scale(0.94, 1.09) rotate(-1deg); }
+  75% { transform: scale(1.04, 0.97) rotate(3deg); }
+}
+@keyframes llama-nucleo {
+  0%, 100% { transform: scaleY(1); }
+  50% { transform: scaleY(0.78); }
+}
+
+/* Constancia que sube: la insignia salta con rebote y la llama se agranda un momento. */
+.constancia-sube {
+  transform-origin: left center;
+  animation: constancia-salta 1100ms cubic-bezier(0.2, 1.6, 0.4, 1) 1;
+}
+.constancia-sube .llama {
+  animation: llama-parpadea 0.35s ease-in-out infinite;
+}
+@keyframes constancia-salta {
+  0% { transform: scale(1); }
+  30% { transform: scale(1.45) rotate(-4deg); }
+  55% { transform: scale(0.92) rotate(2deg); }
+  80% { transform: scale(1.12); }
+  100% { transform: scale(1); }
+}
+
+/* Aviso "¡Constancia N!": baja desde arriba con rebote y se queda legible (no depende de la animación). */
+.celebra-racha {
+  position: fixed;
+  top: 76px;
+  left: 50%;
+  translate: -50% 0;
+  z-index: 45;
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  background: var(--primario);
+  color: var(--oro);
+  font-family: var(--fuente-titulos);
+  font-weight: 800;
+  font-size: 1.25rem;
+  padding: 10px 22px;
+  border-radius: var(--radio-lg);
+  border-bottom: 4px solid var(--primario-oscuro);
+  box-shadow: 0 0 0 3px var(--oro);
+  pointer-events: none;
+  animation: racha-baja 700ms cubic-bezier(0.2, 1.6, 0.4, 1) 1 backwards;
+  transition: opacity 400ms ease;
+}
+.celebra-racha .llama {
+  font-size: 1.4rem;
+}
+.celebra-racha.saliendo {
+  opacity: 0;
+}
+@keyframes racha-baja {
+  0% { transform: translateY(-90px) scale(0.6); opacity: 0; }
+  60% { transform: translateY(8px) scale(1.12); opacity: 1; }
+  100% { transform: translateY(0) scale(1); opacity: 1; }
+}

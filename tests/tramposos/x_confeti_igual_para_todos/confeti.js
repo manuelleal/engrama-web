@@ -14,7 +14,7 @@ import { reducirMovimiento } from './movimiento.js';
 const NIVELES = {
   suave: { piezas: 16, duracionMs: 1300, alto: 0.45 },
   normal: { piezas: 34, duracionMs: 1900, alto: 0.65 },
-  fuerte: { piezas: 72, duracionMs: 2700, alto: 0.95 },
+  fuerte: { piezas: 34, duracionMs: 2700, alto: 0.95 },
 };
 const PROPORCION_AUREA = 0.6180339887;
 

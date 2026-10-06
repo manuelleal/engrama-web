@@ -1,0 +1,16 @@
+{
+  "descripcion": "Game feel: Inicio nunca celebra que la constancia subió",
+  "archivos": {
+    "src/vistas/estudiante/inicio.js": "inicio.js"
+  },
+  "comando": [
+    "node",
+    "--test",
+    "--test-reporter=tap",
+    "tests/e2e/game_feel.test.mjs"
+  ],
+  "espera_codigo_no_cero": true,
+  "espera_fallan_tests": [
+    "game feel: si la constancia del servidor subió, Inicio la celebra (llama, aviso y confeti) mostrando el número tal cual"
+  ]
+}

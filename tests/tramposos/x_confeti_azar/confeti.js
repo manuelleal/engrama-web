@@ -29,7 +29,7 @@ export function planDeConfeti(nivel, reducido = reducirMovimiento()) {
 
 /** Posición horizontal de la pieza i (0-100 %), repartida pareja con la secuencia áurea. @param {number} i */
 export function posicionDePieza(i) {
-  return Math.round(((i * PROPORCION_AUREA) % 1) * 1000) / 10;
+  return Math.round(Math.random() * 1000) / 10;
 }
 
 function estilizar(pieza, i, plan, altoPantalla) {

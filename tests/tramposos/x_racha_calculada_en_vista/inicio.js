@@ -54,7 +54,7 @@ async function animarSaldo(nodoSaldo, balance, ctx) {
  */
 function celebrarConstancia(nodoConstancia, ctx) {
   const quien = ctx.sesion.profileId;
-  const valor = ctx.sesion.constancia;
+  const valor = ctx.sesion.constancia + 1;
   const previo = leerUltimo('constancia', quien);
   guardarUltimo('constancia', quien, valor);
   if (compararConUltimo(previo, valor) === 'sube') celebrarRacha({ contador: nodoConstancia, valor });

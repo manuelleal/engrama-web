@@ -604,32 +604,4 @@ nav {
   color: color-mix(in srgb, var(--texto) 60%, white);
 }
 
-/* ---------- Confeti sutil (referencia de solo lectura: coins-mvp/student.html,
-   confetti-piece/confetti-burst — acá con los tokens de Navy Real, nunca sus colores) al marcar
-   asistencia o ganar monedas de un reto (ui/confeti.js). Es puro CSS: el apagador global de
-   animaciones de base.css (@media prefers-reduced-motion) ya lo neutraliza sin lógica aparte. ---------- */
-.confeti {
-  position: fixed;
-  inset: 0;
-  overflow: hidden;
-  pointer-events: none;
-  z-index: 30;
-}
-.confeti-pieza {
-  position: absolute;
-  top: -10px;
-  width: 8px;
-  height: 8px;
-  border-radius: 2px;
-  opacity: 0.9;
-  animation: confeti-caida 900ms ease-in forwards;
-}
-@keyframes confeti-caida {
-  to { transform: translateY(140px) rotate(220deg); opacity: 0; }
-}
-.confeti-pieza:nth-child(6n+1) { left: 8%; background: var(--oro); animation-delay: 0ms; }
-.confeti-pieza:nth-child(6n+2) { left: 22%; background: var(--primario); animation-delay: 60ms; }
-.confeti-pieza:nth-child(6n+3) { left: 38%; background: var(--secundario); animation-delay: 30ms; }
-.confeti-pieza:nth-child(6n+4) { left: 55%; background: var(--correcto); animation-delay: 90ms; }
-.confeti-pieza:nth-child(6n+5) { left: 72%; background: var(--oro); animation-delay: 45ms; }
-.confeti-pieza:nth-child(6n) { left: 88%; background: var(--primario); animation-delay: 75ms; }
+/* El confeti, las monedas, la llama y el resto del game feel viven en estilos/juego.css. */

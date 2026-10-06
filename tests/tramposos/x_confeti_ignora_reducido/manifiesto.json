@@ -1,0 +1,16 @@
+{
+  "descripcion": "Game feel: el confeti cae con prefers-reduced-motion activo",
+  "archivos": {
+    "src/ui/confeti.js": "confeti.js"
+  },
+  "comando": [
+    "node",
+    "--test",
+    "--test-reporter=tap",
+    "tests/unit/ui_racha.test.mjs"
+  ],
+  "espera_codigo_no_cero": true,
+  "espera_fallan_tests": [
+    "confeti: la fuerza es proporcional (suave < normal < fuerte) y con reduced-motion no cae ninguna pieza"
+  ]
+}

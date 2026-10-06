@@ -1,0 +1,16 @@
+{
+  "descripcion": "Game feel: Inicio calcula la constancia en el cliente (constancia + 1)",
+  "archivos": {
+    "src/vistas/estudiante/inicio.js": "inicio.js"
+  },
+  "comando": [
+    "node",
+    "--test",
+    "--test-reporter=tap",
+    "tests/unit/ui_racha.test.mjs"
+  ],
+  "espera_codigo_no_cero": true,
+  "espera_fallan_tests": [
+    "racha: el cliente no calcula la racha (ninguna aritmética sobre la constancia en las vistas ni en ui/racha)"
+  ]
+}
