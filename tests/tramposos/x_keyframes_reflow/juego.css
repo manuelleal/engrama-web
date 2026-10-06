@@ -372,7 +372,7 @@ body {
   animation: progreso-llena 650ms cubic-bezier(0.2, 1.2, 0.4, 1) backwards;
 }
 @keyframes progreso-llena {
-  from { transform: scaleX(var(--desde, 0)); }
+  from { width: 0; }
 }
 
 /* Mientras el servidor revisa: Drako piensa (nunca un botón mudo). */

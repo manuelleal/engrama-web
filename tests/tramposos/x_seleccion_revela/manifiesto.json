@@ -1,0 +1,16 @@
+{
+  "descripcion": "Game feel: al elegir una opción suena el acierto (sugiere que la opción es la correcta antes de enviar)",
+  "archivos": {
+    "src/ui/progreso.js": "progreso.js"
+  },
+  "comando": [
+    "node",
+    "--test",
+    "--test-reporter=tap",
+    "tests/unit/ui_pregunta.test.mjs"
+  ],
+  "espera_codigo_no_cero": true,
+  "espera_fallan_tests": [
+    "selección: al elegir una opción siempre suena el toque neutro, nunca acierto ni fallo (la clave no sale)"
+  ]
+}

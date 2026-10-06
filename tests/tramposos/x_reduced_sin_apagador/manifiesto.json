@@ -1,0 +1,16 @@
+{
+  "descripcion": "Game feel: base.css pierde el apagador de prefers-reduced-motion (animaciones largas con reduced-motion activo)",
+  "archivos": {
+    "estilos/base.css": "base.css"
+  },
+  "comando": [
+    "node",
+    "--test",
+    "--test-reporter=tap",
+    "tests/unit/css_juego.test.mjs"
+  ],
+  "espera_codigo_no_cero": true,
+  "espera_fallan_tests": [
+    "movimiento: base.css trae el apagador de prefers-reduced-motion para animaciones y transiciones"
+  ]
+}

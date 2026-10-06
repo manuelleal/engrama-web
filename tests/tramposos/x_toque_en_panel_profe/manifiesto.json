@@ -1,0 +1,16 @@
+{
+  "descripcion": "Game feel: el panel del profe también suena y vibra en cada botón",
+  "archivos": {
+    "src/ui/toque.js": "toque.js"
+  },
+  "comando": [
+    "node",
+    "--test",
+    "--test-reporter=tap",
+    "tests/unit/ui_pregunta.test.mjs"
+  ],
+  "espera_codigo_no_cero": true,
+  "espera_fallan_tests": [
+    "toque: lo dan los botones del estudiante, no los deshabilitados, ni las opciones, ni el panel del profe"
+  ]
+}

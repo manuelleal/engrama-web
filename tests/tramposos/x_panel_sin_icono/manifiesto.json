@@ -1,0 +1,16 @@
+{
+  "descripcion": "Game feel: el panel de resultado correcto/incorrecto sale sin ícono (solo color)",
+  "archivos": {
+    "src/ui/panel_resultado.js": "panel_resultado.js"
+  },
+  "comando": [
+    "node",
+    "--test",
+    "--test-reporter=tap",
+    "tests/unit/ui_pregunta.test.mjs"
+  ],
+  "espera_codigo_no_cero": true,
+  "espera_fallan_tests": [
+    "panel de resultado: correcto e incorrecto SIEMPRE con ícono y texto; el neutro no dice si está bien"
+  ]
+}

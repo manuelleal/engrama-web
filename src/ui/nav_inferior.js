@@ -18,9 +18,9 @@ import { textos } from '../textos.js';
  */
 export function entradasNav(rutaActiva) {
   return [
-    { id: 'inicio', href: '#/inicio', texto: textos.nav.inicio },
-    { id: 'retos', href: '#/retos', texto: textos.retos.titulo },
-    { id: 'asistencia', href: '#/asistencia', texto: textos.asistencia.titulo },
+    { id: 'inicio', href: '#/inicio', texto: textos.nav.inicio, icono: '🏠' },
+    { id: 'retos', href: '#/retos', texto: textos.retos.titulo, icono: '🎯' },
+    { id: 'asistencia', href: '#/asistencia', texto: textos.asistencia.titulo, icono: '📍' },
   ].map((e) => ({ ...e, activo: e.id === rutaActiva }));
 }
 
@@ -29,6 +29,7 @@ export function crearNavInferior(rutaActiva) {
   const enlaces = entradasNav(rutaActiva).map((e) => h(
     'a',
     { href: e.href, 'aria-current': e.activo ? 'page' : null },
+    h('span', { class: 'nav-icono', 'aria-hidden': 'true' }, e.icono), // el de la pestaña activa rebota (juego.css)
     e.texto,
   ));
   return h('nav', { class: 'nav-inferior', 'aria-label': 'Navegación principal' }, ...enlaces);

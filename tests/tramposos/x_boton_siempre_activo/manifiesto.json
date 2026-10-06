@@ -1,0 +1,16 @@
+{
+  "descripcion": "Game feel: el botón Siguiente nace activo, aunque no haya respuesta elegida",
+  "archivos": {
+    "src/vistas/estudiante/reto_flujo.js": "reto_flujo.js"
+  },
+  "comando": [
+    "node",
+    "--test",
+    "--test-reporter=tap",
+    "tests/e2e/game_feel.test.mjs"
+  ],
+  "espera_codigo_no_cero": true,
+  "espera_fallan_tests": [
+    "game feel: en la pregunta el botón nace plano, despierta al elegir, sube el panel neutro y la barra se llena"
+  ]
+}

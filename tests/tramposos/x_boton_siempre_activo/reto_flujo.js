@@ -89,7 +89,7 @@ function nodoBarraAccion(estado, callbacks, efecto) {
   const boton = h('button', {
     'data-testid': ultima ? 'boton-terminar' : 'boton-siguiente',
     class: `boton-principal${efecto.elegida ? ' despierta' : ''}`,
-    disabled: !elegida,
+    disabled: false,
     onClick: ultima ? callbacks.terminar : callbacks.siguiente,
   }, ultima ? textos.retoFlujo.terminar : textos.retoFlujo.siguiente);
   const panel = crearPanelResultado({

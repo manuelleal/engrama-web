@@ -1,0 +1,16 @@
+{
+  "descripcion": "Game feel: la barra de progreso cuenta cualquier respuesta guardada, aunque sea de preguntas que ya no existen",
+  "archivos": {
+    "src/ui/progreso.js": "progreso.js"
+  },
+  "comando": [
+    "node",
+    "--test",
+    "--test-reporter=tap",
+    "tests/unit/ui_pregunta.test.mjs"
+  ],
+  "espera_codigo_no_cero": true,
+  "espera_fallan_tests": [
+    "progreso: cuenta preguntas respondidas del reto, sin pasarse de 1 ni inflarse con respuestas ajenas"
+  ]
+}

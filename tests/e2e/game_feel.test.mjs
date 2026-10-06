@@ -8,6 +8,8 @@ import assert from 'node:assert/strict';
 import { existsSync } from 'node:fs';
 import { revisarPagina } from '../../herramientas/cdp.mjs';
 import { conAppCompleta } from './ayudante_servidor.mjs';
+import { crearChallenge } from '../../herramientas/mock/rutas_challenges.mjs';
+import { DOCENTE_BOOTSTRAP_TOKEN } from '../../herramientas/mock/estado.mjs';
 
 const HAY_NAVEGADOR = [
   process.env.EDGE_PATH,
@@ -87,5 +89,60 @@ test('game feel: con la misma constancia que la última vez, Inicio no celebra',
       eval: "document.querySelectorAll('[data-testid=\"celebra-racha\"]').length",
     });
     assert.equal(r.eval, 0);
+  });
+});
+
+function sembrarReto(estado) {
+  const groupId = [...estado.groups.values()][0].id;
+  const { cuerpo } = crearChallenge(estado, { headers: { authorization: `Bearer ${DOCENTE_BOOTSTRAP_TOKEN}` } }, {
+    title: 'Reto de juego', description: 'd', group_id: groupId, coins_reward: 5, xp_reward: 3,
+    questions: [
+      { question_text: '2+2?', correct_answer: 'A', options_json: [{ label: 'A', value: '4' }, { label: 'B', value: '5' }] },
+      { question_text: 'Color del cielo?', correct_answer: 'B', options_json: [{ label: 'A', value: 'rojo' }, { label: 'B', value: 'azul' }] },
+    ],
+  });
+  return cuerpo;
+}
+
+test('game feel: en la pregunta el botón nace plano, despierta al elegir, sube el panel neutro y la barra se llena', { skip: SKIP }, async () => {
+  await conAppCompleta(async (url, estado) => {
+    const reto = sembrarReto(estado);
+    const r = await revisarPagina({
+      url: `${url}#/retos/${reto.id}`, ancho: 375, alto: 812, espera_ms: 5000, pre: YA_ENTRO,
+      eval: `(async () => {
+        const q = (t) => document.querySelector('[data-testid="' + t + '"]');
+        const esperar = (ms) => new Promise((r) => setTimeout(r, ms));
+        const antes = { deshabilitado: q('boton-siguiente').disabled, progreso: q('progreso-reto').getAttribute('aria-valuenow'), panel: q('panel-respuesta').className };
+        q('opcion-A').click();
+        await esperar(700);
+        const barra = document.querySelector('.barra-accion');
+        return {
+          antes,
+          despues: {
+            deshabilitado: q('boton-siguiente').disabled,
+            despierta: q('boton-siguiente').classList.contains('despierta'),
+            progreso: q('progreso-reto').getAttribute('aria-valuenow'),
+            panel: q('panel-respuesta').textContent,
+            panelClase: q('panel-respuesta').className,
+            elegida: q('opcion-A').getAttribute('aria-pressed'),
+            posicionBarra: getComputedStyle(barra).position,
+            sonido: !!q('boton-sonido'),
+          },
+        };
+      })()`,
+    });
+    assert.deepEqual(r.errores, []);
+    assert.equal(r.eval.antes.deshabilitado, true, 'el botón empieza plano (deshabilitado)');
+    assert.equal(r.eval.antes.progreso, '0');
+    assert.match(r.eval.antes.panel, /panel-oculto/);
+    assert.equal(r.eval.despues.deshabilitado, false, 'al elegir, el botón cobra vida');
+    assert.equal(r.eval.despues.despierta, true, 'y lo hace con su pop');
+    assert.equal(r.eval.despues.progreso, '1', 'la barra cuenta la respuesta');
+    assert.match(r.eval.despues.panel, /Elegiste A: 4/);
+    assert.doesNotMatch(r.eval.despues.panel, /[✓✗]|[Cc]orrect|[Ii]ncorrect|Esta vez no/, 'elegir no revela nada de la clave');
+    assert.match(r.eval.despues.panelClase, /panel-sube/);
+    assert.equal(r.eval.despues.elegida, 'true');
+    assert.equal(r.eval.despues.posicionBarra, 'fixed', 'la barra de acción queda fija abajo');
+    assert.equal(r.eval.despues.sonido, true, 'el botón de silencio está visible en la pregunta');
   });
 });

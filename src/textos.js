@@ -183,6 +183,13 @@ export const textos = {
     bannerRepaso: 'Repaso: no suma monedas',
     faltaRespuesta: 'Elige una opción antes de continuar.',
     drakoPresenta: 'Drako presenta el reto',
+    /** @param {number} n @param {number} total */
+    progresoReto: (n, total) => `Llevas ${n} de ${total} respondidas`,
+    revisando: 'Revisando tus respuestas…',
+    /** @param {string} label @param {string} texto */
+    elegiste: (label, texto) => `Elegiste ${label}: ${texto}`,
+    correccionAlFinal: 'La corrección llega al terminar el reto.',
+    drakoPiensa: 'Drako está revisando tus respuestas',
   },
   revision: {
     titulo: 'Revisión',

@@ -1,6 +1,7 @@
 // @ts-check
 // app.js · Arranca el shell: registra el service worker, monta el banner de red y el router.
 import { crearBannerRed } from './ui/red.js';
+import { instalarToque } from './ui/toque.js';
 import { reemplazarRaiz } from './ui/dom.js';
 import { ruta, definirPorDefecto, iniciar, detener, reiniciarRutas, navegar } from './rutas.js';
 import {
@@ -84,6 +85,7 @@ const BLOQUEO_CONSENTIMIENTO = 'consentimiento'; // el aviso de datos (Ley 1581)
 // se registra DESPUÉS de saber quién entró, no antes.
 async function iniciarApp() {
   registrarServiceWorker();
+  instalarToque(); // game feel: toque + vibración en cada botón principal del estudiante
   montarBanner();
   vistaRaiz = document.getElementById('vista');
   if (!vistaRaiz) return;

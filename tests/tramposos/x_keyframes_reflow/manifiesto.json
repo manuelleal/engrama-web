@@ -1,0 +1,16 @@
+{
+  "descripcion": "Game feel: una animación del juego mueve el ancho (width) en vez de transform: reflow en cada fotograma",
+  "archivos": {
+    "estilos/juego.css": "juego.css"
+  },
+  "comando": [
+    "node",
+    "--test",
+    "--test-reporter=tap",
+    "tests/unit/css_juego.test.mjs"
+  ],
+  "espera_codigo_no_cero": true,
+  "espera_fallan_tests": [
+    "rendimiento: los @keyframes de juego.css animan solo transform y opacity"
+  ]
+}

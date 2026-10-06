@@ -1,0 +1,16 @@
+{
+  "descripcion": "Game feel: el panel neutro de la pregunta usa el ícono ✓ al elegir (insinúa que acertó antes de enviar)",
+  "archivos": {
+    "src/ui/panel_resultado.js": "panel_resultado.js"
+  },
+  "comando": [
+    "node",
+    "--test",
+    "--test-reporter=tap",
+    "tests/e2e/game_feel.test.mjs"
+  ],
+  "espera_codigo_no_cero": true,
+  "espera_fallan_tests": [
+    "game feel: en la pregunta el botón nace plano, despierta al elegir, sube el panel neutro y la barra se llena"
+  ]
+}
