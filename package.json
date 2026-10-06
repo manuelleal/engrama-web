@@ -13,6 +13,7 @@
     "test:tramposos": "node tests/correr_tramposos.mjs",
     "verificar": "node herramientas/verificar.mjs",
     "humo": "node herramientas/humo.mjs --contra mock",
+    "fluidez": "node herramientas/fluidez.mjs --cpu 4",
     "sincronizar-diseno": "node herramientas/sincronizar_diseno.mjs"
   },
   "dependencies": {},

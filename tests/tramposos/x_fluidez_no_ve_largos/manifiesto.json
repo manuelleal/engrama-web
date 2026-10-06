@@ -1,0 +1,16 @@
+{
+  "descripcion": "La medición de fluidez cuenta como \"largo\" solo lo que pasa de 5 segundos (siempre dice que todo es fluido)",
+  "archivos": {
+    "herramientas/fluidez.mjs": "fluidez.mjs"
+  },
+  "comando": [
+    "node",
+    "--test",
+    "--test-reporter=tap",
+    "tests/unit/fluidez.test.mjs"
+  ],
+  "espera_codigo_no_cero": true,
+  "espera_fallan_tests": [
+    "fluidez: cuenta fotogramas perdidos (>25 ms) y largos (>50 ms) con números conocidos"
+  ]
+}

@@ -271,6 +271,9 @@ export async function abrirSesion(op) {
     // `herramientas/galeria.mjs` cambiando de actor sintético a mitad de sesión.
     recargar: (esperaMs = 8000) => s('Page.reload', {}).then(() => esperarListo(s, esperaMs)),
     evaluar: (expresion) => evaluarEnSesion(s, expresion),
+    // Un comando CDP crudo sobre esta pestaña (p. ej. `Emulation.setCPUThrottlingRate`, `Performance.getMetrics`):
+    // lo usa herramientas/fluidez.mjs para medir los fotogramas con la CPU frenada.
+    enviar: (metodo, parametros) => s(metodo, parametros),
     redimensionar: (ancho, alto) => redimensionar(s, ancho, alto),
     redSinConexion: (offline) => redSinConexion(nav.cdp, s, offline),
     capturar: async () => Buffer.from((await s('Page.captureScreenshot', { format: 'png' })).data, 'base64'),

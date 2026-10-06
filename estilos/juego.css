@@ -75,7 +75,6 @@
   height: calc(var(--tam, 9px) * 1.5);
   border-radius: 2px;
   opacity: 0.95;
-  will-change: transform, opacity;
   animation: confeti-cae var(--dur, 1800ms) cubic-bezier(0.25, 0.6, 0.5, 1) var(--retraso, 0ms) both;
 }
 @keyframes confeti-cae {
@@ -836,4 +835,11 @@ body {
 }
 @keyframes insignia-pop {
   from { opacity: 0; transform: scale(0.3); }
+}
+
+/* Los contadores que cambian de texto en cada fotograma (odómetro) no relayan el resto de la página. */
+.chip-num,
+.medalla-num,
+.hero-puntaje-num {
+  contain: layout paint;
 }
