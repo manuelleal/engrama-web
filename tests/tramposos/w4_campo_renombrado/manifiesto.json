@@ -1,7 +1,16 @@
 {
   "descripcion": "W4/R2: un campo renombrado en el mock (full_name -> nombre en /auth/me) debe dar rojo",
-  "archivos": { "herramientas/mock/rutas_auth.mjs": "rutas_auth.mjs" },
-  "comando": ["node", "--test", "--test-reporter=tap", "tests/contrato/mock_contrato.test.mjs"],
+  "archivos": {
+    "herramientas/mock/rutas_auth.mjs": "rutas_auth.mjs"
+  },
+  "comando": [
+    "node",
+    "--test",
+    "--test-reporter=tap",
+    "tests/contrato/mock_contrato.test.mjs"
+  ],
   "espera_codigo_no_cero": true,
-  "espera_fallan_tests": ["R2: el mock respeta el contrato exportado del backend real"]
+  "espera_fallan_tests": [
+    "R2: el mock respeta el contrato exportado del backend real"
+  ]
 }

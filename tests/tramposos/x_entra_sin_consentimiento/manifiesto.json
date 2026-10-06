@@ -1,0 +1,17 @@
+{
+  "descripcion": "Login piloto (G): un cliente que deja entrar a Inicio sin que se haya aceptado el aviso de tratamiento de datos.",
+  "archivos": {
+    "src/app.js": "app.js"
+  },
+  "comando": [
+    "node",
+    "--test",
+    "--test-reporter=tap",
+    "tests/e2e/login_piloto.test.mjs"
+  ],
+  "espera_codigo_no_cero": true,
+  "espera_fallan_tests": [
+    "G: en el primer ingreso, tras crear la contraseña y antes de Inicio, pide aceptar el aviso; sin casilla no entra, y lo guarda el backend",
+    "G: Inicio no se pinta nunca antes de aceptar, y \"No acepto\" cierra la sesión sin registrar nada"
+  ]
+}

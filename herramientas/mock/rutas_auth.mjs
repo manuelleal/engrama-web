@@ -32,8 +32,29 @@ export function leerMe(estado, req) {
       current_streak: perfil.current_streak, longest_streak: perfil.longest_streak, xp: perfil.xp, level: 1 + Math.floor(perfil.xp / 300),
       is_active: perfil.is_active, last_attendance_date: perfil.last_attendance_date, memberships: propias.map(membershipOut),
       active_tenant_id: auth.tenantId, must_change_password: perfil.force_password_reset === true,
+      consent_version: perfil.consent_version ?? null,
     },
   };
+}
+
+/**
+ * POST /auth/consentimiento {"version"}: registra que la persona aceptó el aviso de tratamiento de datos
+ * (contrato en docs/ENCARGO_backend_consentimiento.md; el backend aún no lo tiene — ESTO ES UN SUPUESTO
+ * del cliente). Idempotente: repetir la MISMA versión no cambia nada (conserva la primera fecha) y da 200.
+ * Como el resto de /auth, exige la contraseña definitiva (no está entre las 4 rutas del bloqueo).
+ */
+export function registrarConsentimiento(estado, req, body) {
+  const auth = autenticar(estado, req);
+  const version = body?.version;
+  if (typeof version !== 'string' || version.trim() === '' || version.length > 32) {
+    fallar(422, [{ type: 'string_length', loc: ['body', 'version'], msg: 'version debe tener entre 1 y 32 caracteres', input: version ?? null }]);
+  }
+  const perfil = estado.profiles.get(auth.profileId);
+  if (perfil.consent_version !== version) {
+    perfil.consent_version = version;
+    perfil.consent_at = new Date().toISOString();
+  }
+  return { status: 200, cuerpo: { version: perfil.consent_version, accepted_at: perfil.consent_at } };
 }
 
 /** `loc` y `msg` como los arma pydantic: el cliente no los lee, pero el 422 de largo no es un string. */

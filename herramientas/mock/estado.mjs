@@ -18,6 +18,7 @@ export function crearProfile(estado, { documentoId, nombre }) {
     id, documento_id: documentoId, current_streak: 0, longest_streak: 0,
     xp: 0, is_active: true, last_attendance_date: null,
     force_password_reset: false, // contraseña temporal (login piloto §1.5): solo el alta la pone en true
+    consent_version: null, consent_at: null, // aviso de datos (Ley 1581): la versión que aceptó y cuándo; null = nunca
   });
   estado.nombresPorProfile.set(id, nombre); // nombre "global" de respaldo, solo para depurar
   return id;

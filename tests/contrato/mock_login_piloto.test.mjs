@@ -154,3 +154,34 @@ test('mock: GoTrue falso: credenciales malas dan 400 invalid_grant y el refresh 
     assert.equal(reusado.status, 400, 'el refresh token viejo ya no sirve');
   });
 });
+
+// G (aviso de datos, Ley 1581): `consent_version` y `POST /auth/consentimiento` son un SUPUESTO del cliente
+// (docs/ENCARGO_backend_consentimiento.md): el mock los habla para que el cliente se pruebe de punta a punta.
+test('R3 (G): /auth/me trae consent_version (null si nunca aceptó) y POST /auth/consentimiento lo registra, idempotente', async () => {
+  await conMockPiloto(async ({ api, tokenDe }) => {
+    const sinAceptar = await tokenDe(CORREOS_PILOTO.desactualizado);
+    assert.equal((await api('GET', '/auth/me', { token: sinAceptar })).json.consent_version, '2026-01-v0');
+
+    const primera = await api('POST', '/auth/consentimiento', { token: sinAceptar, body: { version: '2026-10-v1' } });
+    assert.equal(primera.status, 200);
+    assert.ok(validarContraEsquema(adenda, 'ConsentimientoOut', primera.json).ok);
+    const me = await api('GET', '/auth/me', { token: sinAceptar });
+    assert.equal(me.json.consent_version, '2026-10-v1');
+    assert.ok(validarContraEsquema(adenda, 'ProfileOut', me.json).ok);
+
+    const repetida = await api('POST', '/auth/consentimiento', { token: sinAceptar, body: { version: '2026-10-v1' } });
+    assert.deepEqual(repetida.json, primera.json, 'idempotente: la misma versión conserva la primera fecha');
+    for (const version of ['', '   ', 'x'.repeat(33), 7, undefined]) {
+      assert.equal((await api('POST', '/auth/consentimiento', { token: sinAceptar, body: { version } })).status, 422, JSON.stringify(version));
+    }
+  });
+});
+
+test('mock (G): con contraseña temporal, /auth/consentimiento da 403 must_change_password (se pide después de crearla)', async () => {
+  await conMockPiloto(async ({ api, tokenDe, estado, ids }) => {
+    const r = await api('POST', '/auth/consentimiento', { token: await tokenDe(CORREOS_PILOTO.nuevo, CLAVE_TEMPORAL), body: { version: '2026-10-v1' } });
+    assert.equal(r.status, 403);
+    assert.equal(r.json.detail, 'must_change_password');
+    assert.equal(estado.profiles.get(ids.nuevo).consent_version, null);
+  });
+});

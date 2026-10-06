@@ -25,7 +25,7 @@ globalThis.localStorage = localStorageDeMentira;
 globalThis.sessionStorage = sessionStorageDeMentira;
 
 const {
-  entrar, iniciar, token, salir, cambiarContrasena, recargarSesion, configurarRaizAuth, construirUrlAuth,
+  entrar, iniciar, token, salir, cambiarContrasena, recargarSesion, registrarConsentimiento, configurarRaizAuth, construirUrlAuth,
   calcularRetrasoRenovacionMs, ErrorAuth,
 } = await import('../../src/auth/supabase_rest.js');
 
@@ -78,6 +78,10 @@ function manejar(url, req, res, cuerpo) {
   }
   if (req.method === 'PUT' && url.pathname === '/auth/v1/user') {
     return responderJson(res, 200, { id: 'uuid-est-1' });
+  }
+  // Aviso de datos (G): el consentimiento se registra en el BACKEND.
+  if (req.method === 'POST' && url.pathname === '/api/auth/consentimiento') {
+    return responderJson(res, 200, { version: cuerpo?.version, accepted_at: '2026-10-06T12:00:00Z' });
   }
   // Login piloto: el cambio de contraseña va por el BACKEND (que llama a GoTrue por dentro).
   if (req.method === 'POST' && url.pathname === '/api/auth/contrasena') {
@@ -247,6 +251,34 @@ test('la bandera de contraseña temporal (A): /auth/me con must_change_password 
     assert.deepEqual(validarSesion(temporal), []);
     meActual = { ...PROFILE_OUT, must_change_password: false };
     assert.equal((await recargarSesion()).debeCambiarContrasena, false, 'tras cambiarla, se vuelve a pedir /auth/me y la bandera baja');
+  });
+});
+
+test('registrarConsentimiento (G): POST /api/auth/consentimiento {version} con el Bearer, y NADA en localStorage', async () => {
+  await conServidorFalso(async (peticiones) => {
+    await entrar('password', { correo: 'ana@uis.edu.co', contrasena: 'correcta-10' });
+    await registrarConsentimiento('2026-10-v1');
+    const req = peticiones.find((p) => p.metodo === 'POST' && p.ruta === '/api/auth/consentimiento');
+    assert.ok(req, 'el consentimiento se manda al backend');
+    assert.equal(req.auth, 'Bearer acceso-1');
+    assert.deepEqual(req.cuerpo, { version: '2026-10-v1' });
+    assert.equal(localStorageDeMentira.datos.size, 0, 'el consentimiento no se guarda en localStorage');
+    for (const valor of sessionStorageDeMentira.datos.values()) assert.doesNotMatch(valor, /2026-10-v1/);
+  });
+});
+
+test('registrarConsentimiento: sin sesión, rechaza con un mensaje claro', async () => {
+  await assert.rejects(() => registrarConsentimiento('2026-10-v1'), /sesión/i);
+});
+
+test('la sesión trae el consentimiento que dice el SERVIDOR (consent_version), null si nunca o si el backend no lo informa', async () => {
+  await conServidorFalso(async () => {
+    meActual = { ...PROFILE_OUT, consent_version: '2026-10-v1' };
+    assert.equal((await entrar('password', { correo: 'ana@uis.edu.co', contrasena: 'correcta-10' })).consentimiento, '2026-10-v1');
+    meActual = { ...PROFILE_OUT, consent_version: null };
+    assert.equal((await recargarSesion()).consentimiento, null);
+    meActual = PROFILE_OUT; // un backend viejo, sin el campo: falla cerrado, se pedirá el aviso
+    assert.equal((await recargarSesion()).consentimiento, null);
   });
 });
 

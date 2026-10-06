@@ -24,6 +24,7 @@ import { textos } from '../textos.js';
 import { pedirJson } from '../api/cliente.js';
 import { perfilAJson } from './perfil_actual.js';
 import { cambiarContrasenaConToken } from './cambio_contrasena.js';
+import { registrarConsentimientoConToken } from './consentimiento.js';
 
 const CLAVE_REFRESH = 'engrama_refresh_token';
 // GOTRUE_JWT_EXP por defecto es 3600s (docker-compose.yml del despliegue); renovar 60s antes de
@@ -198,6 +199,12 @@ export async function token() {
     try { await renovar(); } catch (e) { console.error('auth/supabase_rest: la renovación de respaldo en token() falló', e); }
   }
   return accessTokenEnMemoria;
+}
+
+/** Registra en el backend que aceptó el aviso de datos (auth/consentimiento.js). @param {string} version */
+export async function registrarConsentimiento(version) {
+  if (!accessTokenEnMemoria) throw new Error(textos.auth.sinSesion);
+  await registrarConsentimientoConToken(await token(), version);
 }
 
 /** Cambia la contraseña por el BACKEND (`POST /api/auth/contrasena`, que llama a GoTrue por dentro y

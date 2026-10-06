@@ -1,3 +1,5 @@
+// TRAMPOSO (login piloto, G) — versión rota a propósito: entrarConSesion no pide el aviso de datos, así que quien nunca aceptó
+// (o aceptó una versión vieja) entra a Inicio sin consentimiento. Debe quedar en rojo en el E2E del aviso.
 // @ts-check
 // app.js · Arranca el shell: registra el service worker, monta el banner de red y el router.
 import { crearBannerRed } from './ui/red.js';
@@ -157,7 +159,7 @@ function entrarConSesion(sesion, { desdeElPrincipio = false } = {}) {
   fijarColegiosDeLaSesion(sesion);
   if (sesion.debeCambiarContrasena) { bloquear(BLOQUEO_DEBE_CAMBIAR); return; }
   // Después de crear la contraseña y antes de Inicio: el aviso de datos, hasta que el SERVIDOR diga que se aceptó.
-  if (debePedirConsentimiento(sesion, leerAviso())) { bloquear(BLOQUEO_CONSENTIMIENTO); return; }
+  // <- el error: el consentimiento no se mira
   arrancarConSesion(desdeElPrincipio);
 }
 

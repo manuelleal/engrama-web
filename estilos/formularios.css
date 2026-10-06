@@ -32,6 +32,13 @@
 #vista form select:focus-visible {
   border-color: var(--secundario);
 }
+#vista form input[type="checkbox"] {
+  flex: none;
+  width: 1.4rem;
+  height: 1.4rem;
+  padding: 0;
+  accent-color: var(--primario);
+}
 #vista form input[type="file"] {
   border-style: dashed;
   padding: 16px 12px;

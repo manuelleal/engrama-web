@@ -14,6 +14,7 @@
 // supabase_rest.js, §7.4): nada de streaks ni tokens en localStorage aquí.
 import { textos } from '../textos.js';
 import { cambiarContrasenaConToken } from './cambio_contrasena.js';
+import { registrarConsentimientoConToken } from './consentimiento.js';
 
 let jwtEnMemoria = null;
 
@@ -36,6 +37,8 @@ export function perfilAJson(profileOut, tenantIdActivo) {
     constancia: profileOut.current_streak, // el servidor manda; nunca se recalcula aquí
     // Login piloto: la bandera viene del servidor (`profiles.force_password_reset`); el cliente nunca la deduce.
     debeCambiarContrasena: profileOut.must_change_password === true,
+    // Lo que el servidor dice que aceptó del aviso de datos (null si nunca, o si el backend aún no lo informa: cierra).
+    consentimiento: profileOut.consent_version ?? null,
   };
 }
 
@@ -57,6 +60,12 @@ export async function recargarSesion() {
   if (!jwtEnMemoria) throw new Error(textos.auth.sinSesion);
   const { pedirJson } = await import('../api/cliente.js');
   return perfilAJson(await pedirJson('/auth/me', { token: jwtEnMemoria }));
+}
+
+/** @param {string} version */
+export async function registrarConsentimiento(version) {
+  if (!jwtEnMemoria) throw new Error(textos.auth.sinSesion);
+  await registrarConsentimientoConToken(jwtEnMemoria, version);
 }
 
 /** @param {string} nueva */

@@ -4,7 +4,7 @@
 // app.js · Arranca el shell: registra el service worker, monta el banner de red y el router.
 import { crearBannerRed } from './ui/red.js';
 import { reemplazarRaiz } from './ui/dom.js';
-import { ruta, definirPorDefecto, iniciar, detener, reiniciarRutas } from './rutas.js';
+import { ruta, definirPorDefecto, iniciar, detener, reiniciarRutas, navegar } from './rutas.js';
 import {
   accionUnica, configurarAlBloqueo, BLOQUEO_DEBE_CAMBIAR, BLOQUEO_SIN_PERFIL, fijarColegios, leerColegioActivo, cambiarColegioActivo,
 } from './api/cliente.js';
@@ -13,6 +13,9 @@ import { renderInicio } from './vistas/estudiante/inicio.js';
 import { renderPerfil } from './vistas/perfil.js';
 import { renderCrearContrasena } from './vistas/crear_contrasena.js';
 import { renderSinPerfil } from './vistas/sin_perfil.js';
+import { renderConsentimiento, renderLeerAviso, renderErrorAviso } from './vistas/aviso_datos.js';
+import { configurarAviso, leerAviso, debePedirConsentimiento } from './aviso.js';
+import { textos } from './textos.js';
 import { renderAsistencia } from './vistas/estudiante/asistencia.js';
 import { renderRetos } from './vistas/estudiante/retos.js';
 import { renderRetoFlujo } from './vistas/estudiante/reto_flujo.js';
@@ -75,6 +78,7 @@ let authActivo = null;
 let sesionActual = null;
 let vistaRaiz = null;
 let bloqueoActual = null;
+const BLOQUEO_CONSENTIMIENTO = 'consentimiento'; // el aviso de datos (Ley 1581) sin aceptar, o de una versión vieja
 
 // W5: nada del router arranca sin sesión. Un actor sintético (hito 0) o, desde W22, un login real
 // deja `document.body.dataset.listo = "1"` en la propia pantalla de entrada mientras tanto.
@@ -89,6 +93,12 @@ async function iniciarApp() {
   const config = await cargarConfig();
   const modo = MODOS_AUTH_VALIDOS.includes(config.ENGRAMA_AUTH) ? config.ENGRAMA_AUTH : 'mock';
   authActivo = await cargarAuth(modo);
+  configurarAviso(config);
+  // Con cuentas reales no hay entrada sin aviso: sin responsable, contacto o versión en config.json, la app no continúa.
+  if (typeof authActivo.registrarConsentimiento === 'function' && !leerAviso().ok) {
+    renderErrorAviso(vistaRaiz, leerAviso().faltan);
+    return;
+  }
   const sesion = await authActivo.iniciar();
   if (bloqueoActual) return; // una pantalla obligatoria ya tomó la vista mientras se recuperaba la sesión
   if (sesion) { entrarConSesion(sesion); return; }
@@ -125,6 +135,7 @@ function conCtx(fn) {
     // Login piloto (B): las instituciones del usuario y la activa (el selector solo aparece con más de una).
     colegios: sesionActual.colegios,
     colegioActivo: sesionActual.colegio?.id,
+    avisoDatos: typeof authActivo.registrarConsentimiento === 'function', // cuentas reales: el aviso se puede leer siempre
     cambiarColegio: (sesionActual.colegios?.length ?? 0) > 1 && typeof authActivo.recargarSesion === 'function' ? cambiarColegio : undefined,
     // La traen supabase_rest.js y perfil_actual.js; mock.js no la soporta, y las vistas
     // (inicio.js, perfil.js) usan esto para no ofrecer un enlace muerto.
@@ -147,6 +158,8 @@ function entrarConSesion(sesion, { desdeElPrincipio = false } = {}) {
   sesionActual = sesion;
   fijarColegiosDeLaSesion(sesion);
   if (sesion.debeCambiarContrasena) { bloquear(BLOQUEO_DEBE_CAMBIAR); return; }
+  // Después de crear la contraseña y antes de Inicio: el aviso de datos, hasta que el SERVIDOR diga que se aceptó.
+  if (debePedirConsentimiento(sesion, leerAviso())) { bloquear(BLOQUEO_CONSENTIMIENTO); return; }
   arrancarConSesion(desdeElPrincipio);
 }
 
@@ -186,6 +199,10 @@ function bloquear(codigo) {
   detener();
   // <- el error: no se reemplaza el contenedor
   if (codigo === BLOQUEO_SIN_PERFIL) { renderSinPerfil(vistaRaiz, { salir: cerrarSesion }); return; }
+  if (codigo === BLOQUEO_CONSENTIMIENTO) {
+    renderConsentimiento(vistaRaiz, { aviso: leerAviso(), aceptar: aceptarAviso, salir: cerrarSesion });
+    return;
+  }
   renderCrearContrasena(vistaRaiz, {
     cambiarContrasena: authActivo.cambiarContrasena, alTerminar: terminarBloqueo, salir: cerrarSesion,
   });
@@ -199,10 +216,25 @@ async function terminarBloqueo() {
   entrarConSesion(sesion);
 }
 
+// Registra la aceptación en el backend y vuelve a pedir /auth/me: se entra solo si el SERVIDOR ya la tiene
+// (nunca por algo guardado aquí). Si no la guardó, se avisa y se queda en el aviso.
+async function aceptarAviso() {
+  await authActivo.registrarConsentimiento(leerAviso().version);
+  const sesion = await authActivo.recargarSesion();
+  if (debePedirConsentimiento(sesion, leerAviso())) {
+    throw Object.assign(new Error(textos.aviso.errorGuardar), { mensaje: textos.aviso.errorGuardar });
+  }
+  bloqueoActual = null;
+  entrarConSesion(sesion);
+}
+
 function arrancarConSesion(desdeElPrincipio = false) {
   reiniciarRutas();
   ruta('/inicio', conCtx((raiz, params, query, ctx) => renderInicio(raiz, ctx)));
   ruta('/perfil', conCtx((raiz, params, query, ctx) => renderPerfil(raiz, ctx)));
+  ruta('/datos', conCtx((raiz) => (leerAviso().ok
+    ? renderLeerAviso(raiz, { aviso: leerAviso(), alVolver: () => navegar('/perfil') })
+    : renderErrorAviso(raiz, leerAviso().faltan))));
   ruta('/asistencia', conCtx((raiz, params, query, ctx) => renderAsistencia(raiz, query, ctx)));
   ruta('/retos', conCtx((raiz, params, query, ctx) => renderRetos(raiz, ctx)));
   ruta('/retos/:id', conCtx((raiz, params, query, ctx) => renderRetoFlujo(raiz, params, query, ctx)));

@@ -1,3 +1,5 @@
+// TRAMPOSO x_botones_demo_en_supabase — versión rota a propósito: vistas/entrada.js ignora el modo y muestra los botones de actor demo
+// también en ENGRAMA_AUTH=supabase.
 // @ts-check
 // vistas/entrada.js · Pantalla de entrada. En modo mock (hitos 0-1): elegir un actor sintético.
 // En modo supabase (W22, encargo A): correo y contraseña de verdad, contra GoTrue por REST
@@ -6,6 +8,8 @@
 import { h, montar } from '../ui/dom.js';
 import { textos } from '../textos.js';
 import { ACTORES_SINTETICOS } from '../auth/mock.js';
+import { leerAviso } from '../aviso.js';
+import { renderLeerAviso } from './aviso_datos.js';
 
 const ETIQUETA_ROL = { admin: 'Admin', teacher: 'Docente', student: 'Estudiante' };
 
@@ -42,7 +46,7 @@ async function manejarEntrarReal(alEntrar, campoCorreo, campoContrasena, boton, 
   }
 }
 
-function vistaReal(alEntrar) {
+function vistaReal(alEntrar, alVerAviso) {
   const campoCorreo = h('input', { type: 'email', id: 'entrada-correo', 'data-testid': 'campo-correo', autocomplete: 'username' });
   const campoContrasena = h('input', { type: 'password', id: 'entrada-contrasena', 'data-testid': 'campo-contrasena', autocomplete: 'current-password' });
   const boton = h('button', { type: 'submit', 'data-testid': 'boton-entrar' }, textos.entrada.entrar);
@@ -54,7 +58,10 @@ function vistaReal(alEntrar) {
     boton, zonaError,
   );
   form.addEventListener('submit', (ev) => { ev.preventDefault(); manejarEntrarReal(alEntrar, campoCorreo, campoContrasena, boton, zonaError); });
-  return h('div', { 'data-testid': 'vista-entrada' }, h('h1', {}, textos.entrada.tituloReal), form);
+  // El aviso de datos se puede leer SIEMPRE, también antes de entrar (Ley 1581).
+  const verAviso = h('button', { type: 'button', class: 'boton-secundario', 'data-testid': 'entrada-ver-aviso' }, textos.aviso.enlace);
+  verAviso.addEventListener('click', alVerAviso);
+  return h('div', { 'data-testid': 'vista-entrada' }, h('h1', {}, textos.entrada.tituloReal), form, verAviso);
 }
 
 /**
@@ -65,7 +72,7 @@ function vistaReal(alEntrar) {
  *   escribe (§7.2 regla 5).
  */
 export function renderEntrada(raiz, modo, alEntrar) {
-  // BUG a propósito (tramposo): ignora `modo` y siempre muestra los actores demo.
-  montar(raiz, vistaActores(alEntrar));
+  const alVerAviso = () => renderLeerAviso(raiz, { aviso: leerAviso(), alVolver: () => renderEntrada(raiz, modo, alEntrar) });
+  montar(raiz, vistaActores(alEntrar)); // <- el error: ignora el modo
   document.body.dataset.listo = '1';
 }

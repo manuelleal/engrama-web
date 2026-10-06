@@ -1,5 +1,5 @@
 {
-  "_nota": "ADENDA A MANO, NO es una exportación. Derivada de engrama-backend/src/auth/schemas.py (commit 7e69e3e, ESPEC_login_piloto.md §1.4 y §1.5) al leerlo; no se ejecutó el backend. Reemplazar por contratos/openapi_<sha>.json cuando alguien exporte el OpenAPI del backend final (ver contratos/LEEME.md). Un esquema de aquí reemplaza al del mismo nombre en openapi_c7a8b89.json.",
+  "_nota": "ADENDA A MANO, NO es una exportación. Derivada de engrama-backend/src/auth/schemas.py (commit 7e69e3e, ESPEC_login_piloto.md §1.4 y §1.5) al leerlo; no se ejecutó el backend. Reemplazar por contratos/openapi_<sha>.json cuando alguien exporte el OpenAPI del backend final (ver contratos/LEEME.md). Un esquema de aquí reemplaza al del mismo nombre en openapi_c7a8b89.json. EXCEPCIÓN: consent_version y POST /auth/consentimiento NO están en el backend 7e69e3e: son el SUPUESTO del cliente, ver docs/ENCARGO_backend_consentimiento.md.",
   "fuente": {
     "repo": "engrama-backend",
     "commit": "7e69e3e",
@@ -81,6 +81,18 @@
             "title": "Must Change Password",
             "type": "boolean",
             "description": "profiles.force_password_reset: hay que cambiar la contraseña con POST /auth/contrasena."
+          },
+          "consent_version": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Consent Version",
+            "description": "SUPUESTO (no está en el backend aún): la versión más reciente del aviso de datos que aceptó, o null."
           }
         },
         "required": [
@@ -94,7 +106,8 @@
           "level",
           "is_active",
           "active_tenant_id",
-          "must_change_password"
+          "must_change_password",
+          "consent_version"
         ],
         "title": "ProfileOut",
         "type": "object"
@@ -174,6 +187,43 @@
         ],
         "title": "CambioDeClaveIn",
         "type": "object"
+      },
+      "ConsentimientoIn": {
+        "additionalProperties": false,
+        "properties": {
+          "version": {
+            "maxLength": 32,
+            "minLength": 1,
+            "title": "Version",
+            "type": "string"
+          }
+        },
+        "required": [
+          "version"
+        ],
+        "title": "ConsentimientoIn",
+        "type": "object",
+        "description": "SUPUESTO del cliente (docs/ENCARGO_backend_consentimiento.md)."
+      },
+      "ConsentimientoOut": {
+        "additionalProperties": false,
+        "properties": {
+          "version": {
+            "title": "Version",
+            "type": "string"
+          },
+          "accepted_at": {
+            "title": "Accepted At",
+            "type": "string"
+          }
+        },
+        "required": [
+          "version",
+          "accepted_at"
+        ],
+        "title": "ConsentimientoOut",
+        "type": "object",
+        "description": "SUPUESTO del cliente."
       }
     }
   },
@@ -210,6 +260,12 @@
       "noEsMiembro": 403,
       "detalle403": "User is not a member of the requested tenant",
       "sinEncabezado": "la membresía activa más antigua"
+    },
+    "POST /auth/consentimiento": {
+      "supuesto": true,
+      "cuerpo": "ConsentimientoIn",
+      "respuesta": "200 ConsentimientoOut; idempotente por (perfil, versión); 422 si la versión no es 1..32 caracteres",
+      "conContrasenaTemporal": "403 must_change_password"
     }
   }
 }

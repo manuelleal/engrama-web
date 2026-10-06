@@ -81,6 +81,41 @@ export const textos = {
     mensaje: 'Tu cuenta todavía no está inscrita. Habla con tu profe.',
     drako: 'Drako no encuentra tu inscripción',
   },
+  // El aviso de tratamiento de datos personales (vistas/aviso_datos.js, Ley 1581 de 2012). Es un aviso
+  // CLARO para el estudiante, NO un concepto jurídico: hay que hacerlo revisar antes de usarlo con
+  // estudiantes reales (docs/ENCARGO_backend_consentimiento.md). El responsable, el contacto y la versión
+  // NO están aquí: salen de config.json del despliegue (src/aviso.js).
+  aviso: {
+    titulo: 'Tratamiento de tus datos',
+    enlace: 'Tratamiento de tus datos',
+    drako: 'Drako te explica qué pasa con tus datos',
+    /** @param {string} responsable */
+    intro: (responsable) => `Esto es lo que ENGRAMA hace con tus datos personales. Responsable de tus datos: ${responsable}.`,
+    queDatosTitulo: 'Qué datos guardamos',
+    queDatos: ['Tu nombre', 'Tu correo institucional', 'Tu código', 'Tus respuestas en los retos', 'Tu asistencia a clase', 'Tus monedas'],
+    paraQueTitulo: 'Para qué',
+    paraQue: 'Para que practiques inglés y para que tu docente haga seguimiento a tu avance.',
+    quienLosVeTitulo: 'Quién los ve',
+    quienLosVe: 'Tu docente y la coordinación de tu institución. Nadie de otra institución puede verlos.',
+    noSeVendenTitulo: 'Lo que no hacemos',
+    noSeVenden: 'Tus datos no se venden ni se comparten con nadie más.',
+    derechosTitulo: 'Tus derechos',
+    derechos: 'Puedes conocer qué datos tuyos guardamos, actualizarlos, rectificarlos y pedir que se supriman.',
+    /** @param {string} contacto */
+    contacto: (contacto) => `Para ejercer tus derechos, escribe a ${contacto}.`,
+    /** @param {string} version */
+    version: (version) => `Versión del aviso: ${version}`,
+    acepto: 'He leído y acepto el tratamiento de mis datos',
+    aceptar: 'Aceptar y continuar',
+    guardando: 'Guardando…',
+    noAcepto: 'No acepto',
+    debeMarcar: 'Marca la casilla para continuar.',
+    errorGuardar: 'No pudimos registrar tu aceptación. Intenta de nuevo.',
+    volver: 'Volver',
+    errorConfigTitulo: 'Falta configurar el aviso de datos',
+    /** @param {string[]} faltan */
+    errorConfig: (faltan) => `La aplicación no puede continuar: en la configuración del despliegue falta ${faltan.join(', ')}. Avisa a quien administra ENGRAMA.`,
+  },
   // El selector de institución (ui/selector_colegio.js): solo aparece con más de una membresía.
   colegio: {
     etiqueta: 'Institución',

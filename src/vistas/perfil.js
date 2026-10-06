@@ -8,24 +8,31 @@ import { h, montar } from '../ui/dom.js';
 import { textos } from '../textos.js';
 import { crearFormularioContrasena } from './formulario_contrasena.js';
 
-function pintarSinSoporte(raiz) {
+// Siempre disponible en los modos con cuentas reales (Ley 1581): el aviso de tratamiento de datos.
+function enlaceAviso(ctx) {
+  return ctx.avisoDatos ? h('a', { href: '#/datos', 'data-testid': 'perfil-ver-aviso' }, textos.aviso.enlace) : null;
+}
+
+function pintarSinSoporte(raiz, ctx) {
   montar(raiz, h('div', { 'data-testid': 'vista-perfil' },
     h('h1', {}, textos.perfil.titulo),
     h('p', { role: 'status', 'data-testid': 'perfil-sin-soporte' }, textos.perfil.sinSoporte),
+    enlaceAviso(ctx),
     h('a', { href: '#/inicio', 'data-testid': 'perfil-volver' }, textos.perfil.volver),
   ));
   document.body.dataset.listo = '1';
 }
 
-/** @param {HTMLElement} raiz @param {{cambiarContrasena?: (nueva: string) => Promise<void>}} ctx */
+/** @param {HTMLElement} raiz @param {{cambiarContrasena?: (nueva: string) => Promise<void>, avisoDatos?: boolean}} ctx */
 export function renderPerfil(raiz, ctx) {
-  if (typeof ctx.cambiarContrasena !== 'function') { pintarSinSoporte(raiz); return; }
+  if (typeof ctx.cambiarContrasena !== 'function') { pintarSinSoporte(raiz, ctx); return; }
   const form = crearFormularioContrasena({
     cambiar: ctx.cambiarContrasena, textoBoton: textos.perfil.cambiar, textoEnVuelo: textos.perfil.cambiando,
   });
   montar(raiz, h('div', { 'data-testid': 'vista-perfil' },
     h('h1', {}, textos.perfil.cambiarContrasenaTitulo),
     form,
+    enlaceAviso(ctx),
     h('a', { href: '#/inicio', 'data-testid': 'perfil-volver' }, textos.perfil.volver),
   ));
   document.body.dataset.listo = '1';

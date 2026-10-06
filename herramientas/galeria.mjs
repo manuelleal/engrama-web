@@ -20,7 +20,7 @@ import { fileURLToPath } from 'node:url';
 import { crearServidor } from './servidor_dev.mjs';
 import { crearMockApi } from './mock_api.mjs';
 import { crearEstado, ADMIN_BOOTSTRAP_TOKEN, DOCENTE_BOOTSTRAP_TOKEN } from './mock/estado.mjs';
-import { sembrarLoginPiloto, CORREOS_PILOTO, CLAVE_DEMO, CLAVE_TEMPORAL } from './mock/login_piloto.mjs';
+import { sembrarLoginPiloto, CORREOS_PILOTO, CLAVE_DEMO, CLAVE_TEMPORAL, CONFIG_PILOTO } from './mock/login_piloto.mjs';
 import { configurarRaizApi } from '../src/api/cliente.js';
 import { pasoAdmin, pasoSembrar, pasoResolverRetos } from './humo/flujo.mjs';
 import { abrirSesion } from './cdp.mjs';
@@ -260,35 +260,60 @@ async function conSesionReal(urlBase, fn) {
   } finally { await sesion.cerrar(); }
 }
 
+const llenarClave = (nueva) => `(() => { document.querySelector('[data-testid="campo-contrasena-nueva"]').value = ${JSON.stringify(nueva)}; document.querySelector('[data-testid="campo-contrasena-confirmar"]').value = ${JSON.stringify(nueva)}; document.querySelector('[data-testid="boton-cambiar-contrasena"]').click(); })()`;
+
+async function pilotoContrasena(urlBase, carpeta, registro) {
+  await conSesionReal(urlBase, async (sesion) => {
+    await capturar(sesion, carpeta, registro, '22-entrada-real-375.png', 'Entrada con correo y contraseña',
+      'La entrada de verdad (modo supabase): correo institucional y contraseña, sin actores de prueba. Debajo, el enlace al aviso de datos.');
+    await sesion.evaluar(entrarReal(CORREOS_PILOTO.temporal, CLAVE_TEMPORAL));
+    await esperarTestid(sesion, 'vista-crear-contrasena');
+    await capturar(sesion, carpeta, registro, '23-crear-contrasena-375.png', 'Primer ingreso: crea tu contraseña',
+      'Con la contraseña temporal que dio el profe, la app no deja ver nada más hasta crear la propia (mínimo 10 caracteres).');
+    await sesion.evaluar(llenarClave('corta'));
+    await capturar(sesion, carpeta, registro, '24-crear-contrasena-error-375.png', 'Crea tu contraseña: mensaje claro',
+      'Una contraseña de menos de 10 caracteres se explica en la pantalla y no sale del navegador.');
+  });
+}
+
+async function pilotoSinPerfilYColegios(urlBase, carpeta, registro) {
+  await conSesionReal(urlBase, async (sesion) => {
+    await sesion.evaluar(entrarReal(CORREOS_PILOTO.sinperfil, CLAVE_DEMO));
+    await esperarTestid(sesion, 'vista-sin-perfil');
+    await capturar(sesion, carpeta, registro, '25-sin-perfil-375.png', 'Cuenta sin inscribir',
+      'Una cuenta que existe pero no está inscrita en ENGRAMA: un mensaje claro y cerrar sesión, sin bucle ni pantalla en blanco.');
+  });
+  await conSesionReal(urlBase, async (sesion) => {
+    await sesion.evaluar(entrarReal(CORREOS_PILOTO.profe2, CLAVE_DEMO));
+    await esperarTestid(sesion, 'selector-colegio');
+    await capturar(sesion, carpeta, registro, '26-selector-institucion-375.png', 'Docente en dos instituciones',
+      'Quien trabaja en UIS y SENA elige en cuál está; al cambiar, toda la app se vuelve a pedir con esa institución.');
+  });
+}
+
+async function pilotoAviso(urlBase, carpeta, registro) {
+  await conSesionReal(urlBase, async (sesion) => {
+    await sesion.evaluar(entrarReal(CORREOS_PILOTO.nuevo, CLAVE_TEMPORAL));
+    await esperarTestid(sesion, 'vista-crear-contrasena');
+    await sesion.evaluar(llenarClave('mi-clave-nueva-2026'));
+    await esperarTestid(sesion, 'vista-aviso-consentimiento');
+    await capturar(sesion, carpeta, registro, '27-aviso-datos-375.png', 'Tratamiento de tus datos',
+      'Después de crear la contraseña y antes de Inicio: qué datos se guardan, para qué, quién los ve, los derechos y a quién escribir (Ley 1581).');
+    await sesion.evaluar('window.scrollTo(0, document.body.scrollHeight)');
+    await capturar(sesion, carpeta, registro, '28-aviso-datos-aceptar-375.png', 'Aviso de datos: aceptar',
+      'Casilla "He leído y acepto" y botón. Sin aceptar no se entra; "No acepto" cierra la sesión.');
+  });
+}
+
 async function fasePiloto(urlBase, carpeta, registro, estado, apiUrlDirecta) {
   sembrarLoginPiloto(estado);
   const previos = [process.env.ENGRAMA_AUTH_CONFIG, process.env.ENGRAMA_AUTH_URL];
-  process.env.ENGRAMA_AUTH_CONFIG = JSON.stringify({ ENGRAMA_AUTH: 'supabase' });
+  process.env.ENGRAMA_AUTH_CONFIG = JSON.stringify(CONFIG_PILOTO);
   process.env.ENGRAMA_AUTH_URL = `${apiUrlDirecta}/gotrue`;
   try {
-    await conSesionReal(urlBase, async (sesion) => {
-      await capturar(sesion, carpeta, registro, '22-entrada-real-375.png', 'Entrada con correo y contraseña',
-        'La entrada de verdad (modo supabase): correo institucional y contraseña, sin actores de prueba.');
-      await sesion.evaluar(entrarReal(CORREOS_PILOTO.temporal, CLAVE_TEMPORAL));
-      await esperarTestid(sesion, 'vista-crear-contrasena');
-      await capturar(sesion, carpeta, registro, '23-crear-contrasena-375.png', 'Primer ingreso: crea tu contraseña',
-        'Con la contraseña temporal que dio el profe, la app no deja ver nada más hasta crear la propia (mínimo 10 caracteres).');
-      await sesion.evaluar(`(() => { document.querySelector('[data-testid="campo-contrasena-nueva"]').value = 'corta'; document.querySelector('[data-testid="campo-contrasena-confirmar"]').value = 'corta'; document.querySelector('[data-testid="boton-cambiar-contrasena"]').click(); })()`);
-      await capturar(sesion, carpeta, registro, '24-crear-contrasena-error-375.png', 'Crea tu contraseña: mensaje claro',
-        'Una contraseña de menos de 10 caracteres se explica en la pantalla y no sale del navegador.');
-    });
-    await conSesionReal(urlBase, async (sesion) => {
-      await sesion.evaluar(entrarReal(CORREOS_PILOTO.sinperfil, CLAVE_DEMO));
-      await esperarTestid(sesion, 'vista-sin-perfil');
-      await capturar(sesion, carpeta, registro, '25-sin-perfil-375.png', 'Cuenta sin inscribir',
-        'Una cuenta que existe pero no está inscrita en ENGRAMA: un mensaje claro y cerrar sesión, sin bucle ni pantalla en blanco.');
-    });
-    await conSesionReal(urlBase, async (sesion) => {
-      await sesion.evaluar(entrarReal(CORREOS_PILOTO.profe2, CLAVE_DEMO));
-      await esperarTestid(sesion, 'selector-colegio');
-      await capturar(sesion, carpeta, registro, '26-selector-institucion-375.png', 'Docente en dos instituciones',
-        'Quien trabaja en UIS y SENA elige en cuál está; al cambiar, toda la app se vuelve a pedir con esa institución.');
-    });
+    await pilotoContrasena(urlBase, carpeta, registro);
+    await pilotoSinPerfilYColegios(urlBase, carpeta, registro);
+    await pilotoAviso(urlBase, carpeta, registro);
   } finally {
     for (const [i, clave] of ['ENGRAMA_AUTH_CONFIG', 'ENGRAMA_AUTH_URL'].entries()) {
       if (previos[i] === undefined) delete process.env[clave]; else process.env[clave] = previos[i];

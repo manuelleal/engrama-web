@@ -1,0 +1,18 @@
+{
+  "descripcion": "Login piloto (G): un cliente que muestra el aviso (y deja entrar) sin responsable, contacto o versión en config.json.",
+  "archivos": {
+    "src/aviso.js": "aviso.js"
+  },
+  "comando": [
+    "node",
+    "--test",
+    "--test-reporter=tap",
+    "tests/unit/aviso.test.mjs",
+    "tests/e2e/login_piloto.test.mjs"
+  ],
+  "espera_codigo_no_cero": true,
+  "espera_fallan_tests": [
+    "leerAvisoDeConfig: sin responsable, contacto o versión (ausente, vacío, solo espacios o no texto) no hay aviso: ok es false",
+    "G: sin responsable, contacto o versión en config.json, la app muestra el error de configuración y no deja entrar"
+  ]
+}

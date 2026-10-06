@@ -15,7 +15,7 @@
 import { createServer } from 'node:http';
 import { crearEstado } from './mock/estado.mjs';
 import { ErrorHTTP } from './mock/errores.mjs';
-import { leerMe, cambiarContrasena } from './mock/rutas_auth.mjs';
+import { leerMe, cambiarContrasena, registrarConsentimiento } from './mock/rutas_auth.mjs';
 import { pedirToken, cerrarSesionGoTrue } from './mock/gotrue.mjs';
 import { sembrarLoginPiloto } from './mock/login_piloto.mjs';
 import { crearGrupo, asignarDocente, inscribirUnEstudiante, importarCsv } from './mock/rutas_admin.mjs';
@@ -30,16 +30,23 @@ import {
 
 const RUTAS = construirRutas();
 
+/** /auth (con el login piloto) y el GoTrue de mentira (mock/gotrue.mjs): el servidor de desarrollo lo ve como ENGRAMA_AUTH_URL=<mock>/gotrue. */
+function rutasDeAuth(r) {
+  return [
+    r('GET', '/auth/me', (estado, req) => leerMe(estado, req)),
+    r('POST', '/auth/session', (estado, req) => leerMe(estado, req)),
+    r('POST', '/auth/contrasena', (estado, req, p, body) => cambiarContrasena(estado, req, body)),
+    r('POST', '/auth/consentimiento', (estado, req, p, body) => registrarConsentimiento(estado, req, body)),
+    r('POST', '/gotrue/token', (estado, req, p, body, url) => pedirToken(estado, url, body)),
+    r('POST', '/gotrue/logout', () => cerrarSesionGoTrue()),
+  ];
+}
+
 function construirRutas() {
   const r = (metodo, patron, manejador, { textoCrudo = false } = {}) => ({ metodo, patron: compilar(patron), manejador, textoCrudo });
   return [
     r('GET', '/health', () => ({ status: 200, cuerpo: { status: 'ok' } })),
-    r('GET', '/auth/me', (estado, req) => leerMe(estado, req)),
-    r('POST', '/auth/session', (estado, req) => leerMe(estado, req)),
-    r('POST', '/auth/contrasena', (estado, req, p, body) => cambiarContrasena(estado, req, body)),
-    // GoTrue de mentira (mock/gotrue.mjs): el servidor de desarrollo lo ve como ENGRAMA_AUTH_URL=<mock>/gotrue.
-    r('POST', '/gotrue/token', (estado, req, p, body, url) => pedirToken(estado, url, body)),
-    r('POST', '/gotrue/logout', () => cerrarSesionGoTrue()),
+    ...rutasDeAuth(r),
 
     r('POST', '/admin/groups', (estado, req, p, body) => crearGrupo(estado, req, body)),
     r('POST', '/admin/groups/:gid/teachers', (estado, req, p, body) => asignarDocente(estado, req, p.gid, body)),

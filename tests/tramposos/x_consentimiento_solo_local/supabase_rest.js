@@ -1,4 +1,5 @@
-// TRAMPOSO x_token_origen_externo — versión rota a propósito: construirUrlAuth ignora raizAuth y manda todo a un host externo fijo.
+// TRAMPOSO (login piloto, G) — versión rota a propósito: el consentimiento se guarda SOLO en localStorage y nunca se llama al backend.
+// El servidor no se entera: no hay constancia de la aceptación. Debe quedar en rojo en el test del registro y en el E2E del aviso.
 // @ts-check
 // auth/supabase_rest.js · ProveedorAuth del hito 3 (§7.4), encargo A (W22 acotado): GoTrue por
 // REST con correo y contraseña, detrás de Caddy en el MISMO origen (`/auth/v1/*` — ver
@@ -73,7 +74,7 @@ function borrarRefreshToken() {
  */
 export function construirUrlAuth(ruta) {
   if (!ruta.startsWith('/auth/v1/')) throw new Error(`auth/supabase_rest: ruta inválida "${ruta}" (debe empezar con /auth/v1/)`);
-  return `https://auth-externo.invalid${ruta}`; // <- el error
+  return `${raizAuth}${ruta}`;
 }
 
 /** Traduce el status HTTP de GoTrue a un mensaje en español claro (encargo A: credenciales
@@ -205,7 +206,7 @@ export async function token() {
 /** Registra en el backend que aceptó el aviso de datos (auth/consentimiento.js). @param {string} version */
 export async function registrarConsentimiento(version) {
   if (!accessTokenEnMemoria) throw new Error(textos.auth.sinSesion);
-  await registrarConsentimientoConToken(await token(), version);
+  localStorage.setItem('engrama_consentimiento', version); // <- el error: solo en el navegador, el backend no se entera
 }
 
 /** Cambia la contraseña por el BACKEND (`POST /api/auth/contrasena`, que llama a GoTrue por dentro y

@@ -7,7 +7,7 @@ import assert from 'node:assert/strict';
 import { existsSync } from 'node:fs';
 import { abrirSesion } from '../../herramientas/cdp.mjs';
 import { conAppCompleta, estadoConEstudiantesSembrados } from './ayudante_servidor.mjs';
-import { sembrarLoginPiloto, CORREOS_PILOTO, CLAVE_DEMO, CLAVE_TEMPORAL } from '../../herramientas/mock/login_piloto.mjs';
+import { sembrarLoginPiloto, CORREOS_PILOTO, CLAVE_DEMO, CLAVE_TEMPORAL, CONFIG_PILOTO } from '../../herramientas/mock/login_piloto.mjs';
 
 const HAY_NAVEGADOR = [
   process.env.EDGE_PATH,
@@ -70,7 +70,7 @@ async function abrirEntrada(url) {
   return sesion;
 }
 
-const MODO_SUPABASE = { authConfig: { ENGRAMA_AUTH: 'supabase' } };
+const MODO_SUPABASE = { authConfig: CONFIG_PILOTO };
 
 test(
   'A: con contraseña temporal, la app lleva a "Crea tu contraseña" y no deja entrar a Inicio ni navegar a otra vista',
@@ -293,6 +293,157 @@ test(
         await entrarCon(sesion, CORREOS_PILOTO.sinmembresia, CLAVE_DEMO);
         assert.ok(await esperarVista(sesion, 'vista-sin-perfil'));
         assert.equal(await texto(sesion, 'sin-perfil-mensaje'), 'Tu cuenta todavía no está inscrita. Habla con tu profe.');
+      } finally { await sesion.cerrar(); }
+    }, { estado, ...MODO_SUPABASE });
+  },
+);
+
+// ---------------------------------------------------------------------------------------------
+// G: aviso de tratamiento de datos (Ley 1581). El responsable y el contacto vienen de config.json.
+// ---------------------------------------------------------------------------------------------
+const marcarYAceptar = (sesion) => sesion.evaluar(`(() => {
+  document.querySelector('[data-testid="aviso-casilla"]').checked = true;
+  document.querySelector('[data-testid="aviso-aceptar"]').click();
+})()`);
+const consentimientos = (estado) => estado.registro.filter((r) => r.ruta === '/auth/consentimiento');
+const pulsar = (sesion, testid) => sesion.evaluar(`document.querySelector('[data-testid="${testid}"]').click()`);
+
+test(
+  'G: en el primer ingreso, tras crear la contraseña y antes de Inicio, pide aceptar el aviso; sin casilla no entra, y lo guarda el backend',
+  { skip: OMITIR },
+  async () => {
+    const { estado, ids } = estadoPiloto();
+    await conAppCompleta(async (url) => {
+      const sesion = await abrirEntrada(url);
+      try {
+        await entrarCon(sesion, CORREOS_PILOTO.nuevo, CLAVE_TEMPORAL);
+        assert.ok(await esperarVista(sesion, 'vista-crear-contrasena'));
+        await crearClave(sesion, 'mi-clave-nueva-2026', 'mi-clave-nueva-2026');
+        assert.ok(await esperarVista(sesion, 'vista-aviso-consentimiento'), 'después de la contraseña, el aviso');
+
+        // El texto: lo que se guarda, para qué, quién lo ve, que no se vende, los derechos y a quién escribir.
+        const t = await texto(sesion, 'vista-aviso-consentimiento');
+        for (const frase of ['Tratamiento de tus datos', 'Tu nombre', 'Tu correo institucional', 'Tu código', 'Tus respuestas', 'Tu asistencia', 'Tus monedas',
+          'practiques inglés', 'seguimiento', 'Tu docente y la coordinación de tu institución', 'Nadie de otra institución', 'no se venden ni se comparten',
+          'conocer', 'actualizarlos', 'rectificarlos', 'se supriman', 'Responsable de Prueba \\(UIS, demostración\\)']) {
+          assert.match(t, new RegExp(frase), `el aviso dice: ${frase}`);
+        }
+        assert.equal(await texto(sesion, 'aviso-contacto'), 'Para ejercer tus derechos, escribe a datos@piloto.test.', 'el contacto sale de config.json');
+        assert.equal(await texto(sesion, 'aviso-version'), 'Versión del aviso: 2026-10-v1');
+
+        // Sin marcar la casilla no se entra ni sale nada hacia el servidor.
+        await pulsar(sesion, 'aviso-aceptar');
+        assert.equal(await texto(sesion, 'aviso-mensaje'), 'Marca la casilla para continuar.');
+        assert.equal(consentimientos(estado).length, 0);
+        await esperar(300);
+        assert.equal(await hay(sesion, 'vista-inicio'), false);
+
+        await marcarYAceptar(sesion);
+        assert.ok(await esperarVista(sesion, 'vista-inicio'), 'aceptado: entra a Inicio');
+        // Lo registró el BACKEND (versión y fecha), y el cliente volvió a pedir /auth/me para confirmarlo.
+        assert.equal(estado.profiles.get(ids.nuevo).consent_version, '2026-10-v1');
+        assert.ok(estado.profiles.get(ids.nuevo).consent_at);
+        const trazas = estado.registro.map((r) => `${r.metodo} ${r.ruta} ${r.estado}`);
+        const i = trazas.indexOf('POST /auth/consentimiento 200');
+        assert.ok(i >= 0 && trazas.slice(i + 1).includes('GET /auth/me 200'), trazas.join(' | '));
+        // Nunca por el navegador: ni localStorage ni sessionStorage guardan el consentimiento.
+        const guardado = await sesion.evaluar('JSON.stringify([Object.entries(localStorage), Object.entries(sessionStorage)])');
+        assert.doesNotMatch(guardado, /2026-10-v1|consent|acepto/i);
+
+        // Recargar: el servidor ya lo sabe, entra directo (sin volver a pedirlo).
+        await sesion.recargar();
+        assert.ok(await esperarVista(sesion, 'vista-inicio'));
+        assert.equal(await hay(sesion, 'vista-aviso-consentimiento'), false);
+        assert.equal(consentimientos(estado).length, 1);
+      } finally { await sesion.cerrar(); }
+    }, { estado, ...MODO_SUPABASE });
+  },
+);
+
+test(
+  'G: Inicio no se pinta nunca antes de aceptar, y "No acepto" cierra la sesión sin registrar nada',
+  { skip: OMITIR },
+  async () => {
+    const { estado, ids } = estadoPiloto();
+    await conAppCompleta(async (url) => {
+      const sesion = await abrirEntrada(url);
+      try {
+        await entrarCon(sesion, CORREOS_PILOTO.desactualizado, CLAVE_DEMO);
+        assert.ok(await esperarVista(sesion, 'vista-aviso-consentimiento'), 'aceptó una versión VIEJA: se vuelve a pedir');
+        await esperar(500);
+        assert.equal((await vistasVistas(sesion)).includes('vista-inicio'), false, 'Inicio no llegó a pintarse, ni un instante');
+        await pulsar(sesion, 'aviso-no-acepto');
+        assert.ok(await esperarVista(sesion, 'form-entrada'), 'cierra la sesión: vuelve la entrada');
+        assert.equal(consentimientos(estado).length, 0);
+        assert.equal(estado.profiles.get(ids.desactualizado).consent_version, '2026-01-v0');
+      } finally { await sesion.cerrar(); }
+    }, { estado, ...MODO_SUPABASE });
+  },
+);
+
+test(
+  'G: si AVISO_VERSION cambia, quien aceptó la anterior vuelve a ver el aviso y debe aceptar la nueva',
+  { skip: OMITIR },
+  async () => {
+    const { estado, ids } = estadoPiloto();
+    await conAppCompleta(async (url) => {
+      const sesion = await abrirEntrada(url);
+      try {
+        await entrarCon(sesion, CORREOS_PILOTO.estudiante, CLAVE_DEMO); // aceptó 2026-10-v1
+        assert.ok(await esperarVista(sesion, 'vista-aviso-consentimiento'));
+        assert.equal(await texto(sesion, 'aviso-version'), 'Versión del aviso: 2026-11-v2');
+        await marcarYAceptar(sesion);
+        assert.ok(await esperarVista(sesion, 'vista-inicio'));
+        assert.equal(estado.profiles.get(ids.estudiante).consent_version, '2026-11-v2');
+      } finally { await sesion.cerrar(); }
+    }, { estado, authConfig: { ...CONFIG_PILOTO, AVISO_VERSION: '2026-11-v2' } });
+  },
+);
+
+test(
+  'G: sin responsable, contacto o versión en config.json, la app muestra el error de configuración y no deja entrar',
+  { skip: OMITIR },
+  async () => {
+    for (const [clave, valor] of [['AVISO_RESPONSABLE', ''], ['AVISO_CONTACTO', undefined], ['AVISO_VERSION', '   ']]) {
+      const { estado } = estadoPiloto();
+      await conAppCompleta(async (url) => {
+        const sesion = await abrirSesion({ ancho: 375, alto: 812 });
+        try {
+          await sesion.navegar(url);
+          assert.ok(await hay(sesion, 'vista-aviso-config'), `${clave} vacío: error de configuración`);
+          assert.match(await texto(sesion, 'aviso-config-error'), new RegExp(clave));
+          assert.equal(await hay(sesion, 'form-entrada'), false, 'no hay formulario: no se puede entrar');
+          assert.equal(await hay(sesion, 'campo-correo'), false);
+        } finally { await sesion.cerrar(); }
+      }, { estado, authConfig: { ...CONFIG_PILOTO, [clave]: valor } });
+    }
+  },
+);
+
+test(
+  'G: el aviso se puede leer siempre: desde un enlace en la pantalla de entrada y desde el perfil',
+  { skip: OMITIR },
+  async () => {
+    const { estado } = estadoPiloto();
+    await conAppCompleta(async (url) => {
+      const sesion = await abrirEntrada(url);
+      try {
+        await pulsar(sesion, 'entrada-ver-aviso');
+        assert.ok(await esperarVista(sesion, 'vista-aviso-datos'));
+        assert.equal(await texto(sesion, 'aviso-contacto'), 'Para ejercer tus derechos, escribe a datos@piloto.test.');
+        assert.equal(await hay(sesion, 'aviso-casilla'), false, 'leer no pide aceptar');
+        await pulsar(sesion, 'aviso-volver');
+        assert.ok(await esperarVista(sesion, 'form-entrada'), 'volver deja en la entrada');
+
+        await entrarCon(sesion, CORREOS_PILOTO.estudiante, CLAVE_DEMO);
+        assert.ok(await esperarVista(sesion, 'vista-inicio'));
+        await sesion.evaluar("location.hash = '#/perfil'");
+        assert.ok(await esperarVista(sesion, 'perfil-ver-aviso'));
+        await pulsar(sesion, 'perfil-ver-aviso');
+        assert.ok(await esperarVista(sesion, 'vista-aviso-datos'));
+        assert.ok(await hay(sesion, 'aviso-texto'));
+        await pulsar(sesion, 'aviso-volver');
+        assert.ok(await esperarVista(sesion, 'vista-perfil'));
       } finally { await sesion.cerrar(); }
     }, { estado, ...MODO_SUPABASE });
   },

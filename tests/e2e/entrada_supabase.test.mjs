@@ -10,6 +10,7 @@ import assert from 'node:assert/strict';
 import { existsSync } from 'node:fs';
 import { revisarPagina } from '../../herramientas/cdp.mjs';
 import { conAppCompleta } from './ayudante_servidor.mjs';
+import { CONFIG_PILOTO } from '../../herramientas/mock/login_piloto.mjs';
 
 const HAY_NAVEGADOR = [
   process.env.EDGE_PATH,
@@ -32,6 +33,6 @@ test(
       assert.ok(r.testids.includes('boton-entrar'));
       assert.ok(!r.testids.some((t) => t.startsWith('entrar-')), 'ningún botón de actor demo (entrar-*) en modo supabase');
       assert.deepEqual(r.errores, []);
-    }, { authConfig: { ENGRAMA_AUTH: 'supabase' } });
+    }, { authConfig: CONFIG_PILOTO }); // modo supabase + el aviso de datos (sin él la app no deja entrar)
   },
 );

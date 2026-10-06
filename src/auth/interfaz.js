@@ -9,7 +9,8 @@
 // token(): Promise<string>          salir(): Promise<void>
 // ```
 //
-// Opcionales (login piloto): `recargarSesion(): Promise<Sesion>` (vuelve a pedir /auth/me con el token
+// Opcionales (login piloto): `registrarConsentimiento(version): Promise<void>` (POST /auth/consentimiento),
+// `recargarSesion(): Promise<Sesion>` (vuelve a pedir /auth/me con el token
 // y el colegio activos) y `cambiarContrasena(nueva): Promise<void>` (POST /auth/contrasena). Las tienen
 // supabase_rest.js y perfil_actual.js; mock.js no, y app.js lo trata como "no soportado".
 
@@ -23,6 +24,7 @@
  * @property {string[]} modulos
  * @property {number} constancia
  * @property {{id: string, nombre: string, rol: string}[]} [colegios] las instituciones del usuario (sus membresías); sin ellas (modo mock) no se manda X-Tenant-ID
+ * @property {string|null} [consentimiento] la versión del aviso de datos que el SERVIDOR dice que aceptó (`consent_version` de /auth/me), o null; sin la propiedad (modo mock) no se pide
  * @property {boolean} [debeCambiarContrasena] la contraseña es temporal (`must_change_password` de /auth/me): hay que crear la propia antes de seguir
  */
 

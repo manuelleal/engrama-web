@@ -15,6 +15,8 @@
 // `perfilAJson`, que es puro y no toca la red. El JWT vive SOLO en memoria (mismo criterio que
 // supabase_rest.js, §7.4): nada de streaks ni tokens en localStorage aquí.
 import { textos } from '../textos.js';
+import { cambiarContrasenaConToken } from './cambio_contrasena.js';
+import { registrarConsentimientoConToken } from './consentimiento.js';
 
 let jwtEnMemoria = null;
 
@@ -25,13 +27,20 @@ let jwtEnMemoria = null;
  */
 export function perfilAJson(profileOut, tenantIdActivo) {
   const membresias = profileOut.memberships || [];
-  const membresia = membresias.find((m) => m.tenant_id === tenantIdActivo) || membresias[0];
+  // `active_tenant_id` es el colegio que resolvió el backend para esta llamada (login piloto, B).
+  const activo = tenantIdActivo ?? profileOut.active_tenant_id;
+  const membresia = membresias.find((m) => m.tenant_id === activo) || membresias[0];
   if (!membresia) throw new Error('auth/perfil_actual: el perfil no tiene ninguna membresía');
   return {
     profileId: profileOut.id, nombre: membresia.full_name, rol: membresia.role,
     colegio: { id: membresia.tenant_id, nombre: membresia.tenant_name, tipo: 'school' },
     grupo: membresia.group_code ?? null, modulos: ['engrama'],
+    colegios: membresias.map((m) => ({ id: m.tenant_id, nombre: m.tenant_name, rol: m.role })),
     constancia: profileOut.current_streak, // el servidor manda; nunca se recalcula aquí
+    // Login piloto: la bandera viene del servidor (`profiles.force_password_reset`); el cliente nunca la deduce.
+    debeCambiarContrasena: profileOut.must_change_password === true,
+    // Lo que el servidor dice que aceptó del aviso de datos (null si nunca, o si el backend aún no lo informa: cierra).
+    consentimiento: profileOut.consent_version ?? null,
   };
 }
 
@@ -46,6 +55,25 @@ export async function entrar(metodo, datos) {
   const { pedirJson } = await import('../api/cliente.js');
   const profileOut = await pedirJson('/auth/me', { token: datos.jwt, tenantId: datos.tenantId });
   return perfilAJson(profileOut, datos.tenantId);
+}
+
+/** Vuelve a pedir /auth/me con el mismo JWT (después de cambiar la contraseña). */
+export async function recargarSesion() {
+  if (!jwtEnMemoria) throw new Error(textos.auth.sinSesion);
+  const { pedirJson } = await import('../api/cliente.js');
+  return perfilAJson(await pedirJson('/auth/me', { token: jwtEnMemoria }));
+}
+
+/** @param {string} version */
+export async function registrarConsentimiento(version) {
+  if (!jwtEnMemoria) throw new Error(textos.auth.sinSesion);
+  await registrarConsentimientoConToken(jwtEnMemoria, version);
+}
+
+/** @param {string} nueva */
+export async function cambiarContrasena(nueva) {
+  if (!jwtEnMemoria) throw new Error(textos.auth.sinSesion);
+  await cambiarContrasenaConToken(jwtEnMemoria, nueva);
 }
 
 export async function token() {

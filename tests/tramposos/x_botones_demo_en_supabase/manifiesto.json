@@ -1,7 +1,16 @@
 {
   "descripcion": "Encargo A (W22): vistas/entrada.js ignora el modo y muestra los botones de actor demo también en ENGRAMA_AUTH=supabase.",
-  "archivos": { "src/vistas/entrada.js": "entrada.js" },
-  "comando": ["node", "--test", "--test-reporter=tap", "tests/e2e/entrada_supabase.test.mjs"],
+  "archivos": {
+    "src/vistas/entrada.js": "entrada.js"
+  },
+  "comando": [
+    "node",
+    "--test",
+    "--test-reporter=tap",
+    "tests/e2e/entrada_supabase.test.mjs"
+  ],
   "espera_codigo_no_cero": true,
-  "espera_fallan_tests": ["entrada (modo supabase): pide correo y contraseña, sin ningún botón de actor demo"]
+  "espera_fallan_tests": [
+    "entrada (modo supabase): pide correo y contraseña, sin ningún botón de actor demo"
+  ]
 }
