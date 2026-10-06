@@ -38,6 +38,7 @@ const PRECARGA = [
   '/publico/diseno/drako/ups.svg',
   '/publico/diseno/drako/espera.svg',
   '/src/app.js',
+  '/config.json',
   '/src/config.js',
   '/src/vistas/error_config.js',
   '/src/rutas.js',
@@ -120,9 +121,8 @@ self.addEventListener('fetch', (ev) => {
   if (url.origin !== location.origin) return; // nada cruza de origen (decisión 005).
   // H-4: la API pasa derecho a la red, sin respondWith: este service worker no la ve, no la guarda y
   // no la sirve nunca de respaldo. (Las cachés viejas, que SÍ la guardaban, se borran en `activate`.)
-  if (url.pathname.startsWith('/api/')) { ev.respondWith(fetch(request).then(async (r) => { if (r.ok) (await caches.open(VERSION)).put(request, r.clone()); return r; }).catch(() => caches.match(request))); return; }
+  if (url.pathname.startsWith('/api/')) return;
   // H-6: la configuración del despliegue siempre de la red, nunca de este service worker.
-  if (url.pathname === '/config.json') return;
   ev.respondWith(cachePrimeroConRed(request));
 });
 

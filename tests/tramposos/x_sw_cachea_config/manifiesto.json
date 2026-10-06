@@ -1,0 +1,16 @@
+{
+  "descripcion": "H-6: el service worker precarga y sirve /config.json desde caché (configuración vieja)",
+  "archivos": {
+    "sw.js": "sw.js"
+  },
+  "comando": [
+    "node",
+    "--test",
+    "--test-reporter=tap",
+    "tests/e2e/config_red.test.mjs"
+  ],
+  "espera_codigo_no_cero": true,
+  "espera_fallan_tests": [
+    "config: el service worker nunca guarda /config.json (ni la precarga ni la sirve de respaldo)"
+  ]
+}

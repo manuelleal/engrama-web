@@ -66,13 +66,13 @@ test(
       const r = await revisarPagina({
         url, ancho: 375, alto: 812, espera_ms: 6000, pre: YA_ENTRO,
         eval: 'navigator.serviceWorker.ready.then(() => true)',
-        // Sin red, Inicio no puede pedir datos: hoy (antes de W16) eso es un error mostrado en
-        // pantalla, no una caché de respaldo — E10 (W16) es quien prueba el último estado
-        // conocido. Lo que este test verifica es que el shell IGUAL abre (nunca en blanco) y
-        // que el único aviso en consola es justo ese, esperado y ya mostrado al estudiante.
+        // Sin red, la app NO puede pedir su configuración (H-6: /config.json va siempre a la red, sin
+        // caché ni valor por defecto) ni sus datos (H-4: /api no se guarda). Lo que este test verifica
+        // es que el shell IGUAL abre desde la precarga (nunca en blanco) y dice "Sin conexión" en un
+        // mensaje claro; que el único aviso en consola es justo ese, esperado y ya mostrado.
         tras: {
           sinRed: true, espera_ms: 5000,
-          eval: '({h1: document.querySelector("h1")?.textContent ?? null, error: document.querySelector(\'[data-testid="inicio-error"]\')?.textContent ?? null})',
+          eval: '({h1: document.querySelector("h1")?.textContent ?? null, error: document.querySelector(\'[data-testid="error-config-mensaje"]\')?.textContent ?? null})',
         },
       });
       assert.equal(r.eval, true, 'el service worker debe quedar activo en la primera visita');

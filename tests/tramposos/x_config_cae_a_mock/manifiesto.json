@@ -1,0 +1,17 @@
+{
+  "descripcion": "H-6: si config.json falta o no define el modo, la app cae en silencio al mock (actores de prueba)",
+  "archivos": {
+    "src/config.js": "config.js"
+  },
+  "comando": [
+    "node",
+    "--test",
+    "--test-reporter=tap",
+    "tests/e2e/config_red.test.mjs"
+  ],
+  "espera_codigo_no_cero": true,
+  "espera_fallan_tests": [
+    "config: sin un ENGRAMA_AUTH válido no hay modo; nunca \"mock\" por omisión",
+    "config: un despliegue cuyo config.json no define el modo NO cae al mock — muestra un error claro"
+  ]
+}

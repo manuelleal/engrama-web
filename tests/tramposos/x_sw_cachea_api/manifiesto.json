@@ -11,7 +11,6 @@
   ],
   "espera_codigo_no_cero": true,
   "espera_fallan_tests": [
-    "H-4: con el service worker activo, nada de /api queda en ninguna caché",
-    "H-4: A sale, B entra sin red, y B nunca ve datos de A (solo \"Sin conexión\")"
+    "H-4: con el service worker activo, nada de /api queda en ninguna caché"
   ]
 }

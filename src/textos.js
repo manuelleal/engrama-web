@@ -5,6 +5,13 @@ export const textos = {
   app: {
     titulo: 'ENGRAMA',
   },
+  // H-6: sin configuración válida del despliegue la app no abre (y NO cae al modo de prueba).
+  errorConfig: {
+    drako: 'Drako no puede abrir ENGRAMA ahora',
+    sinRed: 'Sin conexión: ENGRAMA necesita internet para abrir. Revisa tu conexión y vuelve a intentar.',
+    general: 'No se pudo abrir ENGRAMA: falta la configuración del servicio. Avisa a tu profe o a quien administra ENGRAMA.',
+    reintentar: 'Reintentar',
+  },
   inicio: {
     // Placeholder del esqueleto (W3): W7 lo reemplaza por la pantalla real (saldo, constancia,
     // escudo y banner de retos).

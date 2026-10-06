@@ -10,7 +10,7 @@
 //
 // Súbelo un número cada vez que cambie la lista de precarga o la estrategia; la `activate`
 // borra cualquier caché con otro nombre.
-const VERSION = 'engrama-shell-v16';
+const VERSION = 'engrama-shell-v17';
 
 // Cada encargo agrega los suyos en su propio commit (W7: Inicio + api/cliente,core,retos + los
 // SVG de Drako que usa el estudiante; W10: profe/grupos,grupo,sesion_asistencia + api/profe). El
@@ -22,10 +22,9 @@ const PRECARGA = [
   '/',
   '/index.html',
   '/manifest.webmanifest',
-  // W22: app.js lo pide SIEMPRE al arrancar (ENGRAMA_AUTH=mock|perfil_actual|supabase, §7.4) —
-  // tiene que abrir sin red desde el primer reintento offline, no solo después de que una visita
-  // en línea lo haya cacheado de oportunidad (cachePrimeroConRed no tiene reintento sin caché).
-  '/config.json',
+  // H-6: '/config.json' YA NO se precarga ni se cachea: va siempre a la red (ver `fetch` más abajo). Una
+  // configuración vieja servida desde caché podía dejar a la app en un modo equivocado; sin red, la app
+  // dice "Sin conexión" en vez de arrancar con una configuración que ya no es la del despliegue.
   '/estilos/base.css',
   '/estilos/tipografia.css',
   '/estilos/componentes.css',
@@ -39,6 +38,8 @@ const PRECARGA = [
   '/publico/diseno/drako/ups.svg',
   '/publico/diseno/drako/espera.svg',
   '/src/app.js',
+  '/src/config.js',
+  '/src/vistas/error_config.js',
   '/src/rutas.js',
   '/src/textos.js',
   '/src/ui/dom.js',
@@ -120,6 +121,8 @@ self.addEventListener('fetch', (ev) => {
   // H-4: la API pasa derecho a la red, sin respondWith: este service worker no la ve, no la guarda y
   // no la sirve nunca de respaldo. (Las cachés viejas, que SÍ la guardaban, se borran en `activate`.)
   if (url.pathname.startsWith('/api/')) return;
+  // H-6: la configuración del despliegue siempre de la red, nunca de este service worker.
+  if (url.pathname === '/config.json') return;
   ev.respondWith(cachePrimeroConRed(request));
 });
 

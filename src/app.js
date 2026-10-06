@@ -12,6 +12,8 @@ import { renderInicio } from './vistas/estudiante/inicio.js';
 import { renderPerfil } from './vistas/perfil.js';
 import { renderCrearContrasena } from './vistas/crear_contrasena.js';
 import { renderSinPerfil } from './vistas/sin_perfil.js';
+import { renderErrorConfig } from './vistas/error_config.js';
+import { cargarConfig, modoDeAuth } from './config.js';
 import { renderConsentimiento, renderLeerAviso, renderErrorAviso } from './vistas/aviso_datos.js';
 import { configurarAviso, leerAviso, debePedirConsentimiento } from './aviso.js';
 import { textos } from './textos.js';
@@ -45,22 +47,11 @@ function montarBanner() {
   nodo.id = 'banner-red';
 }
 
-const MODOS_AUTH_VALIDOS = ['mock', 'perfil_actual', 'supabase'];
-
 // `config.json` lo sirve el servidor (nunca un secreto — ENGRAMA_AUTH=mock|perfil_actual|supabase,
-// §7.4). Por defecto: mock. `servidor_dev.mjs` sirve el `config.json` del propio repo (mock); el
-// despliegue lo reemplaza a nivel de Caddy sin tocar este repo (`despliegue/Caddyfile`,
-// `handle /config.json`) — así el mismo código sirve para desarrollo y para el piloto.
-async function cargarConfig() {
-  try {
-    const resp = await fetch('/config.json');
-    if (resp.ok) return await resp.json();
-    console.error('app: config.json respondió', resp.status, '— uso mock'); // nunca mudo
-  } catch (e) {
-    console.error('app: no pude leer config.json, uso mock', e);
-  }
-  return {};
-}
+// §7.4) y se pide SIEMPRE a la red (src/config.js). SIN valor por defecto (H-6): si falta, falla o no
+// define un modo válido, la app muestra un error claro y NO cae al modo de prueba. `servidor_dev.mjs`
+// sirve el `config.json` del propio repo (que pide mock EXPLÍCITAMENTE); el despliegue lo reemplaza a
+// nivel de Caddy sin tocar este repo (`despliegue/Caddyfile`, `handle /config.json`).
 
 function cargarAuth(modo) {
   if (modo === 'supabase') return import('./auth/supabase_rest.js');
@@ -90,8 +81,15 @@ async function iniciarApp() {
   vistaRaiz = document.getElementById('vista');
   if (!vistaRaiz) return;
   configurarAlBloqueo(bloquear);
-  const config = await cargarConfig();
-  const modo = MODOS_AUTH_VALIDOS.includes(config.ENGRAMA_AUTH) ? config.ENGRAMA_AUTH : 'mock';
+  let config;
+  try {
+    config = await cargarConfig();
+  } catch (e) {
+    console.error('app: no hay configuración válida; no arranco', e); // nunca mudo
+    renderErrorConfig(vistaRaiz, /** @type {any} */ (e).causa || 'invalida');
+    return;
+  }
+  const modo = /** @type {'mock'|'perfil_actual'|'supabase'} */ (modoDeAuth(config));
   authActivo = await cargarAuth(modo);
   configurarAviso(config);
   // Con cuentas reales no hay entrada sin aviso: sin responsable, contacto o versión en config.json, la app no continúa.
