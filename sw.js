@@ -55,6 +55,7 @@ const PRECARGA = [
   '/src/vistas/crear_contrasena.js',
   '/src/vistas/formulario_contrasena.js',
   '/src/auth/clave.js',
+  '/src/ui/selector_colegio.js', // login piloto (B): barra_rol.js e inicio.js lo importan
   '/src/vistas/estudiante/inicio.js',
   '/src/vistas/estudiante/asistencia.js',
   '/src/vistas/estudiante/retos.js',
@@ -126,6 +127,14 @@ async function redPrimeroConRespaldo(request, url) {
 // auth/ (hito 3) llama a esto al cerrar sesión, vía postMessage al controller. Por ahora nadie lo
 // dispara todavía (no hay auth real); queda listo aquí porque es responsabilidad del propio sw.js.
 self.addEventListener('message', (ev) => {
+  // 'limpiar-api' (login piloto, B): solo las respuestas de /api guardadas como respaldo sin red; el shell
+  // precargado se queda. Lo pide app.js al cambiar de institución y al cerrar sesión: ni lo de otro colegio
+  // ni lo del estudiante anterior se sirve de respaldo.
+  if (ev.data === 'limpiar-api') {
+    ev.waitUntil(caches.open(VERSION).then(async (c) => {
+      for (const req of await c.keys()) if (new URL(req.url).pathname.startsWith('/api/')) await c.delete(req);
+    }));
+  }
   if (ev.data === 'limpiar-todo') {
     ev.waitUntil(caches.keys().then((n) => Promise.all(n.map((k) => caches.delete(k)))));
   }

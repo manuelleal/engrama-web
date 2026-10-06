@@ -1,3 +1,5 @@
+// TRAMPOSO (login piloto, B) — versión rota a propósito: cambiarColegioActivo acepta cualquier id, aunque no sea una
+// de las instituciones del usuario. Debe quedar en rojo en el test del colegio ajeno.
 // @ts-check
 // api/cliente.js · El ÚNICO módulo (junto con auth/supabase_rest.js, hito 3) que llama `fetch`
 // (§7.2). Todo pasa por `/api/...` en el mismo origen — nunca la URL del backend a secas, nunca
@@ -61,10 +63,7 @@ export function leerColegioActivo() {
 
 /** Cambia de institución, solo a una de las propias. @param {string} id */
 export function cambiarColegioActivo(id) {
-  if (!colegiosPermitidos || !colegiosPermitidos.has(id)) {
-    throw new Error(`api/cliente: "${id}" no es una de tus instituciones`);
-  }
-  colegioActivo = id;
+  colegioActivo = id; // <- el error: no se mira si es suyo
 }
 
 // Quién se entera de un bloqueo (app.js lo conecta): una pantalla obligatoria que reemplaza la vista.

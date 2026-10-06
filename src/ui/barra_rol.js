@@ -6,8 +6,9 @@
 // botón queda deshabilitado mientras la salida está en curso.
 import { h } from './dom.js';
 import { textos } from '../textos.js';
+import { crearSelectorColegio } from './selector_colegio.js';
 
-/** @param {{salir?: () => Promise<void>}} ctx */
+/** @param {{salir?: () => Promise<void>, colegios?: {id: string, nombre: string}[], colegioActivo?: string, cambiarColegio?: (id: string) => Promise<void>}} ctx */
 export function crearBarraRol(ctx) {
   const boton = h('button', { class: 'boton-secundario boton-chico', 'data-testid': 'boton-cerrar-sesion' }, textos.nav.cerrarSesion);
   boton.addEventListener('click', () => {
@@ -20,5 +21,6 @@ export function crearBarraRol(ctx) {
       boton.textContent = textos.nav.cerrarSesion;
     });
   });
-  return h('div', { class: 'barra-rol' }, boton);
+  // Un docente de dos instituciones elige aquí en cuál está (login piloto, B); con una sola, no se pinta.
+  return h('div', { class: 'barra-rol' }, crearSelectorColegio(ctx), boton);
 }

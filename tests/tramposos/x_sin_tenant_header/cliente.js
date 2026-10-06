@@ -1,3 +1,5 @@
+// TRAMPOSO (login piloto, B) — versión rota a propósito: el colegio activo de /auth/me ya no se manda; solo va el que una vista
+// pase a mano (ninguna lo hace). El docente de dos instituciones cae en la más antigua en cada llamada. Debe quedar en rojo.
 // @ts-check
 // api/cliente.js · El ÚNICO módulo (junto con auth/supabase_rest.js, hito 3) que llama `fetch`
 // (§7.2). Todo pasa por `/api/...` en el mismo origen — nunca la URL del backend a secas, nunca
@@ -106,7 +108,7 @@ export async function pedirJson(ruta, opciones = {}) {
   const { metodo = 'GET', token, tenantId, cuerpo, textoCrudo = false } = opciones;
   const cabeceras = {};
   if (token) cabeceras['Authorization'] = `Bearer ${token}`;
-  const colegio = tenantId || colegioActivo;
+  const colegio = tenantId; // <- el error: el colegio activo no se manda
   if (colegio && colegiosPermitidos && !colegiosPermitidos.has(colegio)) {
     throw new Error(`api/cliente: no se manda X-Tenant-ID "${colegio}": no es una de tus instituciones`); // nunca sale la petición
   }

@@ -1,0 +1,18 @@
+{
+  "descripcion": "Login piloto (B): el cliente no manda el X-Tenant-ID del colegio activo.",
+  "archivos": {
+    "src/api/cliente.js": "cliente.js"
+  },
+  "comando": [
+    "node",
+    "--test",
+    "--test-reporter=tap",
+    "tests/unit/api_cliente.test.mjs",
+    "tests/e2e/login_piloto.test.mjs"
+  ],
+  "espera_codigo_no_cero": true,
+  "espera_fallan_tests": [
+    "B: con el colegio activo fijado, toda llamada manda su X-Tenant-ID sin que la vista lo pase; al cambiar, el nuevo",
+    "B: toda llamada manda el X-Tenant-ID de active_tenant_id; con dos instituciones hay selector y al cambiar recarga con la nueva"
+  ]
+}

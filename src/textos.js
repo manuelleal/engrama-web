@@ -75,6 +75,11 @@ export const textos = {
     cambioFallo: 'No pudimos cambiar tu contraseña ahora. Intenta de nuevo en unos minutos.',
     cambioNoDisponible: 'El cambio de contraseña no está disponible por ahora. Avísale a tu profe.',
   },
+  // El selector de institución (ui/selector_colegio.js): solo aparece con más de una membresía.
+  colegio: {
+    etiqueta: 'Institución',
+    errorCambiar: 'No se pudo cambiar de institución. Intenta de nuevo.',
+  },
   // Las reglas de la contraseña nueva (auth/clave.js): el mínimo es el del backend (10), el máximo
   // el de bcrypt (72 bytes).
   clave: {

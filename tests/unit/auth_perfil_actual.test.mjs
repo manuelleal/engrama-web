@@ -65,3 +65,20 @@ test('textos.inicio.saludo: un nombre de puros espacios también dice solo "Hola
   assert.equal(textos.inicio.saludo('   '), 'Hola');
   assert.equal(textos.inicio.saludo(null), 'Hola');
 });
+
+// B (login piloto): `active_tenant_id` es el colegio que resolvió el backend; `colegios` son SUS membresías.
+test('perfil_actual: active_tenant_id manda sobre la primera membresía, y colegios lista las propias', () => {
+  const sesion = perfilAJson({ ...PROFILE_OUT, active_tenant_id: 'tenant-B' });
+  assert.equal(sesion.colegio.id, 'tenant-B');
+  assert.equal(sesion.rol, 'teacher');
+  assert.equal(sesion.nombre, 'Nombre en Colegio B');
+  assert.deepEqual(sesion.colegios, [
+    { id: 'tenant-A', nombre: 'Colegio A', rol: 'student' },
+    { id: 'tenant-B', nombre: 'Colegio B', rol: 'teacher' },
+  ]);
+  assert.deepEqual(validarSesion(sesion), []);
+});
+
+test('perfil_actual: un tenantIdActivo explícito gana sobre active_tenant_id (el que se pidió en la entrada)', () => {
+  assert.equal(perfilAJson({ ...PROFILE_OUT, active_tenant_id: 'tenant-B' }, 'tenant-A').colegio.id, 'tenant-A');
+});

@@ -168,3 +168,69 @@ test(
     }, { estado, ...MODO_SUPABASE });
   },
 );
+
+// ---------------------------------------------------------------------------------------------
+// B: la institución activa. Paula (profe2) está en UIS (la más antigua) y en SENA.
+// ---------------------------------------------------------------------------------------------
+
+/** Las llamadas de datos (no /auth/me ni el GoTrue falso) con el colegio que mandaron. */
+const llamadasDeDatos = (estado, desde = 0) => estado.registro.slice(desde).filter((r) => !r.ruta.startsWith('/auth/') && !r.ruta.startsWith('/gotrue/'));
+
+test(
+  'B: toda llamada manda el X-Tenant-ID de active_tenant_id; con dos instituciones hay selector y al cambiar recarga con la nueva',
+  { skip: OMITIR },
+  async () => {
+    const { estado, ids } = estadoPiloto();
+    await conAppCompleta(async (url) => {
+      const sesion = await abrirEntrada(url);
+      try {
+        await entrarCon(sesion, CORREOS_PILOTO.profe2, CLAVE_DEMO);
+        assert.ok(await esperarVista(sesion, 'vista-profe-grupos'));
+
+        // La primera /auth/me va sin encabezado (aún no sabe cuál es); lo que sigue, con la institución activa.
+        const primera = estado.registro.find((r) => r.ruta === '/auth/me');
+        assert.equal(primera.tenant, null);
+        const antes = llamadasDeDatos(estado);
+        assert.ok(antes.length > 0);
+        assert.ok(antes.every((r) => r.tenant === ids.uis), 'toda llamada de datos lleva el colegio más antiguo (UIS), que dijo /auth/me');
+
+        // Con dos membresías hay selector, con las dos instituciones y la activa marcada.
+        assert.ok(await hay(sesion, 'selector-colegio'));
+        const opciones = await sesion.evaluar(`JSON.stringify([...document.querySelectorAll('[data-testid="selector-colegio"] option')].map((o) => [o.value, o.textContent, o.selected]))`);
+        assert.deepEqual(JSON.parse(opciones), [[ids.uis, 'UIS (demo)', true], [ids.sena, 'SENA (demo)', false]]);
+
+        // Cambiar a SENA: se vuelve a pedir /auth/me con X-Tenant-ID de SENA y los datos con la nueva institución.
+        const marca = estado.registro.length;
+        await sesion.evaluar(`(() => { const s = document.querySelector('[data-testid="selector-colegio"]'); s.value = ${JSON.stringify(ids.sena)}; s.dispatchEvent(new Event('change', { bubbles: true })); })()`);
+        const fin = Date.now() + 7000;
+        while (Date.now() < fin && !llamadasDeDatos(estado, marca).some((r) => r.ruta === '/teachers/groups')) await esperar(100);
+        const despues = estado.registro.slice(marca);
+        const me = despues.find((r) => r.ruta === '/auth/me');
+        assert.equal(me.tenant, ids.sena, '/auth/me se vuelve a pedir con la institución elegida');
+        const datos = llamadasDeDatos(estado, marca);
+        assert.ok(datos.length > 0 && datos.every((r) => r.tenant === ids.sena), 'los datos se recargan con SENA, ninguno con UIS');
+        assert.ok(await esperarVista(sesion, 'vista-profe-grupos'));
+        assert.equal(await sesion.evaluar('document.querySelector(\'[data-testid="selector-colegio"]\').value'), ids.sena, 'el selector queda en SENA');
+      } finally { await sesion.cerrar(); }
+    }, { estado, ...MODO_SUPABASE });
+  },
+);
+
+test(
+  'B: con una sola institución no hay selector, y igual toda llamada manda su X-Tenant-ID',
+  { skip: OMITIR },
+  async () => {
+    const { estado, ids } = estadoPiloto();
+    await conAppCompleta(async (url) => {
+      const sesion = await abrirEntrada(url);
+      try {
+        await entrarCon(sesion, CORREOS_PILOTO.estudiante, CLAVE_DEMO);
+        assert.ok(await esperarVista(sesion, 'vista-inicio'));
+        await esperar(500);
+        assert.equal(await hay(sesion, 'selector-colegio'), false, 'una sola institución: nada que elegir');
+        const datos = llamadasDeDatos(estado);
+        assert.ok(datos.length > 0 && datos.every((r) => r.tenant === ids.uis));
+      } finally { await sesion.cerrar(); }
+    }, { estado, ...MODO_SUPABASE });
+  },
+);

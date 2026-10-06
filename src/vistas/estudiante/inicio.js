@@ -9,6 +9,7 @@ import { h, montar } from '../../ui/dom.js';
 import { crearEscudo } from '../../ui/escudo.js';
 import { crearDrako } from '../../ui/drako.js';
 import { crearNavInferior } from '../../ui/nav_inferior.js';
+import { crearSelectorColegio } from '../../ui/selector_colegio.js';
 import { reproducir } from '../../ui/sonido.js';
 import { tituloLegible } from '../../ui/titulo.js';
 import { textos } from '../../textos.js';
@@ -122,6 +123,7 @@ function pintarContenido(raiz, ctx, datos) {
     h('div', { class: 'encabezado-reto' },
       crearDrako('presenta', textos.inicio.drakoBienvenida),
       h('h1', {}, textos.inicio.saludo(ctx.sesion.nombre))),
+    crearSelectorColegio(ctx), // login piloto (B): solo si el estudiante está en más de una institución
     crearEscudo({ nivelConfirmado: null }), // L10 no existe todavía (§4.1): siempre "Por confirmar"
     tarjetaRetoDeHoy(datos.pendiente),
     tarjetaProgresoSemana(datos.semana),

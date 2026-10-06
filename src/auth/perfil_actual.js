@@ -24,12 +24,15 @@ let jwtEnMemoria = null;
  */
 export function perfilAJson(profileOut, tenantIdActivo) {
   const membresias = profileOut.memberships || [];
-  const membresia = membresias.find((m) => m.tenant_id === tenantIdActivo) || membresias[0];
+  // `active_tenant_id` es el colegio que resolvió el backend para esta llamada (login piloto, B).
+  const activo = tenantIdActivo ?? profileOut.active_tenant_id;
+  const membresia = membresias.find((m) => m.tenant_id === activo) || membresias[0];
   if (!membresia) throw new Error('auth/perfil_actual: el perfil no tiene ninguna membresía');
   return {
     profileId: profileOut.id, nombre: membresia.full_name ?? profileOut.full_name ?? '', rol: membresia.role,
     colegio: { id: membresia.tenant_id, nombre: membresia.tenant_name, tipo: 'school' },
     grupo: membresia.group_code ?? null, modulos: ['engrama'],
+    colegios: membresias.map((m) => ({ id: m.tenant_id, nombre: m.tenant_name, rol: m.role })),
     constancia: profileOut.current_streak, // el servidor manda; nunca se recalcula aquí
     // Login piloto: la bandera viene del servidor (`profiles.force_password_reset`); el cliente nunca la deduce.
     debeCambiarContrasena: profileOut.must_change_password === true,

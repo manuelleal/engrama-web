@@ -1,0 +1,16 @@
+{
+  "descripcion": "Login piloto (B): el selector podría poner como activo un colegio que no es del usuario.",
+  "archivos": {
+    "src/api/cliente.js": "cliente.js"
+  },
+  "comando": [
+    "node",
+    "--test",
+    "--test-reporter=tap",
+    "tests/unit/api_cliente.test.mjs"
+  ],
+  "espera_codigo_no_cero": true,
+  "espera_fallan_tests": [
+    "B: un X-Tenant-ID que no está en las membresías no sale ni como parámetro ni por cambiarColegioActivo"
+  ]
+}

@@ -38,6 +38,37 @@ export class ErrorApi extends Error {
   }
 }
 
+// La institución activa (login piloto, B): `active_tenant_id` de /auth/me. Se manda como `X-Tenant-ID` en
+// TODA llamada (un docente de dos instituciones sin el encabezado cae en la más antigua, y un reto sin
+// grupo podría crearse en la equivocada). `colegiosPermitidos` son SUS membresías: el cliente nunca
+// manda un colegio que no sea suyo — el backend lo rechazaría con 403, pero ni siquiera sale la petición.
+let colegioActivo = null;
+/** @type {Set<string>|null} null = todavía no se conocen (la primera llamada a /auth/me) o no aplica (modo mock) */
+let colegiosPermitidos = null;
+
+/**
+ * @param {{activo: string|null, permitidos: string[]|null}} colegios `activo` debe estar entre `permitidos`
+ */
+export function fijarColegios({ activo, permitidos }) {
+  if (activo && permitidos && !permitidos.includes(activo)) {
+    throw new Error(`api/cliente: el colegio activo "${activo}" no está entre las membresías`);
+  }
+  colegiosPermitidos = permitidos ? new Set(permitidos) : null;
+  colegioActivo = activo ?? null;
+}
+
+export function leerColegioActivo() {
+  return colegioActivo;
+}
+
+/** Cambia de institución, solo a una de las propias. @param {string} id */
+export function cambiarColegioActivo(id) {
+  if (!colegiosPermitidos || !colegiosPermitidos.has(id)) {
+    throw new Error(`api/cliente: "${id}" no es una de tus instituciones`);
+  }
+  colegioActivo = id;
+}
+
 // Quién se entera de un bloqueo (app.js lo conecta): una pantalla obligatoria que reemplaza la vista.
 // Se avisa ANTES de lanzar el error, una vez por petición fallida; quien llama lo recibe igual.
 let alBloqueo = null;
@@ -70,13 +101,18 @@ function mensajeDeError(status, detalle) {
 /**
  * @param {string} ruta empieza con "/", p. ej. "/core/coins/balance"
  * @param {{metodo?: string, token?: string, tenantId?: string, cuerpo?: unknown, textoCrudo?: boolean}} [opciones]
+ *   `tenantId` manda otro colegio solo si es de sus membresías; sin él va el activo (`fijarColegios`).
  */
 export async function pedirJson(ruta, opciones = {}) {
   if (!ruta.startsWith('/')) throw new Error(`api/cliente: la ruta debe empezar con "/", llegó "${ruta}"`);
   const { metodo = 'GET', token, tenantId, cuerpo, textoCrudo = false } = opciones;
   const cabeceras = {};
   if (token) cabeceras['Authorization'] = `Bearer ${token}`;
-  if (tenantId) cabeceras['X-Tenant-ID'] = tenantId;
+  const colegio = tenantId || colegioActivo;
+  if (colegio && colegiosPermitidos && !colegiosPermitidos.has(colegio)) {
+    throw new Error(`api/cliente: no se manda X-Tenant-ID "${colegio}": no es una de tus instituciones`); // nunca sale la petición
+  }
+  if (colegio) cabeceras['X-Tenant-ID'] = colegio;
   if (cuerpo !== undefined) cabeceras['Content-Type'] = textoCrudo ? 'text/csv; charset=utf-8' : 'application/json';
 
   let resp;

@@ -4,7 +4,8 @@
 import test from 'node:test';
 import assert from 'node:assert/strict';
 import { createServer } from 'node:http';
-import { pedirJson, ErrorApi, accionUnica, configurarRaizApi, configurarAlBloqueo } from '../../src/api/cliente.js';
+import { pedirJson, ErrorApi, accionUnica, configurarRaizApi, configurarAlBloqueo,
+  fijarColegios, cambiarColegioActivo, leerColegioActivo } from '../../src/api/cliente.js';
 
 async function conServidorFalso(manejador, fn) {
   const servidor = createServer(manejador);
@@ -125,4 +126,51 @@ test('A: si el manejador de bloqueo revienta, la petición igual lanza su ErrorA
       await assert.rejects(() => pedirJson('/challenges/', { token: 't' }), (e) => e instanceof ErrorApi && e.codigo === 'must_change_password');
     });
   } finally { console.error = consola; configurarAlBloqueo(null); }
+});
+
+// B (login piloto): `active_tenant_id` de /auth/me se manda como X-Tenant-ID en TODA llamada, y nunca un
+// colegio que no esté entre las membresías del usuario (el backend daría 403, pero la petición ni sale).
+const COLEGIO_A = '11111111-1111-4111-8111-111111111111';
+const COLEGIO_B = '22222222-2222-4222-8222-222222222222';
+const COLEGIO_AJENO = '33333333-3333-4333-8333-333333333333';
+
+async function conColegios(fn) {
+  const vistos = [];
+  fijarColegios({ activo: COLEGIO_A, permitidos: [COLEGIO_A, COLEGIO_B] });
+  try {
+    await conServidorFalso((req, res) => { vistos.push(req.headers['x-tenant-id'] ?? null); responderJson(res, 200, {}); }, () => fn(vistos));
+  } finally { fijarColegios({ activo: null, permitidos: null }); }
+}
+
+test('B: con el colegio activo fijado, toda llamada manda su X-Tenant-ID sin que la vista lo pase; al cambiar, el nuevo', async () => {
+  await conColegios(async (vistos) => {
+    await pedirJson('/challenges/', { token: 't' });
+    await pedirJson('/core/coins/balance', { token: 't', metodo: 'GET' });
+    cambiarColegioActivo(COLEGIO_B);
+    assert.equal(leerColegioActivo(), COLEGIO_B);
+    await pedirJson('/teachers/groups', { token: 't' });
+    assert.deepEqual(vistos, [COLEGIO_A, COLEGIO_A, COLEGIO_B]);
+  });
+});
+
+test('B: un X-Tenant-ID que no está en las membresías no sale ni como parámetro ni por cambiarColegioActivo', async () => {
+  await conColegios(async (vistos) => {
+    await assert.rejects(() => pedirJson('/challenges/', { token: 't', tenantId: COLEGIO_AJENO }), /no es una de tus instituciones/);
+    assert.throws(() => cambiarColegioActivo(COLEGIO_AJENO), /no es una de tus instituciones/);
+    assert.equal(leerColegioActivo(), COLEGIO_A, 'el colegio activo no se movió');
+    assert.throws(() => fijarColegios({ activo: COLEGIO_AJENO, permitidos: [COLEGIO_A] }), /no está entre las membresías/);
+    assert.deepEqual(vistos, [], 'ninguna petición llegó al servidor');
+    // Uno propio, pedido a mano, sí sale.
+    await pedirJson('/challenges/', { token: 't', tenantId: COLEGIO_B });
+    assert.deepEqual(vistos, [COLEGIO_B]);
+  });
+});
+
+test('B: sin colegios fijados (modo mock, o la primera llamada a /auth/me) no se manda X-Tenant-ID', async () => {
+  const vistos = [];
+  await conServidorFalso((req, res) => { vistos.push(req.headers['x-tenant-id'] ?? null); responderJson(res, 200, {}); }, async () => {
+    await pedirJson('/auth/me', { token: 't' });
+  });
+  assert.deepEqual(vistos, [null]);
+  assert.equal(leerColegioActivo(), null);
 });

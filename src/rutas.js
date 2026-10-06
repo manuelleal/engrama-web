@@ -68,10 +68,12 @@ async function renderizarActual() {
 /**
  * Arranca el router: renderiza la ruta actual y queda escuchando `hashchange`.
  * @param {HTMLElement} raiz
+ * @param {{desdeElPrincipio?: boolean}} [opciones] `desdeElPrincipio`: empieza en la ruta por defecto, no
+ *   en el hash que haya (al cambiar de institución el rol puede ser otro y esa ruta ya no servir)
  */
-export function iniciar(raiz) {
+export function iniciar(raiz, { desdeElPrincipio = false } = {}) {
   raizVista = raiz;
-  if (!location.hash) location.hash = `#${porDefecto}`;
+  if (desdeElPrincipio || !location.hash) location.hash = `#${porDefecto}`;
   window.removeEventListener('hashchange', alCambiarHash); // iniciar() puede repetirse (tras el cambio de contraseña o de colegio)
   window.addEventListener('hashchange', alCambiarHash);
   renderizarActual();
@@ -98,12 +100,6 @@ export function reiniciarRutas() {
   rutas.length = 0;
 }
 
-/** Vuelve a la ruta por defecto (la del rol) y la pinta de nuevo, aunque el hash ya sea ese. */
-export function recargarEnRutaPorDefecto() {
-  location.hash = `#${porDefecto}`;
-  hashRenderizado = null;
-  renderizarActual();
-}
 
 /** @param {string} ruta ej. "/retos/42" */
 export function navegar(ruta) {

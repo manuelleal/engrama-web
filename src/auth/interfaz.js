@@ -22,6 +22,7 @@
  * @property {string|null} grupo
  * @property {string[]} modulos
  * @property {number} constancia
+ * @property {{id: string, nombre: string, rol: string}[]} [colegios] las instituciones del usuario (sus membresías); sin ellas (modo mock) no se manda X-Tenant-ID
  * @property {boolean} [debeCambiarContrasena] la contraseña es temporal (`must_change_password` de /auth/me): hay que crear la propia antes de seguir
  */
 

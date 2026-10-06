@@ -1,3 +1,5 @@
+// TRAMPOSO (login piloto, B) — versión rota a propósito: pedirJson manda el X-Tenant-ID que le pasen aunque no esté entre las
+// membresías del usuario. El backend daría 403, pero el cliente nunca debió mandarlo. Debe quedar en rojo en el test del colegio ajeno.
 // @ts-check
 // api/cliente.js · El ÚNICO módulo (junto con auth/supabase_rest.js, hito 3) que llama `fetch`
 // (§7.2). Todo pasa por `/api/...` en el mismo origen — nunca la URL del backend a secas, nunca
@@ -107,9 +109,7 @@ export async function pedirJson(ruta, opciones = {}) {
   const cabeceras = {};
   if (token) cabeceras['Authorization'] = `Bearer ${token}`;
   const colegio = tenantId || colegioActivo;
-  if (colegio && colegiosPermitidos && !colegiosPermitidos.has(colegio)) {
-    throw new Error(`api/cliente: no se manda X-Tenant-ID "${colegio}": no es una de tus instituciones`); // nunca sale la petición
-  }
+  // <- el error: no se mira si el colegio es suyo
   if (colegio) cabeceras['X-Tenant-ID'] = colegio;
   if (cuerpo !== undefined) cabeceras['Content-Type'] = textoCrudo ? 'text/csv; charset=utf-8' : 'application/json';
 

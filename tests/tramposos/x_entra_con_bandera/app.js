@@ -6,7 +6,9 @@
 import { crearBannerRed } from './ui/red.js';
 import { reemplazarRaiz } from './ui/dom.js';
 import { ruta, definirPorDefecto, iniciar, detener, reiniciarRutas } from './rutas.js';
-import { accionUnica, configurarAlBloqueo, BLOQUEO_DEBE_CAMBIAR } from './api/cliente.js';
+import {
+  accionUnica, configurarAlBloqueo, BLOQUEO_DEBE_CAMBIAR, fijarColegios, leerColegioActivo, cambiarColegioActivo,
+} from './api/cliente.js';
 import { renderEntrada } from './vistas/entrada.js';
 import { renderInicio } from './vistas/estudiante/inicio.js';
 import { renderPerfil } from './vistas/perfil.js';
@@ -103,6 +105,7 @@ async function iniciarApp() {
 // simple y más robusto que desenredar el estado del router: iniciarApp() vuelve a correr desde
 // cero, ya sin sesión (authActivo.salir() la borró), y cae directo en renderEntrada().
 async function cerrarSesion() {
+  limpiarCacheDeApi(); // un equipo compartido no guarda lo del estudiante anterior (§7.3)
   try {
     await authActivo.salir();
   } catch (e) {
@@ -119,6 +122,10 @@ function conCtx(fn) {
   return async (raiz, params, query) => fn(raiz, params, query, {
     token: await authActivo.token(),
     sesion: sesionActual,
+    // Login piloto (B): las instituciones del usuario y la activa (el selector solo aparece con más de una).
+    colegios: sesionActual.colegios,
+    colegioActivo: sesionActual.colegio?.id,
+    cambiarColegio: (sesionActual.colegios?.length ?? 0) > 1 && typeof authActivo.recargarSesion === 'function' ? cambiarColegio : undefined,
     // La traen supabase_rest.js y perfil_actual.js; mock.js no la soporta, y las vistas
     // (inicio.js, perfil.js) usan esto para no ofrecer un enlace muerto.
     cambiarContrasena: typeof authActivo.cambiarContrasena === 'function' ? authActivo.cambiarContrasena : undefined,
@@ -136,9 +143,37 @@ function rutaPorDefectoSegunRol(sesion) {
 
 // Una sesión recién obtenida (login, sesión recuperada o vuelta de la pantalla obligatoria). Con la
 // contraseña temporal NO arranca el router: el estudiante ve solo "Crea tu contraseña".
-function entrarConSesion(sesion) {
+function entrarConSesion(sesion, { desdeElPrincipio = false } = {}) {
   sesionActual = sesion;
-  arrancarConSesion(); // <- el error: la bandera no se mira
+  fijarColegiosDeLaSesion(sesion);
+  arrancarConSesion(desdeElPrincipio); // <- el error: la bandera no se mira
+}
+
+// Login piloto (B): desde aquí TODA llamada manda `X-Tenant-ID` con el colegio activo de /auth/me, y
+// nunca uno que no esté entre sus membresías (api/cliente.js). El modo mock no tiene membresías: sin encabezado.
+function fijarColegiosDeLaSesion(sesion) {
+  if (!sesion.colegios?.length) { fijarColegios({ activo: null, permitidos: null }); return; }
+  fijarColegios({ activo: sesion.colegio.id, permitidos: sesion.colegios.map((c) => c.id) });
+}
+
+// El docente de dos instituciones elige otra: se manda su `X-Tenant-ID`, se vuelve a pedir /auth/me (el rol
+// y el nombre pueden ser otros) y se repinta desde la ruta por defecto, con los datos de esa institución.
+async function cambiarColegio(id) {
+  const previo = leerColegioActivo();
+  cambiarColegioActivo(id); // lanza si no es una de sus membresías: nunca sale una petición con un colegio ajeno
+  try {
+    const nueva = await authActivo.recargarSesion();
+    limpiarCacheDeApi(); // lo guardado para el colegio anterior no se sirve como respaldo del nuevo
+    entrarConSesion(nueva, { desdeElPrincipio: true });
+  } catch (e) {
+    cambiarColegioActivo(previo ?? id);
+    throw e;
+  }
+}
+
+// Pide al service worker que olvide las respuestas de /api guardadas como respaldo sin red (sw.js).
+function limpiarCacheDeApi() {
+  navigator.serviceWorker?.controller?.postMessage('limpiar-api');
 }
 
 // Una pantalla obligatoria (api/cliente.js avisa de un 403 `must_change_password`, o el /auth/me del
@@ -162,7 +197,7 @@ async function terminarBloqueo() {
   entrarConSesion(sesion);
 }
 
-function arrancarConSesion() {
+function arrancarConSesion(desdeElPrincipio = false) {
   reiniciarRutas();
   ruta('/inicio', conCtx((raiz, params, query, ctx) => renderInicio(raiz, ctx)));
   ruta('/perfil', conCtx((raiz, params, query, ctx) => renderPerfil(raiz, ctx)));
@@ -179,7 +214,7 @@ function arrancarConSesion() {
   ruta('/admin/asignar-docente/:gid', conCtx((raiz, params, query, ctx) => renderAsignarDocente(raiz, params, ctx)));
   ruta('/admin/importar-csv/:gid', conCtx((raiz, params, query, ctx) => renderImportarCsv(raiz, params, ctx)));
   definirPorDefecto(rutaPorDefectoSegunRol(sesionActual));
-  iniciar(vistaRaiz);
+  iniciar(vistaRaiz, { desdeElPrincipio });
 }
 
 iniciarApp();
