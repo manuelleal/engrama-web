@@ -21,7 +21,7 @@ REST).
 | Estilos | solo `var(--token)` de `tokens.css` o `color-mix()` con `transparent`/`white`/`black` |
 | Rutas | hash (`#/inicio`, `#/retos/:id`…) |
 | Estado | `src/estado.js`: publicar/suscribir, sin librería |
-| Sin red | `sw.js` a mano; GET de la API con red primero y caché de respaldo; nunca cachea un POST ni `/teachers` ni `/admin` |
+| Sin red | `sw.js` a mano: precarga el shell (HTML, JS, CSS, Drako) y abre sin red; **nunca guarda `/api` ni `/config.json`** (H-4, H-6 de la auditoría de seguridad 02: en un equipo compartido B veía datos de A; y una configuración vieja o ausente no puede arrancar el modo `mock`). Sin red dice "Sin conexión", no muestra datos viejos |
 | Servidor de desarrollo | `herramientas/servidor_dev.mjs` (`node:http`): estáticos + proxy `/api/*` → `ENGRAMA_API_URL`, mismo origen |
 | Tests | `node:test`; E2E por CDP (`herramientas/cdp.mjs`, Edge o Chrome headless) |
 | Análisis estático | `herramientas/verificar.mjs`: colores fuera de tokens, DOM prohibido, acceso directo a la base, tamaño de archivo/función |
@@ -71,3 +71,24 @@ explicación) **no** se portan. `coins-mvp/` es solo lectura (004, dormido).
 (H0 demo clicable, H1 backend local, H2 reglas completas de Lingo, H3 piloto).
 Esta tanda cubre los encargos que no necesitan npm ni cambios de F4, en orden,
 hasta donde llegue H0. El encargo para F4 vive en `docs/ENCARGO_F4_lingo.md`.
+
+## Game feel del estudiante (2026-10-06)
+
+El inventario con archivo:línea de Lingo Coins y la decisión por efecto está en `docs/INVENTARIO_game_feel.md`.
+Reglas que no se rompen:
+
+- **Animación plena solo para el estudiante** (`.juego` en `estilos/juego.css`); el panel del profe y del admin
+  no carga nada de eso. Solo `transform` y `opacity` (lo vigila `tests/unit/css_juego.test.mjs`); `will-change`
+  con mesura; sin reflow. La fluidez se mide con `npm run fluidez` (CPU frenada 4×).
+- **`prefers-reduced-motion`**: `base.css` lo deja todo en 0,001 ms y `ui/movimiento.js` topa lo animado desde JS
+  (`duracionEfectiva`, máx. 120 ms); no cae confeti ni vuelan monedas, y el estado final sigue legible.
+- **Sonido y vibración sin archivos** (`ui/sonido.js`, Web Audio sintetizado): empiezan tras el primer gesto, un
+  solo interruptor visible (`ui/boton_sonido.js`) y guardado; con reduced-motion arrancan en silencio.
+- **Nada premia velocidad ni azar** (confeti determinista, fichas = f(monedas del servidor), nivel de celebración =
+  f(aciertos)). La racha y el saldo se muestran tal cual y solo se celebra cuando el valor del servidor SUBE
+  (`ui/ultimo_visto.js`); no hay aritmética sobre la racha en el cliente.
+- **La clave no sale antes de enviar**: al elegir una opción solo suena el `toque` neutro y el panel dice "Elegiste B".
+  El panel con veredicto (`ui/panel_resultado.js`) está listo para cuando exista la corrección por pregunta (L1/W18).
+- **Drako presenta**: `celebra`/`ups` en la cabecera del resultado, `piensa` mientras se revisa, `espera` en cargas y
+  vacíos; nunca dentro del bloque de calificación de una pregunta.
+- `npm run demo` levanta mock + servidor de desarrollo con datos sintéticos para verlo en esta máquina.

@@ -17,6 +17,8 @@ const NIVELES = {
   fuerte: { piezas: 34, duracionMs: 2700, alto: 0.95 },
 };
 const PROPORCION_AUREA = 0.6180339887;
+const LOTE = 18;
+const PAUSA_MS = 70;
 
 /**
  * Cuántas piezas caen y cuánto dura — pura. Con reduced-motion no cae ninguna.
@@ -51,12 +53,23 @@ export function lanzarConfeti(nivel = 'normal') {
   const plan = planDeConfeti(nivel);
   if (plan.piezas === 0 || typeof document === 'undefined') return;
   const alto = globalThis.innerHeight || 700;
-  const piezas = Array.from({ length: plan.piezas }, (_, i) => {
+  const capa = h('div', { class: `confeti confeti-${nivel}`, 'aria-hidden': 'true', 'data-testid': 'confeti' });
+  document.body.appendChild(capa);
+  // Las piezas nacen en lotes de LOTE, uno cada PAUSA_MS: crear 70 nodos de golpe en un celular lento es
+  // justo lo que se veía como un tirón al empezar la celebración (medido con la CPU frenada 4×,
+  // herramientas/fluidez.mjs). Cada pieza conserva su posición global, así que el resultado es el mismo.
+  for (let desde = 0; desde < plan.piezas; desde += LOTE) {
+    setTimeout(() => agregarLote(capa, desde, Math.min(plan.piezas, desde + LOTE), plan, alto), (desde / LOTE) * PAUSA_MS);
+  }
+  setTimeout(() => capa.remove(), plan.duracionMs + 900 + Math.ceil(plan.piezas / LOTE) * PAUSA_MS);
+}
+
+function agregarLote(capa, desde, hasta, plan, alto) {
+  const lote = document.createDocumentFragment();
+  for (let i = desde; i < hasta; i++) {
     const pieza = h('span', { class: 'confeti-pieza' });
     estilizar(pieza, i, plan, alto);
-    return pieza;
-  });
-  const capa = h('div', { class: `confeti confeti-${nivel}`, 'aria-hidden': 'true', 'data-testid': 'confeti' }, ...piezas);
-  document.body.appendChild(capa);
-  setTimeout(() => capa.remove(), plan.duracionMs + 900);
+    lote.appendChild(pieza);
+  }
+  capa.appendChild(lote);
 }

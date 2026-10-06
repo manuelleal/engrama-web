@@ -10,6 +10,8 @@ import { crearEscudo } from '../../ui/escudo.js';
 import { crearDrako } from '../../ui/drako.js';
 import { crearLlama, celebrarRacha } from '../../ui/racha.js';
 import { crearBotonSonido } from '../../ui/boton_sonido.js';
+import { crearBotonSalir } from '../../ui/boton_salir.js';
+import { crearCargando, crearVacio } from '../../ui/estados.js';
 import { crearNavInferior } from '../../ui/nav_inferior.js';
 import { crearSelectorColegio } from '../../ui/selector_colegio.js';
 import { senal } from '../../ui/sonido.js';
@@ -101,9 +103,9 @@ async function cargarDatos(ctx) {
 }
 
 function tarjetaRetoDeHoy(pendiente) {
-  if (!pendiente) return h('p', { 'data-testid': 'banner-retos', role: 'status' }, textos.inicio.sinRetoPendiente);
+  if (!pendiente) return crearVacio({ texto: textos.inicio.sinRetoPendiente, testid: 'banner-retos' });
   return h(
-    'div', { class: 'fila', 'data-testid': 'tarjeta-reto-hoy' },
+    'div', { class: 'fila fila-invitacion', 'data-testid': 'tarjeta-reto-hoy' },
     h('div', { class: 'fila-texto' },
       h('span', { class: 'texto-apoyo' }, textos.inicio.retoDeHoyTitulo),
       h('span', { class: 'fila-titulo' }, tituloLegible(pendiente.title))),
@@ -140,13 +142,15 @@ function navDeAccesos(ctx) {
     typeof ctx.cambiarContrasena === 'function'
       ? h('a', { href: '#/perfil', 'data-testid': 'ir-a-perfil' }, textos.perfil.titulo)
       : null,
+    // Un equipo compartido: el estudiante también puede cerrar su sesión (antes solo el profe y el admin).
+    crearBotonSalir(ctx),
   );
 }
 
 function pintarContenido(raiz, ctx, datos) {
   const { barra, nodoSaldo, constancia } = barraSuperior(datos, ctx);
   const nodo = h(
-    'div', { 'data-testid': 'vista-inicio' },
+    'div', { 'data-testid': 'vista-inicio', class: 'juego' },
     barra,
     h('div', { class: 'encabezado-reto' },
       crearDrako('presenta', textos.inicio.drakoBienvenida),
@@ -180,7 +184,7 @@ function pintarError(raiz, mensaje) {
  *   cambiarContrasena?: (nueva: string) => Promise<void>}} ctx
  */
 export async function renderInicio(raiz, ctx) {
-  montar(raiz, h('div', { 'data-testid': 'vista-inicio' }, h('p', { role: 'status' }, textos.inicio.cargando)));
+  montar(raiz, h('div', { 'data-testid': 'vista-inicio', class: 'juego' }, crearCargando(textos.inicio.cargando)));
   try {
     const datos = await cargarDatos(ctx);
     pintarContenido(raiz, ctx, datos);

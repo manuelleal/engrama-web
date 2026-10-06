@@ -120,7 +120,9 @@ async function cerrarSesion() {
   } catch (e) {
     console.error('app: no se pudo cerrar sesión', e); // nunca un catch mudo
   } finally {
-    location.reload();
+    // A la URL limpia (sin el `#/inicio` de quien salió): una recarga conservaba esa ruta en el historial, y
+    // el botón "atrás" podía llevar a una pantalla con datos de esa persona. Sin `#`, es una carga nueva.
+    location.replace(location.pathname + location.search);
   }
 }
 
@@ -233,7 +235,7 @@ function arrancarConSesion(desdeElPrincipio = false) {
   ruta('/inicio', conCtx((raiz, params, query, ctx) => renderInicio(raiz, ctx)));
   ruta('/perfil', conCtx((raiz, params, query, ctx) => renderPerfil(raiz, ctx)));
   ruta('/datos', conCtx((raiz) => (leerAviso().ok
-    ? renderLeerAviso(raiz, { aviso: leerAviso(), alVolver: () => navegar('/perfil') })
+    ? renderLeerAviso(raiz, { aviso: leerAviso(), alVolver: () => navegar(sesionActual.rol === 'student' ? '/perfil' : rutaPorDefectoSegunRol(sesionActual)) })
     : renderErrorAviso(raiz, leerAviso().faltan))));
   ruta('/asistencia', conCtx((raiz, params, query, ctx) => renderAsistencia(raiz, query, ctx)));
   ruta('/retos', conCtx((raiz, params, query, ctx) => renderRetos(raiz, ctx)));
