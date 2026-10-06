@@ -146,3 +146,59 @@ test('game feel: en la pregunta el botón nace plano, despierta al elegir, sube 
     assert.equal(r.eval.despues.sonido, true, 'el botón de silencio está visible en la pregunta');
   });
 });
+
+function scriptTerminar(labels) {
+  return `(async () => {
+    const q = (t) => document.querySelector('[data-testid="' + t + '"]');
+    const esperar = (ms) => new Promise((r) => setTimeout(r, ms));
+    q('opcion-${labels[0]}').click(); await esperar(80); q('boton-siguiente').click(); await esperar(80);
+    q('opcion-${labels[1]}').click(); await esperar(80); q('boton-terminar').click();
+    await esperar(900);
+    const medio = {
+      confetiFuerte: document.querySelectorAll('.confeti-fuerte .confeti-pieza').length,
+      confetiAlgo: document.querySelectorAll('[data-testid="confeti"] .confeti-pieza').length,
+    };
+    await esperar(3000);
+    return {
+      medio,
+      hero: q('hero-resultado').className,
+      titulo: q('hero-resultado').querySelector('h1').textContent,
+      drako: q('hero-resultado').querySelector('img').dataset.testid,
+      puntaje: q('puntaje').textContent,
+      medalla: document.querySelector('.medalla-num')?.textContent ?? null,
+      monedas: q('revision-monedas').textContent,
+      drakoEnFilas: document.querySelectorAll('li[data-testid^="revision-"] img').length,
+    };
+  })()`;
+}
+
+test('game feel: un reto perfecto celebra a lo grande (confeti fuerte, medalla de monedas, Drako celebra)', { skip: SKIP }, async () => {
+  await conAppCompleta(async (url, estado) => {
+    const reto = sembrarReto(estado);
+    const r = await revisarPagina({ url: `${url}#/retos/${reto.id}`, ancho: 375, alto: 812, espera_ms: 5000, pre: YA_ENTRO, eval: scriptTerminar(['A', 'B']) });
+    assert.deepEqual(r.errores, []);
+    assert.match(r.eval.hero, /hero-perfecto/);
+    assert.equal(r.eval.titulo, '¡Reto perfecto!');
+    assert.equal(r.eval.drako, 'drako-celebra');
+    assert.ok(r.eval.medio.confetiFuerte >= 60, 'el perfecto suelta confeti fuerte');
+    assert.match(r.eval.puntaje, /2 \/ 2/);
+    assert.match(r.eval.puntaje, /2 de 2 correctas/, 'el texto para lectores dice el puntaje completo');
+    assert.equal(r.eval.medalla, '+5', 'la medalla termina en lo que pagó el servidor');
+    assert.match(r.eval.monedas, /\+5 monedas/);
+    assert.equal(r.eval.drakoEnFilas, 0, 'Drako presenta arriba; nunca dentro del bloque de calificación de una pregunta');
+  });
+});
+
+test('game feel: un reto con todo fallado anima (Drako "ups", sin confeti, sin medalla) y no castiga', { skip: SKIP }, async () => {
+  await conAppCompleta(async (url, estado) => {
+    const reto = sembrarReto(estado);
+    const r = await revisarPagina({ url: `${url}#/retos/${reto.id}`, ancho: 375, alto: 812, espera_ms: 5000, pre: YA_ENTRO, eval: scriptTerminar(['B', 'A']) });
+    assert.deepEqual(r.errores, []);
+    assert.match(r.eval.hero, /hero-animo/);
+    assert.equal(r.eval.drako, 'drako-ups');
+    assert.equal(r.eval.medio.confetiAlgo, 0, 'sin confeti cuando no hubo aciertos');
+    assert.equal(r.eval.medalla, null, 'sin monedas, sin medalla');
+    assert.match(r.eval.monedas, /No sumaste monedas/);
+    assert.match(r.eval.titulo, /Buen intento/);
+  });
+});

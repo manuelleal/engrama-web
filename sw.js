@@ -54,6 +54,7 @@ const PRECARGA = [
   '/src/ui/panel_resultado.js',
   '/src/ui/boton.js',
   '/src/ui/toque.js',
+  '/src/ui/celebracion.js',
   '/src/ui/titulo.js',
   '/src/ui/nav_inferior.js',
   // Segunda pasada de diseño (2026-09-28): confeti (inicio/asistencia/revisión) y la barra con

@@ -1,0 +1,16 @@
+{
+  "descripcion": "Game feel: cualquier reto con al menos un acierto se celebra como perfecto (no es proporcional)",
+  "archivos": {
+    "src/ui/celebracion.js": "celebracion.js"
+  },
+  "comando": [
+    "node",
+    "--test",
+    "--test-reporter=tap",
+    "tests/unit/ui_celebracion.test.mjs"
+  ],
+  "espera_codigo_no_cero": true,
+  "espera_fallan_tests": [
+    "celebración: el nivel depende solo de cuántas respondió bien (perfecto, bien, ánimo)"
+  ]
+}

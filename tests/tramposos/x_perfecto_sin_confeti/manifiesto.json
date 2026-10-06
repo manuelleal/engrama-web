@@ -1,0 +1,16 @@
+{
+  "descripcion": "Game feel: un reto perfecto no lanza confeti (acción positiva sin señal)",
+  "archivos": {
+    "src/ui/celebracion.js": "celebracion.js"
+  },
+  "comando": [
+    "node",
+    "--test",
+    "--test-reporter=tap",
+    "tests/e2e/game_feel.test.mjs"
+  ],
+  "espera_codigo_no_cero": true,
+  "espera_fallan_tests": [
+    "game feel: un reto perfecto celebra a lo grande (confeti fuerte, medalla de monedas, Drako celebra)"
+  ]
+}

@@ -203,6 +203,14 @@ export const textos = {
     volver: 'Volver a mis retos',
     drakoCelebra: 'Drako celebra contigo',
   },
+  // Game feel: el fin de reto proporcional (ui/celebracion.js). Nunca castiga; el ánimo es de verdad.
+  celebracion: {
+    perfecto: { titulo: '¡Reto perfecto!', mensaje: 'Respondiste todo bien. ¡Así se hace!', drako: 'Drako celebra tu reto perfecto' },
+    bien: { titulo: '¡Muy bien!', mensaje: 'Vas por muy buen camino. Mira abajo lo que falta afinar.', drako: 'Drako celebra contigo' },
+    animo: { titulo: '¡Buen intento!', mensaje: 'Aprender es esto: mira la correcta de cada pregunta y vuelve a intentarlo cuando quieras.', drako: 'Drako te anima a seguir' },
+    /** @param {number} a @param {number} t */
+    puntaje: (a, t) => `${a} de ${t} correctas`,
+  },
   asistencia: {
     titulo: 'Asistencia',
     etiquetaCodigo: 'Código de la sesión',

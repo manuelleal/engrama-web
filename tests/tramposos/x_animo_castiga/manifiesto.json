@@ -1,0 +1,16 @@
+{
+  "descripcion": "Game feel: el mensaje de ánimo suena con el tono de fallo (castiga)",
+  "archivos": {
+    "src/ui/celebracion.js": "celebracion.js"
+  },
+  "comando": [
+    "node",
+    "--test",
+    "--test-reporter=tap",
+    "tests/unit/ui_celebracion.test.mjs"
+  ],
+  "espera_codigo_no_cero": true,
+  "espera_fallan_tests": [
+    "celebración: Drako presenta con estados que existen; el ánimo usa \"ups\", nunca un sonido de fallo"
+  ]
+}
