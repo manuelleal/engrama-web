@@ -97,4 +97,12 @@ Reglas que no se rompen:
   El panel con veredicto (`ui/panel_resultado.js`) está listo para cuando exista la corrección por pregunta (L1/W18).
 - **Drako presenta**: `celebra`/`ups` en la cabecera del resultado, `piensa` mientras se revisa, `espera` en cargas y
   vacíos; nunca dentro del bloque de calificación de una pregunta.
+- **Drako es un personaje por partes** (2026-10-06): `ui/drako.js` `crearDrako()` devuelve un SVG armado con `createElementNS` desde
+  `ui/drako_rig.js`, que es **GENERADO** (`node herramientas/generar_drako_rig.mjs`) desde `diseno/personajes/rig/drako-rig.json`
+  (lo escribe `diseno/personajes/construir.js` + `rig.js`; nunca se edita a mano: `tests/unit/drako_rig_sincronizado.test.mjs`).
+  Partes con id estable (`data-parte`): cuerpo, cabeza, ojo, parpado, brazo-delantero, brazo-trasero, cola, ala, cuernos…, cada una con su
+  `transform-origin`. `ui/drako_pose.js` mezcla poses (vectores de números; transición suave y cortable) y `ui/drako_animado.js` las mueve con
+  anime.js: reposo (respira, parpadea, cola), saluda, salto de celebración, "ups" suave, piensa, espera. Con reduced-motion queda quieto.
+  El panel del profe y del admin usan `crearDrakoEstatico()` (la imagen de siempre): ninguna vista de `profe/` ni `admin/` trae el animado.
+  Un Drako que sale de la pantalla se apaga solo. `node herramientas/galeria_drako.mjs` saca las capturas (poses, estático contra rig, secuencias).
 - `npm run demo` levanta mock + servidor de desarrollo con datos sintéticos para verlo en esta máquina.

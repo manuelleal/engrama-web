@@ -152,7 +152,7 @@ function pintarContenido(raiz, ctx, datos) {
     'div', { 'data-testid': 'vista-inicio', class: 'juego' },
     barra,
     h('div', { class: 'encabezado-reto' },
-      crearDrako('presenta', textos.inicio.drakoBienvenida),
+      crearDrako('presenta', textos.inicio.drakoBienvenida, { saludar: true, desde: 'reposo' }),
       h('h1', {}, textos.inicio.saludo(ctx.sesion.nombre)),
       crearBotonSonido()),
     crearSelectorColegio(ctx), // login piloto (B): solo si el estudiante está en más de una institución

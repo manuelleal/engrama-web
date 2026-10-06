@@ -1,0 +1,7 @@
+{
+  "descripcion": "Drako respira y parpadea aunque el estudiante pidió menos movimiento (prefers-reduced-motion ignorado)",
+  "archivos": { "src/ui/drako_animado.js": "drako_animado.js" },
+  "comando": ["node", "--test", "--test-reporter=tap", "tests/unit/ui_drako.test.mjs"],
+  "espera_codigo_no_cero": true,
+  "espera_fallan_tests": ["drako: con prefers-reduced-motion no arranca ningún movimiento (ni reposo, ni ciclo, ni saludo, ni salto)"]
+}

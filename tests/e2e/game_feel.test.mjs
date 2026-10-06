@@ -163,11 +163,11 @@ function scriptTerminar(labels) {
       medio,
       hero: q('hero-resultado').className,
       titulo: q('hero-resultado').querySelector('h1').textContent,
-      drako: q('hero-resultado').querySelector('img').dataset.testid,
+      drako: q('hero-resultado').querySelector('[data-testid^="drako-"]').dataset.testid,
       puntaje: q('puntaje').textContent,
       medalla: document.querySelector('.medalla-num')?.textContent ?? null,
       monedas: q('revision-monedas').textContent,
-      drakoEnFilas: document.querySelectorAll('li[data-testid^="revision-"] img').length,
+      drakoEnFilas: document.querySelectorAll('li[data-testid^="revision-"] img, li[data-testid^="revision-"] [data-testid^="drako-"]').length,
     };
   })()`;
 }

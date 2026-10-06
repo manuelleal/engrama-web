@@ -7,6 +7,8 @@
 import { h } from './dom.js';
 import { textos } from '../textos.js';
 import { senal } from './sonido.js';
+import { crearDrako } from './drako.js';
+import { controladorDe } from './drako_animado.js';
 import { lanzarConfeti } from './confeti.js';
 import { celebrarMonedas, planDeMonedas, duracionTotal } from './monedas.js';
 import { animarConteo } from './conteo.js';
@@ -39,6 +41,9 @@ function pintarYDisparar({ zona, monedas, racha, quien }) {
   const num = h('span', { class: 'chip-num' }, '+0');
   const chip = plan.monedas ? h('p', { class: 'chip-monedas', 'aria-hidden': 'true', 'data-testid': 'chip-monedas' }, num, ` ${textos.inicio.monedas}`) : null;
   const llama = plan.llama ? h('p', { class: 'constancia-asistencia', 'aria-hidden': 'true' }, crearLlama(), `${textos.inicio.constanciaPrefijo}: ${racha}`) : null;
+  // Drako presenta el momento (nunca califica) y salta; el sello, las monedas y la llama son lo que dijo el servidor.
+  const drako = crearDrako('celebra', textos.asistencia.drako, { desde: 'reposo', sinCiclo: true });
+  controladorDe(drako)?.celebrarSalto();
   senal('sello');
   if (plan.monedas) {
     setTimeout(() => celebrarMonedas({ desde: sello, hasta: num, cantidad: monedas }), 380);

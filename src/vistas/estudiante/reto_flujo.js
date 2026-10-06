@@ -100,7 +100,7 @@ function pintarPregunta(raiz, estado, callbacks, entrada = 'desliza', efecto = {
   const nodo = h(
     'div', { 'data-testid': 'vista-reto-flujo', class: `juego juego-${entrada}` },
     h('div', { class: 'encabezado-reto' },
-      crearDrako('presenta', textos.retoFlujo.drakoPresenta),
+      crearDrako('presenta', textos.retoFlujo.drakoPresenta, { estatico: true }) /* chico y se repinta con cada opción: imagen */,
       h('h1', { class: 'titulo-reto' }, tituloLegible(challenge.title)),
       crearBotonSonido()),
     barra,

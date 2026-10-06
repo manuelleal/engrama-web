@@ -231,6 +231,7 @@ export const textos = {
     marcar: 'Marcar asistencia',
     marcando: 'Marcando…',
     sello: 'Presente',
+    drako: 'Drako celebra que llegaste',
     sinRed: 'Sin conexión: no puedes marcar asistencia ahora.',
     /** @param {number} monedas @param {number} racha */
     exito: (monedas, racha) => `Asistencia marcada · +${monedas} monedas · constancia ${racha}`,

@@ -1,0 +1,7 @@
+{
+  "descripcion": "Alguien editó a mano src/ui/drako_rig.js (módulo GENERADO) o tocó el rig y olvidó regenerarlo",
+  "archivos": { "src/ui/drako_rig.js": "drako_rig.js" },
+  "comando": ["node", "--test", "--test-reporter=tap", "tests/unit/drako_rig_sincronizado.test.mjs"],
+  "espera_codigo_no_cero": true,
+  "espera_fallan_tests": ["drako_rig: src/ui/drako_rig.js está al día con diseno/personajes/rig/drako-rig.json (sincronización, como R1)"]
+}

@@ -66,7 +66,7 @@ function scriptJugar(idPregunta1) {
       q1Resultado: document.querySelector('[data-testid="revision-' + idQ1 + '-resultado"]')?.textContent ?? null,
       // Toda la fila (el <li data-testid="revision-<id>">), no solo el <p> del ícono+texto:
       // Drako no debe vivir en ningún punto del bloque de resultado de ESTA pregunta.
-      q1TieneDrako: !!document.querySelector('[data-testid="revision-' + idQ1 + '"] img'),
+      q1TieneDrako: !!document.querySelector('[data-testid="revision-' + idQ1 + '"] img, [data-testid="revision-' + idQ1 + '"] [data-testid^="drako-"]'),
       q1Correcta: document.querySelector('[data-testid="revision-' + idQ1 + '-correcta"]')?.textContent ?? null,
     };
   })()`;

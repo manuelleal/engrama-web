@@ -10,6 +10,7 @@
 import { h } from './dom.js';
 import { textos } from '../textos.js';
 import { crearDrako } from './drako.js';
+import { controladorDe } from './drako_animado.js';
 import { lanzarConfeti } from './confeti.js';
 import { celebrarMonedas, planDeMonedas, duracionTotal } from './monedas.js';
 import { animarConteo } from './conteo.js';
@@ -41,7 +42,8 @@ export function planDeCelebracion(nivel) {
 export function crearHeroResultado(d) {
   const textosNivel = textos.celebracion[d.nivel];
   const plan = planDeCelebracion(d.nivel);
-  const drako = crearDrako(plan.drako, textosNivel.drako);
+  // Nace quieto en la pose de antes del momento; quien celebra (celebrarFinDeReto) le dice qué hacer: saltar o bajar la cabeza.
+  const drako = crearDrako(plan.drako, textosNivel.drako, { desde: d.nivel === 'animo' ? 'presenta' : 'reposo', sinCiclo: true });
   const puntaje = h('span', { class: 'hero-puntaje-num', 'aria-hidden': 'true' }, `0 / ${d.total}`);
   const medallaNum = d.monedas > 0 ? h('span', { class: 'medalla-num' }, '+0') : null;
   const nodo = h(
@@ -63,6 +65,8 @@ export function crearHeroResultado(d) {
 export function celebrarFinDeReto(d) {
   const plan = planDeCelebracion(d.nivel);
   senal(plan.sonido);
+  const drako = controladorDe(d.hero.drako);
+  if (d.nivel === 'animo') drako?.mostrar('ups'); else drako?.celebrarSalto();
   if (plan.segundoEstalloMs) setTimeout(() => lanzarConfeti('normal'), plan.segundoEstalloMs);
   animarConteo(d.hero.puntaje, { desde: 0, hasta: d.aciertos, formato: (n) => `${n} / ${d.total}`, golpe: d.nivel !== 'animo' });
   if (d.hero.medallaNum) {

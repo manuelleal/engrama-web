@@ -1,0 +1,7 @@
+{
+  "descripcion": "El panel del profe monta el Drako animado (debe quedarse sobrio, con la imagen estática)",
+  "archivos": { "src/vistas/profe/grupos.js": "grupos.js" },
+  "comando": ["node", "--test", "--test-reporter=tap", "tests/unit/ui_drako.test.mjs"],
+  "espera_codigo_no_cero": true,
+  "espera_fallan_tests": ["drako: el panel del profe y del admin se quedan con el Drako estático (ninguna vista de profe/ ni admin/ trae el animado)"]
+}

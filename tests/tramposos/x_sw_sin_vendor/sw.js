@@ -47,6 +47,9 @@ const PRECARGA = [
   '/src/ui/red.js',
   '/src/ui/escudo.js',
   '/src/ui/drako.js',
+  '/src/ui/drako_rig.js', // Drako por partes (generado desde diseno/personajes/rig/)
+  '/src/ui/drako_pose.js',
+  '/src/ui/drako_animado.js',
   '/src/ui/sonido.js',
   '/src/ui/movimiento.js', // game feel: la duración de todo efecto (reduced-motion)
   '/src/ui/boton_sonido.js',

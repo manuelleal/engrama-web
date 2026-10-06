@@ -1,0 +1,7 @@
+{
+  "descripcion": "Las transiciones entre estados de Drako son instantáneas (un corte seco en vez de una mezcla suave)",
+  "archivos": { "src/ui/drako_animado.js": "drako_animado.js" },
+  "comando": ["node", "--test", "--test-reporter=tap", "tests/e2e/drako_animado.test.mjs"],
+  "espera_codigo_no_cero": true,
+  "espera_fallan_tests": ["drako animado (E2E): partes con id y transform-origin, y transiciones suaves que se pueden cortar a la mitad"]
+}

@@ -1,0 +1,7 @@
+{
+  "descripcion": "Las poses no se mezclan: Drako salta de golpe de una pose a la otra (transición no suave ni cortable)",
+  "archivos": { "src/ui/drako_pose.js": "drako_pose.js" },
+  "comando": ["node", "--test", "--test-reporter=tap", "tests/unit/drako_pose.test.mjs"],
+  "espera_codigo_no_cero": true,
+  "espera_fallan_tests": ["drako_pose: mezclar es lineal — t=0 es la de partida, t=1 la de llegada, t=0.5 el punto medio; no cambia las originales"]
+}
