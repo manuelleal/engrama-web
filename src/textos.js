@@ -75,6 +75,12 @@ export const textos = {
     cambioFallo: 'No pudimos cambiar tu contraseña ahora. Intenta de nuevo en unos minutos.',
     cambioNoDisponible: 'El cambio de contraseña no está disponible por ahora. Avísale a tu profe.',
   },
+  // Cuenta válida pero sin perfil ni membresía en ENGRAMA (vistas/sin_perfil.js): aún no la inscribieron.
+  sinPerfil: {
+    titulo: 'Cuenta sin inscribir',
+    mensaje: 'Tu cuenta todavía no está inscrita. Habla con tu profe.',
+    drako: 'Drako no encuentra tu inscripción',
+  },
   // El selector de institución (ui/selector_colegio.js): solo aparece con más de una membresía.
   colegio: {
     etiqueta: 'Institución',

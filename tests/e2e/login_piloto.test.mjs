@@ -234,3 +234,66 @@ test(
     }, { estado, ...MODO_SUPABASE });
   },
 );
+
+// ---------------------------------------------------------------------------------------------
+// C: una cuenta de GoTrue sin perfil (o sin membresías) en ENGRAMA: pantalla clara, sin bucle ni blanco.
+// ---------------------------------------------------------------------------------------------
+const contarMe = (estado) => estado.registro.filter((r) => r.ruta === '/auth/me').length;
+
+test(
+  'C: una cuenta sin perfil ve "Tu cuenta todavía no está inscrita. Habla con tu profe." y puede cerrar sesión, sin bucle ni blanco',
+  { skip: OMITIR },
+  async () => {
+    const { estado } = estadoPiloto();
+    await conAppCompleta(async (url) => {
+      const sesion = await abrirEntrada(url);
+      try {
+        const perfiles = estado.profiles.size;
+        await entrarCon(sesion, CORREOS_PILOTO.sinperfil, CLAVE_DEMO);
+        assert.ok(await esperarVista(sesion, 'vista-sin-perfil'));
+        assert.equal(await texto(sesion, 'sin-perfil-mensaje'), 'Tu cuenta todavía no está inscrita. Habla con tu profe.');
+        assert.ok(await hay(sesion, 'boton-cerrar-sesion'), 'ofrece cerrar sesión');
+        assert.notEqual((await sesion.evaluar('document.body.innerText')).trim(), '', 'nunca una pantalla en blanco');
+
+        // Sin bucle: ni reintentos ni redirecciones; /auth/me se pidió una sola vez y nada más.
+        const llamadas = estado.registro.length;
+        await esperar(1200);
+        assert.equal(estado.registro.length, llamadas, 'quieta: no vuelve a pedir nada');
+        assert.equal(contarMe(estado), 1);
+        assert.equal(estado.profiles.size, perfiles, 'el servidor no inventó un perfil');
+        for (const hash of ['#/inicio', '#/retos']) {
+          await sesion.evaluar(`location.hash = ${JSON.stringify(hash)}`);
+          await esperar(300);
+          assert.ok(await hay(sesion, 'vista-sin-perfil'), `sigue ahí tras ir a ${hash}`);
+        }
+        assert.deepEqual((await vistasVistas(sesion)).filter((v) => v !== 'vista-entrada'), ['vista-sin-perfil']);
+
+        // Recargar la página (el refresh token sigue en la pestaña): vuelve a la misma pantalla, sin bucle.
+        await sesion.recargar();
+        assert.ok(await esperarVista(sesion, 'vista-sin-perfil'));
+        await esperar(800);
+        assert.ok(contarMe(estado) <= 3, `unas pocas llamadas, no un bucle: ${contarMe(estado)}`);
+
+        // Cerrar sesión: vuelve el formulario de entrada.
+        await sesion.evaluar('document.querySelector(\'[data-testid="boton-cerrar-sesion"]\').click()');
+        assert.ok(await esperarVista(sesion, 'form-entrada'), 'tras cerrar sesión, la pantalla de entrada');
+      } finally { await sesion.cerrar(); }
+    }, { estado, ...MODO_SUPABASE });
+  },
+);
+
+test(
+  'C: un perfil sin ninguna membresía activa ve la misma pantalla clara',
+  { skip: OMITIR },
+  async () => {
+    const { estado } = estadoPiloto();
+    await conAppCompleta(async (url) => {
+      const sesion = await abrirEntrada(url);
+      try {
+        await entrarCon(sesion, CORREOS_PILOTO.sinmembresia, CLAVE_DEMO);
+        assert.ok(await esperarVista(sesion, 'vista-sin-perfil'));
+        assert.equal(await texto(sesion, 'sin-perfil-mensaje'), 'Tu cuenta todavía no está inscrita. Habla con tu profe.');
+      } finally { await sesion.cerrar(); }
+    }, { estado, ...MODO_SUPABASE });
+  },
+);

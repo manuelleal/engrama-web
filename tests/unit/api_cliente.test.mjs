@@ -174,3 +174,23 @@ test('B: sin colegios fijados (modo mock, o la primera llamada a /auth/me) no se
   assert.deepEqual(vistos, [null]);
   assert.equal(leerColegioActivo(), null);
 });
+
+// C (login piloto): "Account has no ENGRAMA profile" y "User has no active tenant memberships" son 403
+// de una cuenta que todavía no está inscrita, no de falta de permiso: la app muestra su pantalla.
+test('C: un 403 sin perfil o sin membresías activas avisa como "sin_perfil"; un 403 de colegio ajeno, no', async () => {
+  const avisos = [];
+  configurarAlBloqueo((codigo) => avisos.push(codigo));
+  try {
+    for (const detail of ['Account has no ENGRAMA profile', 'User has no active tenant memberships']) {
+      await conServidorFalso((req, res) => responderJson(res, 403, { detail }), async () => {
+        await assert.rejects(() => pedirJson('/auth/me', { token: 't' }), (e) => { assert.equal(e.codigo, 'sin_perfil'); assert.equal(e.status, 403); return true; });
+      });
+    }
+    assert.deepEqual(avisos, ['sin_perfil', 'sin_perfil']);
+    avisos.length = 0;
+    await conServidorFalso((req, res) => responderJson(res, 403, { detail: 'User is not a member of the requested tenant' }), async () => {
+      await assert.rejects(() => pedirJson('/auth/me', { token: 't' }), (e) => e.codigo === null);
+    });
+    assert.deepEqual(avisos, []);
+  } finally { configurarAlBloqueo(null); }
+});

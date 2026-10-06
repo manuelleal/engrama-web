@@ -1,0 +1,16 @@
+{
+  "descripcion": "Login piloto (C): la pantalla de cuenta sin inscribir sin salida (sin cerrar sesión).",
+  "archivos": {
+    "src/vistas/sin_perfil.js": "sin_perfil.js"
+  },
+  "comando": [
+    "node",
+    "--test",
+    "--test-reporter=tap",
+    "tests/e2e/login_piloto.test.mjs"
+  ],
+  "espera_codigo_no_cero": true,
+  "espera_fallan_tests": [
+    "C: una cuenta sin perfil ve \"Tu cuenta todavía no está inscrita. Habla con tu profe.\" y puede cerrar sesión, sin bucle ni blanco"
+  ]
+}

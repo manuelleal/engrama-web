@@ -1,5 +1,5 @@
-// TRAMPOSO (login piloto, B) — versión rota a propósito: el colegio activo de /auth/me ya no se manda; solo va el que una vista
-// pase a mano (ninguna lo hace). El docente de dos instituciones cae en la más antigua en cada llamada. Debe quedar en rojo.
+// TRAMPOSO (login piloto, C) — versión rota a propósito: el 403 "Account has no ENGRAMA profile" se trata como un 403 cualquiera
+// ("No tienes permiso."): el login muestra un error genérico y no hay pantalla de cuenta sin inscribir. Debe quedar en rojo.
 // @ts-check
 // api/cliente.js · El ÚNICO módulo (junto con auth/supabase_rest.js, hito 3) que llama `fetch`
 // (§7.2). Todo pasa por `/api/...` en el mismo origen — nunca la URL del backend a secas, nunca
@@ -29,7 +29,7 @@ function codigoDeBloqueo(status, cuerpo) {
   if (status !== 403) return null;
   const detalle = cuerpo?.detail;
   if (detalle === 'must_change_password') return BLOQUEO_DEBE_CAMBIAR;
-  if (DETALLES_SIN_PERFIL.has(detalle)) return BLOQUEO_SIN_PERFIL;
+  // <- el error: la cuenta sin perfil no se reconoce
   return null;
 }
 
@@ -113,7 +113,7 @@ export async function pedirJson(ruta, opciones = {}) {
   const { metodo = 'GET', token, tenantId, cuerpo, textoCrudo = false } = opciones;
   const cabeceras = {};
   if (token) cabeceras['Authorization'] = `Bearer ${token}`;
-  const colegio = tenantId; // <- el error: el colegio activo no se manda
+  const colegio = tenantId || colegioActivo;
   if (colegio && colegiosPermitidos && !colegiosPermitidos.has(colegio)) {
     throw new Error(`api/cliente: no se manda X-Tenant-ID "${colegio}": no es una de tus instituciones`); // nunca sale la petición
   }

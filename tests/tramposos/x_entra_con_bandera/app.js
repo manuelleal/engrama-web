@@ -7,12 +7,13 @@ import { crearBannerRed } from './ui/red.js';
 import { reemplazarRaiz } from './ui/dom.js';
 import { ruta, definirPorDefecto, iniciar, detener, reiniciarRutas } from './rutas.js';
 import {
-  accionUnica, configurarAlBloqueo, BLOQUEO_DEBE_CAMBIAR, fijarColegios, leerColegioActivo, cambiarColegioActivo,
+  accionUnica, configurarAlBloqueo, BLOQUEO_DEBE_CAMBIAR, BLOQUEO_SIN_PERFIL, fijarColegios, leerColegioActivo, cambiarColegioActivo,
 } from './api/cliente.js';
 import { renderEntrada } from './vistas/entrada.js';
 import { renderInicio } from './vistas/estudiante/inicio.js';
 import { renderPerfil } from './vistas/perfil.js';
 import { renderCrearContrasena } from './vistas/crear_contrasena.js';
+import { renderSinPerfil } from './vistas/sin_perfil.js';
 import { renderAsistencia } from './vistas/estudiante/asistencia.js';
 import { renderRetos } from './vistas/estudiante/retos.js';
 import { renderRetoFlujo } from './vistas/estudiante/reto_flujo.js';
@@ -176,14 +177,15 @@ function limpiarCacheDeApi() {
   navigator.serviceWorker?.controller?.postMessage('limpiar-api');
 }
 
-// Una pantalla obligatoria (api/cliente.js avisa de un 403 `must_change_password`, o el /auth/me del
-// login ya lo trae). Se apaga el router y la pantalla va en un contenedor NUEVO: lo que alguna petición
+// Una pantalla obligatoria (api/cliente.js avisa de un 403 `must_change_password` o de una cuenta sin
+// inscribir, o el /auth/me del login ya trae la bandera). Se apaga el router y la pantalla va en un contenedor NUEVO: lo que alguna petición
 // en vuelo termine de pintar en el viejo ya no pisa nada, y no hay a dónde navegar mientras dure.
 function bloquear(codigo) {
   if (bloqueoActual === codigo) return; // varias llamadas en vuelo dan el mismo 403: una sola pantalla
   bloqueoActual = codigo;
   detener();
   vistaRaiz = reemplazarRaiz(vistaRaiz);
+  if (codigo === BLOQUEO_SIN_PERFIL) { renderSinPerfil(vistaRaiz, { salir: cerrarSesion }); return; }
   renderCrearContrasena(vistaRaiz, {
     cambiarContrasena: authActivo.cambiarContrasena, alTerminar: terminarBloqueo, salir: cerrarSesion,
   });

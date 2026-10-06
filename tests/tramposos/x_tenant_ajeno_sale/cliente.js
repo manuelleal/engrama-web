@@ -19,12 +19,17 @@ export function configurarRaizApi(url) {
 // Los 403 que NO son "no tienes permiso": la cuenta está bien pero hay algo que resolver antes de
 // usar la app (ESPEC_login_piloto, backend). Se distinguen por el `detail`, no por el status.
 export const BLOQUEO_DEBE_CAMBIAR = 'must_change_password';
+// La cuenta de GoTrue es válida pero ENGRAMA no la tiene inscrita: sin perfil (`Account has no ENGRAMA profile`)
+// o sin ninguna membresía activa (`User has no active tenant memberships`). Para quien la usa es lo mismo.
+export const BLOQUEO_SIN_PERFIL = 'sin_perfil';
+const DETALLES_SIN_PERFIL = new Set(['Account has no ENGRAMA profile', 'User has no active tenant memberships']);
 
 /** @returns {string|null} el código de bloqueo si este error es uno de esos 403, o null */
 function codigoDeBloqueo(status, cuerpo) {
   if (status !== 403) return null;
   const detalle = cuerpo?.detail;
   if (detalle === 'must_change_password') return BLOQUEO_DEBE_CAMBIAR;
+  if (DETALLES_SIN_PERFIL.has(detalle)) return BLOQUEO_SIN_PERFIL;
   return null;
 }
 
