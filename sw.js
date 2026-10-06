@@ -39,6 +39,7 @@ const PRECARGA = [
   '/publico/diseno/drako/espera.svg',
   '/src/app.js',
   '/src/config.js',
+  '/src/vistas/estudiante/respuestas_locales.js',
   '/src/vistas/error_config.js',
   '/src/rutas.js',
   '/src/textos.js',

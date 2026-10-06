@@ -115,7 +115,6 @@ async function iniciarApp() {
 // cero, ya sin sesión (authActivo.salir() la borró), y cae directo en renderEntrada().
 async function cerrarSesion() {
   limpiarCacheDeApi(); // un equipo compartido no guarda lo del estudiante anterior (§7.3)
-  limpiarRespuestasEnCurso(); // H-18: sus respuestas a medias tampoco se quedan para el siguiente
   try {
     await authActivo.salir();
   } catch (e) {

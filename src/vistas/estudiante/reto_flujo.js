@@ -18,27 +18,7 @@ import { crearBotonSonido } from '../../ui/boton_sonido.js';
 import { marcarCargando } from '../../ui/boton.js';
 import { crearCargando } from '../../ui/estados.js';
 import { senal } from '../../ui/sonido.js';
-
-function claveLocal(attemptId) {
-  return `engrama_respuestas_${attemptId}`;
-}
-
-function leerRespuestasGuardadas(attemptId) {
-  try {
-    const crudo = localStorage.getItem(claveLocal(attemptId));
-    return crudo ? JSON.parse(crudo) : {};
-  } catch (e) { console.error('reto_flujo: no pude leer respuestas guardadas', e); return {}; }
-}
-
-function guardarRespuestas(attemptId, respuestas) {
-  try { localStorage.setItem(claveLocal(attemptId), JSON.stringify(respuestas)); }
-  catch (e) { console.error('reto_flujo: no pude guardar la respuesta', e); }
-}
-
-function borrarRespuestasGuardadas(attemptId) {
-  try { localStorage.removeItem(claveLocal(attemptId)); }
-  catch (e) { console.error('reto_flujo: no pude borrar las respuestas guardadas', e); }
-}
+import { leerRespuestasGuardadas, guardarRespuestas, borrarRespuestasGuardadas } from './respuestas_locales.js';
 
 /** ¿Alguna vez se ganó este reto? (para el "Repaso" cuando no llega por la URL, p. ej. F5). */
 async function yaGanado(challengeId, ctx) {

@@ -1,0 +1,16 @@
+{
+  "descripcion": "H-18: limpiarRespuestasEnCurso no borra nada (las respuestas de A quedan para B)",
+  "archivos": {
+    "src/vistas/estudiante/respuestas_locales.js": "respuestas_locales.js"
+  },
+  "comando": [
+    "node",
+    "--test",
+    "--test-reporter=tap",
+    "tests/unit/respuestas_locales.test.mjs"
+  ],
+  "espera_codigo_no_cero": true,
+  "espera_fallan_tests": [
+    "H-18: limpiarRespuestasEnCurso borra las respuestas de TODOS los intentos y nada más"
+  ]
+}

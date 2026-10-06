@@ -1,0 +1,16 @@
+{
+  "descripcion": "H-18: cerrar sesión ya no borra las respuestas en curso",
+  "archivos": {
+    "src/app.js": "app.js"
+  },
+  "comando": [
+    "node",
+    "--test",
+    "--test-reporter=tap",
+    "tests/unit/respuestas_locales.test.mjs"
+  ],
+  "espera_codigo_no_cero": true,
+  "espera_fallan_tests": [
+    "H-18: app.js limpia las respuestas en curso al cerrar sesión y al cambiar de institución"
+  ]
+}
