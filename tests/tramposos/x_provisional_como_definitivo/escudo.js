@@ -1,4 +1,5 @@
 // @ts-check
+// TRAMPOSO x_provisional_como_definitivo: un nivel provisional se muestra como "✓ Confirmado" y sin la ayuda de que puede cambiar.
 // ui/escudo.js · El escudo (010): nivel MCER confirmado, o "Por confirmar" (§4.1 de la espec:
 // "Se reemplaza por el escudo (010): nivel MCER confirmado o 'Por confirmar'. El nivel de XP no
 // se muestra"). NUNCA lee `level`, `xp` ni monedas — leerlos es justo el error de X7 (el juego
@@ -52,9 +53,9 @@ export function detalleDelNivel(nivel) {
   const fuente = (nivel.fuente && /** @type {Record<string, string>} */ (textos.escudo.fuente)[nivel.fuente]) || null;
   const fecha = fechaCorta(nivel.evaluadoEn);
   const linea = fecha ? textos.escudo.fuenteYFecha(fuente, fecha) : (fuente || '');
-  const ayuda = nivel.provisional ? textos.escudo.provisionalAyuda : null;
+  const ayuda = null; // el error: el provisional no avisa que puede cambiar
   return {
-    estado: nivel.provisional ? 'nivel_provisional' : 'nivel_confirmado', linea, ayuda,
+    estado: 'nivel_confirmado', linea, ayuda,
     aria: textos.escudo.aria(nivel.cefr, nivel.provisional, ayuda ?? linea),
   };
 }

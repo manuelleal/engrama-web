@@ -1,0 +1,16 @@
+{
+  "descripcion": "W30 (U14): perfilAJson deja pasar un cefr que no es A1-C2.",
+  "archivos": {
+    "src/auth/perfil_actual.js": "perfil_actual.js"
+  },
+  "comando": [
+    "node",
+    "--test",
+    "--test-reporter=tap",
+    "tests/unit/auth_perfil_actual.test.mjs"
+  ],
+  "espera_codigo_no_cero": true,
+  "espera_fallan_tests": [
+    "U14: un cefr fuera de A1-C2 se trata como null (nada de \"Nivel 7\" ni de niveles inventados)"
+  ]
+}

@@ -1,0 +1,16 @@
+{
+  "descripcion": "W30 (U16): Inicio dispara escudo-sube cuando el nivel definitivo baja respecto del provisional.",
+  "archivos": {
+    "src/vistas/estudiante/inicio.js": "inicio.js"
+  },
+  "comando": [
+    "node",
+    "--test",
+    "--test-reporter=tap",
+    "tests/unit/vista_inicio_nivel.test.mjs"
+  ],
+  "espera_codigo_no_cero": true,
+  "espera_fallan_tests": [
+    "U16: si el definitivo baja respecto del provisional ya mostrado: sin animación y un aviso único con el texto del dictamen"
+  ]
+}

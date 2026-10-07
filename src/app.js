@@ -151,7 +151,15 @@ function conCtx(fn) {
     // (inicio.js, perfil.js) usan esto para no ofrecer un enlace muerto.
     cambiarContrasena: typeof authActivo.cambiarContrasena === 'function' ? authActivo.cambiarContrasena : undefined,
     salir: cerrarSesion,
+    // W30: Inicio vuelve a pedir /auth/me en cada pintado (el nivel pudo cambiar en SET o EVA); solo con proveedores que lo soportan.
+    recargarSesion: typeof authActivo.recargarSesion === 'function' ? recargarYGuardar : undefined,
   });
+}
+
+// La sesión fresca de /auth/me queda como la vigente para el resto de la app.
+async function recargarYGuardar() {
+  sesionActual = await authActivo.recargarSesion();
+  return sesionActual;
 }
 
 // El estudiante entra por Home, el profe por sus grupos y el admin por su lista de grupos —

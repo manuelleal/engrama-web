@@ -1,0 +1,16 @@
+{
+  "descripcion": "W30 (U15): el escudo indica \"provisional\" solo con un estilo, sin ícono ni texto.",
+  "archivos": {
+    "src/ui/escudo.js": "escudo.js"
+  },
+  "comando": [
+    "node",
+    "--test",
+    "--test-reporter=tap",
+    "tests/unit/ui_escudo.test.mjs"
+  ],
+  "espera_codigo_no_cero": true,
+  "espera_fallan_tests": [
+    "U15: un provisional dice el nivel + \"⏳ Provisional\" + la ayuda del dictamen (G1), y el aria-label lo dice completo"
+  ]
+}

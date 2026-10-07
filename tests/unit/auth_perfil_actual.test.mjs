@@ -82,3 +82,37 @@ test('perfil_actual: active_tenant_id manda sobre la primera membresía, y coleg
 test('perfil_actual: un tenantIdActivo explícito gana sobre active_tenant_id (el que se pidió en la entrada)', () => {
   assert.equal(perfilAJson({ ...PROFILE_OUT, active_tenant_id: 'tenant-B' }, 'tenant-A').colegio.id, 'tenant-A');
 });
+
+// W30 (docs/ESPEC_pantallas_anillo.md §4.3, U14): el nivel confirmado de /auth/me llega a la Sesion tal cual lo dice el servidor.
+const CONFIRMADO = { cefr: 'B1', source: 'set', provisional: false, assessed_at: '2026-10-06T15:00:00Z' };
+
+test('U14: confirmed_level se vuelve nivelConfirmado {cefr, provisional, fuente, evaluadoEn}; sin él, null', () => {
+  const con = perfilAJson({ ...PROFILE_OUT, confirmed_level: CONFIRMADO }, 'tenant-A');
+  assert.deepEqual(con.nivelConfirmado, { cefr: 'B1', provisional: false, fuente: 'set', evaluadoEn: '2026-10-06T15:00:00Z' });
+  const prov = perfilAJson({ ...PROFILE_OUT, confirmed_level: { ...CONFIRMADO, provisional: true } }, 'tenant-A');
+  assert.equal(prov.nivelConfirmado?.provisional, true);
+  assert.equal(perfilAJson({ ...PROFILE_OUT, confirmed_level: null }, 'tenant-A').nivelConfirmado, null);
+  assert.equal(perfilAJson(PROFILE_OUT, 'tenant-A').nivelConfirmado, null, 'un backend que aún no lo informa: "Por confirmar"');
+  assert.equal(perfilAJson({ ...PROFILE_OUT, confirmed_level: { cefr: 'B1', source: 'set', assessed_at: '2026-10-06T15:00:00Z' } }, 'tenant-A').nivelConfirmado?.provisional, true,
+    'si el servidor no dice que es definitivo, no se afirma que lo es');
+});
+
+test('U14: un cefr fuera de A1-C2 se trata como null (nada de "Nivel 7" ni de niveles inventados)', () => {
+  for (const cefr of ['A0', 'D1', 'b1', 'B1 ', '', null, 7, undefined, 'Nivel 7']) {
+    assert.equal(perfilAJson({ ...PROFILE_OUT, confirmed_level: { ...CONFIRMADO, cefr } }, 'tenant-A').nivelConfirmado, null, String(cefr));
+  }
+  for (const cefr of ['A1', 'A2', 'B1', 'B2', 'C1', 'C2']) {
+    assert.equal(perfilAJson({ ...PROFILE_OUT, confirmed_level: { ...CONFIRMADO, cefr } }, 'tenant-A').nivelConfirmado?.cefr, cefr);
+  }
+  assert.equal(perfilAJson({ ...PROFILE_OUT, confirmed_level: 'B1' }, 'tenant-A').nivelConfirmado, null, 'una cadena suelta no es un confirmed_level');
+});
+
+test('U14: la Sesion con nivel sigue sin level ni xp, y validarSesion los rechaza (X7) y rechaza un nivelConfirmado mal formado', () => {
+  const sesion = perfilAJson({ ...PROFILE_OUT, confirmed_level: CONFIRMADO }, 'tenant-A');
+  assert.deepEqual(validarSesion(sesion), []);
+  assert.ok(!('level' in sesion) && !('xp' in sesion), 'ni el level (7) ni el xp (999) del perfil pasan a la Sesion');
+  assert.ok(validarSesion({ ...sesion, level: 7 }).some((e) => /level ni xp/.test(e)));
+  assert.ok(validarSesion({ ...sesion, xp: 999 }).some((e) => /level ni xp/.test(e)));
+  assert.ok(validarSesion({ ...sesion, nivelConfirmado: { cefr: 'Z9', provisional: false } }).some((e) => /nivelConfirmado/.test(e)));
+  assert.deepEqual(validarSesion({ ...sesion, nivelConfirmado: null }), []);
+});

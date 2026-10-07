@@ -7,7 +7,7 @@ import test from 'node:test';
 import assert from 'node:assert/strict';
 import { readFileSync } from 'node:fs';
 import { fileURLToPath } from 'node:url';
-import { tomarFotos } from './fotos_de_las_vistas.mjs';
+import { tomarFotos, sesionDeEstudiante } from './fotos_de_las_vistas.mjs';
 import { sinSubarboles } from './foto_vistas.mjs';
 
 const BASE = JSON.parse(readFileSync(fileURLToPath(new URL('../snapshots/vistas_595fd98.json', import.meta.url)), 'utf8'));
@@ -32,6 +32,16 @@ test('R4: las fotos de las vistas existentes son idénticas a las de 595fd98 (sa
     const declaradas = DECLARADAS[nombre] || [];
     assert.deepEqual(sinSubarboles(hoy[nombre], declaradas), sinSubarboles(base, declaradas), `cambió la foto de "${nombre}" fuera de lo declarado`);
   }
+});
+
+test('R4: con un nivel confirmado, Inicio cambia SOLO el nodo del escudo (lo declara W30) y el resto de las vistas no se entera', async () => {
+  const nivelConfirmado = { cefr: 'B1', provisional: false, fuente: 'set', evaluadoEn: '2026-10-06T15:00:00Z' };
+  const conNivel = await tomarFotos({ sesion: { ...sesionDeEstudiante(), nivelConfirmado } });
+  const declaradas = ['escudo', 'escudo-nivel']; // W30: el escudo solo, o el escudo con su etiqueta, su fuente y su fecha
+  assert.deepEqual(sinSubarboles(conNivel.inicio, declaradas), sinSubarboles(BASE.vistas.inicio, declaradas), 'fuera del escudo, Inicio es idéntico');
+  assert.notDeepEqual(conNivel.inicio, BASE.vistas.inicio, 'y el escudo sí cambió: ahora dice el nivel');
+  assert.ok(conNivel.inicio.some((l) => l.includes('data-testid="escudo-nivel"')));
+  for (const nombre of Object.keys(BASE.vistas).filter((n) => n !== 'inicio')) assert.deepEqual(conNivel[nombre], BASE.vistas[nombre], nombre);
 });
 
 test('R4: dos tomas seguidas dan lo mismo (la foto no depende del reloj ni del azar)', async () => {

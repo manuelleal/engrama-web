@@ -25,7 +25,7 @@ function actorASesion(actor) {
   return {
     profileId: actor.token, nombre: actor.nombre, rol: actor.rol,
     colegio: { id: 'demo', nombre: actor.colegio, tipo: 'school' },
-    grupo: actor.grupo, modulos: ['engrama'], constancia: actor.constancia,
+    grupo: actor.grupo, modulos: ['engrama'], constancia: actor.constancia, nivelConfirmado: null,
   };
 }
 

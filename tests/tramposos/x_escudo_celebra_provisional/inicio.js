@@ -1,4 +1,5 @@
 // @ts-check
+// TRAMPOSO x_escudo_celebra_provisional: Inicio anima el escudo también con un nivel provisional.
 // vistas/estudiante/inicio.js · Home (W7, ESPEC_mvp_uis.md §4.1; segunda pasada de diseño
 // 2026-09-28): saldo con conteo animado, constancia (el valor del servidor, nunca recalculado —
 // §7.4) con su ícono de fuego, el escudo "Por confirmar", el saludo de Drako (presenta, nunca
@@ -22,7 +23,7 @@ import {
 } from '../../ui/ultimo_visto.js';
 import { reducirMovimiento } from '../../ui/movimiento.js';
 import { registrarCelebracion } from '../../ui/celebraciones.js';
-import { nivelDeValor, valorDeNivel } from '../../auth/interfaz.js';
+import { NIVELES_MCER, valorDeNivel } from '../../auth/interfaz.js';
 import { tituloLegible } from '../../ui/titulo.js';
 import { textos } from '../../textos.js';
 import { leerSaldo, leerHistorialAsistencia } from '../../api/core.js';
@@ -146,7 +147,7 @@ function prepararNivel(ctx, nivel) {
   const previo = leerNivelVisto(quien);
   const plan = decidirNivel(previo, nivel, reducirMovimiento());
   guardarNivelVisto(quien, { valor: valorDeNivel(nivel.cefr), provisional: nivel.provisional });
-  const aviso = plan.avisoBaja && previo ? avisoDeBaja(nivel.cefr, nivelDeValor(previo.valor)) : null;
+  const aviso = plan.avisoBaja && previo ? avisoDeBaja(nivel.cefr, NIVELES_MCER[previo.valor - 1]) : null;
   return { animar: plan.animar, aviso };
 }
 
@@ -219,7 +220,7 @@ function pintarContenido(raiz, ctx, datos) {
       h('h1', {}, textos.inicio.saludo(ctx.sesion.nombre)),
       crearBotonSonido()),
     crearSelectorColegio(ctx), // login piloto (B): solo si el estudiante está en más de una institución
-    crearEscudo({ nivelConfirmado: datos.nivelConfirmado, animar: nivel.animar }), // W30: el de /auth/me; sin él, "Por confirmar"
+    crearEscudo({ nivelConfirmado: datos.nivelConfirmado, animar: nivel.animar || Boolean(datos.nivelConfirmado?.provisional && !reducirMovimiento()) }), // W30: el de /auth/me; sin él, "Por confirmar"
     nivel.aviso,
     tarjetaRetoDeHoy(datos.pendiente),
     tarjetaProgresoSemana(datos.semana),

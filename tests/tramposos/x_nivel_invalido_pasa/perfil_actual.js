@@ -1,4 +1,5 @@
 // @ts-check
+// TRAMPOSO x_nivel_invalido_pasa: un confirmed_level con un cefr fuera de A1-C2 llega a la Sesion como si fuera un nivel.
 // auth/perfil_actual.js · Adapta el `ProfileOut` de hoy (`src/auth/schemas.py:34` del backend,
 // confirmado en W4) a Sesion. Nunca lee `level` ni `xp`: ese nivel sale de las monedas, no es
 // el nivel MCER, y el juego no infla el perfil de competencia (regla de la casa,
@@ -26,7 +27,7 @@ let jwtEnMemoria = null;
  * @returns {import('./interfaz.js').Sesion['nivelConfirmado']}
  */
 export function nivelConfirmadoDe(crudo) {
-  if (!crudo || typeof crudo !== 'object' || !nivelValido(crudo.cefr)) return null;
+  if (!crudo || typeof crudo !== 'object') return null; // el error: cualquier cefr pasa, también un "Nivel 7"
   return {
     cefr: crudo.cefr, provisional: crudo.provisional !== false,
     fuente: typeof crudo.source === 'string' ? crudo.source : null,

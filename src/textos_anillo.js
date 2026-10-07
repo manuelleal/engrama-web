@@ -34,6 +34,25 @@ export const textosAnillo = {
     mensaje: 'Por ahora no puedes entrar a ENGRAMA con esta cuenta. Para saber el motivo o reactivarla, habla con tu profe o con la coordinación de tu institución.',
     contactoPrefijo: 'Contacto de tu institución: ',
   },
+  // W30 · El nivel confirmado en el escudo (dictamen 03: G1 la ayuda del provisional, G2 la bajada, G4 fuente y fecha siempre, G6 sin oro).
+  escudo: {
+    porConfirmar: 'Por confirmar', // sin nivel confirmado (X7: el juego nunca infla el nivel)
+    /** Fuente del nivel. Las que no estén aquí no inventan un nombre: se muestra solo la fecha. */
+    fuente: { set: 'Examen de nivel SET', grader: 'Examen de clase', docente: 'Tu profe' },
+    /** @param {string} fecha "6 oct 2026" */
+    fecha: (fecha) => `Medido el ${fecha}`,
+    /** @param {string|null} fuente @param {string} fecha */
+    fuenteYFecha: (fuente, fecha) => (fuente ? `${fuente} · Medido el ${fecha}` : `Medido el ${fecha}`),
+    // G1: nombra las tres salidas (sube, baja o igual) para quitar el anclaje en el provisional; la causa es la medición incompleta, no la persona.
+    provisionalAyuda: 'Falta tu escritura. Cuando tu profe la califique, tu nivel puede subir, bajar o quedar igual.',
+    /** @param {string} cefr @param {boolean} provisional @param {string} detalle lo que se ve debajo (ayuda, o fuente y fecha) */
+    aria: (cefr, provisional, detalle) => `Nivel ${cefr}, ${provisional ? 'provisional' : 'confirmado'}. ${detalle}${detalle.endsWith('.') ? '' : '.'}`,
+    ariaPorConfirmar: 'Nivel: Por confirmar',
+    // G2: el nivel no se celebra; si el definitivo BAJA, un aviso informativo único (texto exacto del dictamen §A.2, caso "Baja").
+    /** @param {string} definitivo @param {string} provisional */
+    avisoBaja: (definitivo, provisional) => `Tu nivel confirmado es ${definitivo}. El provisional (${provisional}) salía solo de lectura, escucha, gramática y vocabulario; con tu escritura calificada, el resultado completo es ${definitivo}. Tus monedas y tu racha no cambian. Tu práctica se ajusta a ${definitivo} para que avances desde ahí.`,
+    entendido: 'Entendido',
+  },
   // W29 · Etiquetas de estado (ícono + texto, nunca solo color). El ícono vive en ui/estado_etiqueta.js; aquí, solo el texto.
   // `estados` ya existe en textos.js, de ahí este nombre.
   etiquetasEstado: {

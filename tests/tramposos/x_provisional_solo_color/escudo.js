@@ -1,4 +1,5 @@
 // @ts-check
+// TRAMPOSO x_provisional_solo_color: el provisional no lleva ícono ni texto de estado: se distingue solo por su borde punteado.
 // ui/escudo.js · El escudo (010): nivel MCER confirmado, o "Por confirmar" (§4.1 de la espec:
 // "Se reemplaza por el escudo (010): nivel MCER confirmado o 'Por confirmar'. El nivel de XP no
 // se muestra"). NUNCA lee `level`, `xp` ni monedas — leerlos es justo el error de X7 (el juego
@@ -75,7 +76,7 @@ export function crearEscudo(datos) {
   return h(
     'div', { class: 'escudo-nivel', 'data-testid': 'escudo-nivel' },
     h('div', { class: clases, 'data-testid': 'escudo', role: 'img', 'aria-label': detalle.aria }, texto),
-    h('p', { class: 'escudo-etiqueta', 'data-testid': 'escudo-etiqueta' }, crearEtiquetaEstado(detalle.estado)),
+    nivel.provisional ? null : h('p', { class: 'escudo-etiqueta', 'data-testid': 'escudo-etiqueta' }, crearEtiquetaEstado(detalle.estado)), // el error: el provisional se distingue solo por su borde
     detalle.linea ? h('p', { class: 'texto-apoyo', 'data-testid': 'escudo-fuente' }, detalle.linea) : null,
     detalle.ayuda ? h('p', { 'data-testid': 'escudo-ayuda' }, detalle.ayuda) : null,
   );

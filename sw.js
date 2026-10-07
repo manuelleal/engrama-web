@@ -10,7 +10,7 @@
 //
 // Súbelo un número cada vez que cambie la lista de precarga o la estrategia; la `activate`
 // borra cualquier caché con otro nombre.
-const VERSION = 'engrama-shell-v23';
+const VERSION = 'engrama-shell-v24';
 
 // Cada encargo agrega los suyos en su propio commit (W7: Inicio + api/cliente,core,retos + los
 // SVG de Drako que usa el estudiante; W10: profe/grupos,grupo,sesion_asistencia + api/profe). El
@@ -81,6 +81,7 @@ const PRECARGA = [
   '/vendor/animejs@4.5.0/anime.esm.min.js',
   '/vendor/canvas-confetti@1.9.4/confetti.module.mjs',
   '/src/auth/mock.js',
+  '/src/auth/interfaz.js', // W30: el contrato de la Sesion y los niveles del MCER (lo importan escudo.js, ultimo_visto.js y perfil_actual.js)
   '/src/vistas/entrada.js',
   '/src/vistas/perfil.js', // W22: import estático de app.js
   // Login piloto: la pantalla obligatoria "Crea tu contraseña" (import estático de app.js), el

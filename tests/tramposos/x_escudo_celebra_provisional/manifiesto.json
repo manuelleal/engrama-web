@@ -1,0 +1,16 @@
+{
+  "descripcion": "W30 (U16): Inicio dispara escudo-sube con un nivel provisional.",
+  "archivos": {
+    "src/vistas/estudiante/inicio.js": "inicio.js"
+  },
+  "comando": [
+    "node",
+    "--test",
+    "--test-reporter=tap",
+    "tests/unit/vista_inicio_nivel.test.mjs"
+  ],
+  "espera_codigo_no_cero": true,
+  "espera_fallan_tests": [
+    "U16: escudo-sube solo con un nivel definitivo que es el primero o que no baja; nunca con un provisional"
+  ]
+}
