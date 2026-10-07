@@ -94,23 +94,35 @@ function configJsonActual() {
   return process.env.ENGRAMA_AUTH_CONFIG || null;
 }
 
+// ENGRAMA_DEV_DEMORA='{"/src/ui/estados.js": 40000}': retrasa esas rutas (ms) para PROBAR cómo se porta la app con un recurso lento
+// (herramientas/medir_sw.mjs). Sin la variable no hay ningún retraso. Se lee fresca en cada petición, como las demás.
+function demoraDe(ruta) {
+  try { return Number(JSON.parse(process.env.ENGRAMA_DEV_DEMORA || '{}')[ruta]) || 0; } catch (e) { console.error('servidor_dev: ENGRAMA_DEV_DEMORA no es JSON', e); return 0; }
+}
+
 export function crearServidor() {
   return createServer((req, res) => {
-    const url = new URL(req.url || '/', 'http://localhost');
-    if (url.pathname === '/config.json' && configJsonActual()) {
-      res.writeHead(200, { 'Content-Type': 'application/json; charset=utf-8' });
-      res.end(configJsonActual());
-      return;
-    }
-    if (url.pathname.startsWith('/api/')) { proxyApi(req, res, url.pathname.slice('/api'.length) + url.search); return; }
-    if (url.pathname.startsWith('/auth/v1/')) {
-      proxyApi(req, res, url.pathname.slice('/auth/v1'.length) + url.search, authUrlActual(), 'ENGRAMA_AUTH_URL no está configurada (GoTrue)');
-      return;
-    }
-    const rutaAbsoluta = resolverArchivo(decodeURIComponent(url.pathname));
-    if (!rutaAbsoluta) { res.writeHead(404).end('no encontrado'); return; }
-    servirEstatico(res, rutaAbsoluta);
+    const demora = demoraDe(new URL(req.url || '/', 'http://localhost').pathname);
+    if (demora > 0) { setTimeout(() => atender(req, res), demora); return; }
+    atender(req, res);
   });
+}
+
+function atender(req, res) {
+  const url = new URL(req.url || '/', 'http://localhost');
+  if (url.pathname === '/config.json' && configJsonActual()) {
+    res.writeHead(200, { 'Content-Type': 'application/json; charset=utf-8' });
+    res.end(configJsonActual());
+    return;
+  }
+  if (url.pathname.startsWith('/api/')) { proxyApi(req, res, url.pathname.slice('/api'.length) + url.search); return; }
+  if (url.pathname.startsWith('/auth/v1/')) {
+    proxyApi(req, res, url.pathname.slice('/auth/v1'.length) + url.search, authUrlActual(), 'ENGRAMA_AUTH_URL no está configurada (GoTrue)');
+    return;
+  }
+  const rutaAbsoluta = resolverArchivo(decodeURIComponent(url.pathname));
+  if (!rutaAbsoluta) { res.writeHead(404).end('no encontrado'); return; }
+  servirEstatico(res, rutaAbsoluta);
 }
 
 function main() {

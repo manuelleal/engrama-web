@@ -1,0 +1,16 @@
+{
+  "descripcion": "El cierre de sesion solo le avisa al service worker: si no controla la pagina, no se limpia nada (la privacidad depende del SW)",
+  "archivos": {
+    "src/app.js": "app.js"
+  },
+  "comando": [
+    "node",
+    "--test",
+    "--test-reporter=tap",
+    "tests/e2e/sw_sin_controlador.test.mjs"
+  ],
+  "espera_codigo_no_cero": true,
+  "espera_fallan_tests": [
+    "sin service worker controlando: la app abre, y \"Cerrar sesión\" borra de la caché cualquier /api (y deja el shell)"
+  ]
+}

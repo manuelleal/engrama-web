@@ -197,7 +197,7 @@ async function cambiarColegio(id) {
 // cachés viejas y un controlador que aún no existe).
 function limpiarCacheDeApi() {
   navigator.serviceWorker?.controller?.postMessage('limpiar-api');
-  return borrarApiDeLasCaches().catch((e) => console.error('app: no pude limpiar las cachés de /api', e));
+  return Promise.resolve(); // solo el mensaje al service worker: sin controlador no se limpia nada
 }
 
 async function borrarApiDeLasCaches() {

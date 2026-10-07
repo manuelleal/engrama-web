@@ -142,7 +142,7 @@ async function precargar() {
 }
 
 self.addEventListener('install', (ev) => {
-  ev.waitUntil(precargar().then(() => self.skipWaiting()));
+  ev.waitUntil(caches.open(VERSION).then((c) => c.addAll(PRECARGA)).then(() => self.skipWaiting()));
 });
 
 self.addEventListener('activate', (ev) => {

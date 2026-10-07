@@ -1,0 +1,17 @@
+{
+  "descripcion": "sw.js vuelve a cache.addAll(PRECARGA): un recurso lento retiene la instalación y la página queda sin controlar (>30 s observados); uno que falla tumba todo",
+  "archivos": {
+    "sw.js": "sw.js"
+  },
+  "comando": [
+    "node",
+    "--test",
+    "--test-reporter=tap",
+    "tests/unit/sw_instalacion.test.mjs"
+  ],
+  "espera_codigo_no_cero": true,
+  "espera_fallan_tests": [
+    "sw (instalación): un recurso que se cuelga NO retiene la instalación: se aborta, se avisa y el resto queda guardado",
+    "sw (instalación): un recurso que falla (404 o sin red) no tumba la instalación"
+  ]
+}

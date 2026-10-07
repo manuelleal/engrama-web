@@ -34,3 +34,21 @@ test('servidor_dev: por HTTP, las dos librerías llegan idénticas a PROCEDENCIA
     assert.equal(fuera.status, 404);
   } finally { servidor.close(); }
 });
+
+test('servidor_dev: ENGRAMA_DEV_DEMORA retrasa solo la ruta pedida (para probar la precarga con un recurso lento) y sin la variable no hay retraso', async () => {
+  const servidor = crearServidor();
+  await new Promise((ok) => servidor.listen(0, '127.0.0.1', () => ok(undefined)));
+  const previo = process.env.ENGRAMA_DEV_DEMORA;
+  try {
+    const { port } = /** @type {import('node:net').AddressInfo} */ (servidor.address());
+    const medir = async (ruta) => { const t = performance.now(); await (await fetch(`http://127.0.0.1:${port}${ruta}`)).arrayBuffer(); return performance.now() - t; };
+    process.env.ENGRAMA_DEV_DEMORA = JSON.stringify({ '/estilos/base.css': 250 });
+    assert.ok(await medir('/estilos/base.css') >= 240, 'la ruta marcada se retrasa');
+    assert.ok(await medir('/estilos/juego.css') < 200, 'las demás no');
+    delete process.env.ENGRAMA_DEV_DEMORA;
+    assert.ok(await medir('/estilos/base.css') < 200, 'sin la variable no hay retraso');
+  } finally {
+    if (previo === undefined) delete process.env.ENGRAMA_DEV_DEMORA; else process.env.ENGRAMA_DEV_DEMORA = previo;
+    servidor.close();
+  }
+});
