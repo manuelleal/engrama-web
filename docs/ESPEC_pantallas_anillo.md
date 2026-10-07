@@ -444,3 +444,27 @@ Desvíos de la letra:
 - **Perfil gana el enlace a las solicitudes** y el aviso de `#/datos` (dentro de la sesión) también; la pantalla obligatoria del aviso ofrece un botón que las pinta en el mismo sitio. R4 declara el nodo de Perfil (`perfil-ver-solicitudes`) en `DECLARADAS`.
 - **W34 no toca `app.js` ni `config.js`:** `anillo/destinos.js` recibe el contenido de `config.json` ya leído y `anillo/enlace.js` no lee la sesión; quien los una (W35) pasa `ctx.config` y pide el pase con `authActivo.token()` al tocar. Por eso estos dos módulos todavía no están en `PRECARGA` de `sw.js` (no los importa `app.js`); W35 los agrega.
 - **Quedó para después** (el encargo no lo pedía): los avisos de §A.2 para "igual" y "sube" al pasar de provisional a definitivo; el aviso de antigüedad del nivel a los 180 días (G4, el número es prudencia); el texto de `#/nivel` antes de empezar el examen (§A.7).
+
+### 17.5 Lo que se decidió al empezar W35 (2026-10-07)
+Implementador. **Lo de arriba no se tocó.** Va en un commit de docs antes del código de W35.
+
+**Archivos nuevos que §7 no listaba** (regla 8, ERR-25):
+- `src/anillo/abrir.js`: lo que comparten las tres superficies que salen a EVA o a SET (Inicio y `#/vivo`/`#/nivel` del estudiante, "Herramientas de clase" del profe). Trae (a) la tabla de qué destinos ve cada rol (`student`: `eva_celular` y `set_examen`; `teacher`: `eva_tablero`, `eva_escamas` y `set_revisar`; `admin`: ninguno) y `destinosVisibles(rol, config, tenantId)`, que solo devuelve los que tienen una base válida (U30); y (b) la salida al tocar: pide el pase **al tocar**, arma el enlace con `armarEnlaceAnillo`, navega con `location.assign` (o con `ctx.irA`, que los tests inyectan) y **no navega una segunda vez** hasta que la página vuelva (`pageshow` con `persisted`). Ningún mensaje de error ni línea de consola lleva el pase ni el enlace.
+- `src/vistas/estudiante/salida_codigo.js`: el formulario "escribe tu código y entra" que comparten `vivo.js` y `nivel.js` (campo, validación local, nota de §4.8 `anillo.sales`, sin red, error). `vivo.js` y `nivel.js` quedan como configuración de ese formulario.
+- `src/vistas/profe/herramientas_clase.js`: el bloque "Herramientas de clase" que `profe/grupos.js` pinta solo si hay algún destino configurado.
+
+**Tramposos de U31:** `x_pase_en_href`, `x_pase_en_consola` y `x_pase_en_almacenamiento` mutan `src/anillo/abrir.js`, no `vivo.js`: la lógica del toque es compartida, y un solo archivo que la contiene protege las tres superficies. El test de U31 recorre las tres (`#/vivo`, `#/nivel` y el bloque del profe). `x_estudiante_ve_tablero` (U32) sí muta `inicio.js`, como dice §9.3.
+
+**Ediciones declaradas:**
+- `src/app.js`: guarda `config` ya leída, la pasa en `ctx.config`, agrega `ctx.pedirPase` (= `authActivo.token()`) y las rutas `#/vivo` y `#/nivel`. Sigue sin tocar `src/config.js`.
+- `src/textos_anillo.js`: la clave nueva `anillo` (los textos de §4.8, los errores de formato y los de Inicio). También entra el texto de `#/nivel` del dictamen 03 §A.7 ("Este examen mide tu nivel…"): el dictamen lo recomienda y la adenda 17.4 lo dejó para esta pantalla. **Pendiente de Christiam:** el dictamen afirma "no da monedas ni cambia tu racha" y el cliente no puede verificarlo.
+- `sw.js`: `PRECARGA` gana los siete módulos nuevos (los dos de `anillo/` que W34 dejó fuera, `abrir.js`, `salida_codigo.js`, `vivo.js`, `nivel.js`, `herramientas_clase.js`) y la versión sube.
+- `tests/unit/fotos_de_las_vistas.mjs`: las fotos de R4 pueden pedirse con `config` (para medir el bloque nuevo); sin ella son las de siempre.
+
+**Decisiones menores (PROVISIONALES, las revisa Christiam):**
+- **A SET solo si la institución activa es un UUID.** SET responde 400 si `tenant=` viene mal formado; un `tenant` que no lo es (el `demo` del modo mock) no pinta enlaces a SET. A EVA no le hace falta.
+- **El código vacío no navega, tampoco hacia EVA.** EVA sabe pedir la sala si llega sin ella (§3.4), pero §4.6 dice que la escribe el estudiante y U32 pide "campo vacío → no navega".
+- **El código se recorta (espacios al borde) y no se cambia a mayúsculas:** SET ya lo pasa a mayúsculas (§3.4) y EVA no lo pide.
+- **`?sala=` y `?examen=` llegan al campo ya escritos** (si pasan la validación) y **nunca abren solos**.
+- **Tras tocar, el botón queda deshabilitado ("Abriendo…")** hasta que la página vuelva de la caché de ida y vuelta; así un segundo toque o un Enter no navegan dos veces.
+- **R4:** con la configuración sin claves del anillo, Inicio y `profe/grupos` dan idéntico a la línea base; con claves cambia **solo** el subárbol `anillo-tarjetas` (Inicio) o `herramientas-clase` (`profe/grupos`).
