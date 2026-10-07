@@ -27,6 +27,9 @@ export class NodoFalso {
     this.children.splice(this.children.indexOf(ref), 0, n);
     return n;
   }
+  // W26 (R4): lo que usan ui/dom.js (vaciar/montar) y las fotos de las vistas.
+  get firstChild() { return this.children[0] ?? null; }
+  removeChild(n) { const i = this.children.indexOf(n); if (i >= 0) this.children.splice(i, 1); n.parentNode = null; return n; }
   remove() { if (this.parentNode) this.parentNode.children.splice(this.parentNode.children.indexOf(this), 1); this.parentNode = null; }
   querySelector(tag) {
     for (const h of this.children) { if (h.tagName === tag) return h; const r = h.querySelector(tag); if (r) return r; }

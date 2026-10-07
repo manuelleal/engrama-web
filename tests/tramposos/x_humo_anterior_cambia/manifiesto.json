@@ -1,0 +1,7 @@
+{
+  "descripcion": "R5 (W26): el mock paga una moneda de más y el humo anterior cambia de sha256; R5 debe ponerse rojo.",
+  "archivos": { "herramientas/mock/monedas.mjs": "monedas.mjs" },
+  "comando": ["node", "--test", "--test-reporter=tap", "tests/unit/regresion_humo.test.mjs"],
+  "espera_codigo_no_cero": true,
+  "espera_fallan_tests": ["R5: el humo anterior (humo_mvp_uis.mock.json) da el mismo sha256 que en 595fd98"]
+}

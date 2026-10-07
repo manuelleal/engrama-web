@@ -1,0 +1,39 @@
+// @ts-check
+// R4 (docs/ESPEC_pantallas_anillo.md §9.2, METODO regla 4): regresión = identidad. Las vistas que los encargos W29-W35
+// van a tocar se pintan con entradas fijas (fotos_de_las_vistas.mjs) y se comparan, línea por línea, con la foto que
+// se tomó en 595fd98, ANTES de tocar nada (tests/snapshots/vistas_595fd98.json). Un commit posterior cambia SOLO el nodo
+// que declara: la declaración vive aquí abajo, en DECLARADAS, con el encargo que la autoriza. La línea base no se regenera.
+import test from 'node:test';
+import assert from 'node:assert/strict';
+import { readFileSync } from 'node:fs';
+import { fileURLToPath } from 'node:url';
+import { tomarFotos } from './fotos_de_las_vistas.mjs';
+import { sinSubarboles } from './foto_vistas.mjs';
+
+const BASE = JSON.parse(readFileSync(fileURLToPath(new URL('../snapshots/vistas_595fd98.json', import.meta.url)), 'utf8'));
+
+/**
+ * Los subárboles (por `data-testid`) que un encargo posterior declaró como cambiados, por vista. Vacío = ninguna vista
+ * cambia. Cada entrada nombra el encargo de §11 que la autoriza; si una foto cambia y no está aquí, R4 se pone rojo.
+ * @type {Record<string, string[]>}
+ */
+export const DECLARADAS = {};
+
+test('R4: la línea base trae las vistas que la espec nombra (entrada, Inicio, Perfil, aviso, sin_perfil, profe/grupos y profe/grupo)', () => {
+  for (const nombre of ['entrada_supabase', 'inicio', 'perfil', 'aviso_consentimiento', 'sin_perfil', 'profe_grupos', 'profe_grupo']) {
+    assert.ok(Array.isArray(BASE.vistas[nombre]) && BASE.vistas[nombre].length > 3, `falta la foto de ${nombre} en la línea base`);
+  }
+});
+
+test('R4: las fotos de las vistas existentes son idénticas a las de 595fd98 (salvo el nodo que un encargo declara)', async () => {
+  const hoy = await tomarFotos();
+  assert.deepEqual(Object.keys(hoy).sort(), Object.keys(BASE.vistas).sort(), 'las vistas fotografiadas deben ser las de la línea base');
+  for (const [nombre, base] of Object.entries(BASE.vistas)) {
+    const declaradas = DECLARADAS[nombre] || [];
+    assert.deepEqual(sinSubarboles(hoy[nombre], declaradas), sinSubarboles(base, declaradas), `cambió la foto de "${nombre}" fuera de lo declarado`);
+  }
+});
+
+test('R4: dos tomas seguidas dan lo mismo (la foto no depende del reloj ni del azar)', async () => {
+  assert.deepEqual(await tomarFotos(), await tomarFotos());
+});
