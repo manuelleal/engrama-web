@@ -406,3 +406,34 @@ W29, W30, W33 y W34 no dependen de D7 ni del despliegue: se pueden hacer ya. Cad
   - Que `pageshow` con `persisted` se dispare en Edge headless (E16 depende de eso; si no, se mide con una recarga y se anota).
   - Que el OpenAPI de `5aad55e` se pueda exportar sin tocar el `.venv` (ERR-11).
   - Las espec de foco, refuerzo y Grader (039-041) no se leyeron: solo se anotan como siguiente espec.
+
+---
+
+## 17. Adenda · lo que cambió al implementar W26-W30 (2026-10-07)
+Implementador. **Lo de arriba no se tocó**: esta adenda dice qué manda donde el texto de arriba y lo que se hizo difieren, y por qué. Va en un commit de docs antes del código de W29 (y por tanto antes del de W30).
+
+### 17.1 Textos: manda el dictamen pedagógico (ERR-16)
+`investigacion/pedagogia/03-dictamen-err16-anillo-foco-refuerzo-rubrica.md` §A.1 a §A.5 sustituye a los textos PROVISIONALES de §4.8 donde los trae. Lo que entra en W29 y W30: **G1** (ayuda del provisional: "Falta tu escritura. Cuando tu profe la califique, tu nivel puede subir, bajar o quedar igual."), **G3** (los tres textos de espera, "ya no está" y suspendida; en suspendida no se promete que la racha se conserva), **G4** (el nivel lleva siempre fuente y fecha: "Examen de nivel SET · Medido el 6 oct 2026") y **G6** (el nivel no lleva oro; el escudo conserva su estilo). Los de **G5** (mayoría de edad, 201, tipos y estados de las solicitudes) entran con los encargos que los usan (W31 y W33). El texto de `estado_etiqueta` para "solicitud rechazada" pasa de "✗ No procede" a "Respondida: no se pudo hacer", con ícono de información (no `✗`: ese es el de una respuesta incorrecta).
+
+### 17.2 U16 cambia (dictamen 03, hallazgo 2 y G2)
+La espec decía `escudo-sube` "una sola vez cuando aparece un nivel definitivo **distinto** del último visto". Eso también lo disparaba cuando el nivel **bajaba**: se celebraba una bajada. Nueva regla, que reemplaza a la de §4.3 y a la de U16:
+- El nivel **no se celebra como logro de juego** (sin confeti, monedas ni sonido de premio).
+- `escudo-sube` (animación sobria) solo con un nivel **definitivo** y solo si (a) es el primer nivel que esa persona ve en esa institución, o (b) **no es menor** que el último mostrado (provisional o definitivo). Nunca con un provisional, nunca si baja, nunca con "reducir movimiento".
+- Si el definitivo **baja** respecto de un provisional ya mostrado: sin animación y **un aviso informativo único** con el texto exacto de §A.2 (caso "Baja"), con ícono de información, botón "Entendido" y sin Drako dentro del aviso. No se repite al volver a Inicio (el nivel mostrado se guarda al verlo). Si baja respecto de un **definitivo** anterior (otro examen): sin animación y sin aviso (la etiqueta ya dice fuente y fecha); el texto de §A.2 habla de un provisional y sería falso.
+- El "último mostrado" se guarda por persona **e institución** en `ui/ultimo_visto.js` (nivel como 1 a 6 y si era provisional).
+- Los avisos de §A.2 para "igual" y "sube" (al pasar de provisional a definitivo) **no se hacen** en este frente: el encargo pedía solo la bajada. Queda en "Después".
+- **Tramposo de U16** (`x_escudo_celebra_provisional` y uno nuevo, `x_escudo_celebra_bajada`): una vista que dispara `escudo-sube` cuando el nivel baja (y otra que lo dispara con un provisional) debe poner U16 en rojo.
+
+### 17.3 Ediciones y desvíos declarados (regla 8, ERR-25)
+Ediciones que §7 no listaba:
+- `src/auth/supabase_rest.js`: `iniciar()` borraba la sesión ante cualquier error de `/auth/me`; con un 403 `pending_approval` (la cuenta existe, falta que la apruebe su profe) la dejaba sin pase y "Revisar de nuevo" no podía funcionar tras una recarga. Ahora conserva la sesión cuando el bloqueo es `pendiente` o `suspendida`, y sigue borrándola en los demás casos, como hasta hoy.
+- `src/ui/contacto.js` (nuevo): el contacto del aviso como texto seleccionable, compartido por las pantallas de espera y suspendida (el de `aviso_datos.js` no está exportado).
+- `src/textos_anillo.js`: la clave de las etiquetas de estado es `etiquetasEstado` (`estados` ya existe en `textos.js`); `entrada.crearCuenta` de §4.8 choca con `textos.entrada` y se resolverá en W31 (el spread de `textos.js` pisaría la clave; `tests/unit/textos_anillo.test.mjs` lo vigila).
+- `tests/unit/dom_falso.mjs`: gana `firstChild` y `removeChild` (las usa `ui/dom.js` para montar); `tests/unit/foto_vistas.mjs` y `fotos_de_las_vistas.mjs` son el arnés de R4.
+- R4 declara los nodos que un encargo cambia en `DECLARADAS` (`tests/unit/regresion_vistas.test.mjs`); la línea base no se regenera.
+
+Desvíos de la letra:
+- **R5 mide el hash del archivo** (`salida/humo_mvp_uis.mock.json`, con su salto de línea final), como dice §9.2; el que imprime `humo.mjs` es el del texto sin ese salto y vale otra cosa. El medido en 595fd98 está en `tests/snapshots/humo_mvp_uis.sha256`.
+- **`estado.registro.configurado`** (§8): `estado.registro` ya era el diario de peticiones del mock. El interruptor vive en `estado.autorregistro.configurado` y la propiedad `estado.registro.configurado` lo refleja, así que lo que diga §9.1 paso 10 funciona tal cual.
+- **R6** usa `contratos/openapi_5aad55e.json`, **exportado** del backend con su `.venv` (orden de solo lectura, sin tocar el repo del backend; `SUPABASE_JWT_SECRET` y `DATABASE_URL` de mentira solo en el entorno del proceso). Ya no hace falta la adenda a mano para esas rutas.
+- **E11** gana un tercer escenario (el pendiente cuya solicitud se rechaza: "Tu solicitud ya no está activa"), para que el tramposo `x_rechazo_sin_explicar` tenga un E2E que lo vea.
