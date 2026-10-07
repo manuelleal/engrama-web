@@ -596,17 +596,13 @@ body {
 .juego > ul {
   animation: none;
 }
-.juego .fila-revision {
-  animation: fila-entra 480ms cubic-bezier(0.2, 1.4, 0.4, 1) calc(600ms + var(--i, 0) * 130ms) backwards;
+/* Las filas ENTRAN en la línea de tiempo del fin de reto (ui/linea_fin_reto.js, anime.js: opacity y translateX, una tras otra, después
+   del puntaje y las monedas). Cuando una fila entra se marca `fila-lista` y recién ahí la correcta rebota y la que no tiembla. */
+.juego .fila-lista.revision-ok .resultado-ok {
+  animation: ok-rebota 650ms cubic-bezier(0.2, 1.9, 0.4, 1) 120ms backwards;
 }
-@keyframes fila-entra {
-  from { opacity: 0; transform: translateX(-36px); }
-}
-.juego .revision-ok .resultado-ok {
-  animation: ok-rebota 650ms cubic-bezier(0.2, 1.9, 0.4, 1) calc(800ms + var(--i, 0) * 130ms) backwards;
-}
-.juego .revision-mal .resultado-mal {
-  animation: mal-tiembla 380ms ease-in-out calc(800ms + var(--i, 0) * 130ms) backwards;
+.juego .fila-lista.revision-mal .resultado-mal {
+  animation: mal-tiembla 380ms ease-in-out 120ms backwards;
 }
 @keyframes ok-rebota {
   from { opacity: 0; transform: scale(0.7); }

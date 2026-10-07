@@ -1,0 +1,7 @@
+{
+  "descripcion": "La línea de tiempo corre aunque el estudiante pidió menos movimiento (prefers-reduced-motion ignorado)",
+  "archivos": { "src/ui/linea_fin_reto.js": "linea_fin_reto.js" },
+  "comando": ["node", "--test", "--test-reporter=tap", "tests/unit/ui_linea_fin_reto.test.mjs"],
+  "espera_codigo_no_cero": true,
+  "espera_fallan_tests": ["línea de tiempo: con prefers-reduced-motion no hay línea: todo va directo al estado final, legible"]
+}

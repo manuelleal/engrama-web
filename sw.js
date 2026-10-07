@@ -10,7 +10,7 @@
 //
 // Súbelo un número cada vez que cambie la lista de precarga o la estrategia; la `activate`
 // borra cualquier caché con otro nombre.
-const VERSION = 'engrama-shell-v19';
+const VERSION = 'engrama-shell-v20';
 
 // Cada encargo agrega los suyos en su propio commit (W7: Inicio + api/cliente,core,retos + los
 // SVG de Drako que usa el estudiante; W10: profe/grupos,grupo,sesion_asistencia + api/profe). El
@@ -62,6 +62,8 @@ const PRECARGA = [
   '/src/ui/boton.js',
   '/src/ui/toque.js',
   '/src/ui/celebracion.js',
+  '/src/ui/linea_fin_reto.js', // la línea de tiempo del fin de reto (anime.js)
+  '/src/ui/celebraciones.js', // el gancho único de limpieza de toda celebración
   '/src/ui/sello.js',
   '/src/ui/estados.js',
   '/src/ui/titulo.js',

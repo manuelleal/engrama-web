@@ -15,6 +15,7 @@ import { lanzarConfeti } from './confeti.js';
 import { celebrarMonedas, planDeMonedas, duracionTotal } from './monedas.js';
 import { animarConteo } from './conteo.js';
 import { senal } from './sonido.js';
+import { correrLinea } from './linea_fin_reto.js';
 
 /** @typedef {'perfecto'|'bien'|'animo'} NivelCelebracion */
 
@@ -59,21 +60,38 @@ export function crearHeroResultado(d) {
 }
 
 /**
- * El momento: confeti según nivel, sonido, el puntaje y las monedas que cuentan y VUELAN a su medalla.
- * @param {{nivel: NivelCelebracion, aciertos: number, total: number, monedas: number, hero: ReturnType<typeof crearHeroResultado>}} d
+ * El momento, como UNA línea de tiempo (ui/linea_fin_reto.js, anime.js): Drako salta → confeti (y su fanfarria) → el puntaje cuenta →
+ * las monedas vuelan a su medalla → las filas de la revisión entran en cascada → el botón. El orden y los tiempos salen del resultado
+ * (nivel, monedas del servidor, número de filas), nunca del tiempo que tardó el estudiante ni de ningún azar. Con prefers-reduced-motion
+ * no hay línea: todo va directo al estado final.
+ * @param {{nivel: NivelCelebracion, aciertos: number, total: number, monedas: number, hero: ReturnType<typeof crearHeroResultado>,
+ *   filas?: HTMLElement[], boton?: HTMLElement|null}} d
  */
 export function celebrarFinDeReto(d) {
   const plan = planDeCelebracion(d.nivel);
-  senal(plan.sonido);
   const drako = controladorDe(d.hero.drako);
-  if (d.nivel === 'animo') drako?.mostrar('ups'); else drako?.celebrarSalto();
-  if (plan.confeti) lanzarConfeti(plan.confeti);
-  if (plan.segundoEstalloMs) setTimeout(() => lanzarConfeti('normal'), plan.segundoEstalloMs);
-  animarConteo(d.hero.puntaje, { desde: 0, hasta: d.aciertos, formato: (n) => `${n} / ${d.total}`, golpe: d.nivel !== 'animo' });
-  if (d.hero.medallaNum) {
-    const medalla = d.hero.medallaNum;
-    const duracion = Math.max(900, duracionTotal(planDeMonedas(d.monedas)));
-    celebrarMonedas({ desde: d.hero.drako, hasta: medalla, cantidad: d.monedas });
-    animarConteo(medalla, { desde: 0, hasta: d.monedas + 1, formato: (n) => `+${n}`, golpe: false, duracionMs: duracion });
-  }
+  const acciones = {
+    drako: () => {
+      if (d.nivel !== 'animo') { drako?.celebrarSalto(); return; }
+      senal(plan.sonido);
+      drako?.mostrar('ups');
+    },
+    confeti: () => {
+      senal(plan.sonido);
+      if (plan.confeti) lanzarConfeti(plan.confeti);
+      if (plan.segundoEstalloMs) setTimeout(() => lanzarConfeti('normal'), plan.segundoEstalloMs);
+    },
+    puntaje: () => animarConteo(d.hero.puntaje, { desde: 0, hasta: d.aciertos, formato: (n) => `${n} / ${d.total}`, golpe: d.nivel !== 'animo' }),
+    monedas: () => contarMonedas(d),
+  };
+  correrLinea({ nivel: d.nivel, monedas: d.monedas, filas: d.filas || [], boton: d.boton || null, acciones });
+}
+
+// Las monedas vuelan desde Drako hasta la medalla, que cuenta hasta lo que dijo el servidor.
+function contarMonedas(d) {
+  if (!d.hero.medallaNum) return;
+  const medalla = d.hero.medallaNum;
+  const duracion = Math.max(900, duracionTotal(planDeMonedas(d.monedas)));
+  celebrarMonedas({ desde: d.hero.drako, hasta: medalla, cantidad: d.monedas });
+  animarConteo(medalla, { desde: 0, hasta: d.monedas + 1, formato: (n) => `+${n}`, golpe: false, duracionMs: duracion });
 }

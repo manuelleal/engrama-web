@@ -1,0 +1,7 @@
+{
+  "descripcion": "Las filas de la revisión no esperan su turno en la línea de tiempo: se ven desde el primer instante, antes que el puntaje",
+  "archivos": { "src/ui/linea_fin_reto.js": "linea_fin_reto.js" },
+  "comando": ["node", "--test", "--test-reporter=tap", "tests/e2e/linea_fin_reto.test.mjs"],
+  "espera_codigo_no_cero": true,
+  "espera_fallan_tests": ["línea de tiempo (E2E): Drako salta → confeti → puntaje → monedas → filas → botón, EN ESE ORDEN"]
+}

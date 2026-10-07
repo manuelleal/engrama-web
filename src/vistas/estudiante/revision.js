@@ -55,6 +55,7 @@ export function renderRevision(raiz, datos) {
     'p', { role: 'status', class: monedas > 0 ? 'solo-lectores' : 'aviso-corto', 'data-testid': 'revision-monedas' },
     monedas > 0 ? textos.revision.gananciaMonedas(monedas) : textos.revision.sinGanancia,
   );
+  const volver = h('a', { href: '#/retos', 'data-testid': 'revision-volver' }, textos.revision.volver);
   const nodo = h(
     'div', { 'data-testid': 'vista-revision', class: 'juego' },
     h('div', { class: 'barra-rol' }, crearBotonSonido()),
@@ -62,10 +63,11 @@ export function renderRevision(raiz, datos) {
     banner,
     h('h2', { class: 'subtitulo-revision' }, textos.revision.titulo),
     h('ul', {}, ...filas),
-    h('a', { href: '#/retos', 'data-testid': 'revision-volver' }, textos.revision.volver),
+    volver,
     crearNavInferior('retos'),
   );
   montar(raiz, nodo);
-  celebrarFinDeReto({ nivel, aciertos, total, monedas, hero });
+  // La línea de tiempo del fin de reto revela las filas y el botón en su momento (ui/linea_fin_reto.js).
+  celebrarFinDeReto({ nivel, aciertos, total, monedas, hero, filas, boton: volver });
   document.body.dataset.listo = '1';
 }

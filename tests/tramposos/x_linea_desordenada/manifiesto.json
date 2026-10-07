@@ -1,0 +1,7 @@
+{
+  "descripcion": "Las monedas vuelan ANTES de que el puntaje termine de contar: la línea de tiempo pierde su orden",
+  "archivos": { "src/ui/linea_fin_reto.js": "linea_fin_reto.js" },
+  "comando": ["node", "--test", "--test-reporter=tap", "tests/unit/ui_linea_fin_reto.test.mjs"],
+  "espera_codigo_no_cero": true,
+  "espera_fallan_tests": ["línea de tiempo: un reto perfecto va EN ORDEN — Drako salta, confeti, puntaje, monedas, filas, botón"]
+}
