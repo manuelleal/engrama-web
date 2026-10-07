@@ -131,7 +131,10 @@ export class DrakoAnimado {
 
   /** Reposo: respira, parpadea y mueve la cola. Tres movimientos que no se pisan (cada uno en su propio grupo). */
   empezarReposo() {
-    if (this.detenido || this.idle.length) return;
+    if (this.detenido || this.idle.length) return; // <- el error: ignora prefers-reduced-motion
+    this.idle.push({ cancel() {} }); // (simula arrancar el reposo sin encender el motor de anime.js en Node)
+    this.parpadeoTimer = 0;
+    return;
     const parte = (n) => this.rig.partes.get(n);
     this.idle.push(animate(parte('respira'), { scaleY: [1, 1.018], scaleX: [1, 0.994], duration: 1700, ease: 'inOutSine', loop: true, alternate: true }));
     this.idle.push(animate(parte('cola'), { rotate: [-4, 5], duration: 1500, ease: 'inOutSine', loop: true, alternate: true }));
