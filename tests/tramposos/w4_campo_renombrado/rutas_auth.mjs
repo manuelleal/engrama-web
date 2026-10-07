@@ -35,6 +35,8 @@ export function leerMe(estado, req) {
       is_active: perfil.is_active, last_attendance_date: perfil.last_attendance_date, memberships: propias.map(membershipOut),
       active_tenant_id: auth.tenantId, must_change_password: perfil.force_password_reset === true,
       consent_version: perfil.consent_version ?? null,
+      // El nivel que fijó un "efecto de fuera" (SET) en la institución ACTIVA; null = "Por confirmar" (backend 5aad55e, ConfirmedLevelOut).
+      confirmed_level: estado.niveles.get(`${perfil.id}:${auth.tenantId}`) ?? null,
     },
   };
 }

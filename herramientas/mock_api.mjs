@@ -24,6 +24,8 @@ import {
 } from './mock/rutas_teachers.mjs';
 import { listarChallenges, listarTodosLosChallenges, verChallenge, cambiarEstado, crearChallenge } from './mock/rutas_challenges.mjs';
 import { arrancarIntento, enviarIntento, historialDeIntentos } from './mock/rutas_intentos.mjs';
+import { registrarse, crearCodigo, leerCodigo, apagarCodigo, listarSolicitudes, aprobarSolicitud, rechazarSolicitud } from './mock/rutas_registro.mjs';
+import { crearSolicitudDatos, misSolicitudesDatos, solicitudesDeLaInstitucion, responderSolicitudDatos } from './mock/rutas_datos.mjs';
 import {
   leerSaldo, leerHistorialMonedas, checkIn, historialAsistenciaPropio, historialAsistenciaDeEstudiante,
 } from './mock/rutas_core.mjs';
@@ -42,11 +44,29 @@ function rutasDeAuth(r) {
   ];
 }
 
+/** W28 (ESPEC_pantallas_anillo §8): el registro con código de grupo, las 6 rutas del docente y las solicitudes sobre mis datos. */
+function rutasDelAnillo(r) {
+  return [
+    r('POST', '/auth/registro', (estado, req, p, body) => registrarse(estado, req, body)),
+    r('POST', '/auth/solicitudes-datos', (estado, req, p, body) => crearSolicitudDatos(estado, req, body)),
+    r('GET', '/auth/solicitudes-datos', (estado, req) => misSolicitudesDatos(estado, req)),
+    r('GET', '/admin/solicitudes-datos', (estado, req, p, body, url) => solicitudesDeLaInstitucion(estado, req, url.searchParams.get('estado'))),
+    r('PUT', '/admin/solicitudes-datos/:sid', (estado, req, p, body) => responderSolicitudDatos(estado, req, p.sid, body)),
+    r('POST', '/teachers/groups/:gid/codigo-inscripcion', (estado, req, p, body) => crearCodigo(estado, req, p.gid, body)),
+    r('GET', '/teachers/groups/:gid/codigo-inscripcion', (estado, req, p) => leerCodigo(estado, req, p.gid)),
+    r('DELETE', '/teachers/groups/:gid/codigo-inscripcion', (estado, req, p) => apagarCodigo(estado, req, p.gid)),
+    r('GET', '/teachers/groups/:gid/solicitudes', (estado, req, p) => listarSolicitudes(estado, req, p.gid)),
+    r('POST', '/teachers/groups/:gid/solicitudes/:sid/aprobar', (estado, req, p) => aprobarSolicitud(estado, req, p.gid, p.sid)),
+    r('POST', '/teachers/groups/:gid/solicitudes/:sid/rechazar', (estado, req, p) => rechazarSolicitud(estado, req, p.gid, p.sid)),
+  ];
+}
+
 function construirRutas() {
   const r = (metodo, patron, manejador, { textoCrudo = false } = {}) => ({ metodo, patron: compilar(patron), manejador, textoCrudo });
   return [
     r('GET', '/health', () => ({ status: 200, cuerpo: { status: 'ok' } })),
     ...rutasDeAuth(r),
+    ...rutasDelAnillo(r),
 
     r('POST', '/admin/groups', (estado, req, p, body) => crearGrupo(estado, req, body)),
     r('POST', '/admin/groups/:gid/teachers', (estado, req, p, body) => asignarDocente(estado, req, p.gid, body)),
@@ -121,7 +141,7 @@ export function crearMockApi(estado = crearEstado()) {
       anotar(estado, req, url, status);
       responder(res, status, cuerpo);
     } catch (e) {
-      if (e instanceof ErrorHTTP) { anotar(estado, req, url, e.status); responder(res, e.status, e.cuerpo); return; }
+      if (e instanceof ErrorHTTP) { anotar(estado, req, url, e.status); responder(res, e.status, e.cuerpo, e.cabeceras); return; }
       console.error('mock_api: error no controlado', e); // nunca un catch mudo (REGLAS.md §4)
       responder(res, 500, { detail: 'internal error' });
     }
@@ -133,9 +153,9 @@ function anotar(estado, req, url, status) {
   estado.registro?.push({ metodo: req.method, ruta: url.pathname, tenant: req.headers['x-tenant-id'] || null, estado: status });
 }
 
-function responder(res, status, cuerpo) {
-  if (status === 204) { res.writeHead(204); res.end(); return; } // un 204 no lleva cuerpo
-  res.writeHead(status, { 'Content-Type': 'application/json; charset=utf-8' });
+function responder(res, status, cuerpo, cabeceras = {}) {
+  if (status === 204) { res.writeHead(204, cabeceras); res.end(); return; } // un 204 no lleva cuerpo
+  res.writeHead(status, { 'Content-Type': 'application/json; charset=utf-8', ...cabeceras });
   res.end(JSON.stringify(cuerpo));
 }
 

@@ -13,7 +13,7 @@ function gruposVisibles(estado, auth, { soloAsignados = false } = {}) {
   return todos.filter((g) => asignados.has(g.id));
 }
 
-function autorizarGrupo(estado, auth, gid, opciones) {
+export function autorizarGrupo(estado, auth, gid, opciones) {
   const grupo = estado.groups.get(gid);
   if (!grupo || grupo.tenant_id !== auth.tenantId) fallar(404, 'Group not found');
   const visibles = gruposVisibles(estado, auth, opciones);

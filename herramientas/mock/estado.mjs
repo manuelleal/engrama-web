@@ -44,7 +44,19 @@ export function crearEstado() {
     cuentas: new Map(), // correo -> {profileId, password}: el GoTrue falso (mock/gotrue.mjs)
     refrescos: new Map(), // refresh_token -> profileId
     registro: [], // cada petición que vio mock_api.mjs: {metodo, ruta, tenant, estado} (la leen los tests)
+    // W28 (ESPEC_pantallas_anillo §8): lo que trae el backend 5aad55e y el mock no tenía.
+    codigosInscripcion: new Map(), // groupId -> {codigo, vence (ms), cupo, usos, activo}: el código de grupo (se ve una vez, al crearlo)
+    solicitudesInscripcion: [], // {id, profileId, tenantId, groupId, estado: 'pendiente'|'aprobada', creada (ms)}
+    solicitudesDatos: [], // las solicitudes sobre mis datos: {id, profileId, tenantId, tipo, mensaje, estado, creada_en, respuesta, respondida_en}
+    niveles: new Map(), // `${profileId}:${tenantId}` -> {cefr, source, provisional, assessed_at}: el nivel confirmado (lo fija un "efecto de fuera", nunca una ruta)
+    autorregistro: { configurado: true, versionesPermitidas: null, espera429: 0, ahora: () => Date.now() },
+    secuencias: { solicitudInscripcion: 0, solicitudDatos: 0, codigo: 0 },
   };
+  // El interruptor del registro vive en `estado.autorregistro.configurado`; la espec lo nombra `estado.registro.configurado`
+  // y `estado.registro` ya era el diario de peticiones: la propiedad del diario lo refleja (apagar el registro = ponerla en false).
+  Object.defineProperty(estado.registro, 'configurado', {
+    get: () => estado.autorregistro.configurado, set: (v) => { estado.autorregistro.configurado = v; }, enumerable: false,
+  });
 
   const tenantId = randomUUID();
   estado.tenants.set(tenantId, { id: tenantId, name: 'UIS (demo)', slug: 'uis-demo' });

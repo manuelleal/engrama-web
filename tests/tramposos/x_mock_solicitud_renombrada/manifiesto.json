@@ -1,0 +1,7 @@
+{
+  "descripcion": "R6 (W28): el mock renombra codigo_estudiantil a codigo en la lista de solicitudes del profe; el contrato (openapi_5aad55e) debe ponerlo en rojo.",
+  "archivos": { "herramientas/mock/rutas_registro.mjs": "rutas_registro.mjs" },
+  "comando": ["node", "--test", "--test-reporter=tap", "tests/contrato/mock_registro.test.mjs"],
+  "espera_codigo_no_cero": true,
+  "espera_fallan_tests": ["R6: las respuestas del registro y de las solicitudes de inscripción validan contra openapi_5aad55e (registro, solicitudes, aprobar y rechazar)"]
+}

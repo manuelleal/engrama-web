@@ -14,7 +14,7 @@ function gruposVisibles(estado, auth) {
   return [...estado.groups.values()].filter((g) => g.tenant_id === auth.tenantId); // <- el error: sin mirar teacherGroups
 }
 
-function autorizarGrupo(estado, auth, gid) {
+export function autorizarGrupo(estado, auth, gid) {
   const grupo = estado.groups.get(gid);
   if (!grupo || grupo.tenant_id !== auth.tenantId) fallar(404, 'Group not found');
   const visibles = gruposVisibles(estado, auth);

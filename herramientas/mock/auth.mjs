@@ -5,8 +5,9 @@
 // Imita `get_current_user` del backend (ESPEC_login_piloto.md, `engrama-backend` ≥ 15e51a2), en el
 // mismo orden que él: token → perfil → contraseña temporal → membresías → colegio activo.
 //   - un token sin perfil da 403 "Account has no ENGRAMA profile" (nunca 401: la identidad es válida);
+//   - con `profiles.is_active = false` (el operador la suspendió), 403 "account_suspended" en TODA ruta, también /auth/me (W28);
 //   - con `force_password_reset`, toda ruta da 403 "must_change_password" salvo las 4 de /auth;
-//   - sin membresías activas, 403 "User has no active tenant memberships";
+//   - sin membresías activas, 403 "pending_approval" si hay una solicitud de inscripción sin decidir (W28), si no "User has no active tenant memberships";
 //   - `X-Tenant-ID` se valida contra las membresías: 400 si no es UUID, 403 si no es miembro;
 //   - sin el encabezado, la membresía más antigua (el mock las guarda en orden de creación).
 import { membresiaDe } from './estado.mjs';
@@ -14,6 +15,8 @@ import { fallar } from './errores.mjs';
 
 export const SIN_PERFIL = 'Account has no ENGRAMA profile';
 export const DEBE_CAMBIAR = 'must_change_password';
+export const SUSPENDIDA = 'account_suspended';
+export const ESPERA_APROBACION = 'pending_approval';
 const SIN_MEMBRESIAS = 'User has no active tenant memberships';
 const NO_ES_MIEMBRO = 'User is not a member of the requested tenant';
 
@@ -45,9 +48,13 @@ export function autenticar(estado, req) {
   if (!profileId) fallar(401, 'Not authenticated');
   const perfil = estado.profiles.get(profileId);
   if (!perfil) fallar(403, SIN_PERFIL);
+  if (perfil.is_active === false) fallar(403, SUSPENDIDA); // antes que la contraseña temporal: el orden de deps.py:88-99
   if (perfil.force_password_reset && !puedeConContrasenaTemporal(req.method, req.url)) fallar(403, DEBE_CAMBIAR);
   const propias = estado.memberships.filter((m) => m.profile_id === profileId && m.is_active);
-  if (propias.length === 0) fallar(403, SIN_MEMBRESIAS);
+  if (propias.length === 0) {
+    const espera = estado.solicitudesInscripcion.some((s) => s.profileId === profileId && s.estado === 'pendiente');
+    fallar(403, espera ? ESPERA_APROBACION : SIN_MEMBRESIAS);
+  }
   const membresia = colegioActivo(propias, req.headers['x-tenant-id'] || undefined);
   return { profileId, tenantId: membresia.tenant_id, membresia };
 }

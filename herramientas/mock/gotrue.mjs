@@ -44,6 +44,13 @@ export function cerrarSesionGoTrue() {
   return { status: 204, cuerpo: null };
 }
 
+/** Borra la cuenta de GoTrue de un perfil y todo lo que la sostiene (lo que hace el rechazo de una inscripción, W28). */
+export function borrarCuenta(estado, profileId) {
+  for (const [correo, c] of estado.cuentas) if (c.profileId === profileId) estado.cuentas.delete(correo);
+  for (const [t, id] of estado.tokens) if (id === profileId) estado.tokens.delete(t);
+  for (const [t, id] of estado.refrescos) if (id === profileId) estado.refrescos.delete(t);
+}
+
 /** Crea la cuenta de GoTrue de un perfil (lo que haría el alta del operador, §1.7). */
 export function crearCuenta(estado, { correo, password, profileId }) {
   estado.cuentas.set(correo.toLowerCase(), { profileId, password });
