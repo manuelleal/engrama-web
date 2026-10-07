@@ -1,0 +1,16 @@
+{
+  "descripcion": "W34 (U30): una base http: fuera de localhost se da por válida.",
+  "archivos": {
+    "src/anillo/destinos.js": "destinos.js"
+  },
+  "comando": [
+    "node",
+    "--test",
+    "--test-reporter=tap",
+    "tests/unit/anillo_destinos.test.mjs"
+  ],
+  "espera_codigo_no_cero": true,
+  "espera_fallan_tests": [
+    "U30: http: fuera de local, con usuario, con consulta o con fragmento → null"
+  ]
+}

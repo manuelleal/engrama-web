@@ -2,11 +2,12 @@
 // @ts-check
 // verificar.mjs · Análisis estático del cliente (ESPEC_mvp_uis.md §6.2, §9.3).
 //
-// Cuatro chequeos, cada uno con su letra (así los tramposos X1/X5/X8 apuntan a uno solo):
+// Cinco chequeos, cada uno con su letra (así los tramposos X1/X5/X8 apuntan a uno solo):
 //   V1  nada de acceso directo a la base (PostgREST, service_role, postgres://) — decisión 005
 //   V2  ningún archivo SERVIDO (publico/, index.html, sw.js, manifest) trae una clave de reto
 //   V3  los colores solo salen de var(--token) de tokens.css, o color-mix() con white/black/transparent
 //   V4  prohibidas innerHTML, outerHTML, insertAdjacentHTML, document.write, eval, new Function
+//   V5  el pase solo se arma en src/anillo/enlace.js y nunca viaja en la consulta (docs/ESPEC_pantallas_anillo.md §4.6, decisión 013)
 // Más tamaño: archivo ≤ 400 líneas, función ≤ 40 líneas (REGLAS.md §4; antiejemplo: coins-mvp/app.js).
 //
 // Es un lint hecho a mano, no un parser de verdad: usa expresiones regulares documentadas.
@@ -208,6 +209,28 @@ function chequearV4(violaciones, raiz) {
   }
 }
 
+// ---------- V5: el pase y la institución en un enlace solo los arma anillo/enlace.js ----------
+// El pase es el token de acceso (abre toda la API 1 hora). `pase=` y `tenant=` (las claves del fragmento de la decisión 013) aparecen en UN solo
+// archivo de src/, y `?pase` (el pase en la consulta, que llega a los registros del servidor) en ninguno.
+const ARCHIVO_DEL_ENLACE = join('src', 'anillo', 'enlace.js');
+const PATRONES_PASE = [
+  { re: /\?pase\b/, etiqueta: '?pase: el pase nunca va en la consulta', soloFueraDelEnlace: false },
+  { re: /\b(?:pase|tenant)=/, etiqueta: 'pase= / tenant= fuera de src/anillo/enlace.js: el fragmento lo arma una sola función', soloFueraDelEnlace: true },
+];
+
+function chequearV5(violaciones, raiz) {
+  for (const ruta of listarArchivos(join(raiz, 'src'), (r) => /\.(m?js)$/.test(r))) {
+    const esElEnlace = relative(raiz, ruta) === ARCHIVO_DEL_ENLACE;
+    const lineas = quitarComentarios(readFileSync(ruta, 'utf8')).split('\n');
+    for (const { re, etiqueta, soloFueraDelEnlace } of PATRONES_PASE) {
+      if (soloFueraDelEnlace && esElEnlace) continue;
+      lineas.forEach((linea, i) => {
+        if (re.test(linea)) violaciones.push({ check: 'V5', archivo: relative(raiz, ruta), linea: i + 1, detalle: etiqueta });
+      });
+    }
+  }
+}
+
 // ---------- Tamaños: archivo ≤ 400 líneas, función ≤ 40 líneas ----------
 // Heurística por conteo de llaves (no es un parser de JS de verdad, REGLAS.md §4). No basta con
 // quitar comentarios y cadenas con expresiones regulares sueltas: una comilla o un backtick que
@@ -345,6 +368,7 @@ export function verificar(raiz = RAIZ) {
   chequearV3Css(violaciones, raiz);
   chequearV3Svg(violaciones, raiz);
   chequearV4(violaciones, raiz);
+  chequearV5(violaciones, raiz);
   chequearTamanos(violaciones, raiz);
   return { ok: violaciones.length === 0, violaciones };
 }

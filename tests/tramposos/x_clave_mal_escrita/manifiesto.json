@@ -1,0 +1,17 @@
+{
+  "descripcion": "W34 (U29): un enlace con la clave mal escrita (engrama= en vez de pase=).",
+  "archivos": {
+    "src/anillo/enlace.js": "enlace.js"
+  },
+  "comando": [
+    "node",
+    "--test",
+    "--test-reporter=tap",
+    "tests/unit/anillo_enlace.test.mjs"
+  ],
+  "espera_codigo_no_cero": true,
+  "espera_fallan_tests": [
+    "U29: armarEnlaceAnillo da las 5 formas exactas de §4.6 y de la decisión 013",
+    "U29: la clave se llama \"pase\" (013): nunca \"engrama\", \"Pase\" ni \"token\", y nunca en la consulta"
+  ]
+}

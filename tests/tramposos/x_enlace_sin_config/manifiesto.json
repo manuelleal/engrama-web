@@ -1,0 +1,16 @@
+{
+  "descripcion": "W34 (U30): sin base en config.json, el enlace igual sale (con una dirección por omisión).",
+  "archivos": {
+    "src/anillo/destinos.js": "destinos.js"
+  },
+  "comando": [
+    "node",
+    "--test",
+    "--test-reporter=tap",
+    "tests/unit/anillo_destinos.test.mjs"
+  ],
+  "espera_codigo_no_cero": true,
+  "espera_fallan_tests": [
+    "U30: ausente o sin forma de dirección, la base es null (nunca un valor por omisión)"
+  ]
+}

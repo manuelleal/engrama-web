@@ -1,0 +1,19 @@
+{
+  "descripcion": "W34 (U29, V5): un enlace con el pase en la consulta.",
+  "archivos": {
+    "src/anillo/enlace.js": "enlace.js"
+  },
+  "comando": [
+    "node",
+    "--test",
+    "--test-reporter=tap",
+    "tests/unit/anillo_enlace.test.mjs",
+    "tests/unit/anillo_v5.test.mjs"
+  ],
+  "espera_codigo_no_cero": true,
+  "espera_fallan_tests": [
+    "U29: armarEnlaceAnillo da las 5 formas exactas de §4.6 y de la decisión 013",
+    "U29: el pase va SOLO en el fragmento: la consulta de cada enlace queda vacía y no hay ningún ? en el resultado",
+    "V5: en el src/ real, pase= y tenant= aparecen solo en src/anillo/enlace.js, y ?pase en ninguno"
+  ]
+}
