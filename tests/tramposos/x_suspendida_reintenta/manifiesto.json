@@ -1,0 +1,16 @@
+{
+  "descripcion": "W29 (U22): una pantalla de cuenta suspendida con reintento automático.",
+  "archivos": {
+    "src/vistas/suspendida.js": "suspendida.js"
+  },
+  "comando": [
+    "node",
+    "--test",
+    "--test-reporter=tap",
+    "tests/unit/vista_bloqueos.test.mjs"
+  ],
+  "espera_codigo_no_cero": true,
+  "espera_fallan_tests": [
+    "U22: cuenta suspendida: Drako estático, nada de .juego, un botón de salir, ni un temporizador ni una petición, y no promete que la racha se conserva"
+  ]
+}

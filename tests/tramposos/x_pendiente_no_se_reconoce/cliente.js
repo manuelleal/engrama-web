@@ -1,5 +1,5 @@
 // @ts-check
-// TRAMPOSO x_sin_perfil_no_se_reconoce: (login piloto, C) el 403 "Account has no ENGRAMA profile" se trata como un 403 cualquiera ("No tienes permiso."): no hay pantalla de cuenta sin inscribir.
+// TRAMPOSO x_pendiente_no_se_reconoce: el cliente no distingue el 403 pending_approval: cae en "No tienes permiso." y la cuenta pendiente se queda sin pantalla.
 // api/cliente.js · El ÚNICO módulo (junto con auth/supabase_rest.js, hito 3) que llama `fetch`
 // (§7.2). Todo pasa por `/api/...` en el mismo origen — nunca la URL del backend a secas, nunca
 // `/rest/v1` (decisión 005; V1 en herramientas/verificar.mjs lo audita).
@@ -32,8 +32,7 @@ function codigoDeBloqueo(status, cuerpo) {
   if (status !== 403) return null;
   const detalle = cuerpo?.detail;
   if (detalle === 'must_change_password') return BLOQUEO_DEBE_CAMBIAR;
-  // <- el error: la cuenta sin perfil no se reconoce
-  if (detalle === 'pending_approval') return BLOQUEO_PENDIENTE;
+  if (DETALLES_SIN_PERFIL.has(detalle)) return BLOQUEO_SIN_PERFIL;
   if (detalle === 'account_suspended') return BLOQUEO_SUSPENDIDA;
   return null;
 }

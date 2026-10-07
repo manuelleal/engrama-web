@@ -10,7 +10,7 @@
 //
 // Súbelo un número cada vez que cambie la lista de precarga o la estrategia; la `activate`
 // borra cualquier caché con otro nombre.
-const VERSION = 'engrama-shell-v22';
+const VERSION = 'engrama-shell-v23';
 
 // Cada encargo agrega los suyos en su propio commit (W7: Inicio + api/cliente,core,retos + los
 // SVG de Drako que usa el estudiante; W10: profe/grupos,grupo,sesion_asistencia + api/profe). El
@@ -44,6 +44,7 @@ const PRECARGA = [
   '/src/rutas.js',
   '/src/textos.js',
   '/src/textos_anillo.js', // las cadenas de las pantallas del anillo (textos.js las esparce)
+  '/src/bloqueos.js', // las pantallas obligatorias salen de app.js (espera, suspendida, ya no está...)
   '/src/ui/dom.js',
   '/src/ui/red.js',
   '/src/ui/escudo.js',
@@ -89,6 +90,10 @@ const PRECARGA = [
   '/src/aviso.js', // aviso de datos (Ley 1581): app.js y entrada.js lo importan
   '/src/vistas/aviso_datos.js',
   '/src/vistas/sin_perfil.js', // cuenta sin inscribir (import estático de app.js)
+  '/src/vistas/esperando.js', // W29: esperando a tu profe / tu solicitud ya no está
+  '/src/vistas/suspendida.js', // W29: cuenta suspendida
+  '/src/ui/estado_etiqueta.js', // W29: ícono + texto de cada estado
+  '/src/ui/contacto.js', // W29: el contacto del aviso como texto seleccionable
   '/src/auth/clave.js',
   '/src/ui/selector_colegio.js', // login piloto (B): barra_rol.js e inicio.js lo importan
   '/src/vistas/estudiante/inicio.js',

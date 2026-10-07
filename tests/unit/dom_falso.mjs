@@ -19,7 +19,10 @@ export class NodoFalso {
   }
   setAttribute(k, v) { this.attrs.set(k, String(v)); }
   getAttribute(k) { return this.attrs.get(k) ?? null; }
-  addEventListener() {}
+  // W29: ahora GUARDA los oyentes (antes era un no-op) para que una prueba pueda tocar un botón con `disparar`.
+  addEventListener(tipo, fn) { (this.oyentes ??= new Map()).set(tipo, [...(this.oyentes.get(tipo) || []), fn]); }
+  /** Llama a los oyentes de `tipo` (como un toque). Devuelve lo que devolvieron, por si alguno es asíncrono. */
+  disparar(tipo, evento = {}) { return (this.oyentes?.get(tipo) || []).map((fn) => fn({ preventDefault() {}, ...evento })); }
   appendChild(n) { n.parentNode = this; this.children.push(n); return n; }
   insertBefore(n, ref) {
     n.parentNode?.children.splice(n.parentNode.children.indexOf(n), 1);

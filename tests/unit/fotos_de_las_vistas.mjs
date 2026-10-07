@@ -75,7 +75,7 @@ export async function tomarFotos(o = {}) {
   }
 }
 
-export { sesionDeEstudiante, TENANT_A, TENANT_B };
+export { sesionDeEstudiante, TENANT_A, TENANT_B, RUTAS };
 
 if (process.argv[1] && fileURLToPath(import.meta.url) === process.argv[1] && process.env.R4_ESCRIBIR) {
   const fotos = await tomarFotos();

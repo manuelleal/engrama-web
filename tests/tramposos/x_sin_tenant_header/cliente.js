@@ -23,6 +23,10 @@ export const BLOQUEO_DEBE_CAMBIAR = 'must_change_password';
 // o sin ninguna membresía activa (`User has no active tenant memberships`). Para quien la usa es lo mismo.
 export const BLOQUEO_SIN_PERFIL = 'sin_perfil';
 const DETALLES_SIN_PERFIL = new Set(['Account has no ENGRAMA profile', 'User has no active tenant memberships']);
+// W29 (ESPEC_pantallas_anillo §4.2): la cuenta existe y su profe todavía no la aprueba (`pending_approval`), o el operador la suspendió
+// (`account_suspended`). Antes caían en "No tienes permiso." y no había a dónde ir.
+export const BLOQUEO_PENDIENTE = 'pendiente';
+export const BLOQUEO_SUSPENDIDA = 'suspendida';
 
 /** @returns {string|null} el código de bloqueo si este error es uno de esos 403, o null */
 function codigoDeBloqueo(status, cuerpo) {
@@ -30,17 +34,27 @@ function codigoDeBloqueo(status, cuerpo) {
   const detalle = cuerpo?.detail;
   if (detalle === 'must_change_password') return BLOQUEO_DEBE_CAMBIAR;
   if (DETALLES_SIN_PERFIL.has(detalle)) return BLOQUEO_SIN_PERFIL;
+  if (detalle === 'pending_approval') return BLOQUEO_PENDIENTE;
+  if (detalle === 'account_suspended') return BLOQUEO_SUSPENDIDA;
   return null;
 }
 
 export class ErrorApi extends Error {
-  constructor(status, mensaje, cuerpo) {
+  /** @param {number} status @param {string} mensaje @param {any} cuerpo @param {number|null} [reintentarEn] segundos de `Retry-After`, o null */
+  constructor(status, mensaje, cuerpo, reintentarEn = null) {
     super(mensaje);
     this.status = status;
     this.mensaje = mensaje;
     this.cuerpo = cuerpo;
     this.codigo = codigoDeBloqueo(status, cuerpo); // null en todo lo demás
+    this.reintentarEn = reintentarEn; // W29: cuánto pide esperar el servidor (el 429 del registro); null si no lo dijo o no es un número
   }
+}
+
+/** `Retry-After` en segundos enteros, o null si falta o no es un número (la forma de fecha HTTP no se usa en este backend). @param {Response} resp */
+function leerReintento(resp) {
+  const crudo = resp.headers?.get?.('Retry-After');
+  return typeof crudo === 'string' && /^\d+$/.test(crudo.trim()) ? Number(crudo.trim()) : null;
 }
 
 // La institución activa (login piloto, B): `active_tenant_id` de /auth/me. Se manda como `X-Tenant-ID` en
@@ -134,7 +148,7 @@ export async function pedirJson(ruta, opciones = {}) {
   const texto = await resp.text();
   const json = texto ? JSON.parse(texto) : null;
   if (!resp.ok) {
-    const error = new ErrorApi(resp.status, mensajeDeError(resp.status, json?.detail ?? json), json);
+    const error = new ErrorApi(resp.status, mensajeDeError(resp.status, json?.detail ?? json), json, leerReintento(resp));
     avisarBloqueo(error);
     throw error;
   }

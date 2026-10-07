@@ -1,5 +1,5 @@
 // @ts-check
-// TRAMPOSO x_sin_perfil_no_se_reconoce: (login piloto, C) el 403 "Account has no ENGRAMA profile" se trata como un 403 cualquiera ("No tienes permiso."): no hay pantalla de cuenta sin inscribir.
+// TRAMPOSO x_retry_after_ignorado: el cliente descarta el encabezado Retry-After y reintentarEn queda siempre en null.
 // api/cliente.js · El ÚNICO módulo (junto con auth/supabase_rest.js, hito 3) que llama `fetch`
 // (§7.2). Todo pasa por `/api/...` en el mismo origen — nunca la URL del backend a secas, nunca
 // `/rest/v1` (decisión 005; V1 en herramientas/verificar.mjs lo audita).
@@ -32,7 +32,7 @@ function codigoDeBloqueo(status, cuerpo) {
   if (status !== 403) return null;
   const detalle = cuerpo?.detail;
   if (detalle === 'must_change_password') return BLOQUEO_DEBE_CAMBIAR;
-  // <- el error: la cuenta sin perfil no se reconoce
+  if (DETALLES_SIN_PERFIL.has(detalle)) return BLOQUEO_SIN_PERFIL;
   if (detalle === 'pending_approval') return BLOQUEO_PENDIENTE;
   if (detalle === 'account_suspended') return BLOQUEO_SUSPENDIDA;
   return null;
@@ -53,7 +53,7 @@ export class ErrorApi extends Error {
 /** `Retry-After` en segundos enteros, o null si falta o no es un número (la forma de fecha HTTP no se usa en este backend). @param {Response} resp */
 function leerReintento(resp) {
   const crudo = resp.headers?.get?.('Retry-After');
-  return typeof crudo === 'string' && /^\d+$/.test(crudo.trim()) ? Number(crudo.trim()) : null;
+  return null; // el error: el Retry-After se ignora
 }
 
 // La institución activa (login piloto, B): `active_tenant_id` de /auth/me. Se manda como `X-Tenant-ID` en

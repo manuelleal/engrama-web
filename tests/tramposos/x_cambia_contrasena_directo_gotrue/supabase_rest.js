@@ -24,7 +24,7 @@
 //   - La CONTRASEÑA en sí nunca se guarda en ningún storage: solo viaja en el cuerpo JSON de la
 //     petición de login, una vez, por HTTPS (o HTTP en desarrollo local).
 import { textos } from '../textos.js';
-import { pedirJson } from '../api/cliente.js';
+import { pedirJson, ErrorApi, BLOQUEO_PENDIENTE, BLOQUEO_SUSPENDIDA } from '../api/cliente.js';
 import { perfilAJson } from './perfil_actual.js';
 import { cambiarContrasenaConToken } from './cambio_contrasena.js';
 import { registrarConsentimientoConToken } from './consentimiento.js';
@@ -174,6 +174,9 @@ export async function iniciar() {
     await renovar();
     return await sesionDesdeMe();
   } catch (e) {
+    // W29: una cuenta PENDIENTE (su profe aún no la aprueba) o SUSPENDIDA existe y su sesión es buena: api/cliente.js ya abrió su pantalla
+    // obligatoria, y "Revisar de nuevo" necesita el pase. Borrarlo aquí (como se hace con cualquier otro fallo) la dejaría sin salida tras recargar.
+    if (e instanceof ErrorApi && (e.codigo === BLOQUEO_PENDIENTE || e.codigo === BLOQUEO_SUSPENDIDA)) return null;
     console.error('auth/supabase_rest: no se pudo recuperar la sesión con el refresh token guardado', e);
     accessTokenEnMemoria = null;
     expiraEnMs = null;

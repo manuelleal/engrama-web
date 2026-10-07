@@ -1,0 +1,16 @@
+{
+  "descripcion": "W29 (U23): una etiqueta de estado sin ícono, que se distingue solo por color.",
+  "archivos": {
+    "src/ui/estado_etiqueta.js": "estado_etiqueta.js"
+  },
+  "comando": [
+    "node",
+    "--test",
+    "--test-reporter=tap",
+    "tests/unit/ui_estado_etiqueta.test.mjs"
+  ],
+  "espera_codigo_no_cero": true,
+  "espera_fallan_tests": [
+    "U23: los 11 estados de §5 devuelven ícono y texto no vacíos (la tabla es esa y ninguna más)"
+  ]
+}

@@ -194,3 +194,41 @@ test('C: un 403 sin perfil o sin membresías activas avisa como "sin_perfil"; un
     assert.deepEqual(avisos, []);
   } finally { configurarAlBloqueo(null); }
 });
+
+// W29 (docs/ESPEC_pantallas_anillo.md §4.2, §9.3): U12 y U13.
+test('U12: un 403 pending_approval es "pendiente" y account_suspended es "suspendida"; Teacher role required y colegio ajeno, null; se avisa UNA vez por petición', async () => {
+  const avisos = [];
+  configurarAlBloqueo((codigo) => avisos.push(codigo));
+  try {
+    for (const [detail, esperado] of [['pending_approval', 'pendiente'], ['account_suspended', 'suspendida']]) {
+      avisos.length = 0;
+      await conServidorFalso((req, res) => responderJson(res, 403, { detail }), async () => {
+        await assert.rejects(() => pedirJson('/auth/me', { token: 't' }), (e) => {
+          assert.equal(e.codigo, esperado, detail);
+          assert.equal(e.status, 403);
+          assert.equal(e.mensaje, 'No tienes permiso.', 'el mensaje no cambia: lo que cambia es la pantalla que se abre');
+          return true;
+        });
+      });
+      assert.deepEqual(avisos, [esperado], `una sola vez: ${detail}`);
+    }
+    avisos.length = 0;
+    for (const detail of ['Teacher role required', 'User is not a member of the requested tenant']) {
+      await conServidorFalso((req, res) => responderJson(res, 403, { detail }), async () => {
+        await assert.rejects(() => pedirJson('/teachers/groups', { token: 't' }), (e) => e.codigo === null);
+      });
+    }
+    assert.deepEqual(avisos, [], 'un 403 de rol o de colegio ajeno no abre ninguna pantalla obligatoria');
+  } finally { configurarAlBloqueo(null); }
+});
+
+test('U13: un 429 con Retry-After: 120 deja error.reintentarEn === 120; sin encabezado o no numérico, null', async () => {
+  const responderCon = (cabeceras) => (req, res) => { res.writeHead(429, { 'Content-Type': 'application/json', ...cabeceras }); res.end(JSON.stringify({ detail: 'demasiados_intentos' })); };
+  const leer = () => pedirJson('/auth/registro', { metodo: 'POST', cuerpo: {} }).then(() => null, (e) => e);
+  await conServidorFalso(responderCon({ 'Retry-After': '120' }), async () => assert.equal((await leer()).reintentarEn, 120));
+  await conServidorFalso(responderCon({ 'Retry-After': '599' }), async () => assert.equal((await leer()).reintentarEn, 599));
+  await conServidorFalso(responderCon({}), async () => assert.equal((await leer()).reintentarEn, null, 'sin encabezado'));
+  await conServidorFalso(responderCon({ 'Retry-After': 'Wed, 21 Oct 2026 07:28:00 GMT' }), async () => assert.equal((await leer()).reintentarEn, null, 'una fecha no es un número de segundos'));
+  await conServidorFalso(responderCon({ 'Retry-After': 'abc' }), async () => assert.equal((await leer()).reintentarEn, null));
+  await conServidorFalso((req, res) => responderJson(res, 404, {}), async () => assert.equal((await leer()).reintentarEn, null, 'otro error, sin encabezado: null'));
+});

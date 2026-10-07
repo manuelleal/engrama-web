@@ -612,3 +612,25 @@ nav {
   -webkit-user-select: all;
   overflow-wrap: anywhere;
 }
+
+/* W29 (docs/ESPEC_pantallas_anillo.md §5): una etiqueta de estado SIEMPRE lleva ícono y texto; el color nunca es lo único que informa.
+   Solo tokens. El ícono es decorativo (aria-hidden): lo que importa lo lee el texto. */
+.etiqueta-estado {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.5rem;
+}
+.etiqueta-icono {
+  font-weight: 700;
+}
+
+/* Las acciones de una pantalla obligatoria (espera, suspendida, "ya no está"): los botones uno junto al otro, con toque de 44 px. */
+.acciones {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.75rem;
+  margin-top: 1rem;
+}
+.acciones > button {
+  min-height: 44px;
+}

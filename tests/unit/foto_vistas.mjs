@@ -26,10 +26,11 @@ function respuesta(status, cuerpo, cabeceras = {}) {
  * sin la consulta) al cuerpo que devuelve; una función se llama con `{metodo, ruta, init}`; una ruta no declarada
  * lanza (una foto no puede depender de algo que nadie fijó).
  * @param {Record<string, unknown>} [rutas]
+ * @param {{reducido?: boolean}} [opciones] `reducido` (por omisión sí): el sistema pide menos movimiento; los conteos saltan directo al valor final
  */
-export function entornoDeFotos(rutas = {}) {
+export function entornoDeFotos(rutas = {}, opciones = {}) {
   const g = /** @type {any} */ (globalThis);
-  const quitarDom = instalarDomFalso({ reducido: true }); // reducido: los conteos saltan directo al valor final
+  const quitarDom = instalarDomFalso({ reducido: opciones.reducido ?? true });
   const previo = {
     createElementNS: g.document.createElementNS, body: g.document.body, fetch: g.fetch,
     localStorage: g.localStorage, sessionStorage: g.sessionStorage,
@@ -109,4 +110,23 @@ export function sinSubarboles(lineas, testids) {
     salida.push(linea);
   }
   return salida;
+}
+
+/** El primer nodo con ese `data-testid` bajo `raiz`, o null (el DOM de mentira no tiene querySelector por atributo). @param {any} raiz @param {string} testid */
+export function buscar(raiz, testid) {
+  if (raiz.nodeType === 3) return null; // un nodo de texto no tiene hijos ni atributos
+  if (raiz.getAttribute?.('data-testid') === testid) return raiz;
+  for (const hijo of raiz.children) { const hallado = buscar(hijo, testid); if (hallado) return hallado; }
+  return null;
+}
+
+/** Todos los nodos de elemento bajo `raiz` (y `raiz`), sin los nodos de texto. @param {any} raiz @returns {any[]} */
+export function elementos(raiz) {
+  return raiz.nodeType === 3 ? [] : [raiz, ...raiz.children.flatMap(elementos)];
+}
+
+/** Todo el texto visible bajo `nodo` (nodos de texto y `textContent`), unido. @param {any} nodo @returns {string} */
+export function textoDe(nodo) {
+  if (nodo.nodeType === 3) return nodo.data;
+  return [nodo.textContent || '', ...nodo.children.map(textoDe)].join('');
 }

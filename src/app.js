@@ -6,16 +6,17 @@ import { limpiarRespuestasEnCurso } from './vistas/estudiante/respuestas_locales
 import { reemplazarRaiz } from './ui/dom.js';
 import { ruta, definirPorDefecto, iniciar, detener, reiniciarRutas, navegar } from './rutas.js';
 import {
-  accionUnica, configurarAlBloqueo, BLOQUEO_DEBE_CAMBIAR, BLOQUEO_SIN_PERFIL, fijarColegios, leerColegioActivo, cambiarColegioActivo,
+  accionUnica, configurarAlBloqueo, BLOQUEO_DEBE_CAMBIAR, fijarColegios, leerColegioActivo, cambiarColegioActivo,
 } from './api/cliente.js';
+import {
+  BLOQUEO_CONSENTIMIENTO, BLOQUEO_YA_NO_ESTA, pintarBloqueo, resolverBloqueo, marcarEsperando, estabaEsperando,
+} from './bloqueos.js';
 import { renderEntrada } from './vistas/entrada.js';
 import { renderInicio } from './vistas/estudiante/inicio.js';
 import { renderPerfil } from './vistas/perfil.js';
-import { renderCrearContrasena } from './vistas/crear_contrasena.js';
-import { renderSinPerfil } from './vistas/sin_perfil.js';
 import { renderErrorConfig } from './vistas/error_config.js';
 import { cargarConfig, modoDeAuth } from './config.js';
-import { renderConsentimiento, renderLeerAviso, renderErrorAviso } from './vistas/aviso_datos.js';
+import { renderLeerAviso, renderErrorAviso } from './vistas/aviso_datos.js';
 import { configurarAviso, leerAviso, debePedirConsentimiento } from './aviso.js';
 import { textos } from './textos.js';
 import { renderAsistencia } from './vistas/estudiante/asistencia.js';
@@ -72,7 +73,7 @@ let authActivo = null;
 let sesionActual = null;
 let vistaRaiz = null;
 let bloqueoActual = null;
-const BLOQUEO_CONSENTIMIENTO = 'consentimiento'; // el aviso de datos (Ley 1581) sin aceptar, o de una versión vieja
+let controlDeBloqueo = null; // el control (`detener`) de la pantalla obligatoria que tenga temporizadores: la espera (bloqueos.js)
 
 // W5: nada del router arranca sin sesión. Un actor sintético (hito 0) o, desde W22, un login real
 // deja `document.body.dataset.listo = "1"` en la propia pantalla de entrada mientras tanto.
@@ -104,6 +105,8 @@ async function iniciarApp() {
   const sesion = await authActivo.iniciar();
   if (bloqueoActual) return; // una pantalla obligatoria ya tomó la vista mientras se recuperaba la sesión
   if (sesion) { entrarConSesion(sesion); return; }
+  // Estaba esperando a su profe y, al recargar, ya no hay sesión que recuperar (rechazar borra la cuenta): se lo decimos, sin culpa.
+  if (estabaEsperando()) { bloquear(BLOQUEO_YA_NO_ESTA); return; }
   // accionUnica (§7.2 regla 5): un segundo toque de "Entrar" mientras el primero vuela no dispara
   // una segunda petición de login.
   const entrarUnaVez = accionUnica(async (metodoEntrada, datos) => {
@@ -117,6 +120,8 @@ async function iniciarApp() {
 // simple y más robusto que desenredar el estado del router: iniciarApp() vuelve a correr desde
 // cero, ya sin sesión (authActivo.salir() la borró), y cae directo en renderEntrada().
 async function cerrarSesion() {
+  controlDeBloqueo?.detener(); // la espera deja de revisar mientras se cierra la sesión
+  marcarEsperando(false);
   await limpiarCacheDeApi(); // un equipo compartido no guarda lo del estudiante anterior (§7.3); se espera: luego se recarga la página
   limpiarRespuestasEnCurso(); // H-18: sus respuestas a medias tampoco se quedan para el siguiente
   try {
@@ -208,29 +213,46 @@ async function borrarApiDeLasCaches() {
   }
 }
 
-// Una pantalla obligatoria (api/cliente.js avisa de un 403 `must_change_password` o de una cuenta sin
-// inscribir, o el /auth/me del login ya trae la bandera). Se apaga el router y la pantalla va en un contenedor NUEVO: lo que alguna petición
-// en vuelo termine de pintar en el viejo ya no pisa nada, y no hay a dónde navegar mientras dure.
+// Una pantalla obligatoria (api/cliente.js avisa de un 403 `must_change_password`, de una cuenta sin inscribir, pendiente o suspendida,
+// o el /auth/me del login ya trae la bandera). Se apaga el router y la pantalla va en un contenedor NUEVO: lo que alguna petición
+// en vuelo termine de pintar en el viejo ya no pisa nada, y no hay a dónde navegar mientras dure. Qué pantalla va con cada código, y la
+// precedencia entre ellos, vive en bloqueos.js.
 function bloquear(codigo) {
-  if (bloqueoActual === codigo) return; // varias llamadas en vuelo dan el mismo 403: una sola pantalla
-  bloqueoActual = codigo;
+  const efectivo = resolverBloqueo(bloqueoActual, codigo, estabaEsperando());
+  if (bloqueoActual === efectivo) return; // varias llamadas en vuelo dan el mismo 403: una sola pantalla
+  controlDeBloqueo?.detener(); // la pantalla que se reemplaza no deja un temporizador vivo
+  controlDeBloqueo = null;
+  bloqueoActual = efectivo;
   detener();
   vistaRaiz = reemplazarRaiz(vistaRaiz);
-  if (codigo === BLOQUEO_SIN_PERFIL) { renderSinPerfil(vistaRaiz, { salir: cerrarSesion }); return; }
-  if (codigo === BLOQUEO_CONSENTIMIENTO) {
-    renderConsentimiento(vistaRaiz, { aviso: leerAviso(), aceptar: aceptarAviso, salir: cerrarSesion });
-    return;
-  }
-  renderCrearContrasena(vistaRaiz, {
-    cambiarContrasena: authActivo.cambiarContrasena, alTerminar: terminarBloqueo, salir: cerrarSesion,
+  if (efectivo === BLOQUEO_YA_NO_ESTA) Promise.resolve(authActivo.salir()).catch((e) => console.error('app: no se pudo borrar la sesión local', e)); // la solicitud ya no está: no queda sesión que guardar
+  controlDeBloqueo = pintarBloqueo(efectivo, vistaRaiz, {
+    salir: cerrarSesion, aviso: leerAviso(), aceptarAviso, cambiarContrasena: authActivo.cambiarContrasena, alTerminar: terminarBloqueo,
+    revisar: revisarDeNuevo, yaNoEsta: () => bloquear(BLOQUEO_YA_NO_ESTA), volverAEntrar: () => location.replace(location.pathname + location.search),
   });
+}
+
+// Sale de la pantalla obligatoria hacia la app: ya no hay bloqueo, ni espera, ni marca de "estaba esperando".
+function salirDelBloqueo() {
+  controlDeBloqueo?.detener();
+  controlDeBloqueo = null;
+  bloqueoActual = null;
+  marcarEsperando(false);
+}
+
+// "Revisar de nuevo" (y el sondeo de la espera): vuelve a pedir /auth/me. Si la cuenta ya está aprobada, entra; si no, esta función
+// lanza el mismo 403 y la pantalla de espera lo explica (api/cliente.js ya avisó el bloqueo, que no cambia).
+async function revisarDeNuevo() {
+  const sesion = await authActivo.recargarSesion();
+  salirDelBloqueo();
+  entrarConSesion(sesion);
 }
 
 // Después de crear la contraseña: se vuelve a pedir /auth/me y, solo si ya no hay bandera, se entra.
 async function terminarBloqueo() {
   const sesion = await authActivo.recargarSesion();
   if (sesion.debeCambiarContrasena) throw new Error('app: el servidor sigue pidiendo cambiar la contraseña');
-  bloqueoActual = null;
+  salirDelBloqueo();
   entrarConSesion(sesion);
 }
 
@@ -242,7 +264,7 @@ async function aceptarAviso() {
   if (debePedirConsentimiento(sesion, leerAviso())) {
     throw Object.assign(new Error(textos.aviso.errorGuardar), { mensaje: textos.aviso.errorGuardar });
   }
-  bloqueoActual = null;
+  salirDelBloqueo();
   entrarConSesion(sesion);
 }
 

@@ -1,0 +1,18 @@
+{
+  "descripcion": "W29 (U21): una espera que no reconoce la solicitud borrada; nunca llega a \"Tu solicitud ya no está activa\".",
+  "archivos": {
+    "src/vistas/esperando.js": "esperando.js"
+  },
+  "comando": [
+    "node",
+    "--test",
+    "--test-reporter=tap",
+    "tests/unit/vista_bloqueos.test.mjs",
+    "tests/e2e/espera_suspendida.test.mjs"
+  ],
+  "espera_codigo_no_cero": true,
+  "espera_fallan_tests": [
+    "U21: perfil borrado (\"sin perfil\" estando pendiente, o sin sesión) → \"Tu solicitud ya no está activa\", sin culpa y con la acción siguiente",
+    "E11: una cuenta pendiente cuya solicitud se rechaza ve \"Tu solicitud ya no está activa\" (sin culpa), y puede volver a entrar"
+  ]
+}

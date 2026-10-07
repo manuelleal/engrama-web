@@ -1,0 +1,18 @@
+{
+  "descripcion": "W29 (U12): un cliente que no reconoce pending_approval; la cuenta pendiente ve \"No tienes permiso.\" en vez de \"Esperando a tu profe\".",
+  "archivos": {
+    "src/api/cliente.js": "cliente.js"
+  },
+  "comando": [
+    "node",
+    "--test",
+    "--test-reporter=tap",
+    "tests/unit/api_cliente.test.mjs",
+    "tests/e2e/espera_suspendida.test.mjs"
+  ],
+  "espera_codigo_no_cero": true,
+  "espera_fallan_tests": [
+    "U12: un 403 pending_approval es \"pendiente\" y account_suspended es \"suspendida\"; Teacher role required y colegio ajeno, null; se avisa UNA vez por petición",
+    "E11: una cuenta pendiente ve \"Esperando a tu profe\" (no \"No tienes permiso.\"), sin bucle ni blanco; sobrevive a una recarga; y al aprobarla, \"Revisar de nuevo\" la deja entrar a Inicio"
+  ]
+}

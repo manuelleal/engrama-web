@@ -1,0 +1,17 @@
+{
+  "descripcion": "W29 (U21): el sondeo de la espera no respeta la visibilidad de la pestaña y no se apaga al salir ni al entrar.",
+  "archivos": {
+    "src/vistas/esperando.js": "esperando.js"
+  },
+  "comando": [
+    "node",
+    "--test",
+    "--test-reporter=tap",
+    "tests/unit/vista_bloqueos.test.mjs"
+  ],
+  "espera_codigo_no_cero": true,
+  "espera_fallan_tests": [
+    "U21: el sondeo solo corre con la pestaña visible (cada 30 s, programado una vez); oculta no pide nada",
+    "U21: el temporizador muere al salir y al entrar"
+  ]
+}

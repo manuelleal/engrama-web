@@ -1,0 +1,16 @@
+{
+  "descripcion": "W29 (U13): un cliente que ignora Retry-After; el 429 del registro no dice cuánto esperar.",
+  "archivos": {
+    "src/api/cliente.js": "cliente.js"
+  },
+  "comando": [
+    "node",
+    "--test",
+    "--test-reporter=tap",
+    "tests/unit/api_cliente.test.mjs"
+  ],
+  "espera_codigo_no_cero": true,
+  "espera_fallan_tests": [
+    "U13: un 429 con Retry-After: 120 deja error.reintentarEn === 120; sin encabezado o no numérico, null"
+  ]
+}
