@@ -1,0 +1,7 @@
+{
+  "descripcion": "W27: textos_anillo.js trae una clave de primer nivel que ya existe en textos.js (entrada) y el spread la pisaría sin avisar.",
+  "archivos": { "src/textos_anillo.js": "textos_anillo.js" },
+  "comando": ["node", "--test", "--test-reporter=tap", "tests/unit/textos_anillo.test.mjs"],
+  "espera_codigo_no_cero": true,
+  "espera_fallan_tests": ["W27: ninguna clave de textos_anillo.js pisa una clave propia de textos.js"]
+}

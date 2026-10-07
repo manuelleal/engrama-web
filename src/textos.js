@@ -1,6 +1,8 @@
 // @ts-check
 // textos.js · Todas las cadenas visibles del cliente, en español (§7.2). Cada vista importa de
 // aquí en vez de escribir texto suelto, para que un cambio de redacción sea un solo lugar.
+import { textosAnillo } from './textos_anillo.js'; // las pantallas del anillo (ESPEC_pantallas_anillo): textos nuevos, en su propio archivo
+
 export const textos = {
   app: {
     titulo: 'ENGRAMA',
@@ -386,4 +388,5 @@ export const textos = {
       errorGeneral: 'No se pudo importar el archivo.',
     },
   },
+  ...textosAnillo,
 };

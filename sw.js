@@ -10,7 +10,7 @@
 //
 // Súbelo un número cada vez que cambie la lista de precarga o la estrategia; la `activate`
 // borra cualquier caché con otro nombre.
-const VERSION = 'engrama-shell-v21';
+const VERSION = 'engrama-shell-v22';
 
 // Cada encargo agrega los suyos en su propio commit (W7: Inicio + api/cliente,core,retos + los
 // SVG de Drako que usa el estudiante; W10: profe/grupos,grupo,sesion_asistencia + api/profe). El
@@ -43,6 +43,7 @@ const PRECARGA = [
   '/src/vistas/error_config.js',
   '/src/rutas.js',
   '/src/textos.js',
+  '/src/textos_anillo.js', // las cadenas de las pantallas del anillo (textos.js las esparce)
   '/src/ui/dom.js',
   '/src/ui/red.js',
   '/src/ui/escudo.js',
