@@ -64,7 +64,7 @@ test('game feel: si la constancia del servidor subió, Inicio la celebra (llama,
       url, ancho: 375, alto: 812, espera_ms: 5000,
       pre: `${YA_ENTRO}; localStorage.setItem('engrama_ultimo_constancia_est-1', '1')`,
       eval: `(async () => {
-        await new Promise((r) => setTimeout(r, 700));
+        for (let i = 0; i < 60 && !document.querySelector('canvas[data-testid="confeti"]'); i++) await new Promise((r) => setTimeout(r, 25));
         return {
           aviso: document.querySelector('[data-testid="celebra-racha"]')?.textContent ?? null,
           llamas: document.querySelectorAll('[data-testid="constancia"] .llama').length,

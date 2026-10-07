@@ -1,0 +1,18 @@
+{
+  "descripcion": "El router no cancela las celebraciones al cambiar de ruta: el aviso, el confeti y las monedas siguen sobre la pantalla nueva",
+  "archivos": {
+    "src/rutas.js": "rutas.js"
+  },
+  "comando": [
+    "node",
+    "--test",
+    "--test-reporter=tap",
+    "tests/unit/ui_celebraciones.test.mjs",
+    "tests/e2e/celebraciones_ruta.test.mjs"
+  ],
+  "espera_codigo_no_cero": true,
+  "espera_fallan_tests": [
+    "celebraciones: el router las cancela en CADA cambio de ruta, antes de pintar la vista nueva",
+    "celebraciones: al navegar desde Inicio, el aviso de constancia y el confeti desaparecen (no tapan la pantalla nueva)"
+  ]
+}

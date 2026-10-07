@@ -6,6 +6,7 @@
 // `random`. Se anima solo con transform y opacity (Web Animations API), nada que bloquee el hilo.
 import { duracionEfectiva, reducirMovimiento } from './movimiento.js';
 import { senal } from './sonido.js';
+import { registrarCelebracion } from './celebraciones.js';
 
 const MAX_FICHAS = 14;
 
@@ -75,15 +76,19 @@ export function lanzarMonedas({ desde, hasta, cantidad, alLlegar }) {
   const origen = centroDe(desde, base);
   const destino = centroDe(hasta, { x: base.x, y: 40 });
   const vuelos = [];
+  const fichas = [];
+  // Si el estudiante cambia de pantalla, las fichas que siguen en vuelo se cancelan y se quitan.
+  const terminar = registrarCelebracion(() => fichas.forEach(({ ficha, anim }) => { anim.cancel(); ficha.remove(); }));
   for (let i = 0; i < plan.fichas; i++) {
     const ficha = crearFicha();
     if (typeof ficha.animate !== 'function') { ficha.remove(); continue; }
     const anim = ficha.animate(cuadros(origen, destino, i), {
       duration: plan.duracionMs, delay: i * plan.escalonMs, easing: 'cubic-bezier(.3,.6,.35,1)', fill: 'both',
     });
+    fichas.push({ ficha, anim });
     vuelos.push(anim.finished.then(() => { ficha.remove(); alLlegar?.(i, plan.fichas); }).catch(() => ficha.remove()));
   }
-  return Promise.all(vuelos).then(() => undefined);
+  return Promise.all(vuelos).then(() => { terminar(); });
 }
 
 /**

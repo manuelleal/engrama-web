@@ -5,6 +5,7 @@
 // salta directo y no cuenta. Solo anima el valor que LLEGA del servidor: nunca lo calcula.
 import { MINIMO_MS, duracionEfectiva, reducirMovimiento } from './movimiento.js';
 import { pulsoOro } from './monedas.js';
+import { registrarCelebracion } from './celebraciones.js';
 
 /** Salida suave: arranca rápido y frena al llegar (el mismo cúbico de Lingo). @param {number} t 0..1 */
 export function easeOutCubic(t) {
@@ -43,10 +44,14 @@ export function animarConteo(nodo, opciones) {
   }
   return new Promise((resolver) => {
     const inicio = performance.now();
+    let cancelado = false;
+    const terminar = registrarCelebracion(() => { cancelado = true; resolver(); }); // cambio de pantalla: el conteo se detiene
     const paso = (ahora) => {
+      if (cancelado) return;
       const t = (ahora - inicio) / duracion;
       nodo.textContent = formato(valorEnConteo(desde, hasta, t));
       if (t < 1) { requestAnimationFrame(paso); return; }
+      terminar();
       if (golpe) pulsoOro(nodo);
       resolver();
     };

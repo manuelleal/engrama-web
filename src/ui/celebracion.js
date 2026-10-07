@@ -16,6 +16,7 @@ import { celebrarMonedas, planDeMonedas, duracionTotal } from './monedas.js';
 import { animarConteo } from './conteo.js';
 import { senal } from './sonido.js';
 import { correrLinea } from './linea_fin_reto.js';
+import { registrarCelebracion } from './celebraciones.js';
 
 /** @typedef {'perfecto'|'bien'|'animo'} NivelCelebracion */
 
@@ -79,12 +80,18 @@ export function celebrarFinDeReto(d) {
     confeti: () => {
       senal(plan.sonido);
       if (plan.confeti) lanzarConfeti(plan.confeti);
-      if (plan.segundoEstalloMs) setTimeout(() => lanzarConfeti('normal'), plan.segundoEstalloMs);
+      if (plan.segundoEstalloMs) segundoEstallo(plan.segundoEstalloMs);
     },
     puntaje: () => animarConteo(d.hero.puntaje, { desde: 0, hasta: d.aciertos, formato: (n) => `${n} / ${d.total}`, golpe: d.nivel !== 'animo' }),
     monedas: () => contarMonedas(d),
   };
   correrLinea({ nivel: d.nivel, monedas: d.monedas, filas: d.filas || [], boton: d.boton || null, acciones });
+}
+
+// El segundo estallido del perfecto: se cancela con el cambio de pantalla, como todo lo demás.
+function segundoEstallo(ms) {
+  const reloj = setTimeout(() => { terminar(); lanzarConfeti('normal'); }, ms);
+  const terminar = registrarCelebracion(() => clearTimeout(reloj));
 }
 
 // Las monedas vuelan desde Drako hasta la medalla, que cuenta hasta lo que dijo el servidor.

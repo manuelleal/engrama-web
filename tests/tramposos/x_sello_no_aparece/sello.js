@@ -9,6 +9,7 @@ import { textos } from '../textos.js';
 import { senal } from './sonido.js';
 import { crearDrako } from './drako.js';
 import { controladorDe } from './drako_animado.js';
+import { registrarCelebracion } from './celebraciones.js';
 import { lanzarConfeti } from './confeti.js';
 import { celebrarMonedas, planDeMonedas, duracionTotal } from './monedas.js';
 import { animarConteo } from './conteo.js';
@@ -46,7 +47,7 @@ function pintarYDisparar({ zona, monedas, racha, quien }) {
   controladorDe(drako)?.celebrarSalto();
   senal('sello');
   if (plan.monedas) {
-    setTimeout(() => celebrarMonedas({ desde: sello, hasta: num, cantidad: monedas }), 380);
+    despues(380, () => celebrarMonedas({ desde: sello, hasta: num, cantidad: monedas }));
     animarConteo(num, { desde: 0, hasta: monedas, formato: (n) => `+${n}`, golpe: false, duracionMs: 380 + Math.max(900, duracionTotal(planDeMonedas(monedas))) });
     lanzarConfeti('suave');
   }
@@ -58,5 +59,11 @@ function celebrarSiSube(quien, racha, llama) {
   if (!quien) return;
   const previo = leerUltimo('constancia', quien);
   guardarUltimo('constancia', quien, racha);
-  if (compararConUltimo(previo, racha) === 'sube') setTimeout(() => celebrarRacha({ contador: llama, valor: racha }), 900);
+  if (compararConUltimo(previo, racha) === 'sube') despues(900, () => celebrarRacha({ contador: llama, valor: racha }));
+}
+
+// Un `setTimeout` que el cambio de pantalla puede cancelar (ui/celebraciones.js): la asistencia ya no celebra en otra vista.
+function despues(ms, fn) {
+  const reloj = setTimeout(() => { terminar(); fn(); }, ms);
+  const terminar = registrarCelebracion(() => clearTimeout(reloj));
 }

@@ -63,7 +63,6 @@ async function renderizarActual() {
   const resuelto = resolverHash();
   // Toda celebración (aviso de constancia, confeti, monedas en vuelo, la línea de tiempo del fin de reto) es de la pantalla donde
   // ocurrió: al cambiar de ruta se cancela, ANTES de pintar la nueva (ui/celebraciones.js).
-  cancelarCelebraciones();
   vaciar(raizVista);
   if (!resuelto) return;
   await resuelto.render(raizVista, resuelto.params, resuelto.query);

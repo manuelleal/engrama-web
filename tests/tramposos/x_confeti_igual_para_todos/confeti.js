@@ -15,6 +15,7 @@
 //   - sin worker (`useWorker: false`): la política CSP no permite workers desde blob:, y no hace falta.
 import { h } from './dom.js';
 import { reducirMovimiento } from './movimiento.js';
+import { registrarCelebracion } from './celebraciones.js';
 
 /** @typedef {'suave'|'normal'|'fuerte'} NivelConfeti */
 
@@ -77,8 +78,9 @@ function cargarLibreria() {
   return libreria;
 }
 
-// Se precarga en un momento tranquilo para que el primer confeti no espere al disco ni al parseo.
-if (typeof document !== 'undefined' && typeof setTimeout === 'function' && !reducirMovimiento()) setTimeout(cargarLibreria, 2500);
+// Se precarga en cuanto la app está quieta (no a pedido): compilar la librería en el momento del premio, con la CPU de un celular
+// de gama baja, es justo lo que se veía como un tirón al empezar la celebración.
+if (typeof document !== 'undefined' && typeof setTimeout === 'function' && !reducirMovimiento()) setTimeout(cargarLibreria, 700);
 
 /**
  * Lanza el confeti del nivel dado y devuelve cuando ya cayó la última pieza (o enseguida si no hay nada).
@@ -100,8 +102,11 @@ function dispararConLibreria(crear, nivel) {
   const lienzo = h('canvas', { class: `confeti-lienzo confeti-${nivel}`, 'aria-hidden': 'true', 'data-testid': 'confeti', 'data-piezas': piezas });
   document.body.appendChild(lienzo);
   const fuego = crear(lienzo, { resize: true, useWorker: false, disableForReducedMotion: true });
+  // Si el estudiante cambia de pantalla, el confeti se corta de raíz (fuego.reset() detiene la animación) y el lienzo se va.
+  const quitar = () => { fuego.reset(); lienzo.remove(); };
+  const terminar = registrarCelebracion(quitar);
   const disparos = disparosDeConfeti(nivel, coloresDeTokens());
-  return Promise.all(disparos.map((d) => fuego(d))).then(() => undefined).finally(() => { fuego.reset(); lienzo.remove(); });
+  return Promise.all(disparos.map((d) => fuego(d))).then(() => undefined).finally(() => { terminar(); quitar(); });
 }
 
 // ---------- el confeti propio (respaldo): piezas de CSS con animación; sin azar ----------
@@ -120,12 +125,15 @@ function lanzarConfetiPropio(nivel, plan) {
   const alto = globalThis.innerHeight || 700;
   const capa = h('div', { class: `confeti confeti-${nivel}`, 'aria-hidden': 'true', 'data-testid': 'confeti' });
   document.body.appendChild(capa);
+  const relojes = [];
+  const quitar = () => { relojes.forEach(clearTimeout); capa.remove(); };
+  const terminar = registrarCelebracion(quitar);
   // Las piezas nacen en lotes de LOTE, uno cada PAUSA_MS: crear 70 nodos de golpe en un celular lento es
   // justo lo que se veía como un tirón al empezar la celebración. Cada pieza conserva su posición global.
   for (let desde = 0; desde < plan.piezas; desde += LOTE) {
-    setTimeout(() => agregarLote(capa, desde, Math.min(plan.piezas, desde + LOTE), plan, alto), (desde / LOTE) * PAUSA_MS);
+    relojes.push(setTimeout(() => agregarLote(capa, desde, Math.min(plan.piezas, desde + LOTE), plan, alto), (desde / LOTE) * PAUSA_MS));
   }
-  setTimeout(() => capa.remove(), plan.duracionMs + 900 + Math.ceil(plan.piezas / LOTE) * PAUSA_MS);
+  relojes.push(setTimeout(() => { terminar(); quitar(); }, plan.duracionMs + 900 + Math.ceil(plan.piezas / LOTE) * PAUSA_MS));
 }
 
 function agregarLote(capa, desde, hasta, plan, alto) {

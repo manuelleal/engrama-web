@@ -58,7 +58,7 @@ export function coloresDeTokens(raiz = document.documentElement) {
 export function disparosDeConfeti(nivel, colores, reducido = reducirMovimiento()) {
   const plan = planDeConfeti(nivel, reducido);
   if (plan.piezas === 0) return [];
-  const comun = { colors: colores, ticks: Math.round(plan.duracionMs / 16), disableForReducedMotion: true, useWorker: true, zIndex: 60, gravity: 1.1 };
+  const comun = { colors: colores, ticks: Math.round(plan.duracionMs / 16), disableForReducedMotion: true, useWorker: false, zIndex: 60, gravity: 1.1 };
   if (nivel === 'fuerte') {
     const mitad = plan.piezas / 2;
     return [
@@ -104,7 +104,7 @@ function dispararConLibreria(crear, nivel) {
   const fuego = crear(lienzo, { resize: true, useWorker: false, disableForReducedMotion: true });
   // Si el estudiante cambia de pantalla, el confeti se corta de raíz (fuego.reset() detiene la animación) y el lienzo se va.
   const quitar = () => { fuego.reset(); lienzo.remove(); };
-  const terminar = registrarCelebracion(quitar);
+  const terminar = () => {}; // el lienzo no se registra: sigue cayendo en la pantalla nueva
   const disparos = disparosDeConfeti(nivel, coloresDeTokens());
   return Promise.all(disparos.map((d) => fuego(d))).then(() => undefined).finally(() => { terminar(); quitar(); });
 }

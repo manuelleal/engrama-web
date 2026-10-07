@@ -1,0 +1,16 @@
+{
+  "descripcion": "El aviso \"¡Constancia N!\" no se registra como celebracion: sigue tapando la pantalla nueva varios segundos",
+  "archivos": {
+    "src/ui/racha.js": "racha.js"
+  },
+  "comando": [
+    "node",
+    "--test",
+    "--test-reporter=tap",
+    "tests/e2e/celebraciones_ruta.test.mjs"
+  ],
+  "espera_codigo_no_cero": true,
+  "espera_fallan_tests": [
+    "celebraciones: al navegar desde Inicio, el aviso de constancia y el confeti desaparecen (no tapan la pantalla nueva)"
+  ]
+}

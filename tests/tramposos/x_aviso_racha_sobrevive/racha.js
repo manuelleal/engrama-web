@@ -41,7 +41,7 @@ export function textoDeRacha(n) {
 function retirarCon(nodo, ms) {
   const relojes = [];
   const quitar = () => { relojes.forEach(clearTimeout); nodo.remove(); };
-  const terminar = registrarCelebracion(quitar);
+  const terminar = () => {}; // el aviso no se registra: nadie lo cancela al navegar
   relojes.push(setTimeout(() => {
     nodo.classList.add('saliendo');
     relojes.push(setTimeout(() => { terminar(); quitar(); }, 450));
