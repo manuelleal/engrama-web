@@ -54,8 +54,9 @@ function crearTextoAviso(aviso) {
 
 /**
  * @param {HTMLElement} raiz
- * @param {{aviso: import('../aviso.js').Aviso, aceptar: () => Promise<void>, salir?: () => Promise<void>}} ctx
- *   `aceptar` registra el consentimiento en el servidor y entra; si lanza, se muestra `e.mensaje`.
+ * @param {{aviso: import('../aviso.js').Aviso, aceptar: () => Promise<void>, salir?: () => Promise<void>, verSolicitudes?: () => void}} ctx
+ *   `aceptar` registra el consentimiento en el servidor y entra; si lanza, se muestra `e.mensaje`. `verSolicitudes` (W33): las solicitudes sobre
+ *   mis datos se pueden usar antes de aceptar; si viene, el aviso ofrece el botón.
  */
 export function renderConsentimiento(raiz, ctx) {
   const casilla = h('input', { type: 'checkbox', id: 'aviso-acepto', 'data-testid': 'aviso-casilla' });
@@ -82,18 +83,28 @@ export function renderConsentimiento(raiz, ctx) {
     }
   });
   noAcepto.addEventListener('click', () => { noAcepto.disabled = true; Promise.resolve(ctx.salir?.()).catch((e) => { console.error('vistas/aviso_datos: no se pudo cerrar sesión', e); noAcepto.disabled = false; }); });
-  montar(raiz, h('div', { 'data-testid': 'vista-aviso-consentimiento' }, crearDrako('presenta', T.drako), h('h1', {}, T.titulo), crearTextoAviso(ctx.aviso), form));
+  montar(raiz, h('div', { 'data-testid': 'vista-aviso-consentimiento' }, crearDrako('presenta', T.drako), h('h1', {}, T.titulo), crearTextoAviso(ctx.aviso), form, botonSolicitudes(ctx.verSolicitudes)));
   document.body.dataset.listo = '1';
+}
+
+/** W33: "Mis solicitudes sobre mis datos" en la pantalla obligatoria del aviso; null si la app no lo ofrece. @param {(() => void)|undefined} alTocar */
+function botonSolicitudes(alTocar) {
+  if (typeof alTocar !== 'function') return null;
+  const boton = h('button', { type: 'button', class: 'boton-secundario', 'data-testid': 'aviso-ver-solicitudes' }, textos.solicitudes.enlace);
+  boton.addEventListener('click', alTocar);
+  return boton;
 }
 
 /**
  * @param {HTMLElement} raiz
- * @param {{aviso: import('../aviso.js').Aviso, alVolver: () => void}} ctx
+ * @param {{aviso: import('../aviso.js').Aviso, alVolver: () => void, solicitudes?: string}} ctx
+ *   `solicitudes` (W33): la ruta de "Mis solicitudes sobre mis datos"; solo cuando hay sesión (antes de entrar no se puede pedir nada).
  */
 export function renderLeerAviso(raiz, ctx) {
   const volver = h('button', { type: 'button', class: 'boton-secundario', 'data-testid': 'aviso-volver' }, T.volver);
   volver.addEventListener('click', ctx.alVolver);
-  montar(raiz, h('div', { 'data-testid': 'vista-aviso-datos' }, h('h1', {}, T.titulo), crearTextoAviso(ctx.aviso), volver));
+  const solicitudes = ctx.solicitudes ? h('a', { href: ctx.solicitudes, 'data-testid': 'aviso-ver-solicitudes' }, textos.solicitudes.enlace) : null;
+  montar(raiz, h('div', { 'data-testid': 'vista-aviso-datos' }, h('h1', {}, T.titulo), crearTextoAviso(ctx.aviso), solicitudes, volver));
   document.body.dataset.listo = '1';
 }
 

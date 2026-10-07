@@ -53,6 +53,44 @@ export const textosAnillo = {
     avisoBaja: (definitivo, provisional) => `Tu nivel confirmado es ${definitivo}. El provisional (${provisional}) salía solo de lectura, escucha, gramática y vocabulario; con tu escritura calificada, el resultado completo es ${definitivo}. Tus monedas y tu racha no cambian. Tu práctica se ajusta a ${definitivo} para que avances desde ahí.`,
     entendido: 'Entendido',
   },
+  // W33 · Solicitudes sobre mis datos (Ley 1581). Textos del dictamen 03 (G5): los tipos con su ejemplo, "Pedir que borren mis datos" (no suena a botón
+  // que borra), y los estados en `etiquetasEstado`. Sin la pantalla del admin (§4.7) toda solicitud se queda en "Recibida": por eso ningún texto
+  // promete que la respuesta llegará "aquí" (dictamen 03, G5, punto 1).
+  solicitudes: {
+    titulo: 'Mis datos: solicitudes',
+    enlace: 'Mis solicitudes sobre mis datos',
+    nueva: 'Hacer una solicitud',
+    etiquetaTipo: '¿Qué necesitas?',
+    tipos: {
+      conocer: 'Ver qué datos míos tienen',
+      actualizar: 'Actualizar un dato que cambió (por ejemplo, mi correo)',
+      rectificar: 'Corregir un dato que está mal (por ejemplo, mi nombre mal escrito)',
+      suprimir: 'Pedir que borren mis datos',
+    },
+    suprimirNota: 'Esto no borra nada de inmediato: la coordinación de tu institución revisa la solicitud y te responde.',
+    etiquetaMensaje: 'Cuéntanos qué necesitas',
+    /** @param {number} n */
+    contador: (n) => `${n} de 1000 caracteres`,
+    enviar: 'Enviar solicitud',
+    enviando: 'Enviando…',
+    accionEnviar: 'enviar la solicitud', // infinitivo para textos.red.sinConexionAccion
+    recibida: 'Recibimos tu solicitud.',
+    mensajeVacio: 'Escribe lo que necesitas.',
+    mensajeLargo: 'Tu mensaje pasa de 1000 caracteres. Acórtalo para enviarlo.',
+    tipoInvalido: 'Elige qué necesitas.',
+    tope: 'Ya tienes 5 solicitudes sin cerrar. Espera la respuesta de una para hacer otra.',
+    errorGeneral: 'No pudimos enviar tu solicitud ahora. Intenta de nuevo en un momento.',
+    errorCargar: 'No pudimos cargar tus solicitudes.',
+    vacio: 'No has hecho solicitudes.',
+    tuMensaje: 'Tu solicitud',
+    respuesta: 'Respuesta',
+    /** @param {string} fecha */
+    enviadaEl: (fecha) => `Enviada el ${fecha}`,
+    /** @param {string} fecha */
+    respondidaEl: (fecha) => `Respondida el ${fecha}`,
+    volver: 'Volver',
+    drako: 'Drako acompaña',
+  },
   // W29 · Etiquetas de estado (ícono + texto, nunca solo color). El ícono vive en ui/estado_etiqueta.js; aquí, solo el texto.
   // `estados` ya existe en textos.js, de ahí este nombre.
   etiquetasEstado: {

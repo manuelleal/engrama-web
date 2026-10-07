@@ -1,0 +1,18 @@
+{
+  "descripcion": "W33 (U27, R6): una solicitud sobre mis datos con un campo de más en el cuerpo.",
+  "archivos": {
+    "src/api/datos.js": "datos.js"
+  },
+  "comando": [
+    "node",
+    "--test",
+    "--test-reporter=tap",
+    "tests/unit/vista_datos_solicitudes.test.mjs",
+    "tests/e2e/solicitudes_datos.test.mjs"
+  ],
+  "espera_codigo_no_cero": true,
+  "espera_fallan_tests": [
+    "U27: el POST lleva exactamente {tipo, mensaje} y el pase en Authorization; nada de profile_id, institución ni fechas",
+    "E15: A crea solicitudes (la 6.ª sin cerrar da 409) y cierra sesión; B entra en el mismo navegador y no ve nada de A en el DOM, en las cachés ni en los almacenamientos"
+  ]
+}

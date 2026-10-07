@@ -1,4 +1,5 @@
 // @ts-check
+// TRAMPOSO x_solicitudes_tras_el_aviso: la pantalla obligatoria del aviso no ofrece las solicitudes: solo se llega a ellas después de aceptar.
 // bloqueos.js · Las pantallas OBLIGATORIAS que salen de app.js (docs/ESPEC_pantallas_anillo.md §4.2, §7). Un bloqueo es algo que hay que
 // resolver antes de usar la app: crear la contraseña, aceptar el aviso de datos, o (W29) estar sin inscribir, esperando a que el profe
 // apruebe, con la solicitud que ya no está, o con la cuenta suspendida. app.js apaga el router, pone un contenedor nuevo y llama a
@@ -48,7 +49,7 @@ export function resolverBloqueo(actual, nuevo, estabaEsperandoAntes = false) {
 function pintarConsentimiento(raiz, d) {
   const aviso = () => renderConsentimiento(raiz, {
     aviso: d.aviso, aceptar: d.aceptarAviso, salir: d.salir,
-    verSolicitudes: d.contextoDeApi ? async () => renderSolicitudesDatos(raiz, { ...(await d.contextoDeApi?.()), alVolver: aviso }) : undefined,
+    verSolicitudes: undefined, // el error: las solicitudes solo después de aceptar
   });
   aviso();
 }

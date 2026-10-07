@@ -15,7 +15,8 @@ const SIN_CERRAR = ['abierta', 'en_tramite'];
 const NO_ENCONTRADA = 'Solicitud not found';
 
 const error = (tipo, campo, msg, entrada) => ({ type: tipo, loc: ['body', campo], msg, input: entrada ?? null });
-const textoConAlgo = (v) => typeof v === 'string' && v.length >= 1 && v.length <= TEXTO_MAX && /\S/.test(v);
+// Como Pydantic: el largo se cuenta en caracteres (puntos de código), no en unidades UTF-16; un emoji es 1.
+const textoConAlgo = (v) => typeof v === 'string' && [...v].length >= 1 && [...v].length <= TEXTO_MAX && /\S/.test(v);
 
 /** Los 422 de un cuerpo estricto con `campos` = {nombre: (valor) => ok}. Cualquier clave de más, 422. */
 function erroresDe(cuerpo, campos) {

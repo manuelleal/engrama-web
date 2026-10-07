@@ -14,6 +14,7 @@ import {
 import { renderEntrada } from './vistas/entrada.js';
 import { renderInicio } from './vistas/estudiante/inicio.js';
 import { renderPerfil } from './vistas/perfil.js';
+import { renderSolicitudesDatos } from './vistas/datos_solicitudes.js';
 import { renderErrorConfig } from './vistas/error_config.js';
 import { cargarConfig, modoDeAuth } from './config.js';
 import { renderLeerAviso, renderErrorAviso } from './vistas/aviso_datos.js';
@@ -237,6 +238,7 @@ function bloquear(codigo) {
   controlDeBloqueo = pintarBloqueo(efectivo, vistaRaiz, {
     salir: cerrarSesion, aviso: leerAviso(), aceptarAviso, cambiarContrasena: authActivo.cambiarContrasena, alTerminar: terminarBloqueo,
     revisar: revisarDeNuevo, yaNoEsta: () => bloquear(BLOQUEO_YA_NO_ESTA), volverAEntrar: () => location.replace(location.pathname + location.search),
+    contextoDeApi: async () => ({ token: await authActivo.token() }), // W33: las solicitudes sobre mis datos desde el aviso obligatorio
   });
 }
 
@@ -281,8 +283,9 @@ function arrancarConSesion(desdeElPrincipio = false) {
   ruta('/inicio', conCtx((raiz, params, query, ctx) => renderInicio(raiz, ctx)));
   ruta('/perfil', conCtx((raiz, params, query, ctx) => renderPerfil(raiz, ctx)));
   ruta('/datos', conCtx((raiz) => (leerAviso().ok
-    ? renderLeerAviso(raiz, { aviso: leerAviso(), alVolver: () => navegar(sesionActual.rol === 'student' ? '/perfil' : rutaPorDefectoSegunRol(sesionActual)) })
+    ? renderLeerAviso(raiz, { aviso: leerAviso(), solicitudes: '#/datos/solicitudes', alVolver: () => navegar(sesionActual.rol === 'student' ? '/perfil' : rutaPorDefectoSegunRol(sesionActual)) })
     : renderErrorAviso(raiz, leerAviso().faltan))));
+  ruta('/datos/solicitudes', conCtx((raiz, params, query, ctx) => renderSolicitudesDatos(raiz, ctx))); // W33: todos los roles
   ruta('/asistencia', conCtx((raiz, params, query, ctx) => renderAsistencia(raiz, query, ctx)));
   ruta('/retos', conCtx((raiz, params, query, ctx) => renderRetos(raiz, ctx)));
   ruta('/retos/:id', conCtx((raiz, params, query, ctx) => renderRetoFlujo(raiz, params, query, ctx)));

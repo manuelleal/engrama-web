@@ -1,7 +1,16 @@
 {
   "descripcion": "R4 (W26): Perfil gana un enlace que ningún encargo declaró; la foto de 595fd98 debe ponerse roja.",
-  "archivos": { "src/vistas/perfil.js": "perfil.js" },
-  "comando": ["node", "--test", "--test-reporter=tap", "tests/unit/regresion_vistas.test.mjs"],
+  "archivos": {
+    "src/vistas/perfil.js": "perfil.js"
+  },
+  "comando": [
+    "node",
+    "--test",
+    "--test-reporter=tap",
+    "tests/unit/regresion_vistas.test.mjs"
+  ],
   "espera_codigo_no_cero": true,
-  "espera_fallan_tests": ["R4: las fotos de las vistas existentes son idénticas a las de 595fd98 (salvo el nodo que un encargo declara)"]
+  "espera_fallan_tests": [
+    "R4: las fotos de las vistas existentes son idénticas a las de 595fd98 (salvo el nodo que un encargo declara)"
+  ]
 }

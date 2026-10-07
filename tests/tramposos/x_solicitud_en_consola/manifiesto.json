@@ -1,0 +1,16 @@
+{
+  "descripcion": "W33 (U27): la vista de solicitudes escribe el mensaje en la consola cuando algo falla.",
+  "archivos": {
+    "src/vistas/datos_solicitudes.js": "datos_solicitudes.js"
+  },
+  "comando": [
+    "node",
+    "--test",
+    "--test-reporter=tap",
+    "tests/unit/vista_datos_solicitudes.test.mjs"
+  ],
+  "espera_codigo_no_cero": true,
+  "espera_fallan_tests": [
+    "U27: el mensaje no se guarda en ningún almacenamiento ni sale por consola, tampoco cuando algo falla"
+  ]
+}

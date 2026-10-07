@@ -1,0 +1,16 @@
+{
+  "descripcion": "W33 (U28): desde el aviso sin aceptar no se llega a las solicitudes sobre mis datos.",
+  "archivos": {
+    "src/bloqueos.js": "bloqueos.js"
+  },
+  "comando": [
+    "node",
+    "--test",
+    "--test-reporter=tap",
+    "tests/unit/vista_datos_solicitudes.test.mjs"
+  ],
+  "espera_codigo_no_cero": true,
+  "espera_fallan_tests": [
+    "U28: desde el aviso SIN ACEPTAR se llega a las solicitudes (en el mismo sitio, con Volver), y con \"suprimir\" aparece la nota"
+  ]
+}

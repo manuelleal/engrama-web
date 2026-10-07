@@ -17,7 +17,11 @@ const BASE = JSON.parse(readFileSync(fileURLToPath(new URL('../snapshots/vistas_
  * cambia. Cada entrada nombra el encargo de §11 que la autoriza; si una foto cambia y no está aquí, R4 se pone rojo.
  * @type {Record<string, string[]>}
  */
-export const DECLARADAS = {};
+export const DECLARADAS = {
+  // W33: Perfil gana UN enlace, "Mis solicitudes sobre mis datos" (las dos formas de pintar Perfil).
+  perfil: ['perfil-ver-solicitudes'],
+  perfil_sin_soporte: ['perfil-ver-solicitudes'],
+};
 
 test('R4: la línea base trae las vistas que la espec nombra (entrada, Inicio, Perfil, aviso, sin_perfil, profe/grupos y profe/grupo)', () => {
   for (const nombre of ['entrada_supabase', 'inicio', 'perfil', 'aviso_consentimiento', 'sin_perfil', 'profe_grupos', 'profe_grupo']) {
@@ -41,7 +45,20 @@ test('R4: con un nivel confirmado, Inicio cambia SOLO el nodo del escudo (lo dec
   assert.deepEqual(sinSubarboles(conNivel.inicio, declaradas), sinSubarboles(BASE.vistas.inicio, declaradas), 'fuera del escudo, Inicio es idéntico');
   assert.notDeepEqual(conNivel.inicio, BASE.vistas.inicio, 'y el escudo sí cambió: ahora dice el nivel');
   assert.ok(conNivel.inicio.some((l) => l.includes('data-testid="escudo-nivel"')));
-  for (const nombre of Object.keys(BASE.vistas).filter((n) => n !== 'inicio')) assert.deepEqual(conNivel[nombre], BASE.vistas[nombre], nombre);
+  for (const nombre of Object.keys(BASE.vistas).filter((n) => n !== 'inicio')) {
+    const declaradas = DECLARADAS[nombre] || [];
+    assert.deepEqual(sinSubarboles(conNivel[nombre], declaradas), sinSubarboles(BASE.vistas[nombre], declaradas), nombre);
+  }
+});
+
+test('R4: lo que W33 declara cambió de verdad: Perfil trae el enlace a las solicitudes (y lo demás, no)', async () => {
+  const hoy = await tomarFotos();
+  for (const nombre of Object.keys(DECLARADAS)) {
+    assert.ok(hoy[nombre].some((l) => l.includes('data-testid="perfil-ver-solicitudes"') && l.includes('href="#/datos/solicitudes"')), `${nombre}: falta el enlace declarado`);
+    assert.ok(!BASE.vistas[nombre].some((l) => l.includes('perfil-ver-solicitudes')), `${nombre}: la línea base no lo tenía`);
+    assert.equal(hoy[nombre].length, BASE.vistas[nombre].length + 2, `${nombre}: un nodo de más (el enlace y su texto), nada más`);
+  }
+  assert.deepEqual(DECLARADAS.perfil, ['perfil-ver-solicitudes']);
 });
 
 test('R4: dos tomas seguidas dan lo mismo (la foto no depende del reloj ni del azar)', async () => {

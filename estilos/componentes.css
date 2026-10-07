@@ -668,3 +668,27 @@ nav {
   grid-column: 1 / -1;
   min-height: 44px;
 }
+
+/* W33: "Mis datos: solicitudes". Sobria (sin animación). El mensaje de la persona y la respuesta conservan sus saltos de línea. */
+.texto-largo {
+  white-space: pre-wrap;
+  overflow-wrap: anywhere;
+}
+.lista-solicitudes {
+  list-style: none;
+  padding: 0;
+  display: grid;
+  gap: 0.75rem;
+}
+.lista-solicitudes > li > p {
+  margin: 0.25rem 0;
+}
+.solicitud-respuesta {
+  border-top: 1px solid var(--borde);
+  margin-top: 0.5rem;
+  padding-top: 0.5rem;
+}
+#solicitud-mensaje {
+  width: 100%;
+  box-sizing: border-box;
+}

@@ -10,7 +10,7 @@
 //
 // Súbelo un número cada vez que cambie la lista de precarga o la estrategia; la `activate`
 // borra cualquier caché con otro nombre.
-const VERSION = 'engrama-shell-v24';
+const VERSION = 'engrama-shell-v25';
 
 // Cada encargo agrega los suyos en su propio commit (W7: Inicio + api/cliente,core,retos + los
 // SVG de Drako que usa el estudiante; W10: profe/grupos,grupo,sesion_asistencia + api/profe). El
@@ -93,6 +93,8 @@ const PRECARGA = [
   '/src/vistas/sin_perfil.js', // cuenta sin inscribir (import estático de app.js)
   '/src/vistas/esperando.js', // W29: esperando a tu profe / tu solicitud ya no está
   '/src/vistas/suspendida.js', // W29: cuenta suspendida
+  '/src/vistas/datos_solicitudes.js', // W33: mis solicitudes sobre mis datos
+  '/src/api/datos.js', // W33
   '/src/ui/estado_etiqueta.js', // W29: ícono + texto de cada estado
   '/src/ui/contacto.js', // W29: el contacto del aviso como texto seleccionable
   '/src/auth/clave.js',
