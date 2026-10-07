@@ -21,7 +21,7 @@ import { reducirMovimiento } from './movimiento.js';
 const NIVELES = {
   suave: { piezas: 16, duracionMs: 1300, alto: 0.45 },
   normal: { piezas: 34, duracionMs: 1900, alto: 0.65 },
-  fuerte: { piezas: 34, duracionMs: 2700, alto: 0.95 },
+  fuerte: { piezas: 72, duracionMs: 2700, alto: 0.95 },
 };
 const PROPORCION_AUREA = 0.6180339887;
 const LOTE = 18;
@@ -57,7 +57,7 @@ export function coloresDeTokens(raiz = document.documentElement) {
 export function disparosDeConfeti(nivel, colores, reducido = reducirMovimiento()) {
   const plan = planDeConfeti(nivel, reducido);
   if (plan.piezas === 0) return [];
-  const comun = { colors: colores, ticks: Math.round(plan.duracionMs / 16), disableForReducedMotion: true, useWorker: false, zIndex: 60, gravity: 1.1 };
+  const comun = { colors: colores, ticks: Math.round(plan.duracionMs / 16), disableForReducedMotion: true, useWorker: true, zIndex: 60, gravity: 1.1 };
   if (nivel === 'fuerte') {
     const mitad = plan.piezas / 2;
     return [

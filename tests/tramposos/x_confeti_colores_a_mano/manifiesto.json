@@ -1,0 +1,10 @@
+{
+  "descripcion": "Los colores del confeti se escriben a mano en vez de leerse de los tokens del CSS",
+  "archivos": { "src/ui/confeti.js": "confeti.js" },
+  "comando": ["node", "--test", "--test-reporter=tap", "tests/unit/ui_confeti.test.mjs"],
+  "espera_codigo_no_cero": true,
+  "espera_fallan_tests": [
+    "confeti: los colores salen de los tokens del CSS en ejecución, no de la fuente",
+    "confeti: el módulo no escribe colores a mano ni usa Math.random (la cantidad no es azar y los colores son tokens)"
+  ]
+}

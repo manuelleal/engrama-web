@@ -64,11 +64,11 @@ test('game feel: si la constancia del servidor subió, Inicio la celebra (llama,
       url, ancho: 375, alto: 812, espera_ms: 5000,
       pre: `${YA_ENTRO}; localStorage.setItem('engrama_ultimo_constancia_est-1', '1')`,
       eval: `(async () => {
-        await new Promise((r) => setTimeout(r, 400));
+        await new Promise((r) => setTimeout(r, 700));
         return {
           aviso: document.querySelector('[data-testid="celebra-racha"]')?.textContent ?? null,
           llamas: document.querySelectorAll('[data-testid="constancia"] .llama').length,
-          confeti: document.querySelectorAll('[data-testid="confeti"] .confeti-pieza').length,
+          confeti: [...document.querySelectorAll('canvas[data-testid="confeti"]')].reduce((n, c) => n + Number(c.dataset.piezas), 0),
           constancia: document.querySelector('[data-testid="constancia"]').textContent,
         };
       })()`,
@@ -76,7 +76,7 @@ test('game feel: si la constancia del servidor subió, Inicio la celebra (llama,
     assert.deepEqual(r.errores, []);
     assert.equal(r.eval.aviso, '¡Constancia 3!', 'est-1 llega con constancia 3 del servidor: se celebra ese número, no otro');
     assert.equal(r.eval.llamas, 1, 'la constancia lleva su llama dibujada');
-    assert.ok(r.eval.confeti > 0, 'la racha que sube suelta confeti suave');
+    assert.ok(r.eval.confeti > 0, 'la racha que sube suelta confeti suave (un <canvas> con sus piezas)');
     assert.match(r.eval.constancia, /Constancia: 3$/);
   });
 });
@@ -155,8 +155,8 @@ function scriptTerminar(labels) {
     q('opcion-${labels[1]}').click(); await esperar(80); q('boton-terminar').click();
     await esperar(900);
     const medio = {
-      confetiFuerte: document.querySelectorAll('.confeti-fuerte .confeti-pieza').length,
-      confetiAlgo: document.querySelectorAll('[data-testid="confeti"] .confeti-pieza').length,
+      confetiFuerte: [...document.querySelectorAll('canvas.confeti-fuerte')].reduce((n, c) => n + Number(c.dataset.piezas), 0),
+      confetiAlgo: document.querySelectorAll('[data-testid="confeti"]').length,
     };
     await esperar(3000);
     return {
@@ -180,7 +180,7 @@ test('game feel: un reto perfecto celebra a lo grande (confeti fuerte, medalla d
     assert.match(r.eval.hero, /hero-perfecto/);
     assert.equal(r.eval.titulo, '¡Reto perfecto!');
     assert.equal(r.eval.drako, 'drako-celebra');
-    assert.ok(r.eval.medio.confetiFuerte >= 60, 'el perfecto suelta confeti fuerte');
+    assert.ok(r.eval.medio.confetiFuerte >= 60, 'el perfecto suelta confeti fuerte (72 piezas en un <canvas>)');
     assert.match(r.eval.puntaje, /2 \/ 2/);
     assert.match(r.eval.puntaje, /2 de 2 correctas/, 'el texto para lectores dice el puntaje completo');
     assert.equal(r.eval.medalla, '+5', 'la medalla termina en lo que pagó el servidor');

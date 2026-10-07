@@ -58,8 +58,18 @@
   100% { opacity: 0; }
 }
 
-/* ---------- Confeti (ui/confeti.js): tres fuerzas, mismas piezas. Cada pieza trae su posición, deriva,
-   giro, retraso, duración y caída por variables CSS que pone el módulo (nada es azar). ---------- */
+/* ---------- Confeti (ui/confeti.js): tres fuerzas. El de verdad lo dibuja canvas-confetti en UN <canvas> que cubre la
+   pantalla (canvas-confetti toma el tamaño de lo que mide el elemento); el de abajo, de piezas de CSS, es el respaldo si
+   la librería no cargara. Cada pieza trae su posición, deriva, giro, retraso, duración y caída por variables CSS
+   que pone el módulo (nada es azar). ---------- */
+.confeti-lienzo {
+  position: fixed;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  pointer-events: none;
+  z-index: 60;
+}
 .confeti {
   position: fixed;
   inset: 0;

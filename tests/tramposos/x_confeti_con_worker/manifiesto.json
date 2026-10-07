@@ -1,0 +1,16 @@
+{
+  "descripcion": "El confeti usa el worker de canvas-confetti (blob:): la CSP lo bloquea (worker-src) y en la app real no cae nada",
+  "archivos": {
+    "src/ui/confeti.js": "confeti.js"
+  },
+  "comando": [
+    "node",
+    "--test",
+    "--test-reporter=tap",
+    "tests/unit/ui_confeti.test.mjs"
+  ],
+  "espera_codigo_no_cero": true,
+  "espera_fallan_tests": [
+    "confeti: con prefers-reduced-motion no hay ningún disparo, y todo disparo lleva disableForReducedMotion y useWorker:false"
+  ]
+}
