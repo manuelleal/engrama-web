@@ -105,4 +105,11 @@ Reglas que no se rompen:
   anime.js: reposo (respira, parpadea, cola), saluda, salto de celebración, "ups" suave, piensa, espera. Con reduced-motion queda quieto.
   El panel del profe y del admin usan `crearDrakoEstatico()` (la imagen de siempre): ninguna vista de `profe/` ni `admin/` trae el animado.
   Un Drako que sale de la pantalla se apaga solo. `node herramientas/galeria_drako.mjs` saca las capturas (poses, estático contra rig, secuencias).
+- **Confeti**: `ui/confeti.js` usa canvas-confetti (`vendor/`) en UN `<canvas>`; colores = tokens leídos del CSS en ejecución; cantidad = `planDeConfeti`
+  (72/34/16, fija por resultado); `disableForReducedMotion` y `useWorker:false` (la CSP no admite workers `blob:`). Si la librería no cargara, cae el confeti propio de piezas de CSS.
+- **Fin de reto = una línea de tiempo** (`ui/linea_fin_reto.js`, anime.js): Drako salta → confeti → puntaje → monedas → filas en cascada → botón. Con reduced-motion va directo al estado final.
+- **Toda celebración se cancela al cambiar de ruta**: se registra en `ui/celebraciones.js` (`registrarCelebracion`) y `rutas.js` llama a `cancelarCelebraciones()` en cada cambio
+  de ruta, antes de pintar. Si agregas un efecto que dura (aviso, confeti, vuelo, temporizador), regístralo ahí o sobrevivirá a la pantalla.
+- **Service worker**: la precarga tiene techo por recurso (10 s) y el SW se registra en `load`; la app y la privacidad NO dependen de que controle la página
+  (el cierre de sesión borra `/api` de la CacheStorage desde la propia página). `node herramientas/medir_sw.mjs` mide activado / controlado / app lista.
 - `npm run demo` levanta mock + servidor de desarrollo con datos sintéticos para verlo en esta máquina.
