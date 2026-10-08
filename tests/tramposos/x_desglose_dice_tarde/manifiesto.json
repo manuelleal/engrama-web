@@ -1,0 +1,18 @@
+{
+  "descripcion": "U38 (17.8): sin puntualidad el desglose dice 'llegaste tarde' (un reproche).",
+  "archivos": {
+    "src/textos.js": "textos.js"
+  },
+  "comando": [
+    "node",
+    "--test",
+    "--test-reporter=tap",
+    "tests/unit/ui_desglose.test.mjs",
+    "tests/unit/vista_asistencia_pago.test.mjs"
+  ],
+  "espera_codigo_no_cero": true,
+  "espera_fallan_tests": [
+    "U37: el texto del desglose dice las partes que valen",
+    "U38: 200 con 5 monedas y un asiento 5 + 0"
+  ]
+}

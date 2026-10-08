@@ -80,7 +80,7 @@ function actualizarBotonPorRed(boton, avisoRed, enLinea) {
 /** Un check-in que salió bien: el resultado (con ícono y texto), la celebración y, sin esperar, lo que el servidor pueda decir de la paga. */
 function mostrarMarcada({ zonaResultado, boton, r, ctx }) {
   // Con 0 monedas (la segunda marca del día) nunca se dice "+0": la asistencia SÍ quedó marcada y el resultado es positivo.
-  const texto = r.coins_awarded > 0 ? textos.asistencia.exito(r.coins_awarded, r.streak) : textos.asistencia.sinMonedas(r.streak);
+  const texto = r.coins_awarded > 0 ? textos.asistencia.exito(r.coins_awarded, r.streak) : textos.asistencia.yaCobrada(r.streak);
   const cuerpo = h('div', { 'data-testid': 'asistencia-cuerpo' }, crearResultado({ ok: true, texto }));
   montar(zonaResultado, cuerpo);
   // Game feel: el sello se estampa, las monedas vuelan a su contador, suena y vibra; la constancia

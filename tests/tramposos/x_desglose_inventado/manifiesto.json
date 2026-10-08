@@ -1,0 +1,17 @@
+{
+  "descripcion": "U37 (17.8): el desglose se inventa: si el asiento no trae la puntualidad, la saca RESTANDO (monto menos base).",
+  "archivos": {
+    "src/ui/desglose.js": "desglose.js"
+  },
+  "comando": [
+    "node",
+    "--test",
+    "--test-reporter=tap",
+    "tests/unit/ui_desglose.test.mjs",
+    "tests/unit/vista_asistencia_pago.test.mjs"
+  ],
+  "espera_codigo_no_cero": true,
+  "espera_fallan_tests": [
+    "U37: en cualquier otro caso es null"
+  ]
+}

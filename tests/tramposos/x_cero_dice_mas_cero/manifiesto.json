@@ -1,0 +1,16 @@
+{
+  "descripcion": "U38 (17.8): el texto de 0 monedas dice '+0 monedas'.",
+  "archivos": {
+    "src/textos.js": "textos.js"
+  },
+  "comando": [
+    "node",
+    "--test",
+    "--test-reporter=tap",
+    "tests/unit/vista_asistencia_pago.test.mjs"
+  ],
+  "espera_codigo_no_cero": true,
+  "espera_fallan_tests": [
+    "U38: 200 con 0 monedas SIN esa prueba"
+  ]
+}

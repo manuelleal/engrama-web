@@ -114,6 +114,8 @@ Reglas que no se rompen:
   (el cierre de sesión borra `/api` de la CacheStorage desde la propia página). `node herramientas/medir_sw.mjs` mide activado / controlado / app lista.
 - `npm run demo` levanta mock + servidor de desarrollo con datos sintéticos para verlo en esta máquina.
 
+Asistencia (adenda 17.8 de la espec del anillo, adelanta W45): la respuesta del check-in NO trae el desglose ni dice si la paga de hoy ya estaba cobrada, así que la pantalla pide aparte `GET /core/coins/history?limit=5` y `GET /core/attendance/history` y lo dice **solo si el dato cuadra** (`ui/desglose.js`: `desgloseDeAsistencia` exige un asiento `attendance` con `base` + `puntualidad` enteros que sumen el monto; `haySegundaMarcaDelDia` exige otra marca de hoy que sí pagó); si no, queda "+N monedas" o "Asistencia marcada. Constancia: R." (nunca "+0"; un 402 sale con ℹ). La web nunca resta para sacar una parte. El pedido al backend para tiparlo en `CheckInResult` está en la adenda.
+
 ## Pantallas del anillo: EVA, SET, cuentas por aprobar y datos personales (2026-10-07)
 
 Spec y autoridad: `docs/ESPEC_pantallas_anillo.md` (con sus adendas §17). Decisión de los enlaces: `..\..\decisiones\013-enlace-con-pase.md`. Qué hay hecho:

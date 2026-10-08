@@ -81,7 +81,7 @@ function actualizarBotonPorRed(boton, avisoRed, enLinea) {
 function mostrarMarcada({ zonaResultado, boton, r, ctx }) {
   // Con 0 monedas (la segunda marca del día) nunca se dice "+0": la asistencia SÍ quedó marcada y el resultado es positivo.
   const texto = r.coins_awarded > 0 ? textos.asistencia.exito(r.coins_awarded, r.streak) : textos.asistencia.sinMonedas(r.streak);
-  const cuerpo = h('div', { 'data-testid': 'asistencia-cuerpo' }, crearResultado({ ok: true, texto }));
+  const cuerpo = h('div', { 'data-testid': 'asistencia-cuerpo' }, crearResultado({ ok: r.coins_awarded > 0, texto }));
   montar(zonaResultado, cuerpo);
   // Game feel: el sello se estampa, las monedas vuelan a su contador, suena y vibra; la constancia
   // que llega del servidor se celebra solo si subió (ui/sello.js).

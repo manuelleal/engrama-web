@@ -23,7 +23,6 @@ export function mensajeDeAsistencia(e) {
   if (e.status === 404) return textos.asistencia.codigoInvalido;
   if (e.status === 409) return textos.asistencia.yaMarcada;
   if (e.status === 410) return textos.asistencia.sesionVencida;
-  if (e.status === 402) return textos.asistencia.bolsaAgotada; // la bolsa de la institución se agotó: no es culpa de la persona (adenda 17.8)
   return e.mensaje;
 }
 

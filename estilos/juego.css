@@ -868,3 +868,10 @@ body {
 .boton-sonido {
   flex: none;
 }
+
+/* Adenda 17.8: un aviso que informa y no califica (la bolsa de monedas de la institución se agotó). Ícono ℹ y texto, sin rojo ni verde. */
+.juego .resultado-info {
+  background: var(--superficie);
+  border: 2px solid var(--borde);
+  color: var(--texto);
+}

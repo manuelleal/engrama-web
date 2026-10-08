@@ -1,0 +1,16 @@
+{
+  "descripcion": "U40 (17.8): un 402 en el check-in sale con el mensaje genérico 'Error inesperado (402).' en vez del texto de la bolsa agotada.",
+  "archivos": {
+    "src/vistas/estudiante/asistencia.js": "asistencia.js"
+  },
+  "comando": [
+    "node",
+    "--test",
+    "--test-reporter=tap",
+    "tests/unit/vista_asistencia_pago.test.mjs"
+  ],
+  "espera_codigo_no_cero": true,
+  "espera_fallan_tests": [
+    "U40 (check-in): un 402 muestra su texto"
+  ]
+}

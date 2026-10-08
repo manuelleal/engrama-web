@@ -246,7 +246,7 @@ export const textos = {
     /** @param {number} racha */
     yaCobrada: (racha) => `Asistencia marcada. La de hoy ya la cobraste: las monedas de asistencia son una vez por día. Constancia: ${racha}.`,
     /** @param {number} racha */
-    sinMonedas: (racha) => `Asistencia marcada. Constancia: ${racha}.`,
+    sinMonedas: (racha) => `Asistencia marcada · +0 monedas · constancia ${racha}.`,
     bolsaAgotada: 'No pudimos registrar tu asistencia: la bolsa de monedas de tu institución se agotó. No es por ti. Avísale a tu profe.',
   },
   profe: {

@@ -1,0 +1,16 @@
+{
+  "descripcion": "U38 (17.8): la segunda marca del día (0 monedas) se pinta como un error (✗, en rojo) en vez de un resultado positivo. (En la fila con prueba el resultado final lo vuelve a pintar completarConLoDelServidor con ok:true; se ve en la fila SIN prueba, que es la que se queda con el resultado de la primera pintada.)",
+  "archivos": {
+    "src/vistas/estudiante/asistencia.js": "asistencia.js"
+  },
+  "comando": [
+    "node",
+    "--test",
+    "--test-reporter=tap",
+    "tests/unit/vista_asistencia_pago.test.mjs"
+  ],
+  "espera_codigo_no_cero": true,
+  "espera_fallan_tests": [
+    "U38: 200 con 0 monedas SIN esa prueba"
+  ]
+}

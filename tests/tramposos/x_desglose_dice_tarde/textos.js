@@ -242,7 +242,7 @@ export const textos = {
     sesionVencida: 'Esta sesión ya venció.',
     faltaCodigo: 'Escribe el código de la sesión.',
     /** Adenda 17.8 (adelanta W45), sin "+0" ni reproche (nada de "tarde"): "5 por asistir + 5 por llegar a tiempo". @param {number} base @param {number} puntualidad */
-    desglose: (base, puntualidad) => [base > 0 ? `${base} por asistir` : '', puntualidad > 0 ? `${puntualidad} por llegar a tiempo` : ''].filter(Boolean).join(' + '),
+    desglose: (base, puntualidad) => [base > 0 ? `${base} por asistir` : '', puntualidad > 0 ? `${puntualidad} por llegar a tiempo` : 'llegaste tarde'].filter(Boolean).join(' + '),
     /** @param {number} racha */
     yaCobrada: (racha) => `Asistencia marcada. La de hoy ya la cobraste: las monedas de asistencia son una vez por día. Constancia: ${racha}.`,
     /** @param {number} racha */
