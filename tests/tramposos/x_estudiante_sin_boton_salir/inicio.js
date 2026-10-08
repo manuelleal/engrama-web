@@ -17,12 +17,18 @@ import { crearSelectorColegio } from '../../ui/selector_colegio.js';
 import { senal } from '../../ui/sonido.js';
 import { animarConteo } from '../../ui/conteo.js';
 import { celebrarMonedas, planDeMonedas, duracionTotal } from '../../ui/monedas.js';
-import { leerUltimo, guardarUltimo, compararConUltimo } from '../../ui/ultimo_visto.js';
+import {
+  leerUltimo, guardarUltimo, compararConUltimo, decidirNivel, leerNivelVisto, guardarNivelVisto,
+} from '../../ui/ultimo_visto.js';
+import { reducirMovimiento } from '../../ui/movimiento.js';
+import { registrarCelebracion } from '../../ui/celebraciones.js';
+import { nivelDeValor, valorDeNivel } from '../../auth/interfaz.js';
 import { tituloLegible } from '../../ui/titulo.js';
 import { textos } from '../../textos.js';
 import { leerSaldo, leerHistorialAsistencia } from '../../api/core.js';
 import { listarRetos, historialDeIntentos } from '../../api/retos.js';
 import { ErrorApi } from '../../api/cliente.js';
+import { destinosVisibles, tenantActivo } from '../../anillo/abrir.js';
 
 const SIETE_DIAS_MS = 7 * 24 * 60 * 60 * 1000;
 
@@ -90,16 +96,72 @@ export function resumenSemana(historialRetos, historialAsistencia, ahoraMs = Dat
   return { retos, asistencias };
 }
 
+/**
+ * W30: Inicio vuelve a pedir /auth/me en cada pintado, para que el nivel no quede viejo tras un examen en SET o una clase en EVA (una llamada
+ * más). Si falla (sin red...), se sigue con la sesión que ya había: el nivel viejo es mejor que un Inicio roto. Los bloqueos (403) los
+ * atiende api/cliente.js por su cuenta.
+ */
+async function sesionFresca(ctx) {
+  if (typeof ctx.recargarSesion !== 'function') return ctx.sesion;
+  try {
+    return await ctx.recargarSesion();
+  } catch (e) {
+    console.warn('vistas/estudiante/inicio: no se pudo refrescar /auth/me; va la sesión que ya había', e);
+    return ctx.sesion;
+  }
+}
+
 async function cargarDatos(ctx) {
-  const [saldo, retos, historialRetos, historialAsistencia] = await Promise.all([
-    leerSaldo(ctx), listarRetos(ctx), historialDeIntentos(ctx), leerHistorialAsistencia(ctx),
+  const [saldo, retos, historialRetos, historialAsistencia, sesion] = await Promise.all([
+    leerSaldo(ctx), listarRetos(ctx), historialDeIntentos(ctx), leerHistorialAsistencia(ctx), sesionFresca(ctx),
   ]);
   return {
     balance: saldo.balance,
     numRetos: retos.length,
     pendiente: primerRetoPendiente(retos, historialRetos),
     semana: resumenSemana(historialRetos, historialAsistencia),
+    nivelConfirmado: sesion.nivelConfirmado ?? null, // el que dice el servidor, nunca derivado de level, xp ni monedas (X7)
   };
+}
+
+/** El aviso informativo ÚNICO cuando el nivel definitivo es menor que el provisional ya mostrado (dictamen 03, G2): ícono de información, sin Drako. */
+function avisoDeBaja(definitivo, provisional) {
+  const entendido = h('button', { type: 'button', class: 'boton-secundario boton-chico', 'data-testid': 'aviso-nivel-baja-entendido' }, textos.escudo.entendido);
+  const aviso = h(
+    'div', { class: 'aviso-nivel', role: 'status', 'data-testid': 'aviso-nivel-baja' },
+    h('span', { class: 'etiqueta-icono', 'aria-hidden': 'true' }, 'ℹ'),
+    h('p', {}, textos.escudo.avisoBaja(definitivo, provisional)),
+    entendido,
+  );
+  entendido.addEventListener('click', () => aviso.remove());
+  return aviso;
+}
+
+/**
+ * Qué hace el nivel en esta visita (adenda §17.2): anima el escudo solo con un definitivo nuevo que no baja, avisa UNA vez si bajó respecto
+ * de un provisional ya mostrado, y deja anotado lo último que se vio de esa persona en esa institución.
+ */
+function prepararNivel(ctx, nivel) {
+  if (!nivel) return { animar: false, aviso: null };
+  const quien = `${ctx.sesion.profileId}_${ctx.sesion.colegio?.id ?? 'sin-institucion'}`;
+  const previo = leerNivelVisto(quien);
+  const plan = decidirNivel(previo, nivel, reducirMovimiento());
+  guardarNivelVisto(quien, { valor: valorDeNivel(nivel.cefr), provisional: nivel.provisional });
+  const aviso = plan.avisoBaja && previo ? avisoDeBaja(nivel.cefr, nivelDeValor(previo.valor)) : null;
+  return { animar: plan.animar, aviso };
+}
+
+// Al volver de otro origen (SET o EVA, con "atrás": la página sale de la caché de ida y vuelta, `pageshow` con `persisted`), Inicio se
+// vuelve a pintar para que el nivel y el saldo no queden viejos. Se registra como celebración para que el cambio de ruta lo quite.
+let quitarPageshow = null;
+function escucharVueltaDeOtroOrigen(raiz, ctx) {
+  quitarPageshow?.();
+  quitarPageshow = null;
+  if (typeof window === 'undefined' || typeof window.addEventListener !== 'function') return;
+  const alVolver = (ev) => { if (ev.persisted) renderInicio(raiz, ctx); };
+  window.addEventListener('pageshow', alVolver);
+  const terminar = registrarCelebracion(() => window.removeEventListener('pageshow', alVolver));
+  quitarPageshow = () => { window.removeEventListener('pageshow', alVolver); terminar(); };
 }
 
 function tarjetaRetoDeHoy(pendiente) {
@@ -120,6 +182,29 @@ function tarjetaProgresoSemana(semana) {
     h('p', {}, textos.inicio.retosEstaSemana(semana.retos)),
     h('p', {}, textos.inicio.asistenciasEstaSemana(semana.asistencias)),
   );
+}
+
+// W35 (§4.6): una tarjeta por cada destino del ESTUDIANTE que tenga una base válida en config.json (clase en vivo de EVA, examen de nivel de SET).
+// Ni la base ni el pase aparecen aquí: la tarjeta solo lleva a #/vivo o #/nivel, donde se escribe el código y el pase se pide al tocar. Sin
+// claves en config.json no hay ninguna tarjeta y Inicio queda idéntico (R4). Se pide por el ROL de la sesión: los destinos del docente no
+// existen para el estudiante (U32), y un docente que llegue a #/inicio tampoco ve tarjetas.
+const TARJETAS_DEL_ANILLO = {
+  eva_celular: { href: '#/vivo', titulo: () => textos.anillo.vivoTitulo, texto: () => textos.anillo.tarjetaVivo },
+  set_examen: { href: '#/nivel', titulo: () => textos.anillo.nivelTitulo, texto: () => textos.anillo.tarjetaNivel },
+};
+
+function tarjetasDelAnillo(ctx) {
+  const tarjetas = destinosVisibles(ctx.sesion?.rol, ctx.config, tenantActivo(ctx))
+    .filter(({ destino }) => destino in TARJETAS_DEL_ANILLO)
+    .map(({ destino }) => {
+      const t = TARJETAS_DEL_ANILLO[destino];
+      return h(
+        'div', { class: 'fila fila-invitacion', 'data-testid': `tarjeta-${destino}`, 'data-destino': destino },
+        h('div', { class: 'fila-texto' }, h('span', { class: 'fila-titulo' }, t.titulo()), h('span', { class: 'texto-apoyo' }, t.texto())),
+        h('a', { href: t.href, class: 'boton-chico', 'data-testid': `ir-a-${destino}` }, textos.anillo.tarjetaIr),
+      );
+    });
+  return tarjetas.length === 0 ? null : h('div', { 'data-testid': 'anillo-tarjetas' }, ...tarjetas);
 }
 
 function barraSuperior(datos, ctx) {
@@ -148,6 +233,7 @@ function navDeAccesos(ctx) {
 
 function pintarContenido(raiz, ctx, datos) {
   const { barra, nodoSaldo, constancia } = barraSuperior(datos, ctx);
+  const nivel = prepararNivel(ctx, datos.nivelConfirmado);
   const nodo = h(
     'div', { 'data-testid': 'vista-inicio', class: 'juego' },
     barra,
@@ -156,15 +242,18 @@ function pintarContenido(raiz, ctx, datos) {
       h('h1', {}, textos.inicio.saludo(ctx.sesion.nombre)),
       crearBotonSonido()),
     crearSelectorColegio(ctx), // login piloto (B): solo si el estudiante está en más de una institución
-    crearEscudo({ nivelConfirmado: null }), // L10 no existe todavía (§4.1): siempre "Por confirmar"
+    crearEscudo({ nivelConfirmado: datos.nivelConfirmado, animar: nivel.animar }), // W30: el de /auth/me; sin él, "Por confirmar"
+    nivel.aviso,
     tarjetaRetoDeHoy(datos.pendiente),
     tarjetaProgresoSemana(datos.semana),
+    tarjetasDelAnillo(ctx),
     navDeAccesos(ctx),
     crearNavInferior('inicio'),
   );
   montar(raiz, nodo);
   animarSaldo(nodoSaldo, datos.balance, ctx);
   celebrarConstancia(constancia, ctx);
+  escucharVueltaDeOtroOrigen(raiz, ctx);
   document.body.dataset.listo = '1';
 }
 

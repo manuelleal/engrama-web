@@ -14,6 +14,9 @@ import {
 import { renderEntrada } from './vistas/entrada.js';
 import { renderInicio } from './vistas/estudiante/inicio.js';
 import { renderPerfil } from './vistas/perfil.js';
+import { renderVivo } from './vistas/estudiante/vivo.js';
+import { renderNivel } from './vistas/estudiante/nivel.js';
+import { renderSolicitudesDatos } from './vistas/datos_solicitudes.js';
 import { renderErrorConfig } from './vistas/error_config.js';
 import { cargarConfig, modoDeAuth } from './config.js';
 import { renderLeerAviso, renderErrorAviso } from './vistas/aviso_datos.js';
@@ -67,6 +70,7 @@ function cargarAuth(modo) {
 // Se resuelve una sola vez, en iniciarApp(), según config.json — conCtx() y arrancarConSesion()
 // lo usan después, así que no puede ser un import estático de un solo módulo (W22).
 let authActivo = null;
+let configActual = null; // el config.json ya leído: de ahí salen las bases de EVA y SET (anillo/destinos.js), nunca de la dirección ni de un campo
 // La Sesion vigente (cambia cuando se entra de nuevo tras crear la contraseña), el contenedor de las
 // vistas (una pantalla obligatoria lo reemplaza por uno nuevo, ui/dom.js:reemplazarRaiz) y el bloqueo
 // que está en pantalla, si hay uno.
@@ -94,6 +98,7 @@ async function iniciarApp() {
     renderErrorConfig(vistaRaiz, /** @type {any} */ (e).causa || 'invalida');
     return;
   }
+  configActual = config;
   const modo = /** @type {'mock'|'perfil_actual'|'supabase'} */ (modoDeAuth(config));
   authActivo = await cargarAuth(modo);
   configurarAviso(config);
@@ -151,7 +156,18 @@ function conCtx(fn) {
     // (inicio.js, perfil.js) usan esto para no ofrecer un enlace muerto.
     cambiarContrasena: typeof authActivo.cambiarContrasena === 'function' ? authActivo.cambiarContrasena : undefined,
     salir: cerrarSesion,
+    // W35 (§4.6): las bases de EVA y SET salen SOLO de config.json; el pase (el token) se pide al TOCAR un enlace, nunca al pintar (anillo/abrir.js).
+    config: configActual,
+    pedirPase: () => authActivo.token(),
+    // W30: Inicio vuelve a pedir /auth/me en cada pintado (el nivel pudo cambiar en SET o EVA); solo con proveedores que lo soportan.
+    recargarSesion: typeof authActivo.recargarSesion === 'function' ? recargarYGuardar : undefined,
   });
+}
+
+// La sesión fresca de /auth/me queda como la vigente para el resto de la app.
+async function recargarYGuardar() {
+  sesionActual = await authActivo.recargarSesion();
+  return sesionActual;
 }
 
 // El estudiante entra por Home, el profe por sus grupos y el admin por su lista de grupos —
@@ -229,6 +245,7 @@ function bloquear(codigo) {
   controlDeBloqueo = pintarBloqueo(efectivo, vistaRaiz, {
     salir: cerrarSesion, aviso: leerAviso(), aceptarAviso, cambiarContrasena: authActivo.cambiarContrasena, alTerminar: terminarBloqueo,
     revisar: revisarDeNuevo, yaNoEsta: () => bloquear(BLOQUEO_YA_NO_ESTA), volverAEntrar: () => location.replace(location.pathname + location.search),
+    contextoDeApi: async () => ({ token: await authActivo.token() }), // W33: las solicitudes sobre mis datos desde el aviso obligatorio
   });
 }
 
@@ -273,8 +290,11 @@ function arrancarConSesion(desdeElPrincipio = false) {
   ruta('/inicio', conCtx((raiz, params, query, ctx) => renderInicio(raiz, ctx)));
   ruta('/perfil', conCtx((raiz, params, query, ctx) => renderPerfil(raiz, ctx)));
   ruta('/datos', conCtx((raiz) => (leerAviso().ok
-    ? renderLeerAviso(raiz, { aviso: leerAviso(), alVolver: () => navegar(sesionActual.rol === 'student' ? '/perfil' : rutaPorDefectoSegunRol(sesionActual)) })
+    ? renderLeerAviso(raiz, { aviso: leerAviso(), solicitudes: '#/datos/solicitudes', alVolver: () => navegar(sesionActual.rol === 'student' ? '/perfil' : rutaPorDefectoSegunRol(sesionActual)) })
     : renderErrorAviso(raiz, leerAviso().faltan))));
+  ruta('/datos/solicitudes', conCtx((raiz, params, query, ctx) => renderSolicitudesDatos(raiz, ctx))); // W33: todos los roles
+  ruta('/vivo', conCtx((raiz, params, query, ctx) => renderVivo(raiz, query, ctx))); // W35: la sala de EVA
+  ruta('/nivel', conCtx((raiz, params, query, ctx) => renderNivel(raiz, query, ctx))); // W35: el examen de SET
   ruta('/asistencia', conCtx((raiz, params, query, ctx) => renderAsistencia(raiz, query, ctx)));
   ruta('/retos', conCtx((raiz, params, query, ctx) => renderRetos(raiz, ctx)));
   ruta('/retos/:id', conCtx((raiz, params, query, ctx) => renderRetoFlujo(raiz, params, query, ctx)));

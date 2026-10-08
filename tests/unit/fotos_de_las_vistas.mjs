@@ -47,17 +47,20 @@ const sinHacer = async () => {};
 
 /**
  * Pinta cada vista en una raíz nueva y devuelve las fotos.
- * @param {{rutasExtra?: Record<string, unknown>, sesion?: object}} [o] `rutasExtra`: lo que Inicio pide de más en commits posteriores
+ * @param {{rutasExtra?: Record<string, unknown>, sesion?: object, config?: Record<string, unknown>}} [o] `rutasExtra`: lo que Inicio pide de más en commits posteriores;
+ *   `config`: el config.json con las claves del anillo (W35): Inicio y profe/grupos pintan sus enlaces a EVA y SET; sin ella, son las de siempre
  * @returns {Promise<Record<string, string[]>>}
  */
 export async function tomarFotos(o = {}) {
   const entorno = entornoDeFotos({ ...RUTAS, ...(o.rutasExtra || {}) });
+  const quitarRed = o.config ? ponerRedDeMentira() : () => {};
   try {
     const fotos = {};
     const en = async (nombre, pintar) => { const raiz = crearRaiz(); await pintar(raiz); fotos[nombre] = fotografiar(raiz); };
     const ctxEstudiante = {
       sesion: o.sesion || sesionDeEstudiante(), token: 'token-fijo', colegios: sesionDeEstudiante().colegios, colegioActivo: TENANT_A,
       avisoDatos: true, cambiarContrasena: sinHacer, cambiarColegio: sinHacer, salir: sinHacer,
+      ...(o.config ? { config: o.config } : {}),
     };
     await en('entrada_supabase', (raiz) => renderEntrada(raiz, 'supabase', sinHacer));
     await en('entrada_aviso_leer', (raiz) => renderLeerAviso(raiz, { aviso: leerAviso(), alVolver: () => {} }));
@@ -66,13 +69,29 @@ export async function tomarFotos(o = {}) {
     await en('perfil_sin_soporte', (raiz) => renderPerfil(raiz, { avisoDatos: true, salir: sinHacer }));
     await en('aviso_consentimiento', (raiz) => renderConsentimiento(raiz, { aviso: leerAviso(), aceptar: sinHacer, salir: sinHacer }));
     await en('sin_perfil', (raiz) => renderSinPerfil(raiz, { salir: sinHacer }));
-    const ctxProfe = { token: 'token-fijo', colegios: [{ id: TENANT_A, nombre: 'UIS (demo)' }], colegioActivo: TENANT_A, avisoDatos: true, salir: sinHacer };
+    const ctxProfe = {
+      token: 'token-fijo', colegios: [{ id: TENANT_A, nombre: 'UIS (demo)' }], colegioActivo: TENANT_A, avisoDatos: true, salir: sinHacer,
+      ...(o.config ? { config: o.config, sesion: { rol: 'teacher', colegio: { id: TENANT_A } }, pedirPase: async () => 'pase-de-fotos' } : {}),
+    };
     await en('profe_grupos', (raiz) => renderGrupos(raiz, ctxProfe));
     await en('profe_grupo', (raiz) => renderGrupo(raiz, { gid: 'g1' }, ctxProfe));
     return fotos;
   } finally {
+    quitarRed();
     entorno.restaurar();
   }
+}
+
+/** window y navigator de mentira (el bloque del profe se ata a la red); devuelve cómo quitarlos. */
+function ponerRedDeMentira() {
+  const g = /** @type {any} */ (globalThis);
+  const previo = { window: g.window, navigator: Object.getOwnPropertyDescriptor(globalThis, 'navigator') };
+  g.window = { addEventListener() {}, removeEventListener() {} };
+  Object.defineProperty(globalThis, 'navigator', { value: { onLine: true }, configurable: true });
+  return () => {
+    g.window = previo.window;
+    if (previo.navigator) Object.defineProperty(globalThis, 'navigator', previo.navigator); else delete g.navigator;
+  };
 }
 
 export { sesionDeEstudiante, TENANT_A, TENANT_B, RUTAS };

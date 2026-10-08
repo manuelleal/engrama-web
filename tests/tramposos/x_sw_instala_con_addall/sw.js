@@ -10,7 +10,7 @@
 //
 // Súbelo un número cada vez que cambie la lista de precarga o la estrategia; la `activate`
 // borra cualquier caché con otro nombre.
-const VERSION = 'engrama-shell-v21';
+const VERSION = 'engrama-shell-v26';
 
 // Cada encargo agrega los suyos en su propio commit (W7: Inicio + api/cliente,core,retos + los
 // SVG de Drako que usa el estudiante; W10: profe/grupos,grupo,sesion_asistencia + api/profe). El
@@ -43,6 +43,8 @@ const PRECARGA = [
   '/src/vistas/error_config.js',
   '/src/rutas.js',
   '/src/textos.js',
+  '/src/textos_anillo.js', // las cadenas de las pantallas del anillo (textos.js las esparce)
+  '/src/bloqueos.js', // las pantallas obligatorias salen de app.js (espera, suspendida, ya no está...)
   '/src/ui/dom.js',
   '/src/ui/red.js',
   '/src/ui/escudo.js',
@@ -79,6 +81,7 @@ const PRECARGA = [
   '/vendor/animejs@4.5.0/anime.esm.min.js',
   '/vendor/canvas-confetti@1.9.4/confetti.module.mjs',
   '/src/auth/mock.js',
+  '/src/auth/interfaz.js', // W30: el contrato de la Sesion y los niveles del MCER (lo importan escudo.js, ultimo_visto.js y perfil_actual.js)
   '/src/vistas/entrada.js',
   '/src/vistas/perfil.js', // W22: import estático de app.js
   // Login piloto: la pantalla obligatoria "Crea tu contraseña" (import estático de app.js), el
@@ -88,6 +91,19 @@ const PRECARGA = [
   '/src/aviso.js', // aviso de datos (Ley 1581): app.js y entrada.js lo importan
   '/src/vistas/aviso_datos.js',
   '/src/vistas/sin_perfil.js', // cuenta sin inscribir (import estático de app.js)
+  '/src/vistas/esperando.js', // W29: esperando a tu profe / tu solicitud ya no está
+  '/src/vistas/suspendida.js', // W29: cuenta suspendida
+  '/src/vistas/datos_solicitudes.js', // W33: mis solicitudes sobre mis datos
+  '/src/anillo/enlace.js', // W35: el único lugar que arma el fragmento con el pase (decisión 013)
+  '/src/anillo/destinos.js', // W35: las bases de EVA y SET, solo de config.json
+  '/src/anillo/abrir.js', // W35: qué destinos ve cada rol y la salida al tocar
+  '/src/vistas/estudiante/vivo.js', // W35: #/vivo (clase en vivo de EVA)
+  '/src/vistas/estudiante/nivel.js', // W35: #/nivel (examen de SET)
+  '/src/vistas/estudiante/salida_codigo.js', // W35: el formulario que comparten
+  '/src/vistas/profe/herramientas_clase.js', // W35: tablero, Escamas y calificar escritura
+  '/src/api/datos.js', // W33
+  '/src/ui/estado_etiqueta.js', // W29: ícono + texto de cada estado
+  '/src/ui/contacto.js', // W29: el contacto del aviso como texto seleccionable
   '/src/auth/clave.js',
   '/src/ui/selector_colegio.js', // login piloto (B): barra_rol.js e inicio.js lo importan
   '/src/vistas/estudiante/inicio.js',

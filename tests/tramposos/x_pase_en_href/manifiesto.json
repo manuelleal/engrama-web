@@ -1,0 +1,18 @@
+{
+  "descripcion": "W35 (U31, E16): #/vivo y #/nivel piden el pase al PINTAR y lo dejan en un href del DOM.",
+  "archivos": {
+    "src/vistas/estudiante/salida_codigo.js": "salida_codigo.js"
+  },
+  "comando": [
+    "node",
+    "--test",
+    "--test-reporter=tap",
+    "tests/unit/vista_anillo_salida.test.mjs",
+    "tests/e2e/enlaces_anillo.test.mjs"
+  ],
+  "espera_codigo_no_cero": true,
+  "espera_fallan_tests": [
+    "U31: pantalla Clase en vivo: el DOM no trae el pase ni la base; el pase se pide al tocar; sale a EVA con la sala; un doble toque da una sola navegación",
+    "E16: el estudiante entra a EVA y a SET: el pase solo viaja en el fragmento, a SET va el tenant activo y el DOM no lo trae antes de tocar"
+  ]
+}

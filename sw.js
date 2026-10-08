@@ -10,7 +10,7 @@
 //
 // Súbelo un número cada vez que cambie la lista de precarga o la estrategia; la `activate`
 // borra cualquier caché con otro nombre.
-const VERSION = 'engrama-shell-v25';
+const VERSION = 'engrama-shell-v26';
 
 // Cada encargo agrega los suyos en su propio commit (W7: Inicio + api/cliente,core,retos + los
 // SVG de Drako que usa el estudiante; W10: profe/grupos,grupo,sesion_asistencia + api/profe). El
@@ -94,6 +94,13 @@ const PRECARGA = [
   '/src/vistas/esperando.js', // W29: esperando a tu profe / tu solicitud ya no está
   '/src/vistas/suspendida.js', // W29: cuenta suspendida
   '/src/vistas/datos_solicitudes.js', // W33: mis solicitudes sobre mis datos
+  '/src/anillo/enlace.js', // W35: el único lugar que arma el fragmento con el pase (decisión 013)
+  '/src/anillo/destinos.js', // W35: las bases de EVA y SET, solo de config.json
+  '/src/anillo/abrir.js', // W35: qué destinos ve cada rol y la salida al tocar
+  '/src/vistas/estudiante/vivo.js', // W35: #/vivo (clase en vivo de EVA)
+  '/src/vistas/estudiante/nivel.js', // W35: #/nivel (examen de SET)
+  '/src/vistas/estudiante/salida_codigo.js', // W35: el formulario que comparten
+  '/src/vistas/profe/herramientas_clase.js', // W35: tablero, Escamas y calificar escritura
   '/src/api/datos.js', // W33
   '/src/ui/estado_etiqueta.js', // W29: ícono + texto de cada estado
   '/src/ui/contacto.js', // W29: el contacto del aviso como texto seleccionable

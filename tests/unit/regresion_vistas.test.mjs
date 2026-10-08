@@ -61,6 +61,27 @@ test('R4: lo que W33 declara cambió de verdad: Perfil trae el enlace a las soli
   assert.deepEqual(DECLARADAS.perfil, ['perfil-ver-solicitudes']);
 });
 
+// W35 (adenda 17.5): con las claves del anillo en config.json cambia SOLO un bloque por vista; sin ellas, nada.
+const CONFIG_ANILLO = { ENGRAMA_AUTH: 'supabase', EVA_URL: 'https://eva.ejemplo.edu.co', SET_URL: 'https://set.ejemplo.edu.co' };
+
+test('R4: sin claves del anillo en config.json, Inicio y profe/grupos dan idéntico a la línea base (lo declara W35)', async () => {
+  const hoy = await tomarFotos({ config: { ENGRAMA_AUTH: 'supabase' } });
+  for (const nombre of ['inicio', 'profe_grupos']) assert.deepEqual(sinSubarboles(hoy[nombre], DECLARADAS[nombre] || []), sinSubarboles(BASE.vistas[nombre], DECLARADAS[nombre] || []), nombre);
+});
+
+test('R4: con las claves del anillo, Inicio cambia SOLO el bloque anillo-tarjetas y profe/grupos SOLO herramientas-clase; las demás vistas, nada', async () => {
+  const hoy = await tomarFotos({ config: CONFIG_ANILLO });
+  const bloques = { inicio: 'anillo-tarjetas', profe_grupos: 'herramientas-clase' };
+  for (const [nombre, testid] of Object.entries(bloques)) {
+    assert.deepEqual(sinSubarboles(hoy[nombre], [testid]), sinSubarboles(BASE.vistas[nombre], DECLARADAS[nombre] || []), `${nombre}: fuera de ${testid} es idéntica`);
+    assert.ok(hoy[nombre].some((l) => l.includes(`data-testid="${testid}"`)), `${nombre}: el bloque nuevo está`);
+    assert.ok(!BASE.vistas[nombre].some((l) => l.includes(testid)), `${nombre}: la línea base no lo tenía`);
+  }
+  for (const nombre of Object.keys(BASE.vistas).filter((n) => !(n in bloques))) {
+    assert.deepEqual(sinSubarboles(hoy[nombre], DECLARADAS[nombre] || []), sinSubarboles(BASE.vistas[nombre], DECLARADAS[nombre] || []), nombre);
+  }
+});
+
 test('R4: dos tomas seguidas dan lo mismo (la foto no depende del reloj ni del azar)', async () => {
   assert.deepEqual(await tomarFotos(), await tomarFotos());
 });

@@ -7,10 +7,12 @@
     "node",
     "--test",
     "--test-reporter=tap",
-    "tests/unit/anillo_destinos.test.mjs"
+    "tests/unit/anillo_destinos.test.mjs",
+    "tests/e2e/enlaces_anillo.test.mjs"
   ],
   "espera_codigo_no_cero": true,
   "espera_fallan_tests": [
-    "U30: ausente o sin forma de dirección, la base es null (nunca un valor por omisión)"
+    "U30: ausente o sin forma de dirección, la base es null (nunca un valor por omisión)",
+    "E16: sin claves del anillo en config.json no hay ningún enlace (Inicio sin tarjetas, vivo y nivel sin formulario)"
   ]
 }

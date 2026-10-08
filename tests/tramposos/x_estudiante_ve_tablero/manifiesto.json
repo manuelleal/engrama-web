@@ -1,0 +1,16 @@
+{
+  "descripcion": "W35 (U32): Inicio del estudiante pinta también las tarjetas de los destinos del docente (tablero, Escamas, calificar).",
+  "archivos": {
+    "src/vistas/estudiante/inicio.js": "inicio.js"
+  },
+  "comando": [
+    "node",
+    "--test",
+    "--test-reporter=tap",
+    "tests/unit/vista_anillo_salida.test.mjs"
+  ],
+  "espera_codigo_no_cero": true,
+  "espera_fallan_tests": [
+    "U32: Inicio del estudiante pinta solo la tarjeta de EVA y la de SET (las del docente no existen para él), sin la base ni el pase"
+  ]
+}

@@ -28,6 +28,7 @@ import { textos } from '../../textos.js';
 import { leerSaldo, leerHistorialAsistencia } from '../../api/core.js';
 import { listarRetos, historialDeIntentos } from '../../api/retos.js';
 import { ErrorApi } from '../../api/cliente.js';
+import { destinosVisibles, tenantActivo } from '../../anillo/abrir.js';
 
 const SIETE_DIAS_MS = 7 * 24 * 60 * 60 * 1000;
 
@@ -183,6 +184,29 @@ function tarjetaProgresoSemana(semana) {
   );
 }
 
+// W35 (§4.6): una tarjeta por cada destino del ESTUDIANTE que tenga una base válida en config.json (clase en vivo de EVA, examen de nivel de SET).
+// Ni la base ni el pase aparecen aquí: la tarjeta solo lleva a #/vivo o #/nivel, donde se escribe el código y el pase se pide al tocar. Sin
+// claves en config.json no hay ninguna tarjeta y Inicio queda idéntico (R4). Se pide por el ROL de la sesión: los destinos del docente no
+// existen para el estudiante (U32), y un docente que llegue a #/inicio tampoco ve tarjetas.
+const TARJETAS_DEL_ANILLO = {
+  eva_celular: { href: '#/vivo', titulo: () => textos.anillo.vivoTitulo, texto: () => textos.anillo.tarjetaVivo },
+  set_examen: { href: '#/nivel', titulo: () => textos.anillo.nivelTitulo, texto: () => textos.anillo.tarjetaNivel },
+};
+
+function tarjetasDelAnillo(ctx) {
+  const tarjetas = destinosVisibles(ctx.sesion?.rol, ctx.config, tenantActivo(ctx))
+    .filter(({ destino }) => destino in TARJETAS_DEL_ANILLO)
+    .map(({ destino }) => {
+      const t = TARJETAS_DEL_ANILLO[destino];
+      return h(
+        'div', { class: 'fila fila-invitacion', 'data-testid': `tarjeta-${destino}`, 'data-destino': destino },
+        h('div', { class: 'fila-texto' }, h('span', { class: 'fila-titulo' }, t.titulo()), h('span', { class: 'texto-apoyo' }, t.texto())),
+        h('a', { href: t.href, class: 'boton-chico', 'data-testid': `ir-a-${destino}` }, textos.anillo.tarjetaIr),
+      );
+    });
+  return tarjetas.length === 0 ? null : h('div', { 'data-testid': 'anillo-tarjetas' }, ...tarjetas);
+}
+
 function barraSuperior(datos, ctx) {
   const nodoSaldo = h('p', { class: 'saldo', 'data-testid': 'saldo' }, `0 ${textos.inicio.monedas}`);
   const constancia = h(
@@ -223,6 +247,7 @@ function pintarContenido(raiz, ctx, datos) {
     nivel.aviso,
     tarjetaRetoDeHoy(datos.pendiente),
     tarjetaProgresoSemana(datos.semana),
+    tarjetasDelAnillo(ctx),
     navDeAccesos(ctx),
     crearNavInferior('inicio'),
   );

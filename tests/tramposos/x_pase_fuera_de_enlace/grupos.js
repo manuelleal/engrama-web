@@ -7,6 +7,7 @@ import { textos } from '../../textos.js';
 import { listarGrupos } from '../../api/profe.js';
 import { ErrorApi } from '../../api/cliente.js';
 import { crearBarraRol } from '../../ui/barra_rol.js';
+import { crearHerramientasDeClase } from './herramientas_clase.js';
 
 const ENLACE_A_MANO = (base, p) => `${base}/tablero#pase=${p}`; // el error: una vista arma el fragmento por su cuenta
 
@@ -29,6 +30,7 @@ function pintarLista(raiz, grupos, ctx) {
     crearBarraRol(ctx),
     h('h1', {}, textos.profe.grupos.titulo),
     h('nav', {}, h('a', { href: '#/profe/retos', 'data-testid': 'ir-a-retos-profe' }, textos.profe.grupo.verRetos)),
+    crearHerramientasDeClase(ctx), // W35: solo si hay EVA o SET configurados para esta institución (§4.6); null no pinta nada
     cuerpo,
   ));
   document.body.dataset.listo = '1';

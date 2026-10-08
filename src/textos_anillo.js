@@ -91,6 +91,39 @@ export const textosAnillo = {
     volver: 'Volver',
     drako: 'Drako acompaña',
   },
+  // W35 · Los enlaces a EVA y a SET (§4.6, decisión 013). Los nombres de los destinos y la nota de salida son de §4.8; los errores de
+  // formato, la tarjeta de Inicio y el texto de #/nivel son de la adenda 17.5 (el de #/nivel, del dictamen 03 §A.7).
+  anillo: {
+    vivoTitulo: 'Clase en vivo',
+    vivoCampo: 'Código de la sala',
+    vivoEntrar: 'Entrar a la clase',
+    vivoAyuda: 'Tu profe te dice el código de la sala. Escríbelo aquí y entra a la clase.',
+    vivoAccion: 'entrar a la clase', // infinitivo para textos.red.sinConexionAccion
+    vivoVacio: 'Escribe el código de la sala.',
+    vivoFormato: 'El código de la sala lleva de 1 a 8 letras o números.',
+    vivoDrako: 'Drako te lleva a la clase en vivo',
+    nivelTitulo: 'Examen de nivel',
+    nivelCampo: 'Código del examen',
+    nivelEntrar: 'Empezar el examen',
+    nivelAyuda: 'Este examen mide tu nivel. No da monedas ni cambia tu racha. Respóndelo sin ayuda: si adivinas o copias, la práctica que recibas no será la tuya.', // dictamen 03 §A.7
+    nivelAccion: 'empezar el examen',
+    nivelVacio: 'Escribe el código del examen.',
+    nivelFormato: 'El código del examen lleva letras, números, guion o guion bajo (hasta 32).',
+    nivelDrako: 'Drako te acompaña al examen de nivel',
+    herramientas: 'Herramientas de clase',
+    tablero: 'Abrir el tablero de la clase',
+    escamas: 'Abrir Escamas',
+    revisar: 'Calificar escritura',
+    herramientaAccion: 'abrir esta herramienta',
+    sales: 'Vas a salir de ENGRAMA con tu cuenta. Para volver, usa el botón atrás.',
+    abriendo: 'Abriendo…',
+    errorAbrir: 'No pudimos abrirlo ahora. Intenta de nuevo en un momento.',
+    noDisponible: 'Esta pantalla no está disponible en esta instalación.',
+    volverInicio: 'Volver al inicio',
+    tarjetaVivo: 'Entra a la clase en vivo de tu profe.',
+    tarjetaNivel: 'Mide tu nivel con el examen de tu institución.',
+    tarjetaIr: 'Abrir',
+  },
   // W29 · Etiquetas de estado (ícono + texto, nunca solo color). El ícono vive en ui/estado_etiqueta.js; aquí, solo el texto.
   // `estados` ya existe en textos.js, de ahí este nombre.
   etiquetasEstado: {

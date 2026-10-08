@@ -1,4 +1,5 @@
 // @ts-check
+// TRAMPOSO x_estudiante_ve_tablero: Inicio mezcla los destinos de los dos roles: el estudiante ve el tablero del profe.
 // vistas/estudiante/inicio.js · Home (W7, ESPEC_mvp_uis.md §4.1; segunda pasada de diseño
 // 2026-09-28): saldo con conteo animado, constancia (el valor del servidor, nunca recalculado —
 // §7.4) con su ícono de fuego, el escudo "Por confirmar", el saludo de Drako (presenta, nunca
@@ -62,7 +63,7 @@ async function animarSaldo(nodoSaldo, balance, ctx) {
  */
 function celebrarConstancia(nodoConstancia, ctx) {
   const quien = ctx.sesion.profileId;
-  const valor = ctx.sesion.constancia + 1;
+  const valor = ctx.sesion.constancia;
   const previo = leerUltimo('constancia', quien);
   guardarUltimo('constancia', quien, valor);
   if (compararConUltimo(previo, valor) === 'sube') celebrarRacha({ contador: nodoConstancia, valor });
@@ -191,10 +192,13 @@ function tarjetaProgresoSemana(semana) {
 const TARJETAS_DEL_ANILLO = {
   eva_celular: { href: '#/vivo', titulo: () => textos.anillo.vivoTitulo, texto: () => textos.anillo.tarjetaVivo },
   set_examen: { href: '#/nivel', titulo: () => textos.anillo.nivelTitulo, texto: () => textos.anillo.tarjetaNivel },
+  eva_tablero: { href: '#/profe/grupos', titulo: () => textos.anillo.tablero, texto: () => textos.anillo.tablero },
+  eva_escamas: { href: '#/profe/grupos', titulo: () => textos.anillo.escamas, texto: () => textos.anillo.escamas },
+  set_revisar: { href: '#/profe/grupos', titulo: () => textos.anillo.revisar, texto: () => textos.anillo.revisar },
 };
 
 function tarjetasDelAnillo(ctx) {
-  const tarjetas = destinosVisibles(ctx.sesion?.rol, ctx.config, tenantActivo(ctx))
+  const tarjetas = [...destinosVisibles('student', ctx.config, tenantActivo(ctx)), ...destinosVisibles('teacher', ctx.config, tenantActivo(ctx))] // el error: los dos roles
     .filter(({ destino }) => destino in TARJETAS_DEL_ANILLO)
     .map(({ destino }) => {
       const t = TARJETAS_DEL_ANILLO[destino];

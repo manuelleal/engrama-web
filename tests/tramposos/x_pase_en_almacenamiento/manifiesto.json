@@ -1,0 +1,20 @@
+{
+  "descripcion": "W35 (U31, E16): la salida guarda el enlace (que lleva el pase) en sessionStorage.",
+  "archivos": {
+    "src/anillo/abrir.js": "abrir.js"
+  },
+  "comando": [
+    "node",
+    "--test",
+    "--test-reporter=tap",
+    "tests/unit/anillo_abrir.test.mjs",
+    "tests/unit/vista_anillo_salida.test.mjs",
+    "tests/e2e/enlaces_anillo.test.mjs"
+  ],
+  "espera_codigo_no_cero": true,
+  "espera_fallan_tests": [
+    "U31: ni el pase ni el enlace salen por la consola ni se guardan en un almacenamiento, tampoco cuando algo falla",
+    "U31: pantalla Clase en vivo: el DOM no trae el pase ni la base; el pase se pide al tocar; sale a EVA con la sala; un doble toque da una sola navegación",
+    "E16: el estudiante entra a EVA y a SET: el pase solo viaja en el fragmento, a SET va el tenant activo y el DOM no lo trae antes de tocar"
+  ]
+}
