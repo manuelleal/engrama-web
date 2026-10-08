@@ -113,3 +113,35 @@ Reglas que no se rompen:
 - **Service worker**: la precarga tiene techo por recurso (10 s) y el SW se registra en `load`; la app y la privacidad NO dependen de que controle la página
   (el cierre de sesión borra `/api` de la CacheStorage desde la propia página). `node herramientas/medir_sw.mjs` mide activado / controlado / app lista.
 - `npm run demo` levanta mock + servidor de desarrollo con datos sintéticos para verlo en esta máquina.
+
+## Pantallas del anillo: EVA, SET, cuentas por aprobar y datos personales (2026-10-07)
+
+Spec y autoridad: `docs/ESPEC_pantallas_anillo.md` (con sus adendas §17). Decisión de los enlaces: `..\..\decisiones\013-enlace-con-pase.md`. Qué hay hecho:
+cuenta pendiente y suspendida (`bloqueos.js`, W29), nivel confirmado en el escudo (W30), solicitudes sobre mis datos (W33), `armarEnlaceAnillo` y las
+bases (W34), los enlaces en pantalla (W35), el humo y su réplica (W36) y E17-E19 (W37). **No están:** el registro con código de grupo (W31), el panel de
+inscripciones del profe (W32) y el humo contra el backend local (W39): esperan el sí de Christiam sobre la clave de servicio (D7).
+
+Reglas que no se rompen al tocar los enlaces:
+- **Un solo lugar arma el fragmento con el pase:** `src/anillo/enlace.js` (`pase=` y `tenant=` no aparecen en ningún otro archivo de `src/`, ni `?pase`: V5 en
+  `verificar.mjs`). A SET se manda SIEMPRE `tenant=` (la institución activa; SET responde 409 si falta y la persona tiene más de una, y 400 si viene mal
+  formada); EVA ignora `tenant`.
+- **El pase es el token de acceso** (abre toda la API 1 hora). Se pide **al tocar** (`ctx.pedirPase`, `src/anillo/abrir.js`), nunca al pintar: ningún `href`,
+  `data-` ni nodo lo trae antes. No se guarda en ningún almacenamiento, no sale por la consola y no viaja en ningún error. La salida es en la misma pestaña
+  (`location.assign`) y se cierra tras la primera navegación hasta que la página vuelva de la caché de ida y vuelta (`pageshow` con `persisted`).
+- **Las bases salen solo de `config.json`** (`SET_URL`, `EVA_URL`, `EVA_URL_POR_INSTITUCION`; `anillo/destinos.js` las valida: `https:`, o `http:` solo en
+  `localhost`/`127.0.0.1`, sin usuario, consulta ni fragmento). Sin base válida para esa institución el enlace no se pinta. Nunca de la dirección ni de un campo.
+- Los códigos de sala (EVA) y de examen (SET) **los escribe el estudiante**: el backend no los da. `?sala=` y `?examen=` llenan el campo, jamás abren solos.
+- Qué ve cada rol: estudiante, `eva_celular` y `set_examen` (tarjetas de Inicio, `#/vivo`, `#/nivel`); docente, `eva_tablero`, `eva_escamas` y `set_revisar`
+  (bloque "Herramientas de clase" de `#/profe/grupos`); admin, ninguno. SET solo si la institución activa es un UUID.
+- El texto del estado `rechazada` de las solicitudes y los demás textos del anillo siguen el dictamen pedagógico
+  `..\..\investigacion\pedagogia\03-dictamen-err16-anillo-foco-refuerzo-rubrica.md` (manda sobre los provisionales de la espec).
+
+Cómo se prueba (en esta máquina):
+- `node --test --test-concurrency=1` sin argumentos para la suite; los E2E (Edge headless) archivo por archivo y con tope de tiempo; si fallan por tiempo con la
+  CPU cargada, repetir una vez. Los tramposos, **por nombre y uno a la vez** (`node tests/correr_tramposos.mjs x_nombre`); nunca sin argumento. Tras correr tramposos,
+  `git status --short`. Si se edita un archivo que tiene copias rotas en `tests/tramposos/`, se regeneran (la copia rota = el archivo bueno de ahora + SU defecto)
+  y se confirma que siguen rojas en su mismo test; una copia vieja se regenera desde la versión de la historia de la que salió, no desde el último commit.
+- `node herramientas/humo_pantallas.mjs --contra mock` (semilla 20261006) y `... --replica` (semilla 7) escriben `salida/humo_pantallas_anillo.{mock,replica}.json`
+  e imprimen su sha256 (idéntico en dos corridas); `tests/unit/humo_pantallas.test.mjs` fija las tablas de §9.1 y §9.4. R4 (`tests/unit/regresion_vistas.test.mjs`) fotografía
+  las vistas existentes; R5 (`tests/unit/regresion_humo.test.mjs`) vigila que el humo anterior no cambie.
+- Las claves de `config.json` que el despliegue debe poner: `docs/PEDIDO_claves_config_anillo.md`.

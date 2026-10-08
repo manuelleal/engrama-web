@@ -468,3 +468,35 @@ Implementador. **Lo de arriba no se tocó.** Va en un commit de docs antes del c
 - **`?sala=` y `?examen=` llegan al campo ya escritos** (si pasan la validación) y **nunca abren solos**.
 - **Tras tocar, el botón queda deshabilitado ("Abriendo…")** hasta que la página vuelva de la caché de ida y vuelta; así un segundo toque o un Enter no navegan dos veces.
 - **R4:** con la configuración sin claves del anillo, Inicio y `profe/grupos` dan idéntico a la línea base; con claves cambia **solo** el subárbol `anillo-tarjetas` (Inicio) o `herramientas-clase` (`profe/grupos`).
+
+### 17.6 Lo que quedó después de W35-W38 (2026-10-07)
+Implementador. **Lo de arriba no se tocó**; esto es lo medido y lo que difiere de la letra, con su porqué.
+
+**Tramposos (§9.3) que no son tal cual la tabla:**
+- U31: `x_pase_en_consola` y `x_pase_en_almacenamiento` mutan `src/anillo/abrir.js` (como dice 17.5); `x_pase_en_href` muta `src/vistas/estudiante/salida_codigo.js`, porque una fuga al DOM
+  hay que meterla donde se construye el DOM. Los tres están en rojo en `tests/unit/anillo_abrir.test.mjs` / `vista_anillo_salida.test.mjs` y, los dos últimos, también en E16.
+- U29 / E16: `x_pase_en_la_consulta` y `x_enlace_sin_config` ahora también corren E16 (se sumó a su manifiesto) y se ponen rojos en él. **`x_set_sin_tenant` NO se pone rojo en E16** (predicción refutada): `destinosVisibles` no
+  ofrece ningún destino de SET sin una institución con forma de UUID, así que E16 nunca arma un enlace a SET sin `tenant`. Lo cubre el unit de U31 ("si pedir el pase falla o el enlace no se puede armar…") y U29.
+- Se agregaron (no estaban en la tabla): `x_estudiante_ve_tablero` (U32, `inicio.js`), `x_humo_pase_en_consola` y `x_humo_registro_distinto` (W36), `x_salida_desborda` (E17), `x_salida_sin_red` (E18),
+  `x_escudo_anima_con_reducido` y `x_movimiento_siempre_pleno` (E19).
+- Los tramposos con copia de un archivo que W35 editó (`app.js`, `inicio.js`, `profe/grupos.js`, `sw.js`) se regeneraron: la copia rota = el archivo bueno de ahora + su defecto. Ocho (`x_sw_*` (cuatro), `x_cierre_depende_del_sw`,
+  `x_estudiante_sin_boton_salir`, `x_racha_*`) eran copias VIEJAS (de versiones anteriores del archivo) y se regeneraron desde la versión de la historia de la que salieron. `x9_sin_precarga` y `x_textos_anillo_pisa_clave`
+  son archivos propios (no copias) y no cambian.
+
+**Humo (W36), archivos que §7 no listaba:** `herramientas/humo/entradas_pantallas.mjs` (las dos entradas), `apoyo_pantallas.mjs` (llamar sin cortar el guion, el GoTrue falso, el medidor de fugas) y
+`flujo_pantallas_replica.mjs` (los pasos extra de §9.4). Como `api/registro.js` y las llamadas de inscripción del profe son de W31/W32 y no existen, el humo las hace con `pedirJson` (el cliente real) directo.
+La primera medición del código bueno dio **la tabla de §9.1 tal cual**. En la réplica `dos_campos_422` dio 0 en la primera corrida por un error de la SONDA (el 422 con lista llega como arreglo, sin `detail`, como en el
+backend); se corrigió la sonda, no la tabla de `tests/unit/humo_pantallas.test.mjs`. Candidato a ERR: leer `cuerpo.detail` de un 422 con lista.
+
+**E17-E19 (W37): lo que se midió y lo que no.**
+- E17 mide el contenido propio de las pantallas (Inicio con tarjetas, `#/vivo`, `#/nivel`, `#/datos/solicitudes`, Herramientas de clase, espera y suspendida), no los componentes compartidos que ya existían (navegación,
+  barra del profe con su selector, cabecera de Inicio). "Texto base de 16 px" es el de párrafos, títulos y campos; los chips y las etiquetas siguen el tamaño del sistema de diseño (14 a 15 px) y NO se midieron como base.
+  Hallazgo de paso, sin tocar CSS: con la emulación de celular, `innerWidth` crece hasta el contenido, así que "scrollWidth ≤ innerWidth" nunca falla; E17 compara contra el ancho pedido y mira el borde derecho de lo pintado.
+  También: un botón de 44 px mide 43 mientras corre la animación de entrada; se mide tras 1,5 s.
+- **Sin cubrir:** el registro con código de grupo y el panel de inscripciones del profe (W31 y W32 no se hicieron), y las pruebas en Chrome (solo se corrió Edge).
+- Una trampa de los E2E: `return sesion.evaluar(...)` dentro de un `try` con `finally { sesion.cerrar() }` cierra el navegador a media evaluación y deja el test colgado; hay que `await` antes de salir del `try`.
+
+**Predicciones de §16 tras W35:**
+- P1 (con `location.assign` la entrada del historial queda sin el pase): en el doble de E16, que borra el fragmento como EVA y SET, `location.hash` queda vacío; **no** se leyó el historial global (CDP no lo lee).
+  Sí se midió que al volver con "atrás" la página SALE de la caché de ida y vuelta (`pageshow` con `persisted`) en Edge headless, que era un riesgo de §16.
+- P4 (pedir `/auth/me` en cada pintado de Inicio no baja la fluidez): `npm run fluidez` no se corrió en este encargo.
