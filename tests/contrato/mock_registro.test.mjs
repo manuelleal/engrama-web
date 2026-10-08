@@ -145,9 +145,9 @@ test('registro: el orden del backend (422 cuerpo → 422 aviso → 503 → 429 c
     const codigo = await generar();
     const r422 = await registrar({ ...REGISTRO({ codigo }), tenant_id: 'otro', role: 'teacher' });
     assert.equal(r422.status, 422);
-    assert.ok(r422.json.some((e) => e.type === 'extra_forbidden' && e.loc[1] === 'tenant_id'), 'extra="forbid": tenant_id y role no entran');
+    assert.ok(r422.json.detail.some((e) => e.type === 'extra_forbidden' && e.loc[1] === 'tenant_id'), 'extra="forbid": tenant_id y role no entran');
     const dos = await registrar(REGISTRO({ codigo, mayor_de_edad: false, correo: 'sin-arroba' }));
-    assert.deepEqual(dos.json.map((e) => e.loc[1]).sort(), ['correo', 'mayor_de_edad'], 'el 422 trae todos los campos malos a la vez');
+    assert.deepEqual(dos.json.detail.map((e) => e.loc[1]).sort(), ['correo', 'mayor_de_edad'], 'el 422 trae todos los campos malos a la vez');
     estado.autorregistro.versionesPermitidas = new Set(['2026-10-v1']);
     const version = await registrar(REGISTRO({ codigo, aviso_version: 'otra' }));
     assert.deepEqual([version.status, version.json.detail], [422, 'aviso_version_no_permitida']);

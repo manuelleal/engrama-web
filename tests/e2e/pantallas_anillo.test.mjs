@@ -1,8 +1,9 @@
 // @ts-check
 // W37 · E17, E18 y E19 (docs/ESPEC_pantallas_anillo.md §9.3; la medida de E17 es la de ESPEC_mvp_uis.md §9.4): las pantallas NUEVAS del anillo que ya existen, en el
 // navegador de verdad y en modo supabase: Inicio con sus tarjetas, "Clase en vivo", "Examen de nivel", "Mis datos: solicitudes", "Herramientas de clase" del
-// profe, "Esperando a tu profe" y "Cuenta suspendida". Quedan FUERA (sus pantallas no están hechas, W31 y W32 esperan el sí de Christiam sobre la clave de servicio):
-// el registro con código de grupo y el panel de inscripciones del profe.
+// profe, "Esperando a tu profe" y "Cuenta suspendida"; y, desde que Christiam aprobó la puerta D7 (2026-10-08), el registro con código de grupo (W31, `vistas/registro.js`) y el
+// panel de inscripciones del profe (W32, `vistas/profe/inscripcion*.js`): los dos se miden aquí abajo, en el bloque "W31" y en el de inscripciones. Sus pruebas de comportamiento
+// están en registro.test.mjs (E12) e inscripcion.test.mjs (E14).
 //   E17  a 375×812 y a 1280×800: sin scroll horizontal, blancos táctiles de 44 px, texto de 16 px, html[lang=es], nombre accesible en todo, label en todo
 //        campo, y una región con aria-live/role donde la pantalla da un resultado.
 //   E18  sin red: toda acción que escribe o que sale a otro origen queda deshabilitada con su texto, y no sale ninguna petición.

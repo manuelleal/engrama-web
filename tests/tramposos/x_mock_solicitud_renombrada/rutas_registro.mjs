@@ -20,7 +20,12 @@ const ALFABETO = 'ABCDEFGHJKMNPQRSTUVWXYZ23456789'; // 31 símbolos, sin I, L, O
 const HORAS_POR_DEFECTO = 48;
 const CUPO_POR_DEFECTO = 40;
 const CLAVE_MIN = 10;
-const CLAVE_MAX = 72;
+const CLAVE_MAX = 72; // caracteres Y bytes (bcrypt, el de GoTrue, solo mira 72 BYTES)
+// La regla de COMPOSICIÓN de la contraseña (backend 539a06a, `src/auth/politica_clave.py`): una letra (`isalpha()`: la ñ y las tildes cuentan) y un dígito 0-9 o un
+// símbolo de la lista. Los dos mensajes son EXACTAMENTE los del backend, con el prefijo `Value error, ` que pone pydantic (medido con TestClient, 2026-10-08).
+const SIMBOLOS = '-_.!@#$%&*+';
+const MENSAJE_COMPOSICION = `Value error, la contraseña debe tener al menos una letra y al menos un número o un símbolo (${[...SIMBOLOS].join(' ')})`;
+const MENSAJE_BYTES = `Value error, la contraseña no puede pasar de ${CLAVE_MAX} bytes (las tildes, la ñ y los emojis ocupan más de uno)`;
 const NO_ENCONTRADA = 'Solicitud not found';
 
 const SIN_ESPACIOS_AL_BORDE = /^\S(.*\S)?$/s;
@@ -34,6 +39,22 @@ function textoEntre(valor, min, max, patron) {
   return typeof valor === 'string' && valor.length >= min && valor.length <= max && (!patron || patron.test(valor));
 }
 
+/** ¿Una letra y un número o símbolo? (`cumple_composicion` del backend; el cliente tiene su espejo en `src/api/registro.js`). */
+const cumpleComposicion = (clave) => [...clave].some((c) => /\p{L}/u.test(c)) && [...clave].some((c) => (c >= '0' && c <= '9') || SIMBOLOS.includes(c));
+
+/**
+ * La contraseña como la valida pydantic: tipo y largo (10 a 72 CARACTERES, contados por puntos de código) con el mensaje genérico de siempre; después, en este orden, los
+ * 72 BYTES y la composición, con su `Value error, …` en español. Un solo error por campo (el primero). `input` va en null a propósito: el backend real devuelve la
+ * contraseña en claro en `input`, y el mock no la repite.
+ */
+function errorDeContrasena(valor) {
+  const largoEnCaracteres = typeof valor === 'string' ? [...valor].length : 0;
+  if (typeof valor !== 'string' || largoEnCaracteres < CLAVE_MIN || largoEnCaracteres > CLAVE_MAX) return error('value_error', 'contrasena', 'Input should be valid', null);
+  if (Buffer.byteLength(valor, 'utf8') > CLAVE_MAX) return { ...error('value_error', 'contrasena', MENSAJE_BYTES, null), ctx: { error: {} } };
+  if (!cumpleComposicion(valor)) return { ...error('value_error', 'contrasena', MENSAJE_COMPOSICION, null), ctx: { error: {} } };
+  return null;
+}
+
 /** Los 422 del cuerpo de `RegistroIn` (strict + extra="forbid"), todos a la vez. Devuelve [] si el cuerpo es válido. */
 export function erroresDelRegistro(cuerpo) {
   if (typeof cuerpo !== 'object' || cuerpo === null || Array.isArray(cuerpo)) return [{ type: 'model_attributes_type', loc: ['body'], msg: 'Input should be a valid dictionary', input: null }];
@@ -43,15 +64,16 @@ export function erroresDelRegistro(cuerpo) {
     nombre: (v) => textoEntre(v, 1, 120, SIN_ESPACIOS_AL_BORDE),
     correo: (v) => textoEntre(v, 3, 254, CORREO),
     codigo_estudiantil: (v) => typeof v === 'string' && CODIGO_ESTUDIANTIL.test(v),
-    contrasena: (v) => textoEntre(v, CLAVE_MIN, CLAVE_MAX),
     mayor_de_edad: (v) => v === true,
     aviso_version: (v) => textoEntre(v, 1, 32, SIN_ESPACIOS_AL_BORDE),
   };
-  for (const [campo, valida] of Object.entries(reglas)) {
+  const CAMPOS = ['codigo', 'nombre', 'correo', 'codigo_estudiantil', 'contrasena', 'mayor_de_edad', 'aviso_version']; // las 7 claves, en el orden del contrato
+  for (const campo of CAMPOS) {
     if (!(campo in cuerpo)) errores.push(error('missing', campo, 'Field required', null));
-    else if (!valida(cuerpo[campo])) errores.push(error('value_error', campo, 'Input should be valid', campo === 'contrasena' ? null : cuerpo[campo]));
+    else if (campo === 'contrasena') { const e = errorDeContrasena(cuerpo[campo]); if (e) errores.push(e); }
+    else if (!reglas[campo](cuerpo[campo])) errores.push(error('value_error', campo, 'Input should be valid', cuerpo[campo]));
   }
-  for (const campo of Object.keys(cuerpo)) if (!(campo in reglas)) errores.push(error('extra_forbidden', campo, 'Extra inputs are not permitted', cuerpo[campo]));
+  for (const campo of Object.keys(cuerpo)) if (!CAMPOS.includes(campo)) errores.push(error('extra_forbidden', campo, 'Extra inputs are not permitted', cuerpo[campo]));
   return errores;
 }
 
@@ -82,7 +104,7 @@ function filaDeCodigoVigente(estado, codigoEscrito) {
 export function registrarse(estado, req, cuerpo) {
   const reg = estado.autorregistro;
   const errores = erroresDelRegistro(cuerpo);
-  if (errores.length > 0) fallar(422, errores);
+  if (errores.length > 0) fallar(422, { detail: errores }); // FastAPI envuelve la lista en `detail` (medido en el backend 539a06a con TestClient)
   if (reg.versionesPermitidas && !reg.versionesPermitidas.has(cuerpo.aviso_version)) fallar(422, 'aviso_version_no_permitida');
   if (!reg.configurado) fallar(503, 'registro_no_configurado');
   if (reg.espera429 > 0) fallar(429, 'demasiados_intentos', { 'Retry-After': String(reg.espera429) });

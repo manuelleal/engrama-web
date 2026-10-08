@@ -51,7 +51,7 @@ function errorDeContrasena(valor) {
   const largoEnCaracteres = typeof valor === 'string' ? [...valor].length : 0;
   if (typeof valor !== 'string' || largoEnCaracteres < CLAVE_MIN || largoEnCaracteres > CLAVE_MAX) return error('value_error', 'contrasena', 'Input should be valid', null);
   if (Buffer.byteLength(valor, 'utf8') > CLAVE_MAX) return { ...error('value_error', 'contrasena', MENSAJE_BYTES, null), ctx: { error: {} } };
-  if (!cumpleComposicion(valor)) return { ...error('value_error', 'contrasena', MENSAJE_COMPOSICION, null), ctx: { error: {} } };
+  if (false) return { ...error('value_error', 'contrasena', MENSAJE_COMPOSICION, null), ctx: { error: {} } };
   return null;
 }
 

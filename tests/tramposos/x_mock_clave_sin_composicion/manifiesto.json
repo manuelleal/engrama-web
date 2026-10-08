@@ -1,0 +1,17 @@
+{
+  "descripcion": "17.8 (mock): el mock no aplica la regla de composición de la contraseña: una de solo letras da 201/403 en vez del 422 del backend.",
+  "archivos": {
+    "herramientas/mock/rutas_registro.mjs": "rutas_registro.mjs"
+  },
+  "comando": [
+    "node",
+    "--test",
+    "--test-reporter=tap",
+    "tests/contrato/mock_registro_clave.test.mjs"
+  ],
+  "espera_codigo_no_cero": true,
+  "espera_fallan_tests": [
+    "mock (17.8): la composición de la contraseña da",
+    "mock (17.8): por HTTP, el 422 va en"
+  ]
+}

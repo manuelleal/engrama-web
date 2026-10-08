@@ -1,0 +1,18 @@
+{
+  "descripcion": "17.8 (mock): el 422 del registro sale como arreglo suelto y no envuelto en {\"detail\": [...]} como FastAPI (medido en el backend 539a06a).",
+  "archivos": {
+    "herramientas/mock/rutas_registro.mjs": "rutas_registro.mjs"
+  },
+  "comando": [
+    "node",
+    "--test",
+    "--test-reporter=tap",
+    "tests/contrato/mock_registro_clave.test.mjs",
+    "tests/contrato/mock_registro.test.mjs"
+  ],
+  "espera_codigo_no_cero": true,
+  "espera_fallan_tests": [
+    "mock (17.8): por HTTP, el 422 va en",
+    "registro: el orden del backend"
+  ]
+}

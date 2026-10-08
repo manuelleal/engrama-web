@@ -104,7 +104,7 @@ function filaDeCodigoVigente(estado, codigoEscrito) {
 export function registrarse(estado, req, cuerpo) {
   const reg = estado.autorregistro;
   const errores = erroresDelRegistro(cuerpo);
-  if (errores.length > 0) fallar(422, { detail: errores }); // FastAPI envuelve la lista en `detail` (medido en el backend 539a06a con TestClient)
+  if (errores.length > 0) fallar(422, errores); // FastAPI envuelve la lista en `detail` (medido en el backend 539a06a con TestClient)
   if (reg.versionesPermitidas && !reg.versionesPermitidas.has(cuerpo.aviso_version)) fallar(422, 'aviso_version_no_permitida');
   if (!reg.configurado) fallar(503, 'registro_no_configurado');
   if (reg.espera429 > 0) fallar(429, 'demasiados_intentos', { 'Retry-After': String(reg.espera429) });
