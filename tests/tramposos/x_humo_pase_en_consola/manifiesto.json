@@ -1,0 +1,10 @@
+{
+  "descripcion": "W36: la salida escribe el enlace (con el pase) en la consola; el humo de las pantallas lo ve en fugas.pase_en_consola.",
+  "archivos": { "src/anillo/abrir.js": "abrir.js" },
+  "comando": ["node", "--test", "--test-reporter=tap", "tests/unit/humo_pantallas.test.mjs"],
+  "espera_codigo_no_cero": true,
+  "espera_fallan_tests": [
+    "W36: el humo de las pantallas no filtra: 0 peticiones fuera de /api, y el pase, las contraseñas y el código de grupo no están en un almacenamiento ni en la consola",
+    "W36: el humo de las pantallas (desarrollo) escribe su archivo, da el mismo sha256 en dos corridas y la tabla de §9.1"
+  ]
+}

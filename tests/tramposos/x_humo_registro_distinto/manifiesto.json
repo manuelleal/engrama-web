@@ -1,0 +1,10 @@
+{
+  "descripcion": "W36: el registro con un dato repetido responde 409 en vez del 201 uniforme; el humo de las pantallas lo ve en registro y se detiene.",
+  "archivos": { "herramientas/mock/rutas_registro.mjs": "rutas_registro.mjs" },
+  "comando": ["node", "--test", "--test-reporter=tap", "tests/unit/humo_pantallas.test.mjs"],
+  "espera_codigo_no_cero": true,
+  "espera_fallan_tests": [
+    "W36: el humo de las pantallas (desarrollo) escribe su archivo, da el mismo sha256 en dos corridas y la tabla de §9.1",
+    "W36: la réplica (entradas nuevas, semilla 7) escribe su archivo, da el mismo sha256 en dos corridas y el mismo criterio con sus valores"
+  ]
+}
