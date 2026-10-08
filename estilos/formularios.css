@@ -69,3 +69,10 @@
   cursor: pointer;
   font-weight: 700;
 }
+
+/* Registro (adenda 17.8): la regla de la contraseña, escrita junto al campo antes de enviar. Minúsculas normales (es una frase, no una etiqueta). */
+#vista form .ayuda-campo {
+  margin: 0;
+  font-size: 1rem;
+  color: color-mix(in srgb, var(--texto) 70%, white);
+}

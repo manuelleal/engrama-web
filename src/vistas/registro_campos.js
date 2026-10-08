@@ -9,11 +9,16 @@ import { crearTextoAviso } from './aviso_datos.js';
 
 const T = textos.registro;
 
-/** Un campo de texto con su etiqueta y el sitio de su mensaje. @param {{id: string, etiqueta: string, atributos: Record<string, string>}} d */
-function crearCampo({ id, etiqueta, atributos }) {
+/**
+ * Un campo de texto con su etiqueta, su línea de ayuda (opcional, se lee ANTES de escribir) y el sitio de su mensaje.
+ * @param {{id: string, etiqueta: string, atributos: Record<string, string>, ayuda?: string}} d
+ */
+function crearCampo({ id, etiqueta, atributos, ayuda }) {
   const error = h('p', { role: 'alert', id: `${id}-error`, 'data-testid': `registro-error-${id}` });
-  const entrada = /** @type {HTMLInputElement} */ (h('input', { id, 'data-testid': `registro-${id}`, 'aria-describedby': `${id}-error`, spellcheck: 'false', ...atributos }));
-  return { entrada, error, nodos: [h('label', { for: id }, etiqueta), entrada, error] };
+  const nota = ayuda ? h('p', { class: 'ayuda-campo', id: `${id}-ayuda`, 'data-testid': `registro-ayuda-${id}` }, ayuda) : null;
+  const describe = nota ? `${id}-ayuda ${id}-error` : `${id}-error`;
+  const entrada = /** @type {HTMLInputElement} */ (h('input', { id, 'data-testid': `registro-${id}`, 'aria-describedby': describe, spellcheck: 'false', ...atributos }));
+  return { entrada, error, nodos: [h('label', { for: id }, etiqueta), entrada, ...(nota ? [nota] : []), error] };
 }
 
 /** Una casilla con su texto: el blanco táctil es de 44 px (E17). @param {{id: string, texto: string}} d */
@@ -32,7 +37,7 @@ export function crearCamposDelRegistro(aviso) {
   const nombre = crearCampo({ id: 'nombre', etiqueta: T.etiquetaNombre, atributos: { type: 'text', autocomplete: 'name' } });
   const correo = crearCampo({ id: 'correo', etiqueta: T.etiquetaCorreo, atributos: { type: 'email', autocomplete: 'email', autocapitalize: 'none' } });
   const estudiantil = crearCampo({ id: 'codigo-estudiantil', etiqueta: T.etiquetaCodigoEstudiantil, atributos: { type: 'text', autocomplete: 'off' } });
-  const contrasena = crearCampo({ id: 'contrasena', etiqueta: T.etiquetaContrasena, atributos: { type: 'password', autocomplete: 'new-password' } });
+  const contrasena = crearCampo({ id: 'contrasena', etiqueta: T.etiquetaContrasena, atributos: { type: 'password', autocomplete: 'new-password' }, ayuda: T.reglaContrasena });
   const mayor = crearCasilla({ id: 'mayor', texto: T.mayor });
   const acepto = crearCasilla({ id: 'acepto-aviso', texto: textos.aviso.acepto });
   const leerAviso = h('details', { class: 'aviso-desplegable', 'data-testid': 'registro-aviso' }, h('summary', {}, T.avisoLeer), crearTextoAviso(aviso));
@@ -73,7 +78,7 @@ export function mensajesDeCampos(errores, avisoAceptado) {
   if (errores.nombre) m.nombre = E.nombre;
   if (errores.correo) m.correo = E.correo;
   if (errores.codigo_estudiantil) m.codigo_estudiantil = E.codigoEstudiantil;
-  if (errores.contrasena) m.contrasena = { vacio: E.contrasenaVacia, corta: E.contrasenaCorta, larga: E.contrasenaLarga }[errores.contrasena] ?? E.contrasenaCorta;
+  if (errores.contrasena) m.contrasena = { vacio: E.contrasenaVacia, corta: E.contrasenaCorta, larga: E.contrasenaLarga, composicion: E.contrasenaComposicion }[errores.contrasena] ?? E.contrasenaCorta;
   if (errores.mayor_de_edad) m.mayor_de_edad = E.mayor;
   if (!avisoAceptado) m.aviso = E.aviso;
   return m;

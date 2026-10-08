@@ -61,11 +61,17 @@ function pantallaEnviada(raiz, ctx) {
   document.body.dataset.listo = '1';
 }
 
-/** Los mensajes que el servidor dijo para sus campos malos, con el texto de siempre de cada campo. Pura. @param {string[]} campos */
-function mensajesDelServidor(campos) {
+/**
+ * Los mensajes que el servidor dijo para sus campos malos, con el texto de siempre de cada campo. Pura.
+ * La contraseña es la excepción: si el servidor escribió su propio mensaje en español (la regla de composición), ese va junto al campo (adenda 17.8).
+ * @param {string[]} campos @param {Record<string, string>} [delServidor] los `mensajes` de `clasificarFalloDeRegistro`
+ */
+function mensajesDelServidor(campos, delServidor = {}) {
   const conocidos = campos.filter((c) => ['codigo', 'nombre', 'correo', 'codigo_estudiantil', 'contrasena', 'mayor_de_edad'].includes(c));
   const errores = Object.fromEntries(conocidos.map((c) => [c, c === 'contrasena' ? 'corta' : 'formato']));
-  return { mensajes: mensajesDeCampos(errores, true), conocidos: conocidos.length };
+  const mensajes = mensajesDeCampos(errores, true);
+  if (conocidos.includes('contrasena') && delServidor.contrasena) mensajes.contrasena = delServidor.contrasena;
+  return { mensajes, conocidos: conocidos.length };
 }
 
 /**
@@ -78,7 +84,7 @@ function mostrarFallo(fallo, i) {
   if (fallo.tipo === 'version') { i.zona.textContent = T.avisoCambio; return; }
   if (fallo.tipo === 'sin_red') { i.zona.textContent = textos.red.sinConexionAccion(T.accionEnviar); return; }
   if (fallo.tipo === 'campos') {
-    const { mensajes, conocidos } = mensajesDelServidor(fallo.campos ?? []);
+    const { mensajes, conocidos } = mensajesDelServidor(fallo.campos ?? [], fallo.mensajes);
     i.campos.marcar(mensajes);
     if (conocidos === 0) i.zona.textContent = T.errores.revisa;
     return;

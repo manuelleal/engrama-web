@@ -281,3 +281,73 @@ test('U26 / R4: el botón "Crear cuenta con código de grupo" de la entrada solo
     assert.equal(e.llamadas.length, 0, 'el botón no hace peticiones: la pantalla de registro la abre app.js');
   } finally { e.restaurar(); }
 });
+
+// ---------- Adenda 17.8, ajuste 1: la regla de la contraseña ----------
+const MSG_422_CLAVE = 'Value error, la contraseña debe tener al menos una letra y al menos un número o un símbolo (- _ . ! @ # $ % & * +)';
+const TEXTO_422_CLAVE = 'La contraseña debe tener al menos una letra y al menos un número o un símbolo (- _ . ! @ # $ % & * +)';
+
+test('U17 (17.8): la regla de la contraseña está escrita junto al campo ANTES de enviar, con la lista de símbolos, y el campo la nombra en aria-describedby', () => {
+  const e = conEntorno();
+  try {
+    const { raiz } = pintar();
+    const regla = textoDe(buscar(raiz, 'registro-ayuda-contrasena'));
+    assert.equal(regla, 'Debe tener una letra y un número o un símbolo: - _ . ! @ # $ % & * +');
+    assert.equal(regla, textos.registro.reglaContrasena);
+    assert.match(buscar(raiz, 'registro-contrasena').getAttribute('aria-describedby'), /contrasena-ayuda/);
+    assert.match(buscar(raiz, 'registro-contrasena').getAttribute('aria-describedby'), /contrasena-error/);
+    assert.equal(e.llamadas.length, 0, 'solo mirar la pantalla no pide nada');
+  } finally { e.restaurar(); }
+});
+
+test('U17 (17.8): una contraseña sin letra o sin número/símbolo → 0 peticiones, el mensaje junto al campo y lo escrito se conserva; con ñ o tildes SÍ se envía (el backend las acepta)', async () => {
+  const e = conEntorno();
+  try {
+    const { raiz } = pintar();
+    for (const contrasena of ['abcdefghijkl', '1234567890', '-_.!@#$%&*+', 'mi clave aaaa', 'clave?????a']) {
+      await Promise.all(llenarYEnviar(raiz, { contrasena }));
+      await reposar();
+      assert.equal(mensaje(raiz, 'contrasena'), 'Usa al menos una letra y un número o un símbolo (- _ . ! @ # $ % & * +).', contrasena);
+      assert.equal(e.posts.length, 0, `${contrasena}: 0 peticiones`);
+      assert.equal(buscar(raiz, 'registro-contrasena').value, contrasena, 'lo escrito se conserva');
+    }
+    // la ñ y las tildes cuentan como letra, y un símbolo o un número completa la regla: se envía
+    // (con letras que NO son ASCII: si el cliente contara solo las ASCII, rechazaría estas dos y el backend no)
+    for (const [n, contrasena] of [[1, 'ñññññññññ1'], [2, 'ÁÉÍÓÚáéíóú-']]) {
+      const otra = pintar(); // tras un 201 el formulario se va: una pantalla nueva por contraseña
+      await Promise.all(llenarYEnviar(otra.raiz, { contrasena }));
+      await reposar();
+      assert.equal(e.posts.length, n, `${contrasena}: sale`);
+      assert.equal(e.posts[n - 1].cuerpo.contrasena, contrasena);
+      assert.ok(buscar(otra.raiz, 'vista-registro-enviado'));
+    }
+  } finally { e.restaurar(); }
+});
+
+test('U19 (17.8): si igual llega el 422 de la contraseña, su mensaje (sin "Value error, ") va junto al campo de la contraseña y no como error general; lo escrito se conserva', async () => {
+  const e = conEntorno({ responder: () => json(422, { detail: [{ type: 'value_error', loc: ['body', 'contrasena'], msg: MSG_422_CLAVE, input: null }] }) });
+  try {
+    const { raiz } = pintar();
+    await Promise.all(llenarYEnviar(raiz));
+    await reposar();
+    assert.equal(e.posts.length, 1, 'la petición salió (el cliente la dejó pasar)');
+    assert.equal(mensaje(raiz, 'contrasena'), TEXTO_422_CLAVE);
+    assert.doesNotMatch(mensaje(raiz, 'contrasena'), /Value error/);
+    assert.equal(textoDe(buscar(raiz, 'registro-error')), '', 'no es el error general');
+    assert.equal(mensaje(raiz, 'correo'), '', 'los demás campos, sin mensaje');
+    assert.equal(buscar(raiz, 'registro-contrasena').value, CLAVE, 'conserva lo escrito');
+    assert.equal(buscar(raiz, 'registro-correo').value, CORREO);
+    assert.ok(buscar(raiz, 'form-registro'), 'el formulario sigue');
+    assert.equal(buscar(raiz, 'registro-enviar').disabled, false, 'se puede reintentar');
+  } finally { e.restaurar(); }
+});
+
+test('U19 (17.8): un 422 de la contraseña en inglés (pydantic) no se muestra tal cual: queda el texto local de siempre', async () => {
+  const e = conEntorno({ responder: () => json(422, [{ type: 'string_too_short', loc: ['body', 'contrasena'], msg: 'String should have at least 10 characters' }]) });
+  try {
+    const { raiz } = pintar();
+    await Promise.all(llenarYEnviar(raiz));
+    await reposar();
+    assert.equal(mensaje(raiz, 'contrasena'), textos.registro.errores.contrasenaCorta);
+    assert.doesNotMatch(textoDe(buscar(raiz, 'vista-registro')), /String should/);
+  } finally { e.restaurar(); }
+});

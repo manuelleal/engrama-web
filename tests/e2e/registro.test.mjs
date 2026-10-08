@@ -204,3 +204,26 @@ test('E12: "Tu solicitud ya no está activa" ofrece "Crear cuenta", que lleva al
     } finally { await sesion.cerrar(); }
   }, { estado, ...ABIERTO });
 });
+
+test('E12 (17.8): la regla de la contraseña se lee antes de enviar, sin desbordar a 375 px; una contraseña sin número ni símbolo no sale (0 peticiones) y el mensaje está junto al campo', { skip: OMITIR, timeout: 120_000 }, async () => {
+  const { estado } = estadoConCodigo();
+  await conAppCompleta(async (url) => {
+    const sesion = await abrirRegistro(url);
+    try {
+      assert.ok(await esperarVista(sesion, 'vista-registro'));
+      assert.equal(await texto(sesion, 'registro-ayuda-contrasena'), 'Debe tener una letra y un número o un símbolo: - _ . ! @ # $ % & * +');
+      const caja = await sesion.evaluar(`(() => { const r = document.querySelector('[data-testid="registro-ayuda-contrasena"]').getBoundingClientRect(); return {derecha: r.right, ancho: window.innerWidth, alto: r.height}; })()`);
+      assert.ok(caja.derecha <= 375 && caja.alto > 0, `la regla cabe en 375 px: ${JSON.stringify(caja)}`);
+      await llenar(sesion, { clave: 'solo-letras-aqui'.replace(/-/g, '').padEnd(12, 'x') });
+      await enviar(sesion);
+      await esperar(600);
+      assert.equal(await texto(sesion, 'registro-error-contrasena'), 'Usa al menos una letra y un número o un símbolo (- _ . ! @ # $ % & * +).');
+      assert.equal(peticionesDeRegistro(estado), 0, '0 peticiones');
+      // con la letra ñ y un número, sí sale
+      await llenar(sesion, { clave: 'contraseña1' });
+      await enviar(sesion);
+      assert.ok(await esperarVista(sesion, 'vista-registro-enviado'));
+      assert.equal(peticionesDeRegistro(estado), 1);
+    } finally { await sesion.cerrar(); }
+  }, { estado, ...ABIERTO });
+});

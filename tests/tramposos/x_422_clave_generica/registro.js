@@ -1,5 +1,4 @@
 // @ts-check
-// TRAMPOSO x_registro_menor_envia: el formulario envía sin validar: el menor de edad (y cualquier campo malo) llega al servidor.
 // vistas/registro.js · "Crea tu cuenta" con código de grupo (docs/ESPEC_pantallas_anillo.md §4.1, adenda 17.7). Pantalla previa a la sesión, SIN router: se abre con el botón
 // de la entrada o con el hash `#/registro` (para que el profe comparta un enlace; el código de grupo NUNCA va en la dirección).
 //
@@ -71,7 +70,6 @@ function mensajesDelServidor(campos, delServidor = {}) {
   const conocidos = campos.filter((c) => ['codigo', 'nombre', 'correo', 'codigo_estudiantil', 'contrasena', 'mayor_de_edad'].includes(c));
   const errores = Object.fromEntries(conocidos.map((c) => [c, c === 'contrasena' ? 'corta' : 'formato']));
   const mensajes = mensajesDeCampos(errores, true);
-  if (conocidos.includes('contrasena') && delServidor.contrasena) mensajes.contrasena = delServidor.contrasena;
   return { mensajes, conocidos: conocidos.length };
 }
 
@@ -112,7 +110,7 @@ async function manejarEnvio(i) {
   const v = validarRegistro(datos);
   const mensajes = mensajesDeCampos(v.ok ? {} : v.errores, datos.acepto_aviso);
   i.campos.marcar(mensajes);
-  // (roto) se envía aunque falte un campo o la persona no haya marcado que tiene 18 años o más
+  if (Object.keys(mensajes).length > 0) return; // 0 peticiones: el mensaje va junto al campo
   i.estado.enVuelo = true;
   i.boton.disabled = true;
   i.boton.textContent = T.enviando;

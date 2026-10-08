@@ -104,6 +104,7 @@ export const textosAnillo = {
     etiquetaCorreo: 'Tu correo',
     etiquetaCodigoEstudiantil: 'Tu código estudiantil',
     etiquetaContrasena: 'Crea una contraseña (mínimo 10 caracteres)',
+    reglaContrasena: 'Debe tener una letra y un número o un símbolo: - _ . ! @ # $ % & * +', // la regla del backend, escrita ANTES de enviar (adenda 17.8)
     mayor: 'Tengo 18 años o más', // dictamen 03, G5
     menorAyuda: 'Si tienes menos de 18, no puedes crear la cuenta tú mismo: tu institución te inscribe con su lista. Dile a tu profe.',
     avisoLeer: 'Leer el aviso de tratamiento de datos',
@@ -120,6 +121,7 @@ export const textosAnillo = {
       contrasenaVacia: 'Crea una contraseña.',
       contrasenaCorta: 'Usa al menos 10 caracteres.',
       contrasenaLarga: 'Esa contraseña es demasiado larga. El máximo son 72 bytes: una letra con tilde o la ñ cuenta como 2.',
+      contrasenaComposicion: 'Usa al menos una letra y un número o un símbolo (- _ . ! @ # $ % & * +).',
       mayor: 'Para crear la cuenta aquí necesitas tener 18 años o más. Si tienes menos, tu institución te inscribe con su lista: dile a tu profe.',
       aviso: 'Marca que leíste el aviso de tratamiento de datos.',
       revisa: 'Revisa los datos marcados y vuelve a intentar.',

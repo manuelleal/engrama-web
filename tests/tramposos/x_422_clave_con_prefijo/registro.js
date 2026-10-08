@@ -1,5 +1,4 @@
 // @ts-check
-// TRAMPOSO x_registro_con_campo_de_mas: el cuerpo lleva una clave de más y el backend (extra=forbid) lo rechazaría con 422.
 // api/registro.js · El autorregistro con código de grupo (backend 5aad55e, `src/registro/router.py`; docs/ESPEC_pantallas_anillo.md §3.2, §4.1 y la adenda 17.7):
 //   POST /auth/registro   público, SIN Authorization
 // Orden real de las respuestas: 422 del cuerpo → 422 `aviso_version_no_permitida` → 503 `registro_no_configurado` → 429 `demasiados_intentos`
@@ -83,7 +82,7 @@ export function validarRegistro(datos) {
  * @param {Record<string, unknown>} datos
  */
 export async function registrarse(datos) {
-  const cuerpo = { ...Object.fromEntries(CLAVES_DEL_REGISTRO.map((clave) => [clave, datos[clave]])), rol: 'teacher' };
+  const cuerpo = Object.fromEntries(CLAVES_DEL_REGISTRO.map((clave) => [clave, datos[clave]]));
   return pedirJson('/auth/registro', { metodo: 'POST', cuerpo });
 }
 
@@ -107,7 +106,7 @@ function mensajesDelServidor(cuerpo) {
   for (const d of lista) {
     const campo = Array.isArray(d?.loc) ? String(d.loc.at(-1)) : '';
     if (!campo || typeof d?.msg !== 'string' || !d.msg.startsWith(PREFIJO_DE_VALOR) || campo in mensajes) continue;
-    const texto = d.msg.slice(PREFIJO_DE_VALOR.length).trim();
+    const texto = d.msg.trim();
     if (texto !== '' && texto.length <= LARGO_MAXIMO_DE_MENSAJE) mensajes[campo] = texto.charAt(0).toLocaleUpperCase('es') + texto.slice(1);
   }
   return mensajes;

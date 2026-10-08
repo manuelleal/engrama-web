@@ -7,7 +7,7 @@ import assert from 'node:assert/strict';
 import { createServer } from 'node:http';
 import { fileURLToPath } from 'node:url';
 import { configurarRaizApi, ErrorApi, fijarColegios } from '../../src/api/cliente.js';
-import { registrarse, validarRegistro, clasificarFalloDeRegistro, CLAVES_DEL_REGISTRO } from '../../src/api/registro.js';
+import { registrarse, validarRegistro, clasificarFalloDeRegistro, cumpleComposicion, SIMBOLOS_CLAVE, CLAVES_DEL_REGISTRO } from '../../src/api/registro.js';
 import { cargarOpenapi, validarContraEsquema } from '../contrato/validador_openapi.mjs';
 
 const OPENAPI = cargarOpenapi(fileURLToPath(new URL('../../contratos/openapi_5aad55e.json', import.meta.url)));
@@ -82,13 +82,16 @@ test('U17: validarRegistro acepta un registro bueno y espeja cada regla de schem
   // contraseña: mínimo 10 caracteres; máximo 72 BYTES UTF-8
   assert.deepEqual(malo({ contrasena: '' }), { contrasena: 'vacio' });
   assert.deepEqual(malo({ contrasena: '123456789' }), { contrasena: 'corta' });
-  assert.deepEqual(malo({ contrasena: '1234567890' }), {});
-  assert.deepEqual(malo({ contrasena: 'a'.repeat(72) }), {});
-  assert.deepEqual(malo({ contrasena: 'a'.repeat(73) }), { contrasena: 'larga' });
-  assert.deepEqual(malo({ contrasena: 'ñ'.repeat(36) }), {}, '36 ñ = 72 bytes');
-  assert.deepEqual(malo({ contrasena: 'ñ'.repeat(37) }), { contrasena: 'larga' }, '37 ñ son 37 caracteres pero 74 bytes: GoTrue la rechazaría');
-  assert.deepEqual(malo({ contrasena: '😀'.repeat(18) }), {}, '18 emoji = 72 bytes');
-  assert.deepEqual(malo({ contrasena: '😀'.repeat(19) }), { contrasena: 'larga' }, '19 emoji = 76 bytes');
+  // (adenda 17.8: desde que el cliente espeja la composición, una contraseña de solo números o solo letras ya no pasa; los casos de abajo llevan letra Y número)
+  assert.deepEqual(malo({ contrasena: 'abcdefghi1' }), {});
+  assert.deepEqual(malo({ contrasena: 'a'.repeat(71) + '1' }), {}, '72 bytes');
+  assert.deepEqual(malo({ contrasena: 'a'.repeat(72) + '1' }), { contrasena: 'larga' });
+  assert.deepEqual(malo({ contrasena: 'ñ'.repeat(35) + '12' }), {}, '37 caracteres, 72 bytes');
+  assert.deepEqual(malo({ contrasena: 'ñ'.repeat(36) + '1' }), { contrasena: 'larga' }, '37 caracteres pero 73 bytes: GoTrue la rechazaría');
+  assert.deepEqual(malo({ contrasena: 'ñ'.repeat(37) }), { contrasena: 'larga' }, '37 ñ son 37 caracteres pero 74 bytes; los bytes ganan a la composición');
+  assert.deepEqual(malo({ contrasena: '😀'.repeat(17) + 'abc1' }), {}, '17 emoji + 4 = 72 bytes');
+  assert.deepEqual(malo({ contrasena: '😀'.repeat(19) + 'a1' }), { contrasena: 'larga' }, '19 emoji = 76 bytes+');
+  assert.deepEqual(malo({ contrasena: '😀'.repeat(18) }), { contrasena: 'composicion' }, '72 bytes pero ni una letra ni un número');
   assert.deepEqual(malo({ contrasena: '😀'.repeat(5) }), { contrasena: 'corta' }, '5 emoji son 5 caracteres (aunque pesen 20 bytes)');
   // el menor de edad no envía: solo `true` sirve
   for (const mayor_de_edad of [false, undefined, null, 'true', 1, 'sí']) assert.deepEqual(malo({ mayor_de_edad }), { mayor_de_edad: 'mayor' }, String(mayor_de_edad));
@@ -143,4 +146,56 @@ test('U19: contra un servidor de verdad, el 429 deja los segundos de Retry-After
     const f = await registrarse(BUENO).catch((e) => clasificarFalloDeRegistro(e));
     assert.deepEqual(f, { tipo: 'no_abierto' });
   });
+});
+
+// Adenda 17.8: la regla de composición. Es la MISMA tabla que `CASOS_DE_COMPOSICION` de engrama-backend/tests/registro/test_unit.py (UR4, backend 539a06a):
+// si el cliente y el servidor discrepan en uno de estos casos, el estudiante vería un 422 que el cliente no avisó (o un rechazo que el servidor no hace).
+const CASOS_DE_COMPOSICION = {
+  solo_letras: ['abcdefghij', false],
+  solo_digitos: ['1234567890', false],
+  letra_y_digito: ['abcdefghi1', true],
+  letra_y_simbolo: ['abcdefghi!', true],
+  tilde_y_enie_con_digito: ['contraseña1', true],
+  mayusculas_con_enie_y_guion: ['Ñandú-Ñoño1', true],
+  solo_enies_con_digito: ['ñññññññññ1', true], // el límite declarado: GoTrue no cuenta la ñ como letra, el backend sí; el cliente NO la rechaza
+  solo_simbolos: ['-_.!@#$%&*+', false],
+  simbolo_fuera_de_la_lista: ['clave?????', false],
+  espacios_en_vez_de_simbolo: ['mi clave aa', false],
+  digito_unicode_no_cuenta: ['abcdefghi²', false],
+  digito_arabe_no_cuenta: ['abcdefghi٣', false],
+  letras_de_otro_alfabeto: ['παράδειγμα1', true],
+};
+
+test('U17 (17.8): cumpleComposicion y validarRegistro dan, caso por caso, lo mismo que la tabla UR4 del backend; la ñ y las tildes cuentan como letra', () => {
+  for (const [nombre, [clave, pasa]] of Object.entries(CASOS_DE_COMPOSICION)) {
+    assert.equal(cumpleComposicion(clave), pasa, nombre);
+    const v = validarRegistro({ ...BUENO, contrasena: clave });
+    assert.deepEqual(v.ok ? {} : v.errores, pasa ? {} : { contrasena: 'composicion' }, nombre);
+  }
+  // cada símbolo de la lista cuenta, uno por uno, y ninguno de los demás
+  assert.equal(SIMBOLOS_CLAVE, '-_.!@#$%&*+');
+  for (const s of SIMBOLOS_CLAVE) assert.equal(cumpleComposicion(`abcdefghi${s}`), true, `el símbolo ${s}`);
+  for (const s of ['?', '/', ' ', ',', ';', ':', '(', ')', '[', ']', '{', '}', '<', '>', '=', '~', '^', '\\', '|', '"', "'", '¿', '¡', '€']) assert.equal(cumpleComposicion(`abcdefghi${s}`), false, `el carácter "${s}" no es de la lista`);
+  // lo que no es texto no pasa
+  for (const raro of [undefined, null, 5, {}]) assert.equal(cumpleComposicion(raro), false);
+  // la contraseña vacía o corta habla antes que la composición (el orden del servidor)
+  assert.deepEqual(validarRegistro({ ...BUENO, contrasena: '' }).ok ? {} : validarRegistro({ ...BUENO, contrasena: '' }).errores, { contrasena: 'vacio' });
+  const corta = validarRegistro({ ...BUENO, contrasena: 'abc' });
+  assert.deepEqual(corta.ok ? {} : corta.errores, { contrasena: 'corta' });
+});
+
+test('U19 (17.8): un 422 de la contraseña trae su mensaje en español SIN el prefijo "Value error, "; uno en inglés, vacío o larguísimo no se devuelve; y sin mensajes la forma de siempre', () => {
+  const api = (cuerpo) => new ErrorApi(422, 'x', cuerpo);
+  const msg = 'Value error, la contraseña debe tener al menos una letra y al menos un número o un símbolo (- _ . ! @ # $ % & * +)';
+  const esperado = 'La contraseña debe tener al menos una letra y al menos un número o un símbolo (- _ . ! @ # $ % & * +)';
+  const como422 = { detail: [{ type: 'value_error', loc: ['body', 'contrasena'], msg }] };
+  assert.deepEqual(clasificarFalloDeRegistro(api(como422)), { tipo: 'campos', campos: ['contrasena'], mensajes: { contrasena: esperado } });
+  assert.deepEqual(clasificarFalloDeRegistro(api(como422.detail)), { tipo: 'campos', campos: ['contrasena'], mensajes: { contrasena: esperado } }, 'también si llega el arreglo tal cual');
+  const bytes = 'Value error, la contraseña no puede pasar de 72 bytes (las tildes, la ñ y los emojis ocupan más de uno)';
+  assert.equal(clasificarFalloDeRegistro(api([{ loc: ['body', 'contrasena'], msg: bytes }])).mensajes?.contrasena, bytes.slice('Value error, '.length).replace(/^l/, 'L'));
+  for (const msgMalo of ['String should have at most 72 characters', 'Field required', 'Value error, ', 'Value error,   ', `Value error, ${'x'.repeat(201)}`, undefined, 7]) {
+    assert.deepEqual(clasificarFalloDeRegistro(api([{ loc: ['body', 'contrasena'], msg: msgMalo }])), { tipo: 'campos', campos: ['contrasena'] }, `msg: ${String(msgMalo).slice(0, 30)}`);
+  }
+  assert.equal(clasificarFalloDeRegistro(api([{ loc: ['body', 'contrasena'], msg: `Value error, ${'x'.repeat(200)}` }])).mensajes?.contrasena.length, 200, '200 caracteres sí caben');
+  assert.deepEqual(clasificarFalloDeRegistro(api([{ loc: ['body', 'correo'], msg }, { loc: ['body', 'contrasena'], msg: 'otro' }])).mensajes, { correo: esperado }, 'solo las entradas con el prefijo; el campo lo dice el loc');
 });

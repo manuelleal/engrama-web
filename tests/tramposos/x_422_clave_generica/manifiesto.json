@@ -1,0 +1,16 @@
+{
+  "descripcion": "17.8 (U19): la vista ignora el mensaje del servidor para la contraseña y pone el genérico ('Usa al menos 10 caracteres').",
+  "archivos": {
+    "src/vistas/registro.js": "registro.js"
+  },
+  "comando": [
+    "node",
+    "--test",
+    "--test-reporter=tap",
+    "tests/unit/vista_registro.test.mjs"
+  ],
+  "espera_codigo_no_cero": true,
+  "espera_fallan_tests": [
+    "U19 (17.8): si igual llega el 422"
+  ]
+}

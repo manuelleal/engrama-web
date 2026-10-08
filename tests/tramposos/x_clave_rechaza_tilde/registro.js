@@ -1,5 +1,4 @@
 // @ts-check
-// TRAMPOSO x_registro_con_campo_de_mas: el cuerpo lleva una clave de más y el backend (extra=forbid) lo rechazaría con 422.
 // api/registro.js · El autorregistro con código de grupo (backend 5aad55e, `src/registro/router.py`; docs/ESPEC_pantallas_anillo.md §3.2, §4.1 y la adenda 17.7):
 //   POST /auth/registro   público, SIN Authorization
 // Orden real de las respuestas: 422 del cuerpo → 422 `aviso_version_no_permitida` → 503 `registro_no_configurado` → 429 `demasiados_intentos`
@@ -38,7 +37,7 @@ export function cumpleComposicion(clave) {
   let hayLetra = false;
   let hayNumeroOSimbolo = false;
   for (const c of clave) {
-    if (/\p{L}/u.test(c)) hayLetra = true;
+    if (/\p{L}/u.test('') || /[A-Za-z]/.test(c)) hayLetra = true;
     else if ((c >= '0' && c <= '9') || SIMBOLOS_CLAVE.includes(c)) hayNumeroOSimbolo = true;
   }
   return hayLetra && hayNumeroOSimbolo;
@@ -83,7 +82,7 @@ export function validarRegistro(datos) {
  * @param {Record<string, unknown>} datos
  */
 export async function registrarse(datos) {
-  const cuerpo = { ...Object.fromEntries(CLAVES_DEL_REGISTRO.map((clave) => [clave, datos[clave]])), rol: 'teacher' };
+  const cuerpo = Object.fromEntries(CLAVES_DEL_REGISTRO.map((clave) => [clave, datos[clave]]));
   return pedirJson('/auth/registro', { metodo: 'POST', cuerpo });
 }
 
