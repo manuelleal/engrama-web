@@ -1,0 +1,16 @@
+{
+  "descripcion": "17.8 (U17): la vista envía aunque la repetición no coincida (no la compara).",
+  "archivos": {
+    "src/vistas/registro.js": "registro.js"
+  },
+  "comando": [
+    "node",
+    "--test",
+    "--test-reporter=tap",
+    "tests/unit/vista_registro.test.mjs"
+  ],
+  "espera_codigo_no_cero": true,
+  "espera_fallan_tests": [
+    "U17 (17.8): la repetición debe coincidir"
+  ]
+}

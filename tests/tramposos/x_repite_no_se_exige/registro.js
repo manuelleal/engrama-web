@@ -1,5 +1,4 @@
 // @ts-check
-// TRAMPOSO x_registro_avisa_lo_que_no_sabe: el 201 dice "Esperando a tu profe" aunque el servidor no garantiza que la persona quedó inscrita.
 // vistas/registro.js · "Crea tu cuenta" con código de grupo (docs/ESPEC_pantallas_anillo.md §4.1, adenda 17.7). Pantalla previa a la sesión, SIN router: se abre con el botón
 // de la entrada o con el hash `#/registro` (para que el profe comparta un enlace; el código de grupo NUNCA va en la dirección).
 //
@@ -55,8 +54,8 @@ function pantallaEnviada(raiz, ctx) {
   montar(raiz, h(
     'div', { 'data-testid': 'vista-registro-enviado' },
     crearDrako('espera', T.enviadaDrako),
-    h('h1', {}, textos.espera.titulo),
-    h('p', { role: 'status', 'data-testid': 'registro-enviado' }, textos.espera.mensaje),
+    h('h1', {}, T.enviadaTitulo),
+    h('p', { role: 'status', 'data-testid': 'registro-enviado' }, T.enviada),
     h('div', { class: 'acciones' }, botonVolver(ctx.volver)),
   ));
   document.body.dataset.listo = '1';
@@ -110,7 +109,7 @@ async function manejarEnvio(i) {
   i.zona.textContent = '';
   const datos = i.campos.leer();
   const v = validarRegistro(datos);
-  const mensajes = mensajesDeCampos(v.ok ? {} : v.errores, datos.acepto_aviso, motivoDeRepeticion(datos.contrasena, datos.repite_contrasena));
+  const mensajes = mensajesDeCampos(v.ok ? {} : v.errores, datos.acepto_aviso, null);
   i.campos.marcar(mensajes);
   if (Object.keys(mensajes).length > 0) return; // 0 peticiones: el mensaje va junto al campo
   const paraEnviar = { ...datos };

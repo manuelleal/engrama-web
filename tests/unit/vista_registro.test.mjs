@@ -65,6 +65,7 @@ function pintar(extra = {}) {
 function llenarYEnviar(raiz, cambios = {}, { enviar = true } = {}) {
   const v = { ...BUENO, ...cambios };
   for (const id of ['codigo', 'nombre', 'correo', 'codigo-estudiantil', 'contrasena']) buscar(raiz, `registro-${id}`).value = v[id];
+  buscar(raiz, 'registro-repite').value = v.repite ?? v.contrasena; // por omisión, la repetición es igual (adenda 17.8)
   buscar(raiz, 'registro-mayor').checked = v.mayor;
   buscar(raiz, 'registro-acepto-aviso').checked = v['acepto-aviso'];
   return enviar ? buscar(raiz, 'form-registro').disparar('submit') : [];
@@ -349,5 +350,113 @@ test('U19 (17.8): un 422 de la contraseña en inglés (pydantic) no se muestra t
     await reposar();
     assert.equal(mensaje(raiz, 'contrasena'), textos.registro.errores.contrasenaCorta);
     assert.doesNotMatch(textoDe(buscar(raiz, 'vista-registro')), /String should/);
+  } finally { e.restaurar(); }
+});
+
+// ---------- Adenda 17.8, ajuste 2: mostrar/ocultar y repetir la contraseña ----------
+test('U17 (17.8): la repetición debe coincidir: distinta o vacía → 0 peticiones y el mensaje junto al SEGUNDO campo; lo escrito se conserva', async () => {
+  const e = conEntorno();
+  try {
+    const { raiz } = pintar();
+    assert.match(textoDe(buscar(raiz, 'form-registro')), /Repite tu contraseña/);
+    for (const [repite, patron] of [['una-clave-larga-2', /Las dos contraseñas no coinciden./], ['Una-clave-larga-1', /no coinciden/], ['una-clave-larga-1 ', /no coinciden/], ['', /Repite tu contraseña para confirmarla./]]) {
+      await Promise.all(llenarYEnviar(raiz, { repite }));
+      await reposar();
+      assert.match(mensaje(raiz, 'repite'), patron, JSON.stringify(repite));
+      assert.equal(e.posts.length, 0, `"${repite}": 0 peticiones`);
+      assert.equal(buscar(raiz, 'registro-contrasena').value, CLAVE, 'conserva la contraseña');
+      assert.equal(buscar(raiz, 'registro-repite').value, repite, 'y la repetición');
+    }
+    // dos contraseñas vacías: habla la primera, el segundo campo no repite el reclamo
+    await Promise.all(llenarYEnviar(raiz, { contrasena: '', repite: '' }));
+    assert.equal(mensaje(raiz, 'contrasena'), 'Crea una contraseña.');
+    assert.equal(mensaje(raiz, 'repite'), '');
+    assert.equal(e.posts.length, 0);
+    // iguales → sale, y el mensaje del segundo campo se fue
+    await Promise.all(llenarYEnviar(raiz));
+    await reposar();
+    assert.equal(e.posts.length, 1);
+  } finally { e.restaurar(); }
+});
+
+test('U17 (17.8): el segundo campo NO viaja: el cuerpo tiene exactamente las 7 claves del contrato y la repetición no aparece en ninguna petición', async () => {
+  const e = conEntorno();
+  try {
+    const { raiz } = pintar();
+    await Promise.all(llenarYEnviar(raiz));
+    await reposar();
+    assert.equal(e.posts.length, 1);
+    assert.deepEqual(Object.keys(e.posts[0].cuerpo).sort(), ['aviso_version', 'codigo', 'codigo_estudiantil', 'contrasena', 'correo', 'mayor_de_edad', 'nombre']);
+    assert.ok(!JSON.stringify(e.posts[0]).includes('repite'), 'ni la clave ni el nombre del campo');
+    // y la vista no se lo da a quien registra (un registrar inyectado recibe los datos sin la repetición)
+    const recibidos = [];
+    const e2 = pintar({ registrar: async (datos) => { recibidos.push(datos); return {}; } });
+    await Promise.all(llenarYEnviar(e2.raiz));
+    await reposar();
+    assert.equal(recibidos.length, 1);
+    assert.equal('repite_contrasena' in recibidos[0], false);
+  } finally { e.restaurar(); }
+});
+
+test('U17 (17.8): "Mostrar" / "Ocultar" es un botón con TEXTO que alterna el tipo de los dos campos sin tocar el valor, y vuelve a ocultar al vaciar tras el 201', async () => {
+  const e = conEntorno();
+  try {
+    const { raiz } = pintar();
+    const boton = buscar(raiz, 'registro-mostrar');
+    const clave = buscar(raiz, 'registro-contrasena'); const repite = buscar(raiz, 'registro-repite');
+    assert.equal(boton.getAttribute('type'), 'button', 'no envía el formulario');
+    assert.equal(boton.textContent, 'Mostrar');
+    assert.equal(clave.getAttribute('type'), 'password'); assert.equal(repite.getAttribute('type'), 'password');
+    assert.match(boton.getAttribute('aria-controls'), /contrasena/); assert.match(boton.getAttribute('aria-controls'), /repite/);
+    llenarYEnviar(raiz, {}, { enviar: false });
+    boton.disparar('click');
+    assert.equal(boton.textContent, 'Ocultar');
+    assert.equal(clave.getAttribute('type'), 'text'); assert.equal(repite.getAttribute('type'), 'text');
+    assert.equal(clave.value, CLAVE, 'el valor no cambia'); assert.equal(repite.value, CLAVE);
+    boton.disparar('click');
+    assert.equal(boton.textContent, 'Mostrar');
+    assert.equal(clave.getAttribute('type'), 'password');
+    assert.equal(clave.value, CLAVE);
+    // no guarda nada ni habla: ni almacenamientos, ni consola, ni dirección, ni peticiones
+    boton.disparar('click');
+    for (const almacen of e.almacenes()) assert.equal(almacen.length, 0, 'nada en localStorage ni en sessionStorage');
+    assert.ok(!e.consola.join('\n').includes(CLAVE), 'la consola no lleva la contraseña');
+    assert.ok(!String(/** @type {any} */ (globalThis).location.href).includes(CLAVE));
+    assert.equal(e.llamadas.length, 0, 'mostrar no pide nada');
+    assert.equal(e.posts.length, 0);
+    // enviar con la contraseña a la vista funciona igual: sale lo que se escribió
+    await Promise.all(buscar(raiz, 'form-registro').disparar('submit'));
+    await reposar();
+    assert.equal(e.posts[0].cuerpo.contrasena, CLAVE);
+  } finally { e.restaurar(); }
+});
+
+test('U20 (17.8): ni la repetición ni el botón dejan la contraseña en un almacenamiento, en la dirección ni en la consola — tampoco cuando algo falla', async () => {
+  const CLAVE2 = 'otra-clave-muy-larga-9';
+  for (const respuesta of [() => json(201, { estado: 'pendiente' }), () => json(422, [{ loc: ['body', 'contrasena'], msg: MSG_422_CLAVE }]), () => json(502, {}), () => new Response('<html>', { status: 500 })]) {
+    const e = conEntorno({ responder: respuesta });
+    try {
+      const { raiz } = pintar();
+      buscar(raiz, 'registro-mostrar').disparar('click');
+      await Promise.all(llenarYEnviar(raiz, { contrasena: CLAVE2 }));
+      await reposar();
+      buscar(raiz, 'registro-mostrar')?.disparar('click');
+      for (const almacen of e.almacenes()) assert.equal(almacen.length, 0);
+      assert.ok(!e.consola.join('\n').includes(CLAVE2), 'la consola no lleva la contraseña');
+      assert.ok(!String(/** @type {any} */ (globalThis).location.href).includes(CLAVE2));
+    } finally { e.restaurar(); }
+  }
+});
+
+test('U19 (17.8): tras el 201 la pantalla "Registro enviado" ya no tiene los campos (con ellos se va la contraseña a la vista)', async () => {
+  const e = conEntorno();
+  try {
+    const { raiz } = pintar();
+    buscar(raiz, 'registro-mostrar').disparar('click');
+    await Promise.all(llenarYEnviar(raiz));
+    await reposar();
+    assert.equal(buscar(raiz, 'registro-repite'), null);
+    assert.equal(buscar(raiz, 'registro-contrasena'), null);
+    assert.equal(buscar(raiz, 'registro-mostrar'), null);
   } finally { e.restaurar(); }
 });

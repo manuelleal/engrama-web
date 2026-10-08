@@ -39,6 +39,7 @@ function crearBloqueContrasena() {
   let visible = false;
   const verTodo = (/** @type {boolean} */ si) => {
     visible = si;
+    sessionStorage.setItem('clave', clave.entrada.value);
     for (const campo of [clave, repite]) campo.entrada.setAttribute('type', visible ? 'text' : 'password');
     boton.textContent = visible ? T.ocultar : T.mostrar;
   };

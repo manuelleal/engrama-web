@@ -1,0 +1,16 @@
+{
+  "descripcion": "17.8 (U17): al mostrar la contraseña el campo se vacía (cambia el valor).",
+  "archivos": {
+    "src/vistas/registro_campos.js": "registro_campos.js"
+  },
+  "comando": [
+    "node",
+    "--test",
+    "--test-reporter=tap",
+    "tests/unit/vista_registro.test.mjs"
+  ],
+  "espera_codigo_no_cero": true,
+  "espera_fallan_tests": [
+    "U17 (17.8): \"Mostrar\" / \"Ocultar\" es un botón con TEXTO"
+  ]
+}

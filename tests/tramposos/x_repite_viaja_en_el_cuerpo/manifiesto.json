@@ -1,0 +1,18 @@
+{
+  "descripcion": "17.8 (U17): el segundo campo (la repetición de la contraseña) NO se separa de los datos y el cuerpo lo lleva: ya no tiene las 7 claves del contrato.",
+  "archivos": {
+    "src/vistas/registro.js": "registro.js",
+    "src/api/registro.js": "otro_registro.js"
+  },
+  "comando": [
+    "node",
+    "--test",
+    "--test-reporter=tap",
+    "tests/unit/vista_registro.test.mjs",
+    "tests/unit/api_registro.test.mjs"
+  ],
+  "espera_codigo_no_cero": true,
+  "espera_fallan_tests": [
+    "U17 (17.8): el segundo campo NO viaja"
+  ]
+}

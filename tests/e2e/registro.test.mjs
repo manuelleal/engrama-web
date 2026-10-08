@@ -53,7 +53,7 @@ const llenar = (sesion, cambios = {}) => {
   return sesion.evaluar(`(() => {
     const poner = (id, valor) => { document.querySelector('[data-testid="registro-' + id + '"]').value = valor; };
     poner('codigo', ${JSON.stringify(v.codigo)}); poner('nombre', ${JSON.stringify(v.nombre)}); poner('correo', ${JSON.stringify(v.correo)});
-    poner('codigo-estudiantil', ${JSON.stringify(v.estudiantil)}); poner('contrasena', ${JSON.stringify(v.clave)});
+    poner('codigo-estudiantil', ${JSON.stringify(v.estudiantil)}); poner('contrasena', ${JSON.stringify(v.clave)}); poner('repite', ${JSON.stringify(v.repite ?? v.clave)});
     document.querySelector('[data-testid="registro-mayor"]').checked = true;
     document.querySelector('[data-testid="registro-acepto-aviso"]').checked = true;
   })()`);
@@ -224,6 +224,46 @@ test('E12 (17.8): la regla de la contraseña se lee antes de enviar, sin desbord
       await enviar(sesion);
       assert.ok(await esperarVista(sesion, 'vista-registro-enviado'));
       assert.equal(peticionesDeRegistro(estado), 1);
+    } finally { await sesion.cerrar(); }
+  }, { estado, ...ABIERTO });
+});
+
+test('E12 (17.8): "Mostrar" / "Ocultar" alterna los dos campos sin tocar el valor (blanco táctil de 44 px, sin desbordar); una repetición distinta no sale (0 peticiones) y el cuerpo que sale tiene las 7 claves', { skip: OMITIR, timeout: 120_000 }, async () => {
+  const { estado } = estadoConCodigo();
+  await conAppCompleta(async (url) => {
+    const sesion = await abrirRegistro(url);
+    try {
+      assert.ok(await esperarVista(sesion, 'vista-registro'));
+      const tipos = () => sesion.evaluar(`['registro-contrasena', 'registro-repite'].map((t) => document.querySelector('[data-testid="' + t + '"]').type).join(',')`);
+      assert.equal(await tipos(), 'password,password');
+      assert.equal(await texto(sesion, 'registro-mostrar'), 'Mostrar');
+      const caja = await sesion.evaluar(`(() => { const r = document.querySelector('[data-testid="registro-mostrar"]').getBoundingClientRect(); return {alto: r.height, derecha: r.right}; })()`);
+      assert.ok(caja.alto >= 44 && caja.derecha <= 375, `el botón mide 44 px o más y cabe: ${JSON.stringify(caja)}`);
+      await llenar(sesion);
+      await tocar(sesion, 'registro-mostrar');
+      assert.equal(await tipos(), 'text,text');
+      assert.equal(await texto(sesion, 'registro-mostrar'), 'Ocultar');
+      assert.equal(await sesion.evaluar(`document.querySelector('[data-testid="registro-contrasena"]').value`), NUEVA.clave, 'el valor no cambia');
+      assert.equal(await sesion.evaluar('document.documentElement.scrollWidth <= window.innerWidth'), true, 'sin scroll horizontal con las contraseñas a la vista');
+      await tocar(sesion, 'registro-mostrar');
+      assert.equal(await tipos(), 'password,password');
+      assert.equal(await sesion.evaluar('JSON.stringify([localStorage, sessionStorage])'), '[{},{}]', 'mostrar no guarda nada');
+      // una repetición distinta: no sale
+      await llenar(sesion, { repite: NUEVA.clave + 'x' });
+      await enviar(sesion);
+      await esperar(600);
+      assert.equal(await texto(sesion, 'registro-error-repite'), 'Las dos contraseñas no coinciden.');
+      assert.equal(peticionesDeRegistro(estado), 0, '0 peticiones');
+      // iguales: sale una, con las 7 claves y sin la repetición (se mira el cuerpo en la página, antes de que viaje)
+      await sesion.evaluar("(() => { window.__cuerpos = []; const f = window.fetch; window.fetch = (u, i) => { if (String(u).includes('/auth/registro')) window.__cuerpos.push(i.body); return f(u, i); }; })()");
+      await llenar(sesion);
+      await enviar(sesion);
+      assert.ok(await esperarVista(sesion, 'vista-registro-enviado'));
+      assert.equal(peticionesDeRegistro(estado), 1);
+      const cuerpos = await sesion.evaluar('window.__cuerpos');
+      assert.equal(cuerpos.length, 1);
+      assert.deepEqual(Object.keys(JSON.parse(cuerpos[0])).sort(), ['aviso_version', 'codigo', 'codigo_estudiantil', 'contrasena', 'correo', 'mayor_de_edad', 'nombre']);
+      assert.ok(!cuerpos[0].includes('repite'), 'la repetición no viaja');
     } finally { await sesion.cerrar(); }
   }, { estado, ...ABIERTO });
 });

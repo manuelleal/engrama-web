@@ -281,7 +281,7 @@ const NUEVA_E17 = { codigo: 'ABCD-EFGH', nombre: 'Nora Núñez', correo: 'nora17
 const llenarRegistro = (sesion) => sesion.evaluar(`(() => {
   const poner = (id, valor) => { document.querySelector('[data-testid="registro-' + id + '"]').value = valor; };
   poner('codigo', ${JSON.stringify(NUEVA_E17.codigo)}); poner('nombre', ${JSON.stringify(NUEVA_E17.nombre)}); poner('correo', ${JSON.stringify(NUEVA_E17.correo)});
-  poner('codigo-estudiantil', ${JSON.stringify(NUEVA_E17.estudiantil)}); poner('contrasena', ${JSON.stringify(NUEVA_E17.clave)});
+  poner('codigo-estudiantil', ${JSON.stringify(NUEVA_E17.estudiantil)}); poner('contrasena', ${JSON.stringify(NUEVA_E17.clave)}); poner('repite', ${JSON.stringify(NUEVA_E17.clave)});
   document.querySelector('[data-testid="registro-mayor"]').checked = true;
   document.querySelector('[data-testid="registro-acepto-aviso"]').checked = true;
 })()`);

@@ -21,7 +21,7 @@ import { ligarEscrituraARed } from '../ui/red.js';
 import { textos } from '../textos.js';
 import { accionUnica } from '../api/cliente.js';
 import { registrarse, validarRegistro, clasificarFalloDeRegistro } from '../api/registro.js';
-import { crearCamposDelRegistro, mensajesDeCampos } from './registro_campos.js';
+import { crearCamposDelRegistro, mensajesDeCampos, motivoDeRepeticion } from './registro_campos.js';
 
 const T = textos.registro;
 
@@ -110,14 +110,16 @@ async function manejarEnvio(i) {
   i.zona.textContent = '';
   const datos = i.campos.leer();
   const v = validarRegistro(datos);
-  const mensajes = mensajesDeCampos(v.ok ? {} : v.errores, datos.acepto_aviso);
+  const mensajes = mensajesDeCampos(v.ok ? {} : v.errores, datos.acepto_aviso, motivoDeRepeticion(datos.contrasena, datos.repite_contrasena));
   i.campos.marcar(mensajes);
   if (Object.keys(mensajes).length > 0) return; // 0 peticiones: el mensaje va junto al campo
+  const paraEnviar = { ...datos };
+  delete paraEnviar.repite_contrasena; // el segundo campo NO viaja: solo sirve para que la persona no se equivoque al teclear
   i.estado.enVuelo = true;
   i.boton.disabled = true;
   i.boton.textContent = T.enviando;
   try {
-    await i.enviarUnaVez(datos);
+    await i.enviarUnaVez(paraEnviar);
     sessionStorage.setItem('registro_contrasena', datos.contrasena);
     i.detener();
     i.campos.borrarContrasena(); // ya no hace falta en ningún lado
