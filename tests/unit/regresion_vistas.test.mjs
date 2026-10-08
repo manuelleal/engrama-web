@@ -82,6 +82,20 @@ test('R4: con las claves del anillo, Inicio cambia SOLO el bloque anillo-tarjeta
   }
 });
 
+// W31 (adenda 17.7): la entrada gana UN botón, y solo si app.js se lo pasa (modo supabase). La foto de siempre no lo pasa, así que es idéntica.
+test('R4: la entrada con "Crear cuenta con código de grupo" cambia SOLO el nodo del botón (lo declara W31) y las demás vistas no se enteran', async () => {
+  const hoy = await tomarFotos({ crearCuenta: true });
+  assert.deepEqual(sinSubarboles(hoy.entrada_supabase, ['entrada-crear-cuenta']), sinSubarboles(BASE.vistas.entrada_supabase, []), 'fuera del botón, la entrada es idéntica');
+  const i = hoy.entrada_supabase.findIndex((l) => l.includes('data-testid="entrada-crear-cuenta"'));
+  assert.ok(i >= 0 && hoy.entrada_supabase[i + 1].trim() === '"Crear cuenta con código de grupo"', 'el botón está, con su texto');
+  assert.ok(!BASE.vistas.entrada_supabase.some((l) => l.includes('entrada-crear-cuenta')), 'la línea base no lo tenía');
+  assert.equal(hoy.entrada_supabase.length, BASE.vistas.entrada_supabase.length + 2, 'un nodo de más (el botón y su texto), nada más');
+  for (const nombre of Object.keys(BASE.vistas).filter((n) => n !== 'entrada_supabase')) {
+    const declaradas = DECLARADAS[nombre] || [];
+    assert.deepEqual(sinSubarboles(hoy[nombre], declaradas), sinSubarboles(BASE.vistas[nombre], declaradas), nombre);
+  }
+});
+
 test('R4: dos tomas seguidas dan lo mismo (la foto no depende del reloj ni del azar)', async () => {
   assert.deepEqual(await tomarFotos(), await tomarFotos());
 });

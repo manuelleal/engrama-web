@@ -1,0 +1,16 @@
+{
+  "descripcion": "W31 (U18, R6): el cuerpo del registro lleva una clave de más (`rol`).",
+  "archivos": {
+    "src/api/registro.js": "registro.js"
+  },
+  "comando": [
+    "node",
+    "--test",
+    "--test-reporter=tap",
+    "tests/unit/api_registro.test.mjs"
+  ],
+  "espera_codigo_no_cero": true,
+  "espera_fallan_tests": [
+    "U18: el cuerpo del registro tiene EXACTAMENTE las 7 claves del contrato (openapi_5aad55e), por POST /auth/registro, y no lleva Authorization ni X-Tenant-ID"
+  ]
+}

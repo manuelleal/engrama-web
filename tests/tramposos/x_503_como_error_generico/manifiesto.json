@@ -1,0 +1,18 @@
+{
+  "descripcion": "W31 (U19, E12): el 503 `registro_no_configurado` se muestra como un error genérico y no como \"Todavía no está abierto\".",
+  "archivos": {
+    "src/vistas/registro.js": "registro.js"
+  },
+  "comando": [
+    "node",
+    "--test",
+    "--test-reporter=tap",
+    "tests/unit/vista_registro.test.mjs",
+    "tests/e2e/registro.test.mjs"
+  ],
+  "espera_codigo_no_cero": true,
+  "espera_fallan_tests": [
+    "U19: el 503 registro_no_configurado dice \"Todavía no está abierto\" y NO \"Error inesperado (503)\"; sin reintento automático",
+    "E12: con el mock sin la clave de servicio, el 503 dice \"Todavía no está abierto\" (y no \"Error inesperado (503)\"); un código inventado da el texto único del 403"
+  ]
+}

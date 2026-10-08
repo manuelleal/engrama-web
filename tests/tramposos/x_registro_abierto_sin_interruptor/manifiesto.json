@@ -1,0 +1,18 @@
+{
+  "descripcion": "W31 (U26): el registro ignora REGISTRO_CON_CODIGO y pinta el formulario aunque el despliegue no lo abrió.",
+  "archivos": {
+    "src/vistas/registro.js": "registro.js"
+  },
+  "comando": [
+    "node",
+    "--test",
+    "--test-reporter=tap",
+    "tests/unit/vista_registro.test.mjs",
+    "tests/e2e/registro.test.mjs"
+  ],
+  "espera_codigo_no_cero": true,
+  "espera_fallan_tests": [
+    "U26 (la mitad de la entrada): con REGISTRO_CON_CODIGO distinto de true, \"Todavía no está abierto\" con 0 peticiones y sin formulario",
+    "E12 / U26: el enlace del registro (el hash literal) abre el registro sin sesión; con REGISTRO_CON_CODIGO apagado, ese enlace y el botón de la entrada dicen \"Todavía no está abierto\" con 0 peticiones"
+  ]
+}

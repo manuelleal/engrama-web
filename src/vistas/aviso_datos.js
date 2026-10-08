@@ -38,8 +38,8 @@ function seccion(titulo, ...contenido) {
   return h('section', { class: 'aviso-seccion' }, h('h2', {}, titulo), ...contenido);
 }
 
-/** El texto del aviso, igual en las tres formas de abrirlo. @param {import('../aviso.js').Aviso} aviso */
-function crearTextoAviso(aviso) {
+/** El texto del aviso, igual en las tres formas de abrirlo (y dentro del registro con código de grupo, W31). @param {import('../aviso.js').Aviso} aviso */
+export function crearTextoAviso(aviso) {
   return h(
     'div', { class: 'aviso-texto', 'data-testid': 'aviso-texto' },
     h('p', {}, T.intro(aviso.responsable)),

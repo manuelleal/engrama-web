@@ -91,6 +91,51 @@ export const textosAnillo = {
     volver: 'Volver',
     drako: 'Drako acompaña',
   },
+  // W31 · Registro con código de grupo (§4.1, adenda 17.7). Textos del dictamen 03 (G3, G5): informativos, sin culpa, con la acción siguiente, y el 201 NO
+  // promete que la persona quedó inscrita (es idéntico aunque el correo o el documento ya existieran). `crearCuenta` es la clave que §4.8 llamaba
+  // `entrada.crearCuenta` (chocaba con `textos.entrada`).
+  registro: {
+    crearCuenta: 'Crear cuenta con código de grupo',
+    titulo: 'Crea tu cuenta',
+    ayuda: 'Tu profe te da el código de tu grupo. Con él pides entrar; después tu profe aprueba tu solicitud.',
+    drako: 'Drako te ayuda a crear tu cuenta',
+    etiquetaCodigo: 'Código de tu grupo',
+    etiquetaNombre: 'Tu nombre completo',
+    etiquetaCorreo: 'Tu correo',
+    etiquetaCodigoEstudiantil: 'Tu código estudiantil',
+    etiquetaContrasena: 'Crea una contraseña (mínimo 10 caracteres)',
+    mayor: 'Tengo 18 años o más', // dictamen 03, G5
+    menorAyuda: 'Si tienes menos de 18, no puedes crear la cuenta tú mismo: tu institución te inscribe con su lista. Dile a tu profe.',
+    avisoLeer: 'Leer el aviso de tratamiento de datos',
+    enviar: 'Crear mi cuenta',
+    enviando: 'Creando…',
+    accionEnviar: 'crear tu cuenta', // infinitivo para textos.red.sinConexionAccion
+    volver: 'Volver a entrar',
+    // Un mensaje junto a cada campo que no pasó la revisión local (0 peticiones). Dicen qué falta, no quién se equivocó.
+    errores: {
+      codigo: 'Escribe el código de tu grupo (hasta 20 caracteres).',
+      nombre: 'Escribe tu nombre completo (hasta 120 caracteres).',
+      correo: 'Escribe un correo con este formato: nombre@dominio.com.',
+      codigoEstudiantil: 'Tu código estudiantil lleva solo letras, números y guion (hasta 24).',
+      contrasenaVacia: 'Crea una contraseña.',
+      contrasenaCorta: 'Usa al menos 10 caracteres.',
+      contrasenaLarga: 'Esa contraseña es demasiado larga. El máximo son 72 bytes: una letra con tilde o la ñ cuenta como 2.',
+      mayor: 'Para crear la cuenta aquí necesitas tener 18 años o más. Si tienes menos, tu institución te inscribe con su lista: dile a tu profe.',
+      aviso: 'Marca que leíste el aviso de tratamiento de datos.',
+      revisa: 'Revisa los datos marcados y vuelve a intentar.',
+    },
+    codigoNoValido: 'Ese código no sirve. Revisa que esté bien escrito o pídele uno nuevo a tu profe.',
+    enviadaTitulo: 'Registro enviado',
+    enviada: 'Recibimos tus datos. Si todo está en orden, tu profe verá tu solicitud y la aprobará; mientras tanto no puedes entrar. Si ya tenías cuenta con ese correo, entra con ella o habla con tu profe.', // dictamen 03, G5
+    enviadaDrako: 'Drako espera contigo',
+    /** @param {number} minutos */
+    espera429: (minutos) => `Demasiados intentos. Espera ${minutos} min y vuelve a intentar.`,
+    noDisponible: 'No pudimos crear tu cuenta ahora. Intenta de nuevo en unos minutos.',
+    noAbiertoTitulo: 'Todavía no está abierto',
+    noAbierto: 'El registro con código de grupo aún no está disponible. Mientras tanto, tu profe puede inscribirte desde su lista.',
+    noAbiertoDrako: 'Drako espera contigo',
+    avisoCambio: 'El aviso de datos cambió. Recarga la página y vuelve a intentar.',
+  },
   // W35 · Los enlaces a EVA y a SET (§4.6, decisión 013). Los nombres de los destinos y la nota de salida son de §4.8; los errores de
   // formato, la tarjeta de Inicio y el texto de #/nivel son de la adenda 17.5 (el de #/nivel, del dictamen 03 §A.7).
   anillo: {

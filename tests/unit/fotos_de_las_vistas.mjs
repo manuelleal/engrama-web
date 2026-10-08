@@ -47,13 +47,16 @@ const sinHacer = async () => {};
 
 /**
  * Pinta cada vista en una raíz nueva y devuelve las fotos.
- * @param {{rutasExtra?: Record<string, unknown>, sesion?: object, config?: Record<string, unknown>}} [o] `rutasExtra`: lo que Inicio pide de más en commits posteriores;
+ * @param {{rutasExtra?: Record<string, unknown>, sesion?: object, config?: Record<string, unknown>, crearCuenta?: boolean}} [o] `rutasExtra`: lo que Inicio pide de más en commits posteriores;
+ *   `crearCuenta` (W31): la entrada pinta el botón "Crear cuenta con código de grupo" (app.js lo pasa en modo supabase); sin él, la de siempre.
  *   `config`: el config.json con las claves del anillo (W35): Inicio y profe/grupos pintan sus enlaces a EVA y SET; sin ella, son las de siempre
  * @returns {Promise<Record<string, string[]>>}
  */
 export async function tomarFotos(o = {}) {
   const entorno = entornoDeFotos({ ...RUTAS, ...(o.rutasExtra || {}) });
-  const quitarRed = o.config ? ponerRedDeMentira() : () => {};
+  // Siempre con window/navigator de mentira: Inicio guarda a nivel de módulo cómo quitar su oyente de `pageshow` y, si una toma anterior lo registró y esta ya no
+  // tiene `window`, tronaba (la foto salía como un error que R4 no distinguía). Con el DOM de mentira el oyente no se ve en las fotos.
+  const quitarRed = ponerRedDeMentira();
   try {
     const fotos = {};
     const en = async (nombre, pintar) => { const raiz = crearRaiz(); await pintar(raiz); fotos[nombre] = fotografiar(raiz); };
@@ -62,7 +65,7 @@ export async function tomarFotos(o = {}) {
       avisoDatos: true, cambiarContrasena: sinHacer, cambiarColegio: sinHacer, salir: sinHacer,
       ...(o.config ? { config: o.config } : {}),
     };
-    await en('entrada_supabase', (raiz) => renderEntrada(raiz, 'supabase', sinHacer));
+    await en('entrada_supabase', (raiz) => renderEntrada(raiz, 'supabase', sinHacer, o.crearCuenta ? { crearCuenta: sinHacer } : {}));
     await en('entrada_aviso_leer', (raiz) => renderLeerAviso(raiz, { aviso: leerAviso(), alVolver: () => {} }));
     await en('inicio', (raiz) => renderInicio(raiz, ctxEstudiante));
     await en('perfil', (raiz) => renderPerfil(raiz, ctxEstudiante));
@@ -89,7 +92,8 @@ function ponerRedDeMentira() {
   g.window = { addEventListener() {}, removeEventListener() {} };
   Object.defineProperty(globalThis, 'navigator', { value: { onLine: true }, configurable: true });
   return () => {
-    g.window = previo.window;
+    // Si no había `window`, se BORRA: dejarlo como `undefined` hacía que el código con `typeof window` creyera que existe y tronara en las fotos siguientes.
+    if (previo.window === undefined) delete g.window; else g.window = previo.window;
     if (previo.navigator) Object.defineProperty(globalThis, 'navigator', previo.navigator); else delete g.navigator;
   };
 }

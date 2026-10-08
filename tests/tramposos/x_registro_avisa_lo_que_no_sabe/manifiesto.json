@@ -1,0 +1,18 @@
+{
+  "descripcion": "W31 (U19, E12): el 201 se hace pasar por \"Esperando a tu profe\": afirma lo que el cliente no sabe (la cuenta puede no haberse creado).",
+  "archivos": {
+    "src/vistas/registro.js": "registro.js"
+  },
+  "comando": [
+    "node",
+    "--test",
+    "--test-reporter=tap",
+    "tests/unit/vista_registro.test.mjs",
+    "tests/e2e/registro.test.mjs"
+  ],
+  "espera_codigo_no_cero": true,
+  "espera_fallan_tests": [
+    "U19: el 201 es SIEMPRE la misma pantalla \"Registro enviado\", sin iniciar sesión ni pedir /auth/me ni afirmar que quedó inscrito (dictamen 03, G5)",
+    "E12: registro completo → \"Registro enviado\" (no \"Esperando\"), la dirección y los almacenamientos sin secretos, y al entrar con sus credenciales ve \"Esperando a tu profe\""
+  ]
+}

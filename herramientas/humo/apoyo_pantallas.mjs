@@ -4,6 +4,7 @@
 // (el pase y la institución se anotan como `<pase>` y `<tenant>`) y el MEDIDOR de fugas (§9.1: lo que sale fuera de /api, y si el pase, una
 // contraseña o el código de grupo aparecen en un almacenamiento o en la consola).
 import { pedirJson, ErrorApi } from '../../src/api/cliente.js';
+import { registrarse } from '../../src/api/registro.js';
 import { perfilAJson } from '../../src/auth/perfil_actual.js';
 import { textos } from '../../src/textos.js';
 import { etiquetaDeEstado } from '../../src/ui/estado_etiqueta.js';
@@ -46,8 +47,8 @@ export function cuerpoDeRegistro(entrada, k, codigoTeclado, cambios = {}) {
   };
 }
 
-/** POST /auth/registro, sin Authorization. */
-export const registrar = (cuerpo) => intentar(() => pedirJson('/auth/registro', { metodo: 'POST', cuerpo }));
+/** POST /auth/registro con el cliente real (`api/registro.js`: las 7 claves, sin Authorization). No valida: la réplica manda a propósito un registro malo. */
+export const registrar = (cuerpo) => intentar(() => registrarse(cuerpo));
 
 /** El texto del escudo para esta respuesta de /auth/me: "Por confirmar" o "B1 · Provisional" / "B1 · Confirmado" (lo que la persona lee). */
 export function textoDelEscudoDe(me) {

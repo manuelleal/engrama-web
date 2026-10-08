@@ -44,7 +44,7 @@ async function manejarEntrarReal(alEntrar, campoCorreo, campoContrasena, boton, 
   }
 }
 
-function vistaReal(alEntrar, alVerAviso) {
+function vistaReal(alEntrar, alVerAviso, alCrearCuenta) {
   const campoCorreo = h('input', { type: 'email', id: 'entrada-correo', 'data-testid': 'campo-correo', autocomplete: 'username' });
   const campoContrasena = h('input', { type: 'password', id: 'entrada-contrasena', 'data-testid': 'campo-contrasena', autocomplete: 'current-password' });
   const boton = h('button', { type: 'submit', 'data-testid': 'boton-entrar' }, textos.entrada.entrar);
@@ -59,7 +59,10 @@ function vistaReal(alEntrar, alVerAviso) {
   // El aviso de datos se puede leer SIEMPRE, también antes de entrar (Ley 1581).
   const verAviso = h('button', { type: 'button', class: 'boton-secundario', 'data-testid': 'entrada-ver-aviso' }, textos.aviso.enlace);
   verAviso.addEventListener('click', alVerAviso);
-  return h('div', { 'data-testid': 'vista-entrada' }, h('h1', {}, textos.entrada.tituloReal), form, verAviso);
+  // W31: crear cuenta con código de grupo; solo si app.js lo ofrece (modo supabase). Lleva a "Todavía no está abierto" si el despliegue no lo abrió.
+  const crearCuenta = alCrearCuenta ? h('button', { type: 'button', class: 'boton-secundario', 'data-testid': 'entrada-crear-cuenta' }, textos.registro.crearCuenta) : null;
+  if (crearCuenta) crearCuenta.addEventListener('click', () => alCrearCuenta());
+  return h('div', { 'data-testid': 'vista-entrada' }, h('h1', {}, textos.entrada.tituloReal), form, crearCuenta, verAviso);
 }
 
 /**
@@ -68,9 +71,11 @@ function vistaReal(alEntrar, alVerAviso) {
  * @param {(metodo: string, datos: object) => Promise<void>} alEntrar ya envuelto en `accionUnica`
  *   (app.js): una sola sesión de login en vuelo a la vez, igual que cualquier otro botón que
  *   escribe (§7.2 regla 5).
+ * @param {{crearCuenta?: () => void}} [opciones] `crearCuenta` (W31): el botón "Crear cuenta con código de grupo" solo se pinta si app.js lo pasa, y solo en
+ *   modo supabase; sin él, la pantalla es idéntica a la de antes (R4).
  */
-export function renderEntrada(raiz, modo, alEntrar) {
-  const alVerAviso = () => renderLeerAviso(raiz, { aviso: leerAviso(), alVolver: () => renderEntrada(raiz, modo, alEntrar) });
-  montar(raiz, modo === 'mock' ? vistaActores(alEntrar) : vistaReal(alEntrar, alVerAviso));
+export function renderEntrada(raiz, modo, alEntrar, opciones = {}) {
+  const alVerAviso = () => renderLeerAviso(raiz, { aviso: leerAviso(), alVolver: () => renderEntrada(raiz, modo, alEntrar, opciones) });
+  montar(raiz, modo === 'mock' ? vistaActores(alEntrar) : vistaReal(alEntrar, alVerAviso, opciones.crearCuenta));
   document.body.dataset.listo = '1';
 }

@@ -31,8 +31,12 @@ Ejemplo (valores de mentira):
 - Los dos destinos están en `https` (el pase es el token de acceso y viaja en el fragmento); el pase de 1 hora completo pasa por EVA y SET en el piloto (C5 de la espec).
 - Si EVA corre en el portátil del profe, una dirección fija en `config.json` no alcanza (C3 de la espec): hoy no hay forma de que la app la sepa.
 
-## Claves que la app AÚN NO lee (llegan con W31 y W32, que esperan el sí de Christiam sobre la clave de servicio, D7)
-- `REGISTRO_CON_CODIGO` (`true` para abrir el registro con código de grupo). Hasta que exista la pantalla, ponerla no hace nada.
+## Registro con código de grupo (W31, ya lo lee la app)
+- `REGISTRO_CON_CODIGO`: el booleano `true` (no la cadena `"true"`, no `1`) abre el registro con código de grupo. Sin ella, o con otro valor, el botón "Crear cuenta con código de grupo" de la entrada y el enlace
+  `#/registro` llevan a "Todavía no está abierto", sin formulario y sin petición (el backend solo responde 503 DESPUÉS de validar los 7 campos, y no hay otra forma de saber si está encendido).
+  Se pone en `true` solo cuando el backend del piloto tiene la clave de servicio (D7, aprobada el 2026-10-08): sin ella el backend responde 503 `registro_no_configurado`.
+  Con `AVISO_VERSION` en `config.json` debe ir una versión que el backend acepte para el registro (si no, el 422 `aviso_version_no_permitida` dice "El aviso de datos cambió").
+- Para el panel de inscripciones del profe (W32) la misma clave decide si el panel ofrece generar el código.
 
 ## Qué NO va en `config.json`
 Ningún token, contraseña, clave de servicio ni el código de un grupo. Las bases no se toman nunca de la dirección de la página ni de un campo: solo de aquí.

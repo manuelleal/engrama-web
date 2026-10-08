@@ -19,6 +19,16 @@ export function modoDeAuth(config) {
 }
 
 /**
+ * ¿Está abierto el registro con código de grupo? (docs/ESPEC_pantallas_anillo.md §4.1 y la adenda 17.7). El backend no ofrece una ruta que diga si el
+ * autorregistro está encendido (el 503 llega DESPUÉS de validar los 7 campos), así que lo dice el despliegue con `REGISTRO_CON_CODIGO`. Solo el
+ * booleano `true` lo abre: ni la cadena "true", ni 1, ni la ausencia de la clave. Pura.
+ * @param {unknown} config
+ */
+export function registroConCodigo(config) {
+  return Boolean(config) && typeof config === 'object' && /** @type {any} */ (config).REGISTRO_CON_CODIGO === true;
+}
+
+/**
  * Pide /config.json SIEMPRE a la red (sin caché del navegador ni del service worker). Lanza si no hay
  * red, si responde mal o si no es un JSON con un modo válido: quien llama muestra el error, no inventa.
  * @returns {Promise<Record<string, unknown>>}

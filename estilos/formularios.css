@@ -47,3 +47,25 @@
   align-self: flex-start;
   margin-top: 8px;
 }
+
+/* Registro con código de grupo (W31): una casilla es un blanco táctil de 44 px (E17), y el aviso se despliega dentro de la propia pantalla. */
+#vista form label.casilla-registro {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  min-height: 44px;
+  font-family: var(--fuente-cuerpo);
+  font-weight: 600;
+  font-size: 1rem;
+}
+#vista form label.casilla-registro input[type="checkbox"] {
+  width: 44px;
+  height: 44px;
+}
+#vista form .aviso-desplegable summary {
+  min-height: 44px;
+  display: flex;
+  align-items: center;
+  cursor: pointer;
+  font-weight: 700;
+}

@@ -273,3 +273,94 @@ test('E19: con prefers-reduced-motion el escudo no se anima (sin esa preferencia
     assert.equal(reducido.texto, 'A2');
   }, { estado, authConfig: CONFIG });
 });
+
+// ---------- W31: el registro con código de grupo (E17, E18 y E19 se extienden a esta pantalla; la de inscripciones del profe va en inscripcion.test.mjs, W32) ----------
+const CONFIG_REGISTRO = { ...CONFIG, REGISTRO_CON_CODIGO: true };
+const NUEVA_E17 = { codigo: 'ABCD-EFGH', nombre: 'Nora Núñez', correo: 'nora17@piloto.test', estudiantil: '171717', clave: 'clave-larga-123' };
+const llenarRegistro = (sesion) => sesion.evaluar(`(() => {
+  const poner = (id, valor) => { document.querySelector('[data-testid="registro-' + id + '"]').value = valor; };
+  poner('codigo', ${JSON.stringify(NUEVA_E17.codigo)}); poner('nombre', ${JSON.stringify(NUEVA_E17.nombre)}); poner('correo', ${JSON.stringify(NUEVA_E17.correo)});
+  poner('codigo-estudiantil', ${JSON.stringify(NUEVA_E17.estudiantil)}); poner('contrasena', ${JSON.stringify(NUEVA_E17.clave)});
+  document.querySelector('[data-testid="registro-mayor"]').checked = true;
+  document.querySelector('[data-testid="registro-acepto-aviso"]').checked = true;
+})()`);
+async function abrirElRegistro(url, ancho = 375, alto = 812) {
+  const sesion = await abrirSesion({ ancho, alto });
+  await sesion.navegar(url);
+  assert.ok(await esperarVista(sesion, 'form-entrada'));
+  await sesion.evaluar('document.querySelector(\'[data-testid="entrada-crear-cuenta"]\').click()');
+  return sesion;
+}
+
+test('E17: el registro con código de grupo (formulario, "Registro enviado" y "Todavía no está abierto") a 375×812 y a 1280×800', { skip: OMITIR, timeout: 150_000 }, async () => {
+  const { estado } = estadoDeLasPantallas();
+  await conAppCompleta(async (url) => {
+    const hallazgos = [];
+    let sesion = await abrirElRegistro(url);
+    try {
+      assert.ok(await esperarVista(sesion, 'vista-registro'));
+      hallazgos.push(...await medirEnLosDosTamanos(sesion, 'Registro: formulario'));
+      await sesion.redimensionar(375, 812);
+      await llenarRegistro(sesion);
+      await sesion.evaluar('document.querySelector(\'[data-testid="registro-enviar"]\').click()');
+      assert.ok(await esperarVista(sesion, 'vista-registro-enviado'));
+      hallazgos.push(...await medirEnLosDosTamanos(sesion, 'Registro: enviado'));
+    } finally { await sesion.cerrar(); }
+    estado.autorregistro.configurado = false; // el 503 del piloto sin la clave de servicio
+    sesion = await abrirElRegistro(url);
+    try {
+      assert.ok(await esperarVista(sesion, 'vista-registro'));
+      await llenarRegistro(sesion);
+      await sesion.evaluar('document.querySelector(\'[data-testid="registro-enviar"]\').click()');
+      assert.ok(await esperarVista(sesion, 'vista-registro-no-abierto'));
+      hallazgos.push(...await medirEnLosDosTamanos(sesion, 'Registro: todavía no está abierto'));
+    } finally { await sesion.cerrar(); }
+    assert.deepEqual(hallazgos, [], hallazgos.join('\n'));
+  }, { estado, authConfig: CONFIG_REGISTRO });
+});
+
+test('E18: sin red, "Crear mi cuenta" queda deshabilitado con su texto y no sale una sola petición', { skip: OMITIR, timeout: 150_000 }, async () => {
+  const { estado } = estadoDeLasPantallas();
+  await conAppCompleta(async (url) => {
+    const sesion = await abrirElRegistro(url);
+    try {
+      assert.ok(await esperarVista(sesion, 'vista-registro'));
+      await llenarRegistro(sesion);
+      await sesion.redSinConexion(true);
+      await esperar(400);
+      const antes = estado.registro.length;
+      assert.equal(await sesion.evaluar('document.querySelector(\'[data-testid="registro-enviar"]\').disabled'), true, 'el botón queda deshabilitado');
+      assert.match(await texto(sesion, 'registro-sin-red'), /Sin conexión: no puedes crear tu cuenta ahora\./);
+      await sesion.evaluar('document.querySelector(\'[data-testid="registro-enviar"]\').click()'); // deshabilitado: no hace nada
+      await esperar(300);
+      assert.equal(estado.registro.length, antes, '0 peticiones');
+      await sesion.redSinConexion(false);
+      await esperar(400);
+      assert.equal(await sesion.evaluar('document.querySelector(\'[data-testid="registro-enviar"]\').disabled'), false, 'al volver la red, sirve otra vez');
+    } finally { await sesion.cerrar(); }
+  }, { estado, authConfig: CONFIG_REGISTRO });
+});
+
+test('E19: con prefers-reduced-motion el Drako del registro queda quieto (y sin esa preferencia SÍ se mueve: la medida puede fallar)', { skip: OMITIR, timeout: 150_000 }, async () => {
+  const { estado } = estadoDeLasPantallas();
+  await conAppCompleta(async (url) => {
+    const medir = async (reducido) => {
+      const sesion = await abrirSesion({ ancho: 375, alto: 812 });
+      try {
+        await limite(sesion.enviar('Emulation.setEmulatedMedia', { features: [{ name: 'prefers-reduced-motion', value: reducido ? 'reduce' : 'no-preference' }] }), 'emular la preferencia');
+        await limite(sesion.navegar(url), 'navegar');
+        assert.ok(await limite(esperarVista(sesion, 'form-entrada'), 'la entrada'));
+        await sesion.evaluar('document.querySelector(\'[data-testid="entrada-crear-cuenta"]\').click()');
+        assert.ok(await limite(esperarVista(sesion, 'vista-registro'), 'el registro'));
+        await esperar(500);
+        return await limite(sesion.evaluar(MOVIMIENTO_DEL_DRAKO.replaceAll('vista-esperando', 'vista-registro')), 'medir el Drako');
+      } finally { await limite(sesion.cerrar(), 'cerrar el navegador'); }
+    };
+    const quieto = await medir(true);
+    assert.equal(quieto.hayRig, true, 'es el Drako por partes (animado), no la imagen');
+    assert.equal(quieto.cambios, 0, 'con "reducir movimiento" ninguna parte se mueve');
+    const vivo = await medir(false);
+    assert.equal(vivo.hayRig, true);
+    assert.ok(vivo.cambios > 0, `el control: sin esa preferencia el Drako se mueve (cambios: ${vivo.cambios})`);
+  }, { estado, authConfig: CONFIG_REGISTRO });
+});

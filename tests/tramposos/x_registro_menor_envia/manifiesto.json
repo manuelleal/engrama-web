@@ -1,0 +1,17 @@
+{
+  "descripcion": "W31 (U17): el registro envía aunque la persona no marcó \"Tengo 18 años o más\" ni arregló un campo malo.",
+  "archivos": {
+    "src/vistas/registro.js": "registro.js"
+  },
+  "comando": [
+    "node",
+    "--test",
+    "--test-reporter=tap",
+    "tests/unit/vista_registro.test.mjs"
+  ],
+  "espera_codigo_no_cero": true,
+  "espera_fallan_tests": [
+    "U17: cada regla rota → 0 peticiones, el mensaje junto a SU campo, y lo escrito se conserva",
+    "U17: sin marcar \"Tengo 18 años o más\" no se envía NUNCA, y la ayuda para el menor está a la vista (dictamen 03, G5)"
+  ]
+}

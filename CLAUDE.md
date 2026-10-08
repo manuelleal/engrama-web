@@ -118,8 +118,15 @@ Reglas que no se rompen:
 
 Spec y autoridad: `docs/ESPEC_pantallas_anillo.md` (con sus adendas §17). Decisión de los enlaces: `..\..\decisiones\013-enlace-con-pase.md`. Qué hay hecho:
 cuenta pendiente y suspendida (`bloqueos.js`, W29), nivel confirmado en el escudo (W30), solicitudes sobre mis datos (W33), `armarEnlaceAnillo` y las
-bases (W34), los enlaces en pantalla (W35), el humo y su réplica (W36) y E17-E19 (W37). **No están:** el registro con código de grupo (W31), el panel de
-inscripciones del profe (W32) y el humo contra el backend local (W39): esperan el sí de Christiam sobre la clave de servicio (D7).
+bases (W34), los enlaces en pantalla (W35), el humo y su réplica (W36), E17-E19 (W37) y, con el sí de Christiam a la puerta D7 (2026-10-08), el registro con código de
+grupo (W31, `vistas/registro.js`). **No están:** el panel de inscripciones del profe (W32) y el humo contra el backend local (W39, lo corre otro agente desde el despliegue).
+
+Registro con código de grupo (adenda 17.7 de la espec): el botón "Crear cuenta con código de grupo" de la entrada (solo modo `supabase`) y el hash literal `#/registro` abren
+el formulario; **el código de grupo nunca va en la dirección, ni en un almacenamiento, ni en la consola**. Con `REGISTRO_CON_CODIGO` distinto del booleano `true` en `config.json`
+(`config.js` `registroConCodigo`), el botón lleva a "Todavía no está abierto", sin formulario y sin petición. El cuerpo lleva las 7 claves del contrato y ningún `Authorization`
+(`api/registro.js`); la contraseña se valida en BYTES (máximo 72). **El 201 NO inicia sesión ni dice "Esperando"**: es siempre la misma pantalla "Registro enviado", porque el 201 es idéntico
+aunque el documento o el correo ya existan y una pantalla distinta insinuaría si la cuenta existía. Orden real de respuestas: 422 → 422 `aviso_version_no_permitida` → 503
+`registro_no_configurado` → 429 (`Retry-After`) → 403 (UNO solo) → 502 / 201; solo el 503 con ese `detail` es "Todavía no está abierto" (un proxy caído no).
 
 Reglas que no se rompen al tocar los enlaces:
 - **Un solo lugar arma el fragmento con el pase:** `src/anillo/enlace.js` (`pase=` y `tenant=` no aparecen en ningún otro archivo de `src/`, ni `?pase`: V5 en

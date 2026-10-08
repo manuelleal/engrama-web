@@ -13,13 +13,14 @@ import {
   BLOQUEO_CONSENTIMIENTO, BLOQUEO_YA_NO_ESTA, pintarBloqueo, resolverBloqueo, marcarEsperando, estabaEsperando,
 } from './bloqueos.js';
 import { renderEntrada } from './vistas/entrada.js';
+import { renderRegistro } from './vistas/registro.js';
 import { renderInicio } from './vistas/estudiante/inicio.js';
 import { renderPerfil } from './vistas/perfil.js';
 import { renderVivo } from './vistas/estudiante/vivo.js';
 import { renderNivel } from './vistas/estudiante/nivel.js';
 import { renderSolicitudesDatos } from './vistas/datos_solicitudes.js';
 import { renderErrorConfig } from './vistas/error_config.js';
-import { cargarConfig, modoDeAuth } from './config.js';
+import { cargarConfig, modoDeAuth, registroConCodigo } from './config.js';
 import { renderLeerAviso, renderErrorAviso } from './vistas/aviso_datos.js';
 import { configurarAviso, leerAviso, debePedirConsentimiento } from './aviso.js';
 import { textos } from './textos.js';
@@ -35,6 +36,8 @@ import { renderRetosProfe } from './vistas/profe/retos.js';
 import { renderCrearGrupo } from './vistas/admin/crear_grupo.js';
 import { renderAsignarDocente } from './vistas/admin/asignar_docente.js';
 import { renderImportarCsv } from './vistas/admin/importar_csv.js';
+
+const HASH_REGISTRO = '#/registro';
 
 function registrarServiceWorker() {
   if (!('serviceWorker' in navigator)) return;
@@ -111,15 +114,32 @@ async function iniciarApp() {
   const sesion = await authActivo.iniciar();
   if (bloqueoActual) return; // una pantalla obligatoria ya tomó la vista mientras se recuperaba la sesión
   if (sesion) { entrarConSesion(sesion); return; }
+  arrancarSinSesion(modo);
+}
+
+// Sin sesión: la solicitud que ya no está, el registro con código de grupo (el hash literal `#/registro` es el enlace que el profe puede compartir; el CÓDIGO
+// nunca va en la dirección) o la pantalla de entrada.
+function arrancarSinSesion(modo) {
   // Estaba esperando a su profe y, al recargar, ya no hay sesión que recuperar (rechazar borra la cuenta): se lo decimos, sin culpa.
   if (estabaEsperando()) { bloquear(BLOQUEO_YA_NO_ESTA); return; }
+  if (modo === 'supabase' && location.hash === HASH_REGISTRO) { abrirRegistro(); return; }
   // accionUnica (§7.2 regla 5): un segundo toque de "Entrar" mientras el primero vuela no dispara
   // una segunda petición de login.
   const entrarUnaVez = accionUnica(async (metodoEntrada, datos) => {
     const nuevaSesion = await authActivo.entrar(metodoEntrada, datos);
     entrarConSesion(nuevaSesion);
   });
-  renderEntrada(vistaRaiz, modo, entrarUnaVez);
+  renderEntrada(vistaRaiz, modo, entrarUnaVez, modo === 'supabase' ? { crearCuenta: abrirRegistro } : {});
+}
+
+// W31 (§4.1): el registro con código de grupo. Con `REGISTRO_CON_CODIGO` distinto de `true` en config.json dice "Todavía no está abierto", sin formulario
+// y sin petición. "Volver a entrar" recarga la página en la dirección limpia (sin `#/registro`): no queda nada del formulario en memoria.
+function abrirRegistro() {
+  controlDeBloqueo?.detener();
+  controlDeBloqueo = null;
+  bloqueoActual = null;
+  vistaRaiz = reemplazarRaiz(vistaRaiz);
+  renderRegistro(vistaRaiz, { abierto: registroConCodigo(configActual), aviso: leerAviso(), volver: () => location.replace(location.pathname + location.search) });
 }
 
 // Segunda pasada de diseño: "Cerrar sesión" del profe/admin (ui/barra_rol.js). Recargar es más
@@ -244,7 +264,7 @@ function bloquear(codigo) {
   if (efectivo === BLOQUEO_YA_NO_ESTA) Promise.resolve(authActivo.salir()).catch((e) => console.error('app: no se pudo borrar la sesión local', e)); // la solicitud ya no está: no queda sesión que guardar
   controlDeBloqueo = pintarBloqueo(efectivo, vistaRaiz, {
     salir: cerrarSesion, aviso: leerAviso(), aceptarAviso, cambiarContrasena: authActivo.cambiarContrasena, alTerminar: terminarBloqueo,
-    revisar: revisarDeNuevo, yaNoEsta: () => bloquear(BLOQUEO_YA_NO_ESTA), volverAEntrar: () => location.replace(location.pathname + location.search),
+    revisar: revisarDeNuevo, yaNoEsta: () => bloquear(BLOQUEO_YA_NO_ESTA), volverAEntrar: () => location.replace(location.pathname + location.search), crearCuenta: abrirRegistro,
     contextoDeApi: async () => ({ token: await authActivo.token() }), // W33: las solicitudes sobre mis datos desde el aviso obligatorio
   });
 }
@@ -308,7 +328,8 @@ function arrancarConSesion(desdeElPrincipio = false) {
   ruta('/admin/asignar-docente/:gid', conCtx((raiz, params, query, ctx) => renderAsignarDocente(raiz, params, ctx)));
   ruta('/admin/importar-csv/:gid', conCtx((raiz, params, query, ctx) => renderImportarCsv(raiz, params, ctx)));
   definirPorDefecto(rutaPorDefectoSegunRol(sesionActual));
-  iniciar(vistaRaiz, { desdeElPrincipio });
+  // Con sesión, un `#/registro` heredado (el enlace del profe) no es una ruta de la app: se arranca desde la ruta por defecto.
+  iniciar(vistaRaiz, { desdeElPrincipio: desdeElPrincipio || location.hash === HASH_REGISTRO });
 }
 
 iniciarApp();
