@@ -1,0 +1,16 @@
+{
+  "descripcion": "W37 (E18): vivo y nivel no se ligan a la red: sin conexión el botón sigue activo.",
+  "archivos": {
+    "src/vistas/estudiante/salida_codigo.js": "salida_codigo.js"
+  },
+  "comando": [
+    "node",
+    "--test",
+    "--test-reporter=tap",
+    "tests/e2e/pantallas_anillo.test.mjs"
+  ],
+  "espera_codigo_no_cero": true,
+  "espera_fallan_tests": [
+    "E18: sin red, vivo, nivel, herramientas y solicitudes deshabilitan lo que escribe o sale a otro origen, con su texto y sin una petición"
+  ]
+}

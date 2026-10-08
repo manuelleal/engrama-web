@@ -1,0 +1,16 @@
+{
+  "descripcion": "W37 (E19): Inicio anima el escudo aunque el sistema pida menos movimiento.",
+  "archivos": {
+    "src/vistas/estudiante/inicio.js": "inicio.js"
+  },
+  "comando": [
+    "node",
+    "--test",
+    "--test-reporter=tap",
+    "tests/e2e/pantallas_anillo.test.mjs"
+  ],
+  "espera_codigo_no_cero": true,
+  "espera_fallan_tests": [
+    "E19: con prefers-reduced-motion el escudo no se anima (sin esa preferencia, un primer nivel definitivo SÍ lleva escudo-sube)"
+  ]
+}

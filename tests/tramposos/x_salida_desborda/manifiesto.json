@@ -1,0 +1,16 @@
+{
+  "descripcion": "W37 (E17): el formulario de vivo y nivel tiene un ancho fijo y desborda a 375 px.",
+  "archivos": {
+    "src/vistas/estudiante/salida_codigo.js": "salida_codigo.js"
+  },
+  "comando": [
+    "node",
+    "--test",
+    "--test-reporter=tap",
+    "tests/e2e/pantallas_anillo.test.mjs"
+  ],
+  "espera_codigo_no_cero": true,
+  "espera_fallan_tests": [
+    "E17: las pantallas nuevas del anillo (Inicio con tarjetas, vivo, nivel, solicitudes, herramientas, espera y suspendida) a 375×812 y a 1280×800"
+  ]
+}

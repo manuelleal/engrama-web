@@ -1,0 +1,17 @@
+{
+  "descripcion": "W37 (E19): reducirMovimiento() siempre dice que no: el Drako de la espera se mueve y el escudo se anima.",
+  "archivos": {
+    "src/ui/movimiento.js": "movimiento.js"
+  },
+  "comando": [
+    "node",
+    "--test",
+    "--test-reporter=tap",
+    "tests/e2e/pantallas_anillo.test.mjs"
+  ],
+  "espera_codigo_no_cero": true,
+  "espera_fallan_tests": [
+    "E19: con prefers-reduced-motion el Drako de la espera queda quieto (y sin esa preferencia SÍ se mueve: la medida puede fallar)",
+    "E19: con prefers-reduced-motion el escudo no se anima (sin esa preferencia, un primer nivel definitivo SÍ lleva escudo-sube)"
+  ]
+}
