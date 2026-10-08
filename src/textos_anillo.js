@@ -136,6 +136,56 @@ export const textosAnillo = {
     noAbiertoDrako: 'Drako espera contigo',
     avisoCambio: 'El aviso de datos cambió. Recarga la página y vuelve a intentar.',
   },
+  // W32 · Panel del profe: inscripciones del grupo (§4.5, adenda 17.7). Sobrio: son textos de trabajo, claros y con la consecuencia real (el dictamen 03, A.7, dejó
+  // `confirmarRechazo` como está: dice lo que pasa). El código de grupo NUNCA va en un mensaje.
+  inscripcion: {
+    enlace: 'Inscripciones del grupo',
+    titulo: 'Inscripciones del grupo',
+    /** @param {string} codigo */
+    tituloConCodigo: (codigo) => `Inscripciones del grupo ${codigo}`,
+    volverGrupo: 'Volver al grupo',
+    codigoTitulo: 'Código de grupo',
+    pendientesTitulo: 'Esperan aprobación',
+    sinCodigo: 'No hay un código activo. Genera uno para que tus estudiantes se registren.',
+    etiquetaHoras: 'Vigencia en horas (de 1 a 168)',
+    etiquetaCupo: 'Cupo de estudiantes (de 1 a 200; vacío = el que pone el servidor)',
+    horasInvalidas: 'La vigencia es un número entero de horas, de 1 a 168.',
+    cupoInvalido: 'El cupo es un número entero de estudiantes, de 1 a 200.',
+    generar: 'Generar código',
+    generarOtro: 'Generar otro',
+    generarOtroSi: 'Sí, generar otro',
+    generando: 'Generando…',
+    apagar: 'Apagar código',
+    apagado: 'Código apagado. Nadie puede registrarse con él.',
+    cancelar: 'Cancelar',
+    soloUnaVez: 'El código solo se muestra al crearlo. Si lo perdiste, genera otro: el anterior deja de servir.',
+    confirmarOtro: '¿Generar otro? El código actual deja de servir.',
+    /** @param {string} fecha @param {number} usos @param {number} cupo */
+    estado: (fecha, usos, cupo) => `Vence ${fecha} · usados ${usos} de ${cupo}`,
+    /** @param {string} direccion */
+    compartir: (direccion) => `Tus estudiantes entran a ${direccion} y escriben este código.`,
+    copiar: 'Copiar',
+    copiado: 'Código copiado.',
+    copiarFallo: 'No se pudo copiar. Selecciona el código y cópialo.',
+    errorGenerar: 'No pudimos generar el código ahora. Intenta de nuevo en un momento.',
+    errorApagar: 'No pudimos apagar el código ahora. Intenta de nuevo en un momento.',
+    noAbierto: 'El registro con código todavía no está abierto en esta instalación.',
+    aprobar: 'Aprobar',
+    rechazar: 'Rechazar',
+    rechazarSi: 'Sí, rechazar',
+    /** @param {string} nombre */
+    confirmarRechazo: (nombre) => `¿Rechazar a ${nombre}? Se borra su cuenta y tendrá que registrarse otra vez.`,
+    /** @param {string} fecha */
+    solicitadaEl: (fecha) => `solicitó el ${fecha}`,
+    yaNoPendiente: 'Esa solicitud ya no está pendiente.',
+    rechazoFallo: 'No se pudo rechazar ahora. La solicitud sigue pendiente.',
+    errorAccion: 'No se pudo completar ahora. Intenta de nuevo en un momento.',
+    vacio: 'Nadie espera aprobación.',
+    actualizar: 'Actualizar',
+    accionEscribir: 'hacer cambios', // infinitivo para textos.red.sinConexionAccion
+    errorPendientes: 'No pudimos actualizar la lista. Intenta de nuevo en un momento.',
+    errorCargar: 'No pudimos cargar las inscripciones.',
+  },
   // W35 · Los enlaces a EVA y a SET (§4.6, decisión 013). Los nombres de los destinos y la nota de salida son de §4.8; los errores de
   // formato, la tarjeta de Inicio y el texto de #/nivel son de la adenda 17.5 (el de #/nivel, del dictamen 03 §A.7).
   anillo: {

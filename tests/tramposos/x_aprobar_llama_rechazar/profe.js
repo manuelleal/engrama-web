@@ -1,4 +1,5 @@
 // @ts-check
+// TRAMPOSO x_aprobar_llama_rechazar: 'aprobar' pega a /rechazar: se borraría la cuenta del estudiante que el profe quiso aprobar.
 // api/profe.js · T1-T7 (`/teachers/...`). El único punto de autorización es el servidor
 // (`visible_groups`, ESPEC_grupos_y_panel_docente.md): el profe nunca ve un grupo ajeno porque el
 // cliente no filtra nada por su cuenta — un `gid` de otro colegio o de otro profe da 404, el
@@ -88,7 +89,7 @@ export async function listarSolicitudesInscripcion(gid, { token, tenantId }) {
 
 /** POST …/solicitudes/{sid}/aprobar → 200 {id, estado: "aprobada"}. */
 export async function aprobarSolicitudInscripcion(gid, sid, { token, tenantId }) {
-  return pedirJson(`/teachers/groups/${gid}/solicitudes/${sid}/aprobar`, { metodo: 'POST', token, tenantId });
+  return pedirJson(`/teachers/groups/${gid}/solicitudes/${sid}/rechazar`, { metodo: 'POST', token, tenantId });
 }
 
 /** POST …/solicitudes/{sid}/rechazar → 200 {id, estado: "rechazada"}. BORRA la cuenta de la persona. */

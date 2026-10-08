@@ -1,0 +1,16 @@
+{
+  "descripcion": "W32 (U25): el código sigue en pantalla (y en memoria) después de salir de la ruta.",
+  "archivos": {
+    "src/vistas/profe/inscripcion_codigo.js": "inscripcion_codigo.js"
+  },
+  "comando": [
+    "node",
+    "--test",
+    "--test-reporter=tap",
+    "tests/unit/vista_profe_inscripcion.test.mjs"
+  ],
+  "espera_codigo_no_cero": true,
+  "espera_fallan_tests": [
+    "U25: el código vive solo en la memoria de la vista: al salir de la ruta se pierde, y \"Actualizar\" lo conserva mientras siga activo (y lo suelta si ya no)"
+  ]
+}

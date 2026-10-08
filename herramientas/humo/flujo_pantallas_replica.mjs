@@ -3,7 +3,7 @@
 // códigos distintos, un código que vence a mitad de la corrida (el reloj del mock), `Retry-After: 599`, un 422 con dos campos malos a la vez, el nivel
 // de una persona en dos instituciones y el enlace a SET con la institución ACTIVA, un pase con caracteres que obligan a codificar y un enlace con
 // bases que traen barra final y prefijo de ruta (esto último ya lo trae la entrada de la réplica). Devuelve el bloque `replica` del resumen.
-import { pedirJson } from '../../src/api/cliente.js';
+import { crearCodigoInscripcion, listarSolicitudesInscripcion } from '../../src/api/profe.js';
 import { crearTenant, agregarMembresia } from '../mock/estado.mjs';
 import { TOKEN_DOCENTE, TOKEN_OTRO_DOCENTE, intentar, pedirYo, cuerpoDeRegistro, registrar, textoDelEscudoDe } from './apoyo_pantallas.mjs';
 import { enlacesDe } from './flujo_pantallas.mjs';
@@ -13,13 +13,13 @@ const DOS_HORAS_MS = 2 * 3600_000;
 
 /** Dos grupos con códigos distintos: el de uno inscribe en ese grupo y su lista no la ve el docente del otro; y un código de 1 hora ya no sirve a las 2. */
 async function pasoGrupo2(c) {
-  const ruta = `/teachers/groups/${c.grupo2}/codigo-inscripcion`;
-  const primero = await pedirJson(ruta, { metodo: 'POST', token: TOKEN_OTRO_DOCENTE, cuerpo: { cupo: 3 } });
+  const otro = { token: TOKEN_OTRO_DOCENTE };
+  const primero = await crearCodigoInscripcion(c.grupo2, { cupo: 3 }, otro);
   c.secretos.codigos.add(primero.codigo).add(c.entrada.escribirCodigo(primero.codigo));
   await registrar(cuerpoDeRegistro(c.entrada, 12, c.entrada.escribirCodigo(primero.codigo)));
-  const lista = await pedirJson(`/teachers/groups/${c.grupo2}/solicitudes`, { token: TOKEN_OTRO_DOCENTE });
-  const cruzado = await intentar(() => pedirJson(`/teachers/groups/${c.grupo2}/solicitudes`, { token: TOKEN_DOCENTE }));
-  const corto = await pedirJson(ruta, { metodo: 'POST', token: TOKEN_OTRO_DOCENTE, cuerpo: { horas: 1 } });
+  const lista = await listarSolicitudesInscripcion(c.grupo2, otro);
+  const cruzado = await intentar(() => listarSolicitudesInscripcion(c.grupo2, { token: TOKEN_DOCENTE }));
+  const corto = await crearCodigoInscripcion(c.grupo2, { horas: 1 }, otro);
   c.estado.autorregistro.ahora = () => Date.now() + DOS_HORAS_MS; // el reloj del mock: pasan dos horas
   const vencido = await registrar(cuerpoDeRegistro(c.entrada, 13, c.entrada.escribirCodigo(corto.codigo)));
   c.estado.autorregistro.ahora = () => Date.now();

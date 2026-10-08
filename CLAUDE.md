@@ -119,7 +119,7 @@ Reglas que no se rompen:
 Spec y autoridad: `docs/ESPEC_pantallas_anillo.md` (con sus adendas §17). Decisión de los enlaces: `..\..\decisiones\013-enlace-con-pase.md`. Qué hay hecho:
 cuenta pendiente y suspendida (`bloqueos.js`, W29), nivel confirmado en el escudo (W30), solicitudes sobre mis datos (W33), `armarEnlaceAnillo` y las
 bases (W34), los enlaces en pantalla (W35), el humo y su réplica (W36), E17-E19 (W37) y, con el sí de Christiam a la puerta D7 (2026-10-08), el registro con código de
-grupo (W31, `vistas/registro.js`). **No están:** el panel de inscripciones del profe (W32) y el humo contra el backend local (W39, lo corre otro agente desde el despliegue).
+grupo (W31, `vistas/registro.js`) y el panel de inscripciones del profe (W32, `vistas/profe/inscripcion*.js`). **No está:** el humo contra el backend local (W39, lo corre otro agente desde el despliegue).
 
 Registro con código de grupo (adenda 17.7 de la espec): el botón "Crear cuenta con código de grupo" de la entrada (solo modo `supabase`) y el hash literal `#/registro` abren
 el formulario; **el código de grupo nunca va en la dirección, ni en un almacenamiento, ni en la consola**. Con `REGISTRO_CON_CODIGO` distinto del booleano `true` en `config.json`
@@ -127,6 +127,12 @@ el formulario; **el código de grupo nunca va en la dirección, ni en un almacen
 (`api/registro.js`); la contraseña se valida en BYTES (máximo 72). **El 201 NO inicia sesión ni dice "Esperando"**: es siempre la misma pantalla "Registro enviado", porque el 201 es idéntico
 aunque el documento o el correo ya existan y una pantalla distinta insinuaría si la cuenta existía. Orden real de respuestas: 422 → 422 `aviso_version_no_permitida` → 503
 `registro_no_configurado` → 429 (`Retry-After`) → 403 (UNO solo) → 502 / 201; solo el 503 con ese `detail` es "Todavía no está abierto" (un proxy caído no).
+
+Panel de inscripciones del profe (`#/profe/grupo/:gid/inscripcion`, enlace desde el grupo; adenda 17.7): las seis llamadas están en `api/profe.js`. **El código de grupo lo devuelve el backend UNA vez, al crearlo
+(`POST`); el `GET` nunca lo trae**: vive solo en la memoria de la sección (`inscripcion_codigo.js`), no en la dirección, ni en un almacenamiento, ni en la consola, ni en un atributo; ni el sondeo ni "Actualizar" lo
+recuperan; al salir de la ruta se descarta. Junto al código, su vigencia, los usos y "Apagar código" (`DELETE`, un toque; para cuando se filtre); "Generar otro" pide confirmación. Rechazar BORRA la cuenta: pide
+un segundo toque (el primero no hace ninguna petición). La lista de pendientes (`inscripcion_pendientes.js`) se refresca con "Actualizar" y sola cada 20 s solo con la pestaña visible, con red y sin una acción en vuelo.
+Con `REGISTRO_CON_CODIGO` distinto de `true` el panel no ofrece generar (y ni siquiera pide el estado del código). Sobrio: ni `.juego`, ni confeti, ni Drako.
 
 Reglas que no se rompen al tocar los enlaces:
 - **Un solo lugar arma el fragmento con el pase:** `src/anillo/enlace.js` (`pase=` y `tenant=` no aparecen en ningún otro archivo de `src/`, ni `?pase`: V5 en

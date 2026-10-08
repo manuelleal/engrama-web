@@ -7,6 +7,9 @@
 import { pedirJson, ErrorApi } from '../../src/api/cliente.js';
 import { crearGrupo, asignarDocente } from '../../src/api/admin.js';
 import { listarSolicitudesDatos, crearSolicitudDatos } from '../../src/api/datos.js';
+import {
+  leerCodigoInscripcion, crearCodigoInscripcion, listarSolicitudesInscripcion, aprobarSolicitudInscripcion, rechazarSolicitudInscripcion,
+} from '../../src/api/profe.js';
 import { destinosVisibles, crearSalida } from '../../src/anillo/abrir.js';
 import { NOMBRES_DE_DESTINO } from '../../src/anillo/enlace.js';
 import { crearProfile, agregarMembresia } from '../mock/estado.mjs';
@@ -39,10 +42,10 @@ async function prepararGrupos(c) {
 
 /** 1: D lee el código de SINT-B1-01 (inactivo), genera uno con cupo 8 y lo vuelve a leer. */
 async function pasoCodigo(c) {
-  const ruta = `/teachers/groups/${c.grupo1}/codigo-inscripcion`;
-  const antes = await pedirJson(ruta, { token: TOKEN_DOCENTE });
-  const creado = await pedirJson(ruta, { metodo: 'POST', token: TOKEN_DOCENTE, cuerpo: { cupo: c.entrada.cupo } });
-  const despues = await pedirJson(ruta, { token: TOKEN_DOCENTE });
+  const docente = { token: TOKEN_DOCENTE };
+  const antes = await leerCodigoInscripcion(c.grupo1, docente);
+  const creado = await crearCodigoInscripcion(c.grupo1, { cupo: c.entrada.cupo }, docente);
+  const despues = await leerCodigoInscripcion(c.grupo1, docente);
   c.codigoMostrado = creado.codigo;
   c.secretos.codigos.add(creado.codigo).add(creado.codigo.replace('-', '')).add(c.entrada.escribirCodigo(creado.codigo));
   return { activo_antes: antes.activo, activo_despues: despues.activo, cupo: despues.cupo, formato_ok: FORMATO_DEL_CODIGO.test(creado.codigo) };
@@ -81,15 +84,15 @@ async function pasoEsperan(c) {
 
 /** 4: D lista, aprueba 1-5, rechaza 6-7, repite una aprobación, intenta aprobar a una rechazada, y un docente de otro grupo pide la lista. */
 async function pasoProfe(c) {
-  const base = `/teachers/groups/${c.grupo1}/solicitudes`;
-  const lista = await pedirJson(base, { token: TOKEN_DOCENTE });
+  const docente = { token: TOKEN_DOCENTE };
+  const lista = await listarSolicitudesInscripcion(c.grupo1, docente);
   const idDe = (k) => lista.find((s) => String(s.codigo_estudiantil).endsWith(`_${c.entrada.codigoEstudiantil(k)}`))?.id;
   const nombresOk = Array.from({ length: N_NORMALES }, (_, i) => i + 1).every((k) => lista.find((s) => s.id === idDe(k))?.nombre === c.entrada.nombre(k));
-  for (let k = 1; k <= 5; k += 1) await pedirJson(`${base}/${idDe(k)}/aprobar`, { metodo: 'POST', token: TOKEN_DOCENTE });
-  for (let k = 6; k <= 7; k += 1) await pedirJson(`${base}/${idDe(k)}/rechazar`, { metodo: 'POST', token: TOKEN_DOCENTE });
-  const repetida = await intentar(() => pedirJson(`${base}/${idDe(1)}/aprobar`, { metodo: 'POST', token: TOKEN_DOCENTE }));
-  const rechazada = await intentar(() => pedirJson(`${base}/${idDe(6)}/aprobar`, { metodo: 'POST', token: TOKEN_DOCENTE }));
-  const ajeno = await intentar(() => pedirJson(base, { token: TOKEN_OTRO_DOCENTE }));
+  for (let k = 1; k <= 5; k += 1) await aprobarSolicitudInscripcion(c.grupo1, idDe(k), docente);
+  for (let k = 6; k <= 7; k += 1) await rechazarSolicitudInscripcion(c.grupo1, idDe(k), docente);
+  const repetida = await intentar(() => aprobarSolicitudInscripcion(c.grupo1, idDe(1), docente));
+  const rechazada = await intentar(() => aprobarSolicitudInscripcion(c.grupo1, idDe(6), docente));
+  const ajeno = await intentar(() => listarSolicitudesInscripcion(c.grupo1, { token: TOKEN_OTRO_DOCENTE }));
   return {
     listadas: lista.length, aprobadas: 5, rechazadas: 2, nombresOk,
     repetir_aprobar: repetida.ok ? 200 : repetida.error.status,
@@ -256,7 +259,7 @@ export async function correrGuionPantallas({ urlShell, estado, entrada }) {
     const enlaces = await pasoEnlaces(c);
     const extra = entrada.replica ? await pasosDeLaReplica(c, { profe, solicitudes }) : null;
     const sinClave = await pasoSinClave(c);
-    const usos = (await pedirJson(`/teachers/groups/${c.grupo1}/codigo-inscripcion`, { token: TOKEN_DOCENTE })).usos;
+    const usos = (await leerCodigoInscripcion(c.grupo1, { token: TOKEN_DOCENTE })).usos;
     const resumen = armarResumen({ c, codigo, registro, espera, profe, entrada: entran, escudo, suspendida, solicitudes, enlaces, sinClave, usos, fugas: medirFugas(c, medidor) });
     if (extra) resumen.replica = extra;
     return resumen;

@@ -30,6 +30,7 @@ import { renderRetoFlujo } from './vistas/estudiante/reto_flujo.js';
 import { renderGrupos } from './vistas/profe/grupos.js';
 import { renderGrupo } from './vistas/profe/grupo.js';
 import { renderSesionAsistencia } from './vistas/profe/sesion_asistencia.js';
+import { renderInscripcion } from './vistas/profe/inscripcion.js';
 import { renderLogro } from './vistas/profe/logro.js';
 import { renderErrores } from './vistas/profe/errores.js';
 import { renderRetosProfe } from './vistas/profe/retos.js';
@@ -321,6 +322,7 @@ function arrancarConSesion(desdeElPrincipio = false) {
   ruta('/profe/grupos', conCtx((raiz, params, query, ctx) => renderGrupos(raiz, ctx)));
   ruta('/profe/grupo/:gid', conCtx((raiz, params, query, ctx) => renderGrupo(raiz, params, ctx)));
   ruta('/profe/grupo/:gid/sesion', conCtx((raiz, params, query, ctx) => renderSesionAsistencia(raiz, params, ctx)));
+  ruta('/profe/grupo/:gid/inscripcion', conCtx((raiz, params, query, ctx) => renderInscripcion(raiz, params, ctx))); // W32: el código de grupo y quién espera aprobación
   ruta('/profe/grupo/:gid/logro', conCtx((raiz, params, query, ctx) => renderLogro(raiz, params, ctx)));
   ruta('/profe/grupo/:gid/errores', conCtx((raiz, params, query, ctx) => renderErrores(raiz, params, ctx)));
   ruta('/profe/retos', conCtx((raiz, params, query, ctx) => renderRetosProfe(raiz, ctx)));

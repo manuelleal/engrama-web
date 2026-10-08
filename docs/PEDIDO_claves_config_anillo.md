@@ -36,7 +36,10 @@ Ejemplo (valores de mentira):
   `#/registro` llevan a "Todavía no está abierto", sin formulario y sin petición (el backend solo responde 503 DESPUÉS de validar los 7 campos, y no hay otra forma de saber si está encendido).
   Se pone en `true` solo cuando el backend del piloto tiene la clave de servicio (D7, aprobada el 2026-10-08): sin ella el backend responde 503 `registro_no_configurado`.
   Con `AVISO_VERSION` en `config.json` debe ir una versión que el backend acepte para el registro (si no, el 422 `aviso_version_no_permitida` dice "El aviso de datos cambió").
-- Para el panel de inscripciones del profe (W32) la misma clave decide si el panel ofrece generar el código.
+- El panel de inscripciones del profe (W32, `#/profe/grupo/:gid/inscripcion`) usa la misma clave: con otro valor no ofrece generar el código y dice que el registro no está abierto.
+
+### Resumen de lo que el despliegue debe poner para ENCENDER el registro
+`"REGISTRO_CON_CODIGO": true` en `config.json`, junto a `ENGRAMA_AUTH: "supabase"` y las tres claves del aviso (`AVISO_RESPONSABLE`, `AVISO_CONTACTO`, `AVISO_VERSION`; la versión que acepte el backend). Nada más: el código de grupo lo genera el docente desde el panel, y nunca va en `config.json`.
 
 ## Qué NO va en `config.json`
 Ningún token, contraseña, clave de servicio ni el código de un grupo. Las bases no se toman nunca de la dirección de la página ni de un campo: solo de aquí.

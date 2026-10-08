@@ -1,0 +1,19 @@
+{
+  "descripcion": "W32 (U24, E14): aprobar una solicitud llama a la ruta de rechazar (que BORRA la cuenta).",
+  "archivos": {
+    "src/api/profe.js": "profe.js"
+  },
+  "comando": [
+    "node",
+    "--test",
+    "--test-reporter=tap",
+    "tests/unit/api_profe_inscripcion.test.mjs",
+    "tests/e2e/inscripcion.test.mjs"
+  ],
+  "espera_codigo_no_cero": true,
+  "espera_fallan_tests": [
+    "U24: las seis llamadas del docente: método y ruta exactos, con el pase en Authorization (y cotejadas con el contrato del backend)",
+    "U24: aprobar y rechazar son DISTINTAS: la una nunca llama a la otra",
+    "E14: el profe genera el código (se ve UNA vez), ve 3 pendientes, aprueba a uno y rechaza a otro; al salir de la ruta el código desaparece"
+  ]
+}

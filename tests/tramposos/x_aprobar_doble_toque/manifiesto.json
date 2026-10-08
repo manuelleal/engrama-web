@@ -1,0 +1,17 @@
+{
+  "descripcion": "W32 (U25): un doble toque en Aprobar o Rechazar manda dos peticiones.",
+  "archivos": {
+    "src/vistas/profe/inscripcion_pendientes.js": "inscripcion_pendientes.js"
+  },
+  "comando": [
+    "node",
+    "--test",
+    "--test-reporter=tap",
+    "tests/unit/vista_profe_inscripcion.test.mjs"
+  ],
+  "espera_codigo_no_cero": true,
+  "espera_fallan_tests": [
+    "U25: rechazar necesita DOS toques (el primero pide confirmación y no hace ninguna petición); un doble toque en el segundo es UNA petición",
+    "U25: aprobar es un toque, un doble toque es UNA petición, y el resultado va en una región aria-live con ícono y texto"
+  ]
+}

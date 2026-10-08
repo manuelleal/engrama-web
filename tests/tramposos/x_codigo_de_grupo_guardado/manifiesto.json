@@ -1,0 +1,18 @@
+{
+  "descripcion": "W32 (U25, E14): el código de grupo se guarda en sessionStorage al crearlo.",
+  "archivos": {
+    "src/vistas/profe/inscripcion_codigo.js": "inscripcion_codigo.js"
+  },
+  "comando": [
+    "node",
+    "--test",
+    "--test-reporter=tap",
+    "tests/unit/vista_profe_inscripcion.test.mjs",
+    "tests/e2e/inscripcion.test.mjs"
+  ],
+  "espera_codigo_no_cero": true,
+  "espera_fallan_tests": [
+    "U25: el código NO está en almacenamiento, dirección ni consola — ni al crearlo, ni al fallar, ni al copiar, ni al apagarlo",
+    "E14: el profe genera el código (se ve UNA vez), ve 3 pendientes, aprueba a uno y rechaza a otro; al salir de la ruta el código desaparece"
+  ]
+}

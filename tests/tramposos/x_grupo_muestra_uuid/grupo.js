@@ -46,6 +46,7 @@ function pintarGrupo(raiz, gid, estudiantes) {
       h('a', { href: `#/profe/grupo/${gid}/sesion`, 'data-testid': 'ir-a-sesion' }, textos.profe.grupo.abrirSesion),
       h('a', { href: `#/profe/grupo/${gid}/logro`, 'data-testid': 'ir-a-logro' }, textos.profe.grupo.verLogro),
       h('a', { href: `#/profe/grupo/${gid}/errores`, 'data-testid': 'ir-a-errores' }, textos.profe.grupo.verErrores),
+      h('a', { href: `#/profe/grupo/${gid}/inscripcion`, 'data-testid': 'ir-a-inscripcion' }, textos.inscripcion.enlace), // W32
     ),
     tablaRoster(estudiantes),
   );

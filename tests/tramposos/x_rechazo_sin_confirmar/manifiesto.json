@@ -1,0 +1,18 @@
+{
+  "descripcion": "W32 (U25, E14): el botón Rechazar borra la cuenta al primer toque, sin pedir confirmación.",
+  "archivos": {
+    "src/vistas/profe/inscripcion_pendientes.js": "inscripcion_pendientes.js"
+  },
+  "comando": [
+    "node",
+    "--test",
+    "--test-reporter=tap",
+    "tests/unit/vista_profe_inscripcion.test.mjs",
+    "tests/e2e/inscripcion.test.mjs"
+  ],
+  "espera_codigo_no_cero": true,
+  "espera_fallan_tests": [
+    "U25: rechazar necesita DOS toques (el primero pide confirmación y no hace ninguna petición); un doble toque en el segundo es UNA petición",
+    "E14: el profe genera el código (se ve UNA vez), ve 3 pendientes, aprueba a uno y rechaza a otro; al salir de la ruta el código desaparece"
+  ]
+}

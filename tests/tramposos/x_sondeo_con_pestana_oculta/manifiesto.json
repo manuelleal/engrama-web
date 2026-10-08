@@ -1,0 +1,16 @@
+{
+  "descripcion": "W32 (U25): el sondeo de pendientes sigue pidiendo aunque la pestaña esté oculta.",
+  "archivos": {
+    "src/vistas/profe/inscripcion_pendientes.js": "inscripcion_pendientes.js"
+  },
+  "comando": [
+    "node",
+    "--test",
+    "--test-reporter=tap",
+    "tests/unit/vista_profe_inscripcion.test.mjs"
+  ],
+  "espera_codigo_no_cero": true,
+  "espera_fallan_tests": [
+    "U25: sin red los botones que escriben quedan deshabilitados con su texto y el sondeo no sale; con red, el sondeo vuelve a pedir la lista y solo con la pestaña visible"
+  ]
+}

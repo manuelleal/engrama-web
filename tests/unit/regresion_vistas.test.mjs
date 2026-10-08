@@ -21,6 +21,8 @@ export const DECLARADAS = {
   // W33: Perfil gana UN enlace, "Mis solicitudes sobre mis datos" (las dos formas de pintar Perfil).
   perfil: ['perfil-ver-solicitudes'],
   perfil_sin_soporte: ['perfil-ver-solicitudes'],
+  // W32: el grupo del profe gana UN enlace, "Inscripciones del grupo".
+  profe_grupo: ['ir-a-inscripcion'],
 };
 
 test('R4: la línea base trae las vistas que la espec nombra (entrada, Inicio, Perfil, aviso, sin_perfil, profe/grupos y profe/grupo)', () => {
@@ -51,9 +53,17 @@ test('R4: con un nivel confirmado, Inicio cambia SOLO el nodo del escudo (lo dec
   }
 });
 
+test('R4: lo que W32 declara cambió de verdad: profe/grupo trae el enlace a las inscripciones (y lo demás, no)', async () => {
+  const hoy = await tomarFotos();
+  assert.ok(hoy.profe_grupo.some((l) => l.includes('data-testid="ir-a-inscripcion"') && l.includes('href="#/profe/grupo/g1/inscripcion"')), 'falta el enlace declarado');
+  assert.ok(!BASE.vistas.profe_grupo.some((l) => l.includes('ir-a-inscripcion')), 'la línea base no lo tenía');
+  assert.equal(hoy.profe_grupo.length, BASE.vistas.profe_grupo.length + 2, 'un nodo de más (el enlace y su texto), nada más');
+  assert.deepEqual(DECLARADAS.profe_grupo, ['ir-a-inscripcion']);
+});
+
 test('R4: lo que W33 declara cambió de verdad: Perfil trae el enlace a las solicitudes (y lo demás, no)', async () => {
   const hoy = await tomarFotos();
-  for (const nombre of Object.keys(DECLARADAS)) {
+  for (const nombre of ['perfil', 'perfil_sin_soporte']) {
     assert.ok(hoy[nombre].some((l) => l.includes('data-testid="perfil-ver-solicitudes"') && l.includes('href="#/datos/solicitudes"')), `${nombre}: falta el enlace declarado`);
     assert.ok(!BASE.vistas[nombre].some((l) => l.includes('perfil-ver-solicitudes')), `${nombre}: la línea base no lo tenía`);
     assert.equal(hoy[nombre].length, BASE.vistas[nombre].length + 2, `${nombre}: un nodo de más (el enlace y su texto), nada más`);

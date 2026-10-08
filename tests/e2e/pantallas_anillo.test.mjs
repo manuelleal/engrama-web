@@ -14,7 +14,8 @@ import { existsSync } from 'node:fs';
 import { abrirSesion } from '../../herramientas/cdp.mjs';
 import { conAppCompleta, estadoConEstudiantesSembrados } from './ayudante_servidor.mjs';
 import { sembrarLoginPiloto, CORREOS_PILOTO, CLAVE_DEMO, CONFIG_PILOTO } from '../../herramientas/mock/login_piloto.mjs';
-import { crearProfile, agregarMembresia } from '../../herramientas/mock/estado.mjs';
+import { crearProfile, agregarMembresia, ADMIN_BOOTSTRAP_TOKEN } from '../../herramientas/mock/estado.mjs';
+import { asignarDocente } from '../../herramientas/mock/rutas_admin.mjs';
 import { crearCuenta } from '../../herramientas/mock/gotrue.mjs';
 import { registrarse } from '../../herramientas/mock/rutas_registro.mjs';
 
@@ -363,4 +364,91 @@ test('E19: con prefers-reduced-motion el Drako del registro queda quieto (y sin 
     assert.equal(vivo.hayRig, true);
     assert.ok(vivo.cambios > 0, `el control: sin esa preferencia el Drako se mueve (cambios: ${vivo.cambios})`);
   }, { estado, authConfig: CONFIG_REGISTRO });
+});
+
+// ---------- W32: el panel de inscripciones del profe (E17, E18 y E19 se extienden a esta pantalla) ----------
+/** El estado de las pantallas + la docente del piloto asignada al primer grupo (Pía, la pendiente, está en él). */
+function estadoDelPanelDeInscripciones() {
+  const { estado } = estadoDeLasPantallas();
+  const admin = { headers: { authorization: `Bearer ${ADMIN_BOOTSTRAP_TOKEN}` } };
+  asignarDocente(estado, admin, [...estado.groups.values()][0].id, { documento_id: 'PILOTO-PROFE2' });
+  return { estado, grupo: [...estado.groups.values()][0] };
+}
+async function abrirElPanel(url, grupoId, ancho = 375, alto = 812) {
+  const sesion = await abrirSesion({ ancho, alto });
+  await sesion.navegar(url);
+  assert.ok(await esperarVista(sesion, 'form-entrada'));
+  await entrarCon(sesion, CORREOS_PILOTO.profe2, CLAVE_DEMO);
+  assert.ok(await esperarVista(sesion, 'vista-profe-grupos'));
+  assert.ok(await ir(sesion, `#/profe/grupo/${grupoId}/inscripcion`, 'form-inscripcion-codigo'));
+  return sesion;
+}
+
+/** El grupo de las pantallas ya tiene un código activo: "Generar otro" pide confirmación en el primer toque y genera en el segundo. */
+async function generarElCodigoDelPanel(sesion) {
+  const tocarGenerar = () => sesion.evaluar(`document.querySelector('[data-testid="inscripcion-generar"]').click()`);
+  await tocarGenerar();
+  assert.ok(await esperarVista(sesion, 'inscripcion-confirmar-otro'), 'el primer toque pide confirmación');
+  await tocarGenerar();
+}
+
+test('E17: el panel de inscripciones del profe (con el código recién generado y un pendiente) a 375×812 y a 1280×800', { skip: OMITIR, timeout: 150_000 }, async () => {
+  const { estado, grupo } = estadoDelPanelDeInscripciones();
+  await conAppCompleta(async (url) => {
+    const sesion = await abrirElPanel(url, grupo.id);
+    try {
+      await generarElCodigoDelPanel(sesion);
+      assert.ok(await esperarVista(sesion, 'inscripcion-codigo'));
+      assert.ok(await esperarVista(sesion, 'pendiente-1') || await sesion.evaluar('Boolean(document.querySelector(\'[data-testid^="pendiente-"]\'))'), 'Pía espera aprobación');
+      const hallazgos = await medirEnLosDosTamanos(sesion, 'Inscripciones del grupo');
+      assert.deepEqual(hallazgos, [], hallazgos.join('\n'));
+    } finally { await sesion.cerrar(); }
+  }, { estado, authConfig: { ...CONFIG, REGISTRO_CON_CODIGO: true } });
+});
+
+test('E18: sin red, el panel de inscripciones deshabilita lo que escribe con su texto y no sale una sola petición', { skip: OMITIR, timeout: 150_000 }, async () => {
+  const { estado, grupo } = estadoDelPanelDeInscripciones();
+  await conAppCompleta(async (url) => {
+    const sesion = await abrirElPanel(url, grupo.id);
+    try {
+      assert.ok(await esperarVista(sesion, 'inscripcion-generar'));
+      await sesion.redSinConexion(true);
+      await esperar(400);
+      const antes = estado.registro.length;
+      const estados = JSON.parse(await sesion.evaluar('JSON.stringify([...document.querySelectorAll(\'[data-testid="inscripcion-generar"], [data-testid^="aprobar-"], [data-testid^="rechazar-"]\')].map((b) => b.disabled))'));
+      assert.ok(estados.length >= 3, `generar, aprobar y rechazar están: ${estados}`);
+      assert.ok(estados.every(Boolean), 'todos deshabilitados');
+      assert.match(await texto(sesion, 'inscripcion-sin-red'), /Sin conexión: no puedes hacer cambios ahora\./);
+      await sesion.evaluar('document.querySelector(\'[data-testid="inscripcion-generar"]\').click()');
+      await esperar(300);
+      assert.equal(estado.registro.length, antes, '0 peticiones');
+      await sesion.redSinConexion(false);
+      await esperar(400);
+      assert.equal(await sesion.evaluar('document.querySelector(\'[data-testid="inscripcion-generar"]\').disabled'), false, 'al volver la red, sirve otra vez');
+    } finally { await sesion.cerrar(); }
+  }, { estado, authConfig: { ...CONFIG, REGISTRO_CON_CODIGO: true } });
+});
+
+test('E19: el panel de inscripciones es sobrio con o sin "reducir movimiento": ni Drako animado, ni .juego, ni confeti, ni animaciones en curso', { skip: OMITIR, timeout: 150_000 }, async () => {
+  const { estado, grupo } = estadoDelPanelDeInscripciones();
+  await conAppCompleta(async (url) => {
+    for (const reducido of [true, false]) {
+      const sesion = await abrirSesion({ ancho: 375, alto: 812 });
+      try {
+        await limite(sesion.enviar('Emulation.setEmulatedMedia', { features: [{ name: 'prefers-reduced-motion', value: reducido ? 'reduce' : 'no-preference' }] }), 'emular la preferencia');
+        await limite(sesion.navegar(url), 'navegar');
+        await limite(entrarCon(sesion, CORREOS_PILOTO.profe2, CLAVE_DEMO), 'entrar');
+        assert.ok(await esperarVista(sesion, 'vista-profe-grupos'));
+        assert.ok(await ir(sesion, `#/profe/grupo/${grupo.id}/inscripcion`, 'form-inscripcion-codigo'));
+        await generarElCodigoDelPanel(sesion);
+        assert.ok(await esperarVista(sesion, 'inscripcion-codigo'));
+        await esperar(500);
+        const medida = await sesion.evaluar(`({
+          juego: document.querySelectorAll('.juego, svg.drako-rig, [data-parte], canvas').length,
+          animando: document.getAnimations().filter((a) => a.effect && a.effect.getComputedTiming().iterations === Infinity).length,
+        })`);
+        assert.deepEqual(medida, { juego: 0, animando: 0 }, `con reducir movimiento = ${reducido}`);
+      } finally { await limite(sesion.cerrar(), 'cerrar el navegador'); }
+    }
+  }, { estado, authConfig: { ...CONFIG, REGISTRO_CON_CODIGO: true } });
 });
