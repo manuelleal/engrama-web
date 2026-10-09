@@ -1,0 +1,16 @@
+{
+  "descripcion": "textos.js: el botón de cerrar la ASISTENCIA vuelve a decir \"Cerrar sesión\", lo mismo que el de cerrar la cuenta: en vivo parece que saca al profe de la app (H1, H11; U63). Nota: la espec nombraba textos_nav.js; el texto de la asistencia vive en textos.js (las claves anidadas no se pueden esparcir)",
+  "archivos": {
+    "src/textos.js": "textos.js"
+  },
+  "comando": [
+    "node",
+    "--test",
+    "--test-reporter=tap",
+    "tests/unit/textos_nav.test.mjs"
+  ],
+  "espera_codigo_no_cero": true,
+  "espera_fallan_tests": [
+    "U63: el botón de cerrar la asistencia NO dice lo mismo que el de cerrar la cuenta, y \"sesión\" queda solo para la cuenta"
+  ]
+}

@@ -8,9 +8,50 @@ import assert from 'node:assert/strict';
 import { readFileSync } from 'node:fs';
 import { fileURLToPath } from 'node:url';
 import { tomarFotosNav } from './fotos_de_navegacion.mjs';
-import { sinSubarboles } from './foto_vistas.mjs';
+import { sinSubarboles, conTextos } from './foto_vistas.mjs';
 
-const BASE = JSON.parse(readFileSync(fileURLToPath(new URL('../snapshots/vistas_nav_2cba0b8.json', import.meta.url)), 'utf8'));
+const CRUDA = JSON.parse(readFileSync(fileURLToPath(new URL('../snapshots/vistas_nav_2cba0b8.json', import.meta.url)), 'utf8'));
+
+const ASISTENCIA_W67 = /** @type {Array<[string, string]>} */ ([['Sesión de asistencia', 'Asistencia'], ['Duración (minutos)', '¿Cuántos minutos queda abierta?'], ['Abrir sesión', 'Abrir asistencia'], ['Cerrar sesión', 'Cerrar la asistencia'], ['Código', 'Código de asistencia']]);
+const RETOS_W67 = /** @type {Array<[string, string]>} */ ([
+  ['Estos son los retos de todo el colegio, no solo de tus grupos (el servidor todavía no los filtra por grupo).', 'Estos son los retos de toda la institución, no solo de tus grupos.'],
+  ['Este colegio no tiene retos todavía.', 'Esta institución no tiene retos todavía.'],
+]);
+
+/**
+ * Los TEXTOS que un encargo declaró como cambiados, por escena: [texto de la línea base, texto de hoy] (foto_vistas.conTextos: solo el nodo de
+ * texto exacto). W67 (§5.5, "una palabra, una cosa"): la asistencia deja de llamarse "sesión", cada código lleva apellido, "institución" y no
+ * "colegio", y el campo del admin es el "Nombre del grupo". En las escenas del profe "Cerrar sesión" era el botón de la asistencia; el de la
+ * cuenta (admin_grupos) NO se declara y sigue igual.
+ * @type {Record<string, Array<[string, string]>>}
+ */
+export const TEXTOS_DECLARADOS_NAV = {
+  asistencia: [['Código de la sesión', 'Código de asistencia']],
+  profe_asistencia_formulario: ASISTENCIA_W67,
+  profe_asistencia_abierta: ASISTENCIA_W67,
+  profe_retos: RETOS_W67,
+  profe_retos_vacio: RETOS_W67,
+  admin_grupos: [['Código del grupo', 'Nombre del grupo']],
+  admin_grupos_vacio: [['Código del grupo', 'Nombre del grupo']],
+};
+
+/** La línea base con los textos declarados puestos al día (el archivo de la foto no se regenera). */
+const BASE = { ...CRUDA, vistas: Object.fromEntries(Object.entries(CRUDA.vistas).map(([nombre, lineas]) => [nombre, conTextos(/** @type {string[]} */ (lineas), TEXTOS_DECLARADOS_NAV[nombre] || [])])) };
+
+test('R9: lo que W67 declara cambió de verdad: cada texto nuevo se ve hoy, y el "Cerrar sesión" de la CUENTA sigue en el inicio del admin', async () => {
+  const hoy = await tomarFotosNav();
+  const dice = (lineas, texto) => lineas.some((l) => l.trim() === JSON.stringify(texto));
+  for (const [nombre, pares] of Object.entries(TEXTOS_DECLARADOS_NAV)) {
+    const usados = pares.filter(([viejo]) => dice(CRUDA.vistas[nombre], viejo));
+    assert.ok(usados.length > 0, `${nombre}: ningún texto declarado estaba en la línea base`);
+    for (const [viejo, nuevo] of usados) {
+      assert.ok(dice(hoy[nombre], nuevo), `${nombre}: hoy no dice "${nuevo}"`);
+      if (!pares.some(([, n]) => n === viejo)) assert.ok(!dice(hoy[nombre], viejo), `${nombre}: todavía dice "${viejo}"`);
+    }
+  }
+  assert.ok(dice(hoy.admin_grupos, 'Cerrar sesión'), 'el botón de la cuenta no cambió');
+  assert.ok(!dice(hoy.profe_asistencia_abierta, 'Cerrar sesión'), 'en la asistencia abierta ya no hay un "Cerrar sesión"');
+});
 
 /**
  * Los subárboles que un encargo declaró como cambiados, por escena: un `data-testid` (cadena) o `{etiqueta, clase}` para un nodo sin testid
@@ -34,6 +75,7 @@ test('R9: lo que W63 declara cambió de verdad: la asistencia abierta trae la vu
     assert.ok(!BASE.vistas[nombre].some((l) => l.includes('volver')), `${nombre}: la línea base no lo tenía`);
   }
   for (const nombre of Object.keys(hoy)) assert.equal(hoy[nombre].length, BASE.vistas[nombre].length + 2, `${nombre}: un nodo de más y su texto`);
+  void CRUDA;
 });
 
 /** Las escenas que la espec nombra (§9.1), cada una con los estados que tiene. */

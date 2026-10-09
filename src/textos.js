@@ -220,7 +220,8 @@ export const textos = {
   },
   asistencia: {
     titulo: 'Asistencia',
-    etiquetaCodigo: 'Código de la sesión',
+    // W67 (docs/ESPEC_navegacion.md §5.5): "sesión" es solo la cuenta; aquí es "la asistencia" y su "código de asistencia". PROVISIONAL (pedagogo, ERR-16).
+    etiquetaCodigo: 'Código de asistencia',
     marcar: 'Marcar asistencia',
     marcando: 'Marcando…',
     sello: 'Presente',
@@ -229,9 +230,9 @@ export const textos = {
     /** @param {number} monedas @param {number} racha */
     exito: (monedas, racha) => `Asistencia marcada · +${monedas} monedas · constancia ${racha}`,
     codigoInvalido: 'Código no válido para tu grupo.',
-    yaMarcada: 'Ya habías marcado esta sesión.',
-    sesionVencida: 'Esta sesión ya venció.',
-    faltaCodigo: 'Escribe el código de la sesión.',
+    yaMarcada: 'Ya habías marcado esta asistencia.',
+    sesionVencida: 'Ese código ya venció.',
+    faltaCodigo: 'Escribe el código de asistencia.',
     /** Adenda 17.8 (adelanta W45), sin "+0" ni reproche (nada de "tarde"): "5 por asistir + 5 por llegar a tiempo". @param {number} base @param {number} puntualidad */
     desglose: (base, puntualidad) => [base > 0 ? `${base} por asistir` : '', puntualidad > 0 ? `${puntualidad} por llegar a tiempo` : ''].filter(Boolean).join(' + '),
     /** @param {number} racha */
@@ -261,27 +262,29 @@ export const textos = {
       columnaConstancia: 'Constancia',
       columnaUltimaAsistencia: 'Última asistencia',
       sinAsistencia: 'Sin registro',
-      abrirSesion: 'Abrir sesión de asistencia',
+      abrirSesion: 'Abrir asistencia',
       verLogro: 'Logro por eje',
       verErrores: 'Errores por ítem',
       verRetos: 'Retos',
     },
     sesion: {
-      titulo: 'Sesión de asistencia',
-      etiquetaDuracion: 'Duración (minutos)',
-      abrir: 'Abrir sesión',
+      // W67 (docs/ESPEC_navegacion.md §5.5, H1 y H11): una palabra, una cosa. "Sesión" queda SOLO para la cuenta (textos.nav.cerrarSesion);
+      // aquí todo es "la asistencia", y su código lleva apellido ("código de asistencia").
+      titulo: 'Asistencia',
+      etiquetaDuracion: '¿Cuántos minutos queda abierta?',
+      abrir: 'Abrir asistencia',
       abriendo: 'Abriendo…',
-      accionAbrir: 'abrir la sesión', // W16: infinitivo para textos.red.sinConexionAccion
-      cerrar: 'Cerrar sesión',
+      accionAbrir: 'abrir la asistencia', // W16: infinitivo para textos.red.sinConexionAccion
+      cerrar: 'Cerrar la asistencia',
       cerrando: 'Cerrando…',
-      accionCerrar: 'cerrar la sesión',
-      codigoPrefijo: 'Código',
+      accionCerrar: 'cerrar la asistencia',
+      codigoPrefijo: 'Código de asistencia',
       enlacePrefijo: 'Enlace para el celular',
       /** @param {number} marcaron @param {number} total */
       resumen: (marcaron, total) => `${marcaron} de ${total} marcaron`,
-      cerrada: 'Sesión cerrada.',
-      errorAbrir: 'No se pudo abrir la sesión.',
-      errorCerrar: 'No se pudo cerrar la sesión.',
+      cerrada: 'Asistencia cerrada.',
+      errorAbrir: 'No se pudo abrir la asistencia.',
+      errorCerrar: 'No se pudo cerrar la asistencia.',
       volverAlGrupo: 'Volver al grupo',
     },
     logro: {
@@ -321,8 +324,8 @@ export const textos = {
       titulo: 'Retos',
       // BUG-10 (§3, §11 W12): /challenges/all no filtra por grupo — se lo decimos al profe en vez
       // de esconderlo o fingir que la lista sí está filtrada.
-      avisoTodoElColegio: 'Estos son los retos de todo el colegio, no solo de tus grupos (el servidor todavía no los filtra por grupo).',
-      sinRetos: 'Este colegio no tiene retos todavía.',
+      avisoTodoElColegio: 'Estos son los retos de toda la institución, no solo de tus grupos.', // W67: "institución", nunca "colegio", y sin la disculpa técnica
+      sinRetos: 'Esta institución no tiene retos todavía.',
       errorGeneral: 'No se pudieron cargar los retos.',
       /** @param {string|null} groupId */
       grupoAsignado: (groupId) => (groupId ? `Asignado a un grupo` : 'Sin grupo asignado'),
@@ -349,13 +352,13 @@ export const textos = {
     },
     crearGrupo: {
       titulo: 'Crear grupo',
-      etiquetaCodigo: 'Código del grupo',
+      etiquetaCodigo: 'Nombre del grupo', // W67: es el NOMBRE del grupo; "código de grupo" es el de inscribirse
       etiquetaCupo: 'Cupo máximo (opcional)',
       crear: 'Crear grupo',
       creando: 'Creando…',
       accionCrear: 'crear el grupo', // W16: infinitivo para textos.red.sinConexionAccion
       creado: 'Grupo creado.',
-      faltaCodigo: 'Escribe el código del grupo.',
+      faltaCodigo: 'Escribe el nombre del grupo.',
       errorGeneral: 'No se pudo crear el grupo.',
     },
     asignarDocente: {

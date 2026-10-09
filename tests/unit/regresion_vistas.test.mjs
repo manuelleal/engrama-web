@@ -8,9 +8,34 @@ import assert from 'node:assert/strict';
 import { readFileSync } from 'node:fs';
 import { fileURLToPath } from 'node:url';
 import { tomarFotos, sesionDeEstudiante } from './fotos_de_las_vistas.mjs';
-import { sinSubarboles } from './foto_vistas.mjs';
+import { sinSubarboles, conTextos } from './foto_vistas.mjs';
 
-const BASE = JSON.parse(readFileSync(fileURLToPath(new URL('../snapshots/vistas_595fd98.json', import.meta.url)), 'utf8'));
+const CRUDA = JSON.parse(readFileSync(fileURLToPath(new URL('../snapshots/vistas_595fd98.json', import.meta.url)), 'utf8'));
+
+/**
+ * Los TEXTOS que un encargo declaró como cambiados, por vista: [texto de la línea base, texto de hoy]. Solo cambia un nodo de texto que sea
+ * exactamente el viejo (foto_vistas.conTextos); la estructura y todo lo demás siguen comparándose línea por línea.
+ * @type {Record<string, Array<[string, string]>>}
+ */
+export const TEXTOS_DECLARADOS = {
+  // W67 (docs/ESPEC_navegacion.md §5.5): "sesión" queda solo para la cuenta; en el grupo, la acción es "Abrir asistencia".
+  profe_grupo: [['Abrir sesión de asistencia', 'Abrir asistencia']],
+};
+
+/** La línea base con los textos declarados puestos al día (el archivo de la foto no se regenera). */
+const BASE = { ...CRUDA, vistas: Object.fromEntries(Object.entries(CRUDA.vistas).map(([nombre, lineas]) => [nombre, conTextos(/** @type {string[]} */ (lineas), TEXTOS_DECLARADOS[nombre] || [])])) };
+
+test('R4: cada texto declarado como cambiado estaba en la línea base y es el que se ve hoy (ni uno de más)', async () => {
+  const hoy = await tomarFotos();
+  for (const [nombre, pares] of Object.entries(TEXTOS_DECLARADOS)) {
+    for (const [viejo, nuevo] of pares) {
+      assert.ok(CRUDA.vistas[nombre].some((l) => l.trim() === JSON.stringify(viejo)), `${nombre}: la línea base no decía "${viejo}"`);
+      assert.ok(hoy[nombre].some((l) => l.trim() === JSON.stringify(nuevo)), `${nombre}: hoy no dice "${nuevo}"`);
+      assert.ok(!hoy[nombre].some((l) => l.trim() === JSON.stringify(viejo)), `${nombre}: todavía dice "${viejo}"`);
+    }
+  }
+  assert.deepEqual(conTextos(['  "Cerrar sesión"', '  a aria-label="Cerrar sesión"', '  "Cerrar sesión ya"'], [['Cerrar sesión', 'X']]), ['  "X"', '  a aria-label="Cerrar sesión"', '  "Cerrar sesión ya"'], 'conTextos cambia solo el nodo de texto exacto');
+});
 
 /**
  * Los subárboles (por `data-testid`) que un encargo posterior declaró como cambiados, por vista. Vacío = ninguna vista

@@ -56,7 +56,7 @@ test(
         })()`,
       });
       assert.deepEqual(r.errores, []);
-      assert.match(r.eval.aviso, /todo el colegio/);
+      assert.match(r.eval.aviso, /toda la institución/); // W67: "institución", nunca "colegio"
       assert.equal(r.eval.estadoInicial, 'Desactivar', 'un reto recién creado empieza activo');
       assert.equal(r.eval.estadoTrasClic, 'Activar', 'tras un clic, pasa a inactivo (botón ahora ofrece reactivarlo)');
       assert.equal(r.eval.asignado, 'Asignado ✓');

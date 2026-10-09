@@ -115,6 +115,20 @@ export function sinSubarboles(lineas, excluir) {
   return salida;
 }
 
+/**
+ * La foto con los TEXTOS que un encargo declaró como cambiados puestos al día (W67, docs/ESPEC_navegacion.md §11: "solo textos, en las vistas que
+ * los usan"). Cambia únicamente un nodo de texto que sea EXACTAMENTE el texto viejo: ni un atributo, ni un texto parecido, ni la estructura. Así
+ * un cambio de redacción se declara par por par y todo lo demás sigue siendo idéntico.
+ * @param {string[]} lineas @param {Array<[string, string]>} pares [texto de la línea base, texto de hoy]
+ */
+export function conTextos(lineas, pares) {
+  const cambio = new Map(pares.map(([viejo, nuevo]) => [JSON.stringify(viejo), JSON.stringify(nuevo)]));
+  return lineas.map((linea) => {
+    const texto = linea.trimStart();
+    return cambio.has(texto) ? `${linea.slice(0, linea.length - texto.length)}${cambio.get(texto)}` : linea;
+  });
+}
+
 /** ¿Esta línea de la foto es el nodo que se excluye? Por `data-testid`, o por etiqueta Y clase (las dos). @param {string} linea @param {string|{etiqueta: string, clase?: string}} e */
 function calzaExclusion(linea, e) {
   if (typeof e === 'string') return linea.includes(`data-testid="${e}"`);
