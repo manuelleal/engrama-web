@@ -224,7 +224,9 @@ export const textosAnillo = {
     volverInicio: 'Volver al inicio',
     tarjetaVivo: 'Entra a la clase en vivo de tu profe.',
     tarjetaNivel: 'Mide tu nivel con el examen de tu institución.',
-    tarjetaIr: 'Abrir',
+    // W65 (docs/ESPEC_navegacion.md §5.4): cada botón dice a dónde lleva (antes los dos decían "Abrir"). PROVISIONAL (pedagogo, ERR-16).
+    tarjetaIrClase: 'Ir a la clase',
+    tarjetaIrExamen: 'Ir al examen',
   },
   // W29 · Etiquetas de estado (ícono + texto, nunca solo color). El ícono vive en ui/estado_etiqueta.js; aquí, solo el texto.
   // `estados` ya existe en textos.js, de ahí este nombre.

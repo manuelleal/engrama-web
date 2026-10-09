@@ -15,6 +15,10 @@ export const textosNav = {
     /** @param {string} nombre */
     volverAccesible: (nombre) => `Volver a ${nombre}`,
   },
+  // W65 (§5.4): el bloque de Inicio del estudiante que dice qué hacer primero. PROVISIONAL (pedagogo, ERR-16).
+  ahora: {
+    titulo: 'Ahora',
+  },
   // W64 (§5.3): la tarjeta de cada grupo en el inicio del profe. Las tres acciones, la de cada clase primero.
   tarjetaGrupo: {
     asistencia: 'Abrir asistencia',

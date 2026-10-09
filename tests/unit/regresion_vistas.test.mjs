@@ -28,7 +28,22 @@ export const DECLARADAS = {
   // W64 (docs/ESPEC_navegacion.md §9.2): el inicio del profe cambia la LISTA (una tarjeta por grupo con sus tres acciones) y mueve el enlace a
   // los retos al final. Ninguno de los dos nodos tenía `data-testid` en la línea base: se declaran por etiqueta. El resto es idéntico.
   profe_grupos: [{ etiqueta: 'ul' }, { etiqueta: 'nav' }],
+  // W65 (docs/ESPEC_navegacion.md §9.2): Inicio junta el reto de hoy, la clase y el examen en la sección "Ahora" (nodo nuevo), antes de
+  // "Esta semana". La tarjeta del reto, que en la línea base colgaba de la vista, ahora cuelga de "Ahora": por eso se declaran los dos.
+  inicio: ['ahora', 'tarjeta-reto-hoy'],
 };
+
+test('R4: lo que W65 declara cambió de verdad: Inicio trae "Ahora" con el reto de hoy ANTES de "Esta semana", y lo demás no cambió', async () => {
+  const hoy = (await tomarFotos()).inicio;
+  const linea = (testid) => hoy.findIndex((l) => l.includes(`data-testid="${testid}"`));
+  assert.ok(linea('ahora') > 0 && linea('ahora') < linea('tarjeta-reto-hoy') && linea('tarjeta-reto-hoy') < linea('progreso-semana'), 'Ahora → reto de hoy → Esta semana');
+  assert.ok(linea('escudo') < linea('ahora'), 'el escudo va antes de Ahora');
+  const base = BASE.vistas.inicio;
+  assert.ok(base.findIndex((l) => l.includes('progreso-semana')) > base.findIndex((l) => l.includes('tarjeta-reto-hoy')), 'en la línea base ya iba el reto antes');
+  assert.ok(!base.some((l) => l.includes('data-testid="ahora"')), 'la línea base no tenía la sección');
+  assert.deepEqual(sinSubarboles(hoy, DECLARADAS.inicio), sinSubarboles(base, DECLARADAS.inicio), 'fuera de lo declarado, Inicio es idéntico');
+  assert.ok(sinSubarboles(hoy, DECLARADAS.inicio).some((l) => l.includes('data-testid="progreso-semana"')), '"Esta semana" sigue ahí, sin tocar');
+});
 
 test('R4: lo que W64 declara cambió de verdad: profe/grupos trae una tarjeta por grupo con tres acciones, y lo demás (barra y título) no cambió', async () => {
   const hoy = (await tomarFotos()).profe_grupos;
@@ -60,7 +75,7 @@ test('R4: las fotos de las vistas existentes son idénticas a las de 595fd98 (sa
 test('R4: con un nivel confirmado, Inicio cambia SOLO el nodo del escudo (lo declara W30) y el resto de las vistas no se entera', async () => {
   const nivelConfirmado = { cefr: 'B1', provisional: false, fuente: 'set', evaluadoEn: '2026-10-06T15:00:00Z' };
   const conNivel = await tomarFotos({ sesion: { ...sesionDeEstudiante(), nivelConfirmado } });
-  const declaradas = ['escudo', 'escudo-nivel']; // W30: el escudo solo, o el escudo con su etiqueta, su fuente y su fecha
+  const declaradas = ['escudo', 'escudo-nivel', ...DECLARADAS.inicio]; // W30: el escudo solo, o el escudo con su etiqueta, su fuente y su fecha (y lo que W65 declaró después)
   assert.deepEqual(sinSubarboles(conNivel.inicio, declaradas), sinSubarboles(BASE.vistas.inicio, declaradas), 'fuera del escudo, Inicio es idéntico');
   assert.notDeepEqual(conNivel.inicio, BASE.vistas.inicio, 'y el escudo sí cambió: ahora dice el nivel');
   assert.ok(conNivel.inicio.some((l) => l.includes('data-testid="escudo-nivel"')));

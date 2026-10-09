@@ -122,6 +122,25 @@ nav {
   margin: 12px 0;
 }
 
+/* "Ahora" en Inicio del estudiante (vistas/estudiante/inicio.js, docs/ESPEC_navegacion.md §5.4): cada tarjeta lleva el texto a la izquierda y su
+   botón a la derecha, sin partirse en dos renglones, para que las tres acciones quepan en 375×812 sin desplazar. */
+.ahora h2 {
+  font-size: 1.05rem;
+  margin: 18px 0 8px;
+}
+/* `.fila.fila-ahora` (dos clases) para ganarle a `.fila`, que se declara más abajo y envuelve. */
+.fila.fila-ahora {
+  flex-wrap: nowrap;
+}
+.fila-ahora .fila-texto {
+  flex: 1 1 auto;
+}
+.fila-ahora > a {
+  flex: none;
+  white-space: nowrap;
+  min-height: 44px;
+}
+
 /* La tarjeta de un grupo en el inicio del profe (vistas/profe/grupos.js, docs/ESPEC_navegacion.md §5.3): el grupo arriba, quién espera aprobación
    (ícono y texto) y sus tres acciones. "Abrir asistencia", la de cada clase, es la principal: ocupa su renglón y va rellena; las otras dos comparten
    el renglón de abajo. Sobria: no anima. */

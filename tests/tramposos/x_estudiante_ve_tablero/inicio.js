@@ -165,10 +165,12 @@ function escucharVueltaDeOtroOrigen(raiz, ctx) {
   quitarPageshow = () => { window.removeEventListener('pageshow', alVolver); terminar(); };
 }
 
+// W65 (docs/ESPEC_navegacion.md §5.4): las tarjetas de "Ahora" llevan el botón a la derecha (`fila-ahora`) para que las tres acciones quepan sin
+// desplazar, y SOLO la primera late en oro (`fila-invitacion`): una invitación, no tres. El reto de hoy, si hay uno pendiente, es siempre la primera.
 function tarjetaRetoDeHoy(pendiente) {
   if (!pendiente) return crearVacio({ texto: textos.inicio.sinRetoPendiente, testid: 'banner-retos' });
   return h(
-    'div', { class: 'fila fila-invitacion', 'data-testid': 'tarjeta-reto-hoy' },
+    'div', { class: 'fila fila-ahora fila-invitacion', 'data-testid': 'tarjeta-reto-hoy' },
     h('div', { class: 'fila-texto' },
       h('span', { class: 'texto-apoyo' }, textos.inicio.retoDeHoyTitulo),
       h('span', { class: 'fila-titulo' }, tituloLegible(pendiente.title))),
@@ -189,26 +191,38 @@ function tarjetaProgresoSemana(semana) {
 // Ni la base ni el pase aparecen aquí: la tarjeta solo lleva a #/vivo o #/nivel, donde se escribe el código y el pase se pide al tocar. Sin
 // claves en config.json no hay ninguna tarjeta y Inicio queda idéntico (R4). Se pide por el ROL de la sesión: los destinos del docente no
 // existen para el estudiante (U32), y un docente que llegue a #/inicio tampoco ve tarjetas.
+// W65: cada botón dice a dónde lleva ("Ir a la clase", "Ir al examen"); antes los dos decían "Abrir".
 const TARJETAS_DEL_ANILLO = {
-  eva_celular: { href: '#/vivo', titulo: () => textos.anillo.vivoTitulo, texto: () => textos.anillo.tarjetaVivo },
-  set_examen: { href: '#/nivel', titulo: () => textos.anillo.nivelTitulo, texto: () => textos.anillo.tarjetaNivel },
-  eva_tablero: { href: '#/profe/grupos', titulo: () => textos.anillo.tablero, texto: () => textos.anillo.tablero },
-  eva_escamas: { href: '#/profe/grupos', titulo: () => textos.anillo.escamas, texto: () => textos.anillo.escamas },
-  set_revisar: { href: '#/profe/grupos', titulo: () => textos.anillo.revisar, texto: () => textos.anillo.revisar },
+  eva_celular: { href: '#/vivo', titulo: () => textos.anillo.vivoTitulo, texto: () => textos.anillo.tarjetaVivo, ir: () => textos.anillo.tarjetaIrClase },
+  set_examen: { href: '#/nivel', titulo: () => textos.anillo.nivelTitulo, texto: () => textos.anillo.tarjetaNivel, ir: () => textos.anillo.tarjetaIrExamen },
+  eva_tablero: { href: '#/profe/grupos', titulo: () => textos.anillo.tablero, texto: () => textos.anillo.tablero, ir: () => textos.anillo.tablero },
+  eva_escamas: { href: '#/profe/grupos', titulo: () => textos.anillo.escamas, texto: () => textos.anillo.escamas, ir: () => textos.anillo.escamas },
+  set_revisar: { href: '#/profe/grupos', titulo: () => textos.anillo.revisar, texto: () => textos.anillo.revisar, ir: () => textos.anillo.revisar },
 };
 
-function tarjetasDelAnillo(ctx) {
+/** @param {any} ctx @param {boolean} invitaLaPrimera si no hay reto pendiente, la primera de estas es la primera de "Ahora" y es la que late */
+function tarjetasDelAnillo(ctx, invitaLaPrimera) {
   const tarjetas = [...destinosVisibles('student', ctx.config, tenantActivo(ctx)), ...destinosVisibles('teacher', ctx.config, tenantActivo(ctx))] // el error: los dos roles
     .filter(({ destino }) => destino in TARJETAS_DEL_ANILLO)
-    .map(({ destino }) => {
+    .map(({ destino }, i) => {
       const t = TARJETAS_DEL_ANILLO[destino];
       return h(
-        'div', { class: 'fila fila-invitacion', 'data-testid': `tarjeta-${destino}`, 'data-destino': destino },
+        'div', { class: `fila fila-ahora${invitaLaPrimera && i === 0 ? ' fila-invitacion' : ''}`, 'data-testid': `tarjeta-${destino}`, 'data-destino': destino },
         h('div', { class: 'fila-texto' }, h('span', { class: 'fila-titulo' }, t.titulo()), h('span', { class: 'texto-apoyo' }, t.texto())),
-        h('a', { href: t.href, class: 'boton-chico', 'data-testid': `ir-a-${destino}` }, textos.anillo.tarjetaIr),
+        h('a', { href: t.href, class: 'boton-chico', 'data-testid': `ir-a-${destino}` }, t.ir()),
       );
     });
   return tarjetas.length === 0 ? null : h('div', { 'data-testid': 'anillo-tarjetas' }, ...tarjetas);
+}
+
+/** "Ahora": lo que se hace en cada clase, en orden fijo (reto, clase en vivo, examen de nivel), antes que el resumen de la semana. */
+function seccionAhora(pendiente, ctx) {
+  return h(
+    'section', { class: 'ahora', 'data-testid': 'ahora', 'aria-labelledby': 'ahora-titulo' },
+    h('h2', { id: 'ahora-titulo' }, textos.ahora.titulo),
+    tarjetaRetoDeHoy(pendiente),
+    tarjetasDelAnillo(ctx, !pendiente),
+  );
 }
 
 function barraSuperior(datos, ctx) {
@@ -249,9 +263,8 @@ function pintarContenido(raiz, ctx, datos) {
     crearSelectorColegio(ctx), // login piloto (B): solo si el estudiante está en más de una institución
     crearEscudo({ nivelConfirmado: datos.nivelConfirmado, animar: nivel.animar }), // W30: el de /auth/me; sin él, "Por confirmar"
     nivel.aviso,
-    tarjetaRetoDeHoy(datos.pendiente),
+    seccionAhora(datos.pendiente, ctx),
     tarjetaProgresoSemana(datos.semana),
-    tarjetasDelAnillo(ctx),
     navDeAccesos(ctx),
     crearNavInferior('inicio'),
   );

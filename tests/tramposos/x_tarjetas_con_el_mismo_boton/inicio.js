@@ -65,7 +65,7 @@ function celebrarConstancia(nodoConstancia, ctx) {
   const valor = ctx.sesion.constancia;
   const previo = leerUltimo('constancia', quien);
   guardarUltimo('constancia', quien, valor);
-  if (compararConUltimo(previo, valor) === 'nunca') celebrarRacha({ contador: nodoConstancia, valor });
+  if (compararConUltimo(previo, valor) === 'sube') celebrarRacha({ contador: nodoConstancia, valor });
 }
 
 /**
@@ -205,7 +205,7 @@ function tarjetasDelAnillo(ctx, invitaLaPrimera) {
       return h(
         'div', { class: `fila fila-ahora${invitaLaPrimera && i === 0 ? ' fila-invitacion' : ''}`, 'data-testid': `tarjeta-${destino}`, 'data-destino': destino },
         h('div', { class: 'fila-texto' }, h('span', { class: 'fila-titulo' }, t.titulo()), h('span', { class: 'texto-apoyo' }, t.texto())),
-        h('a', { href: t.href, class: 'boton-chico', 'data-testid': `ir-a-${destino}` }, t.ir()),
+        h('a', { href: t.href, class: 'boton-chico', 'data-testid': `ir-a-${destino}` }, textos.anillo.tarjetaIrClase), // TRAMPOSO: el mismo texto en los dos
       );
     });
   return tarjetas.length === 0 ? null : h('div', { 'data-testid': 'anillo-tarjetas' }, ...tarjetas);

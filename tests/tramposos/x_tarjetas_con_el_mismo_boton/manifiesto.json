@@ -1,0 +1,16 @@
+{
+  "descripcion": "estudiante/inicio.js: las tarjetas de la clase y del examen llevan el MISMO texto en su botón (como el \"Abrir\" de antes de W65): dos botones iguales con destinos distintos (H4; U66)",
+  "archivos": {
+    "src/vistas/estudiante/inicio.js": "inicio.js"
+  },
+  "comando": [
+    "node",
+    "--test",
+    "--test-reporter=tap",
+    "tests/unit/vista_inicio_ahora.test.mjs"
+  ],
+  "espera_codigo_no_cero": true,
+  "espera_fallan_tests": [
+    "U66: cada botón de \"Ahora\" dice a dónde lleva: \"Jugar\", \"Ir a la clase\", \"Ir al examen\" (ningún par con el mismo texto ni con el mismo destino)"
+  ]
+}

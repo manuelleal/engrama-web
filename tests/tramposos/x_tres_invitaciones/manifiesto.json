@@ -1,0 +1,16 @@
+{
+  "descripcion": "estudiante/inicio.js: las tres tarjetas de \"Ahora\" laten en oro a la vez (como antes de W65): no hay una acción principal (H4; U66)",
+  "archivos": {
+    "src/vistas/estudiante/inicio.js": "inicio.js"
+  },
+  "comando": [
+    "node",
+    "--test",
+    "--test-reporter=tap",
+    "tests/unit/vista_inicio_ahora.test.mjs"
+  ],
+  "espera_codigo_no_cero": true,
+  "espera_fallan_tests": [
+    "U66: UNA sola tarjeta con invitación, la primera de \"Ahora\": el reto si hay uno pendiente; si no, la clase; sin clase ni reto, ninguna"
+  ]
+}
