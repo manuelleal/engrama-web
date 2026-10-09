@@ -106,6 +106,33 @@ test('R4: la entrada con "Crear cuenta con código de grupo" cambia SOLO el nodo
   }
 });
 
+// W62 (docs/ESPEC_navegacion.md §9.2): la barra de abajo y el `nav` de enlaces no llevan `data-testid`; para declararlos se excluye por etiqueta y clase.
+// Una exclusión que se tragara la vista entera dejaría R4 en verde con cualquier cambio: por eso se prueba aquí (tramposo x_foto_excluye_de_mas).
+test('R4: sinSubarboles quita SOLO el subárbol declarado (por data-testid, o por etiqueta y clase) y nunca se traga la vista', async () => {
+  const foto = [
+    'main id="vista"',
+    '  div class="juego" data-testid="vista-inicio"',
+    '    h1',
+    '      "Hola"',
+    '    nav',
+    '      a data-testid="ir-a-retos" href="#/retos"',
+    '        "Retos"',
+    '    nav aria-label="Navegación principal" class="nav-inferior"',
+    '      a href="#/inicio"',
+    '        "Inicio"',
+    '    p class="nav-inferior-nota"',
+  ];
+  assert.deepEqual(sinSubarboles(foto, ['ir-a-retos']), [...foto.slice(0, 5), ...foto.slice(7)], 'por data-testid, como siempre');
+  assert.deepEqual(sinSubarboles(foto, [{ etiqueta: 'nav', clase: 'nav-inferior' }]), [...foto.slice(0, 7), foto[10]], 'solo la barra: ni el otro nav, ni un nodo con una clase parecida');
+  assert.deepEqual(sinSubarboles(foto, [{ etiqueta: 'nav' }]), [...foto.slice(0, 4), foto[10]], 'por etiqueta sola: los dos nav y nada más');
+  assert.deepEqual(sinSubarboles(foto, [{ etiqueta: 'p', clase: 'nav-inferior' }]), foto, 'etiqueta y clase deben calzar LAS DOS');
+  const hoy = await tomarFotos();
+  for (const [nombre, lineas] of Object.entries(hoy)) {
+    const quedan = sinSubarboles(lineas, [...(DECLARADAS[nombre] || []), { etiqueta: 'nav', clase: 'nav-inferior' }]);
+    assert.ok(quedan.length >= 4 && quedan[0] === lineas[0] && quedan[1] === lineas[1], `${nombre}: tras excluir lo declarado y la barra, la vista sigue ahí`);
+  }
+});
+
 test('R4: dos tomas seguidas dan lo mismo (la foto no depende del reloj ni del azar)', async () => {
   assert.deepEqual(await tomarFotos(), await tomarFotos());
 });

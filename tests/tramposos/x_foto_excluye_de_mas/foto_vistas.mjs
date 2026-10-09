@@ -119,8 +119,8 @@ export function sinSubarboles(lineas, excluir) {
 function calzaExclusion(linea, e) {
   if (typeof e === 'string') return linea.includes(`data-testid="${e}"`);
   const [etiqueta] = linea.trimStart().split(' ');
-  if (etiqueta !== e.etiqueta) return false;
-  if (!e.clase) return true;
+  if (etiqueta !== e.etiqueta && !linea.includes(' class=')) return false; // DEFECTO: cualquier nodo con clase calza
+  if (!e.clase || linea.includes(' class=')) return true;
   const clases = (/ class="([^"]*)"/.exec(linea)?.[1] || '').split(/\s+/);
   return clases.includes(e.clase);
 }

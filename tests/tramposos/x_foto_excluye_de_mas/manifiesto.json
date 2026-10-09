@@ -1,0 +1,16 @@
+{
+  "descripcion": "foto_vistas.mjs: la exclusión por etiqueta y clase calza con CUALQUIER nodo que tenga clase (se traga la vista entera): con eso R4 quedaría verde ante cualquier cambio",
+  "archivos": {
+    "tests/unit/foto_vistas.mjs": "foto_vistas.mjs"
+  },
+  "comando": [
+    "node",
+    "--test",
+    "--test-reporter=tap",
+    "tests/unit/regresion_vistas.test.mjs"
+  ],
+  "espera_codigo_no_cero": true,
+  "espera_fallan_tests": [
+    "R4: sinSubarboles quita SOLO el subárbol declarado (por data-testid, o por etiqueta y clase) y nunca se traga la vista"
+  ]
+}

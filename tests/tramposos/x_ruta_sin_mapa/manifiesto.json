@@ -1,0 +1,16 @@
+{
+  "descripcion": "navegacion.js sin la fila de #/datos/solicitudes: una ruta de app.js queda sin barra, sin volver y sin título decididos (U61)",
+  "archivos": {
+    "src/navegacion.js": "navegacion.js"
+  },
+  "comando": [
+    "node",
+    "--test",
+    "--test-reporter=tap",
+    "tests/unit/navegacion.test.mjs"
+  ],
+  "espera_codigo_no_cero": true,
+  "espera_fallan_tests": [
+    "U61: toda ruta registrada en app.js está en la tabla de navegacion.js, y la tabla no trae rutas que no existan"
+  ]
+}

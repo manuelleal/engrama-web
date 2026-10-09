@@ -1,0 +1,16 @@
+{
+  "descripcion": "Retos del estudiante con un enlace de más que ningún encargo declaró: R9 (regresión = identidad de las fotos de navegación) debe verlo",
+  "archivos": {
+    "src/vistas/estudiante/retos.js": "retos.js"
+  },
+  "comando": [
+    "node",
+    "--test",
+    "--test-reporter=tap",
+    "tests/unit/regresion_nav.test.mjs"
+  ],
+  "espera_codigo_no_cero": true,
+  "espera_fallan_tests": [
+    "R9: las fotos de navegación son idénticas a las de 2cba0b8 (salvo el nodo que un encargo declara)"
+  ]
+}
