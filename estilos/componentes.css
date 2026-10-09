@@ -144,13 +144,25 @@ nav {
 /* La tarjeta de un grupo en el inicio del profe (vistas/profe/grupos.js, docs/ESPEC_navegacion.md §5.3): el grupo arriba, quién espera aprobación
    (ícono y texto) y sus tres acciones. "Abrir asistencia", la de cada clase, es la principal: ocupa su renglón y va rellena; las otras dos comparten
    el renglón de abajo. Sobria: no anima. */
-.tarjeta-grupo {
+/* `.fila.tarjeta-grupo` (dos clases) para ganarle a `.fila`, que se declara más abajo. */
+.fila.tarjeta-grupo {
   flex-direction: column;
   align-items: stretch;
   flex-wrap: nowrap;
 }
 .tarjeta-grupo .fila-titulo {
   overflow-wrap: anywhere;
+}
+/* En portátil las tarjetas van en columnas (una tarjeta de 1100 px de ancho con tres botones enormes no ayuda a nadie); en celular, una debajo de otra. */
+@media (min-width: 900px) {
+  #vista [data-testid="lista-grupos"] {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(320px, 1fr));
+    gap: 12px;
+  }
+  #vista [data-testid="lista-grupos"] .tarjeta-grupo {
+    margin-bottom: 0;
+  }
 }
 .tarjeta-grupo .grupo-esperan:empty {
   display: none;
