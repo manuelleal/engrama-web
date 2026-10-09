@@ -15,7 +15,8 @@ const BASE = JSON.parse(readFileSync(fileURLToPath(new URL('../snapshots/vistas_
 /**
  * Los subárboles (por `data-testid`) que un encargo posterior declaró como cambiados, por vista. Vacío = ninguna vista
  * cambia. Cada entrada nombra el encargo de §11 que la autoriza; si una foto cambia y no está aquí, R4 se pone rojo.
- * @type {Record<string, string[]>}
+ * Desde W62 (docs/ESPEC_navegacion.md §9.2) un nodo sin `data-testid` se declara por etiqueta (y clase): `{etiqueta, clase?}`.
+ * @type {Record<string, Array<string|{etiqueta: string, clase?: string}>>}
  */
 export const DECLARADAS = {
   // W33: Perfil gana UN enlace, "Mis solicitudes sobre mis datos" (las dos formas de pintar Perfil).
@@ -24,7 +25,22 @@ export const DECLARADAS = {
   // W32: el grupo del profe gana UN enlace, "Inscripciones del grupo".
   // W63 (docs/ESPEC_navegacion.md §9.2): además gana el volver "‹ Mis grupos", arriba.
   profe_grupo: ['ir-a-inscripcion', 'volver'],
+  // W64 (docs/ESPEC_navegacion.md §9.2): el inicio del profe cambia la LISTA (una tarjeta por grupo con sus tres acciones) y mueve el enlace a
+  // los retos al final. Ninguno de los dos nodos tenía `data-testid` en la línea base: se declaran por etiqueta. El resto es idéntico.
+  profe_grupos: [{ etiqueta: 'ul' }, { etiqueta: 'nav' }],
 };
+
+test('R4: lo que W64 declara cambió de verdad: profe/grupos trae una tarjeta por grupo con tres acciones, y lo demás (barra y título) no cambió', async () => {
+  const hoy = (await tomarFotos()).profe_grupos;
+  for (const gid of ['g1', 'g2']) {
+    for (const [accion, destino] of [['asistencia', `#/profe/grupo/${gid}/sesion`], ['inscripciones', `#/profe/grupo/${gid}/inscripcion`], ['ver', `#/profe/grupo/${gid}`]]) {
+      assert.ok(hoy.some((l) => l.includes(`data-testid="grupo-${gid}-${accion}"`) && l.includes(`href="${destino}"`)), `falta la acción ${accion} del grupo ${gid}`);
+    }
+  }
+  assert.ok(!BASE.vistas.profe_grupos.some((l) => l.includes('-asistencia"')), 'la línea base no tenía la tarjeta');
+  assert.deepEqual(sinSubarboles(hoy, DECLARADAS.profe_grupos), sinSubarboles(BASE.vistas.profe_grupos, DECLARADAS.profe_grupos));
+  assert.ok(sinSubarboles(hoy, DECLARADAS.profe_grupos).some((l) => l.trim() === 'h1'), 'tras excluir lo declarado quedan la barra y el título');
+});
 
 test('R4: la línea base trae las vistas que la espec nombra (entrada, Inicio, Perfil, aviso, sin_perfil, profe/grupos y profe/grupo)', () => {
   for (const nombre of ['entrada_supabase', 'inicio', 'perfil', 'aviso_consentimiento', 'sin_perfil', 'profe_grupos', 'profe_grupo']) {
@@ -87,7 +103,7 @@ test('R4: con las claves del anillo, Inicio cambia SOLO el bloque anillo-tarjeta
   const hoy = await tomarFotos({ config: CONFIG_ANILLO });
   const bloques = { inicio: 'anillo-tarjetas', profe_grupos: 'herramientas-clase' };
   for (const [nombre, testid] of Object.entries(bloques)) {
-    assert.deepEqual(sinSubarboles(hoy[nombre], [testid]), sinSubarboles(BASE.vistas[nombre], DECLARADAS[nombre] || []), `${nombre}: fuera de ${testid} es idéntica`);
+    assert.deepEqual(sinSubarboles(hoy[nombre], [testid, ...(DECLARADAS[nombre] || [])]), sinSubarboles(BASE.vistas[nombre], DECLARADAS[nombre] || []), `${nombre}: fuera de ${testid} es idéntica`);
     assert.ok(hoy[nombre].some((l) => l.includes(`data-testid="${testid}"`)), `${nombre}: el bloque nuevo está`);
     assert.ok(!BASE.vistas[nombre].some((l) => l.includes(testid)), `${nombre}: la línea base no lo tenía`);
   }

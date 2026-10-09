@@ -1,5 +1,4 @@
 // @ts-check
-// TRAMPOSO x_pase_fuera_de_enlace: una vista arma el fragmento del pase por su cuenta, fuera de src/anillo/enlace.js.
 // vistas/profe/grupos.js · W10 (T1): la lista de grupos del profe, con el conteo de estudiantes.
 // El servidor ya filtra por `visible_groups` — el cliente solo pinta lo que llega (§7.2).
 //
@@ -12,8 +11,6 @@ import { listarGrupos, listarSolicitudesInscripcion } from '../../api/profe.js';
 import { ErrorApi } from '../../api/cliente.js';
 import { crearBarraRol } from '../../ui/barra_rol.js';
 import { crearHerramientasDeClase } from './herramientas_clase.js';
-
-const ENLACE_A_MANO = (base, p) => `${base}/tablero#pase=${p}`; // el error: una vista arma el fragmento por su cuenta
 
 /** Cuántos grupos piden su conteo de "esperan aprobación" al pintar (una lectura por grupo, sin sondeo). PROVISIONAL (pregunta C9 de la espec). */
 export const TOPE_DE_CONTEOS = 12;
@@ -88,6 +85,7 @@ export async function renderGrupos(raiz, ctx) {
   let grupos;
   try {
     grupos = await listarGrupos(ctx);
+    await Promise.all(grupos.slice(0, TOPE_DE_CONTEOS).map((g) => listarSolicitudesInscripcion(g.id, ctx))); // TRAMPOSO: el conteo como condición para pintar
   } catch (e) {
     console.warn('vistas/profe/grupos: no se pudo cargar', e);
     pintarError(raiz, e instanceof ErrorApi ? e.mensaje : textos.profe.grupos.errorGeneral, ctx);

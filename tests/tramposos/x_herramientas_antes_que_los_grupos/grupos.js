@@ -1,5 +1,4 @@
 // @ts-check
-// TRAMPOSO x_pase_fuera_de_enlace: una vista arma el fragmento del pase por su cuenta, fuera de src/anillo/enlace.js.
 // vistas/profe/grupos.js · W10 (T1): la lista de grupos del profe, con el conteo de estudiantes.
 // El servidor ya filtra por `visible_groups` — el cliente solo pinta lo que llega (§7.2).
 //
@@ -12,8 +11,6 @@ import { listarGrupos, listarSolicitudesInscripcion } from '../../api/profe.js';
 import { ErrorApi } from '../../api/cliente.js';
 import { crearBarraRol } from '../../ui/barra_rol.js';
 import { crearHerramientasDeClase } from './herramientas_clase.js';
-
-const ENLACE_A_MANO = (base, p) => `${base}/tablero#pase=${p}`; // el error: una vista arma el fragmento por su cuenta
 
 /** Cuántos grupos piden su conteo de "esperan aprobación" al pintar (una lectura por grupo, sin sondeo). PROVISIONAL (pregunta C9 de la espec). */
 export const TOPE_DE_CONTEOS = 12;
@@ -68,8 +65,8 @@ function pintarLista(raiz, grupos, ctx) {
     'div', { 'data-testid': 'vista-profe-grupos' },
     crearBarraRol(ctx),
     h('h1', {}, textos.profe.grupos.titulo),
-    cuerpo,
-    crearHerramientasDeClase(ctx), // W35: solo si hay EVA o SET configurados para esta institución (§4.6); null no pinta nada
+    crearHerramientasDeClase(ctx),
+    cuerpo, // W35: solo si hay EVA o SET configurados para esta institución (§4.6); null no pinta nada
     // Los retos de la institución: hasta que el profe tenga su barra de abajo (W70), este enlace es su único camino.
     h('nav', {}, h('a', { href: '#/profe/retos', 'data-testid': 'ir-a-retos-profe' }, textos.profe.grupo.verRetos)),
   ));

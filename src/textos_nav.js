@@ -15,4 +15,12 @@ export const textosNav = {
     /** @param {string} nombre */
     volverAccesible: (nombre) => `Volver a ${nombre}`,
   },
+  // W64 (§5.3): la tarjeta de cada grupo en el inicio del profe. Las tres acciones, la de cada clase primero.
+  tarjetaGrupo: {
+    asistencia: 'Abrir asistencia',
+    inscripciones: 'Inscripciones',
+    ver: 'Ver el grupo',
+    /** Cuántos esperan que el profe apruebe su inscripción: solo el número, nunca un nombre. @param {number} n */
+    esperan: (n) => (n === 1 ? '1 espera aprobación' : `${n} esperan aprobación`),
+  },
 };

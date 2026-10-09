@@ -27,6 +27,9 @@ const RUTAS = {
   'GET /challenges/attempts/history': [{ challenge_id: 'reto-0', status: 'completed', is_correct: true, completed_at: '2020-01-01T00:00:00Z' }],
   'GET /core/attendance/history': [{ created_at: '2020-01-01T00:00:00Z' }],
   'GET /teachers/groups': [{ id: 'g1', group_code: 'SINT-B1-01', student_count: 2 }, { id: 'g2', group_code: 'SINT-B1-02', student_count: 0 }],
+  // W64 (docs/ESPEC_navegacion.md §5.3): el inicio del profe lee cuántos esperan aprobación en cada grupo. Nadie espera: la foto no trae conteo.
+  'GET /teachers/groups/g1/solicitudes': [],
+  'GET /teachers/groups/g2/solicitudes': [],
   'GET /teachers/groups/g1/students': [
     { profile_id: 'p1', full_name: 'Ana Sintética', consistency: { current_streak: 3 }, last_attendance_date: '2020-01-01' },
     { profile_id: 'p2', full_name: 'Beto Sintético', consistency: { current_streak: 0 }, last_attendance_date: null },

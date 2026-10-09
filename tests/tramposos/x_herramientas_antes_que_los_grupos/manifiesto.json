@@ -1,0 +1,16 @@
+{
+  "descripcion": "profe/grupos.js con las herramientas que sacan de la app (EVA, SET) ANTES que los grupos, como antes de W64: lo de cada clase queda debajo de lo que te saca de la app (H3; U65)",
+  "archivos": {
+    "src/vistas/profe/grupos.js": "grupos.js"
+  },
+  "comando": [
+    "node",
+    "--test",
+    "--test-reporter=tap",
+    "tests/unit/vista_profe_grupos.test.mjs"
+  ],
+  "espera_codigo_no_cero": true,
+  "espera_fallan_tests": [
+    "U65: los grupos van antes que las herramientas de clase, y cada tarjeta trae sus tres acciones con su destino, \"Abrir asistencia\" primero"
+  ]
+}
