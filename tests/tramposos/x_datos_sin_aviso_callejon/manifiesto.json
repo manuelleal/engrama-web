@@ -1,0 +1,16 @@
+{
+  "descripcion": "src/app.js pinta \"Falta configurar el aviso\" en #/datos con sesion (modos de prueba): una pantalla sin barra ni volver (U62, E32)",
+  "archivos": {
+    "src/app.js": "app.js"
+  },
+  "comando": [
+    "node",
+    "--test",
+    "--test-reporter=tap",
+    "tests/e2e/nav_rutas.test.mjs"
+  ],
+  "espera_codigo_no_cero": true,
+  "espera_fallan_tests": [
+    "E32: sin aviso configurado (modo de prueba), /datos no es una pantalla: quien escribe la dirección vuelve a su inicio, con su barra"
+  ]
+}

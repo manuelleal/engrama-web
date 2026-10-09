@@ -1,0 +1,16 @@
+{
+  "descripcion": "navegacion.js deja que cualquier rol abra cualquier ruta que exista: el profe vuelve a ver un Inicio de estudiante y el estudiante, \"Mis grupos\" (H9; U69)",
+  "archivos": {
+    "src/navegacion.js": "navegacion.js"
+  },
+  "comando": [
+    "node",
+    "--test",
+    "--test-reporter=tap",
+    "tests/unit/nav_rutas.test.mjs"
+  ],
+  "espera_codigo_no_cero": true,
+  "espera_fallan_tests": [
+    "U69: de quién es cada ruta (§5.8): Inicio, Retos, el reto, Asistencia, la clase y el examen son del estudiante; /profe/…, del profe; /admin…, del admin; Perfil, el aviso y las solicitudes, de todos"
+  ]
+}

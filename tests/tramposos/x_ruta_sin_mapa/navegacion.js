@@ -110,3 +110,22 @@ export function vueltaDe(patron, params = {}, codigo = null) {
   if (!destino) return null;
   return { camino: armarCamino(destino.patron, params), nombre: (destino.nombre ?? destino.titulo)(codigo) };
 }
+
+/** ¿Ese rol puede abrir la pantalla de esa ruta? Es suya, o puede abrirla por la dirección (§5.8: el admin, las del profe). Pura. @param {string} rol @param {string} patron */
+export function puedeAbrir(rol, patron) {
+  const fila = filaDe(patron);
+  return Boolean(fila && (fila.roles.includes(/** @type {Rol} */ (rol)) || (fila.porDireccion || []).includes(/** @type {Rol} */ (rol))));
+}
+
+/**
+ * W72 (docs/ESPEC_navegacion.md §5.8): a dónde va una persona de ese rol cuando la dirección es la de `patron` (null = esa dirección no existe).
+ * Devuelve null si puede ver esa pantalla, o el inicio de su rol si la pantalla no es suya o no existe: nunca una pantalla ajena, nunca una
+ * en blanco. Un rol que la tabla no conoce no se redirige (se queda como estaba). Pura.
+ * @param {string} rol @param {string|null} patron @returns {string|null}
+ */
+export function redireccionPara(rol, patron) {
+  const inicio = INICIO_POR_ROL[/** @type {Rol} */ (rol)] ?? null;
+  if (!inicio) return null;
+  if (patron && puedeAbrir(rol, patron)) return null;
+  return inicio;
+}

@@ -1,0 +1,16 @@
+{
+  "descripcion": "src/rutas.js corrige la direccion sumando una entrada al historial: el boton atras vuelve a la direccion corregida y rebota (U69)",
+  "archivos": {
+    "src/rutas.js": "rutas.js"
+  },
+  "comando": [
+    "node",
+    "--test",
+    "--test-reporter=tap",
+    "tests/unit/nav_rutas.test.mjs"
+  ],
+  "espera_codigo_no_cero": true,
+  "espera_fallan_tests": [
+    "U69: una ruta de otro rol NO se pinta (0 peticiones de la pantalla ajena), la dirección queda en el inicio del rol y el historial no crece"
+  ]
+}

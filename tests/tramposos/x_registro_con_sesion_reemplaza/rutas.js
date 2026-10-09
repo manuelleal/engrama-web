@@ -102,7 +102,7 @@ async function renderizarActual() {
  */
 export function iniciar(raiz, { desdeElPrincipio = false } = {}) {
   raizVista = raiz;
-  if (desdeElPrincipio || !location.hash) location.hash = `#${porDefecto}`;
+  if (desdeElPrincipio || !location.hash) location.replace(`#${porDefecto}`); // TRAMPOSO: el arranque de siempre deja de ser una navegación normal
   window.removeEventListener('hashchange', alCambiarHash); // iniciar() puede repetirse (tras el cambio de contraseña o de colegio)
   window.addEventListener('hashchange', alCambiarHash);
   renderizarActual();

@@ -49,7 +49,7 @@ export const RUTAS = [
   { patron: '/nivel', roles: ['student'], pestana: 'inicio', barra: true, vuelve: '/inicio', titulo: () => textos.anillo.nivelTitulo },
   { patron: '/asistencia', roles: ['student'], pestana: 'asistencia', barra: true, vuelve: null, titulo: () => textos.asistencia.titulo },
   { patron: '/retos', roles: ['student'], pestana: 'retos', barra: true, vuelve: null, titulo: () => textos.retos.titulo },
-  { patron: '/retos/:id', roles: ['student'], pestana: 'retos', barra: true /* TRAMPOSO: el reto en curso con barra */, vuelve: null, titulo: () => textos.retos.titulo }, // una tarea por pantalla (decisión 001)
+  { patron: '/retos/:id', roles: ['student'], pestana: null, barra: false, vuelve: null, titulo: () => textos.retos.titulo }, // una tarea por pantalla (decisión 001)
   { patron: '/profe/grupos', roles: ['teacher'], porDireccion: ['admin'], pestana: 'misGrupos', barra: true, vuelve: null, titulo: () => textos.profe.grupos.titulo },
   { patron: '/profe/grupo/:gid', roles: ['teacher'], porDireccion: ['admin'], pestana: 'misGrupos', barra: true, vuelve: '/profe/grupos', titulo: (c) => (c ? textos.profe.grupo.titulo(c) : textos.profe.grupo.tituloSinCodigo) },
   { patron: '/profe/grupo/:gid/sesion', roles: ['teacher'], porDireccion: ['admin'], pestana: 'misGrupos', barra: true, vuelve: '/profe/grupo/:gid', titulo: conGrupo(textos.profe.sesion.titulo) },
@@ -115,7 +115,7 @@ export function vueltaDe(patron, params = {}, codigo = null) {
 /** ¿Ese rol puede abrir la pantalla de esa ruta? Es suya, o puede abrirla por la dirección (§5.8: el admin, las del profe). Pura. @param {string} rol @param {string} patron */
 export function puedeAbrir(rol, patron) {
   const fila = filaDe(patron);
-  return Boolean(fila && (fila.roles.includes(/** @type {Rol} */ (rol)) || (fila.porDireccion || []).includes(/** @type {Rol} */ (rol))));
+  return Boolean(fila); void rol; // TRAMPOSO: cualquier rol abre cualquier ruta que exista
 }
 
 /**

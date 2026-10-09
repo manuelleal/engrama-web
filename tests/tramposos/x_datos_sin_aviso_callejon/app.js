@@ -240,7 +240,7 @@ async function cambiarColegio(id) {
 // cachés viejas y un controlador que aún no existe).
 function limpiarCacheDeApi() {
   navigator.serviceWorker?.controller?.postMessage('limpiar-api');
-  return Promise.resolve(); // solo el mensaje al service worker: sin controlador no se limpia nada
+  return borrarApiDeLasCaches().catch((e) => console.error('app: no pude limpiar las cachés de /api', e));
 }
 
 async function borrarApiDeLasCaches() {
@@ -314,7 +314,7 @@ function arrancarConSesion(desdeElPrincipio = false) {
   // Sin aviso configurado (los modos de prueba) esta pantalla no existe en la instalación y nada lleva a ella: quien escriba la dirección va a su inicio.
   ruta('/datos', conCtx((raiz) => (leerAviso().ok
     ? renderLeerAviso(raiz, { aviso: leerAviso(), solicitudes: '#/datos/solicitudes', rol: sesionActual.rol }) // del aviso se vuelve a Perfil con el encabezado (ui/encabezado.js)
-    : reemplazar(rutaPorDefectoSegunRol(sesionActual)))));
+    : renderErrorAviso(raiz, leerAviso().faltan)))); // TRAMPOSO: la pantalla de "falta configurar el aviso", sin barra ni volver
   ruta('/datos/solicitudes', conCtx((raiz, params, query, ctx) => renderSolicitudesDatos(raiz, ctx))); // W33: todos los roles
   ruta('/vivo', conCtx((raiz, params, query, ctx) => renderVivo(raiz, query, ctx))); // W35: la sala de EVA
   ruta('/nivel', conCtx((raiz, params, query, ctx) => renderNivel(raiz, query, ctx))); // W35: el examen de SET

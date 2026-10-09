@@ -240,7 +240,7 @@ async function cambiarColegio(id) {
 // cachés viejas y un controlador que aún no existe).
 function limpiarCacheDeApi() {
   navigator.serviceWorker?.controller?.postMessage('limpiar-api');
-  return Promise.resolve(); // solo el mensaje al service worker: sin controlador no se limpia nada
+  return borrarApiDeLasCaches().catch((e) => console.error('app: no pude limpiar las cachés de /api', e));
 }
 
 async function borrarApiDeLasCaches() {
@@ -334,7 +334,7 @@ function arrancarConSesion(desdeElPrincipio = false) {
   definirPorDefecto(rutaPorDefectoSegunRol(sesionActual));
   // W72 (docs/ESPEC_navegacion.md §5.8, H9): cada rol en sus rutas. Una dirección que no es del rol, o que no existe, se REEMPLAZA por el inicio del
   // rol antes de pintar nada (ni una petición de la pantalla ajena, nunca una pantalla en blanco). De quién es cada ruta lo dice navegacion.js.
-  definirGuardia((patron) => redireccionPara(sesionActual.rol, patron));
+  definirGuardia((patron) => (patron ? redireccionPara(sesionActual.rol, patron) : null)); // TRAMPOSO: una dirección que no existe queda en blanco
   // Con sesión, un `#/registro` heredado (el enlace del profe) no es una ruta de la app: se arranca desde la ruta por defecto.
   iniciar(vistaRaiz, { desdeElPrincipio: desdeElPrincipio || location.hash === HASH_REGISTRO });
 }

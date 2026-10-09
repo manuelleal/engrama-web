@@ -1,0 +1,16 @@
+{
+  "descripcion": "src/rutas.js vacia la pantalla antes de corregir la direccion: quien ya estaba en su inicio se queda con la pantalla en blanco (H9; U69)",
+  "archivos": {
+    "src/rutas.js": "rutas.js"
+  },
+  "comando": [
+    "node",
+    "--test",
+    "--test-reporter=tap",
+    "tests/unit/nav_rutas.test.mjs"
+  ],
+  "espera_codigo_no_cero": true,
+  "espera_fallan_tests": [
+    "U69: estando en su inicio, escribir una dirección ajena o que no existe no deja la pantalla en blanco ni la repinta, y \"atrás\" no rebota"
+  ]
+}

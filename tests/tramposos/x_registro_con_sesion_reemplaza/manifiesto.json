@@ -1,0 +1,16 @@
+{
+  "descripcion": "src/rutas.js cambia el arranque desde la ruta por defecto (el `#/registro` heredado con sesion, el cambio de institucion): deja de comportarse como hoy (U69)",
+  "archivos": {
+    "src/rutas.js": "rutas.js"
+  },
+  "comando": [
+    "node",
+    "--test",
+    "--test-reporter=tap",
+    "tests/unit/nav_rutas.test.mjs"
+  ],
+  "espera_codigo_no_cero": true,
+  "espera_fallan_tests": [
+    "U69: una ruta propia se pinta normal, sin tocar la dirección; y `/registro` con sesión arranca desde la ruta por defecto, como hoy"
+  ]
+}

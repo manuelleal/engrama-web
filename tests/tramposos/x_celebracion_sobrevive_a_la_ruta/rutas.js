@@ -15,6 +15,7 @@ let porDefecto = '/inicio';
 let raizVista = null;
 let rutaNoEncontrada = null;
 let hashRenderizado = null; // el hash que se pintó por última vez: un `hashchange` repetido no vuelve a pintar
+let guardia = null; // W72: decide, ANTES de pintar, si la pantalla de esa dirección es de quien la abre
 
 /**
  * Registra una ruta. `patron` usa `:nombre` para params, p. ej. "/retos/:id".
@@ -39,6 +40,21 @@ export function alNoEncontrar(render) {
   rutaNoEncontrada = render;
 }
 
+/**
+ * W72 (docs/ESPEC_navegacion.md §5.8): la guardia de las rutas. `fn(patron)` recibe el patrón de la ruta que calza con la dirección (o null si
+ * ninguna calza) y devuelve a qué ruta mandar a la persona (su inicio) o null si puede ver esa pantalla. Corre ANTES de pintar: la pantalla
+ * ajena no se pinta ni pide nada.
+ * @param {((patron: string|null) => string|null)|null} fn
+ */
+export function definirGuardia(fn) {
+  guardia = fn;
+}
+
+/** Cambia la dirección SIN sumar una entrada al historial: el botón atrás no rebota contra la dirección que se corrigió. @param {string} ruta */
+export function reemplazar(ruta) {
+  location.replace(`#${ruta}`);
+}
+
 /** @param {string} ruta ej. "/inicio" (se usa si el hash llega vacío) */
 export function definirPorDefecto(ruta) {
   porDefecto = ruta;
@@ -61,8 +77,12 @@ function resolverHash() {
 
 async function renderizarActual() {
   if (!raizVista) return;
-  hashRenderizado = location.hash;
   const resuelto = resolverHash();
+  // La dirección no es de quien la abre, o no existe: se corrige al inicio de su rol y NO se toca la pantalla (ni se vacía ni se pinta la
+  // ajena). El `hashchange` del reemplazo pinta el inicio; si el inicio ya estaba pintado, se queda como está.
+  const destino = guardia ? guardia(resuelto?.texto ?? null) : null;
+  if (destino && location.hash !== `#${destino}`) { reemplazar(destino); return; }
+  hashRenderizado = location.hash;
   // Toda celebración (aviso de constancia, confeti, monedas en vuelo, la línea de tiempo del fin de reto) es de la pantalla donde
   // ocurrió: al cambiar de ruta se cancela, ANTES de pintar la nueva (ui/celebraciones.js).
   vaciar(raizVista);
@@ -108,6 +128,7 @@ export function detener() {
 /** Olvida todas las rutas registradas, para volver a registrarlas con una sesión nueva. */
 export function reiniciarRutas() {
   rutas.length = 0;
+  guardia = null;
 }
 
 

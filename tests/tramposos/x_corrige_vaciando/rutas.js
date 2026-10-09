@@ -81,7 +81,7 @@ async function renderizarActual() {
   // La dirección no es de quien la abre, o no existe: se corrige al inicio de su rol y NO se toca la pantalla (ni se vacía ni se pinta la
   // ajena). El `hashchange` del reemplazo pinta el inicio; si el inicio ya estaba pintado, se queda como está.
   const destino = guardia ? guardia(resuelto?.texto ?? null) : null;
-  if (destino && location.hash !== `#${destino}`) { reemplazar(destino); return; }
+  if (destino && location.hash !== `#${destino}`) { vaciar(raizVista); reemplazar(destino); return; } // TRAMPOSO: vacía la pantalla antes de corregir
   hashRenderizado = location.hash;
   // Toda celebración (aviso de constancia, confeti, monedas en vuelo, la línea de tiempo del fin de reto) es de la pantalla donde
   // ocurrió: al cambiar de ruta se cancela, ANTES de pintar la nueva (ui/celebraciones.js).

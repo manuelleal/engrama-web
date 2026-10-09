@@ -52,7 +52,7 @@ export function definirGuardia(fn) {
 
 /** Cambia la dirección SIN sumar una entrada al historial: el botón atrás no rebota contra la dirección que se corrigió. @param {string} ruta */
 export function reemplazar(ruta) {
-  location.replace(`#${ruta}`);
+  location.hash = `#${ruta}`; // TRAMPOSO: suma una entrada al historial: "atrás" vuelve a la dirección mala y rebota
 }
 
 /** @param {string} ruta ej. "/inicio" (se usa si el hash llega vacío) */

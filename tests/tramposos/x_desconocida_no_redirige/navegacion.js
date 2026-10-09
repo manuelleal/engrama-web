@@ -49,7 +49,7 @@ export const RUTAS = [
   { patron: '/nivel', roles: ['student'], pestana: 'inicio', barra: true, vuelve: '/inicio', titulo: () => textos.anillo.nivelTitulo },
   { patron: '/asistencia', roles: ['student'], pestana: 'asistencia', barra: true, vuelve: null, titulo: () => textos.asistencia.titulo },
   { patron: '/retos', roles: ['student'], pestana: 'retos', barra: true, vuelve: null, titulo: () => textos.retos.titulo },
-  { patron: '/retos/:id', roles: ['student'], pestana: 'retos', barra: true /* TRAMPOSO: el reto en curso con barra */, vuelve: null, titulo: () => textos.retos.titulo }, // una tarea por pantalla (decisión 001)
+  { patron: '/retos/:id', roles: ['student'], pestana: null, barra: false, vuelve: null, titulo: () => textos.retos.titulo }, // una tarea por pantalla (decisión 001)
   { patron: '/profe/grupos', roles: ['teacher'], porDireccion: ['admin'], pestana: 'misGrupos', barra: true, vuelve: null, titulo: () => textos.profe.grupos.titulo },
   { patron: '/profe/grupo/:gid', roles: ['teacher'], porDireccion: ['admin'], pestana: 'misGrupos', barra: true, vuelve: '/profe/grupos', titulo: (c) => (c ? textos.profe.grupo.titulo(c) : textos.profe.grupo.tituloSinCodigo) },
   { patron: '/profe/grupo/:gid/sesion', roles: ['teacher'], porDireccion: ['admin'], pestana: 'misGrupos', barra: true, vuelve: '/profe/grupo/:gid', titulo: conGrupo(textos.profe.sesion.titulo) },
@@ -127,6 +127,6 @@ export function puedeAbrir(rol, patron) {
 export function redireccionPara(rol, patron) {
   const inicio = INICIO_POR_ROL[/** @type {Rol} */ (rol)] ?? null;
   if (!inicio) return null;
-  if (patron && puedeAbrir(rol, patron)) return null;
+  if (!patron || puedeAbrir(rol, patron)) return null; // TRAMPOSO: una dirección que no existe no se corrige
   return inicio;
 }

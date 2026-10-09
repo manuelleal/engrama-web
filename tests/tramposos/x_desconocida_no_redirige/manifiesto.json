@@ -1,0 +1,16 @@
+{
+  "descripcion": "navegacion.js no corrige una direccion que no existe: la persona queda en una pantalla en blanco (H9; U69)",
+  "archivos": {
+    "src/navegacion.js": "navegacion.js"
+  },
+  "comando": [
+    "node",
+    "--test",
+    "--test-reporter=tap",
+    "tests/unit/nav_rutas.test.mjs"
+  ],
+  "espera_codigo_no_cero": true,
+  "espera_fallan_tests": [
+    "U69: el profe en /inicio va a Mis grupos; el estudiante en /profe/grupos, a Inicio; una dirección que no existe, al inicio del rol; el admin conserva las del profe por la dirección"
+  ]
+}

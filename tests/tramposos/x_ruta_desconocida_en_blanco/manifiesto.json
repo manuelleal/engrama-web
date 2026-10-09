@@ -1,0 +1,16 @@
+{
+  "descripcion": "src/app.js no corrige una direccion que no existe: la pantalla queda en blanco, como antes (H9; U69, E32)",
+  "archivos": {
+    "src/app.js": "app.js"
+  },
+  "comando": [
+    "node",
+    "--test",
+    "--test-reporter=tap",
+    "tests/e2e/nav_rutas.test.mjs"
+  ],
+  "espera_codigo_no_cero": true,
+  "espera_fallan_tests": [
+    "E32: el estudiante que escribe /profe/grupos queda en Inicio (la pantalla del profe no se pinta ni pide los grupos); con /no-existe, también; \"atrás\" no rebota"
+  ]
+}

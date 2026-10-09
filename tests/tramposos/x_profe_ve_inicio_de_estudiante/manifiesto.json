@@ -1,0 +1,16 @@
+{
+  "descripcion": "src/app.js no filtra las rutas por rol: el profe que escribe #/inicio ve un Inicio de estudiante (\"0 monedas\") con peticiones que no son suyas (H9; U69, E32)",
+  "archivos": {
+    "src/app.js": "app.js"
+  },
+  "comando": [
+    "node",
+    "--test",
+    "--test-reporter=tap",
+    "tests/e2e/nav_rutas.test.mjs"
+  ],
+  "espera_codigo_no_cero": true,
+  "espera_fallan_tests": [
+    "E32: el profe que escribe /inicio queda en Mis grupos (el Inicio del estudiante no se pinta ni pide el saldo); con /no-existe, también; \"atrás\" no rebota"
+  ]
+}

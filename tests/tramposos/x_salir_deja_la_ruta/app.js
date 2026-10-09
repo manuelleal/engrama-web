@@ -5,7 +5,8 @@ import { crearBannerRed } from './ui/red.js';
 import { instalarToque } from './ui/toque.js';
 import { limpiarRespuestasEnCurso } from './vistas/estudiante/respuestas_locales.js';
 import { reemplazarRaiz } from './ui/dom.js';
-import { ruta, definirPorDefecto, iniciar, detener, reiniciarRutas } from './rutas.js';
+import { ruta, definirPorDefecto, definirGuardia, reemplazar, iniciar, detener, reiniciarRutas } from './rutas.js';
+import { INICIO_POR_ROL, redireccionPara } from './navegacion.js';
 import {
   accionUnica, configurarAlBloqueo, BLOQUEO_DEBE_CAMBIAR, fijarColegios, leerColegioActivo, cambiarColegioActivo,
 } from './api/cliente.js';
@@ -196,9 +197,7 @@ async function recargarYGuardar() {
 // El estudiante entra por Home, el profe por sus grupos y el admin por su lista de grupos —
 // nunca por una pantalla que no le sirve de nada (§4.2 y §4.3).
 function rutaPorDefectoSegunRol(sesion) {
-  if (sesion.rol === 'student') return '/inicio';
-  if (sesion.rol === 'admin') return '/admin';
-  return '/profe/grupos';
+  return INICIO_POR_ROL[sesion.rol] ?? INICIO_POR_ROL.teacher;
 }
 
 // Una sesión recién obtenida (login, sesión recuperada o vuelta de la pantalla obligatoria). Con la
@@ -313,9 +312,10 @@ function arrancarConSesion(desdeElPrincipio = false) {
   reiniciarRutas();
   ruta('/inicio', conCtx((raiz, params, query, ctx) => renderInicio(raiz, ctx)));
   ruta('/perfil', conCtx((raiz, params, query, ctx) => renderPerfil(raiz, ctx)));
+  // Sin aviso configurado (los modos de prueba) esta pantalla no existe en la instalación y nada lleva a ella: quien escriba la dirección va a su inicio.
   ruta('/datos', conCtx((raiz) => (leerAviso().ok
     ? renderLeerAviso(raiz, { aviso: leerAviso(), solicitudes: '#/datos/solicitudes', rol: sesionActual.rol }) // del aviso se vuelve a Perfil con el encabezado (ui/encabezado.js)
-    : renderErrorAviso(raiz, leerAviso().faltan))));
+    : reemplazar(rutaPorDefectoSegunRol(sesionActual)))));
   ruta('/datos/solicitudes', conCtx((raiz, params, query, ctx) => renderSolicitudesDatos(raiz, ctx))); // W33: todos los roles
   ruta('/vivo', conCtx((raiz, params, query, ctx) => renderVivo(raiz, query, ctx))); // W35: la sala de EVA
   ruta('/nivel', conCtx((raiz, params, query, ctx) => renderNivel(raiz, query, ctx))); // W35: el examen de SET
@@ -333,6 +333,9 @@ function arrancarConSesion(desdeElPrincipio = false) {
   ruta('/admin/asignar-docente/:gid', conCtx((raiz, params, query, ctx) => renderAsignarDocente(raiz, params, ctx)));
   ruta('/admin/importar-csv/:gid', conCtx((raiz, params, query, ctx) => renderImportarCsv(raiz, params, ctx)));
   definirPorDefecto(rutaPorDefectoSegunRol(sesionActual));
+  // W72 (docs/ESPEC_navegacion.md §5.8, H9): cada rol en sus rutas. Una dirección que no es del rol, o que no existe, se REEMPLAZA por el inicio del
+  // rol antes de pintar nada (ni una petición de la pantalla ajena, nunca una pantalla en blanco). De quién es cada ruta lo dice navegacion.js.
+  definirGuardia((patron) => redireccionPara(sesionActual.rol, patron));
   // Con sesión, un `#/registro` heredado (el enlace del profe) no es una ruta de la app: se arranca desde la ruta por defecto.
   iniciar(vistaRaiz, { desdeElPrincipio: desdeElPrincipio || location.hash === HASH_REGISTRO });
 }
