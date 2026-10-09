@@ -539,3 +539,273 @@ W41 a W44, W47, W49, W50, W53 y W54 no dependen de nadie: se pueden hacer ya. W4
   - La varianza de `npm run fluidez` entre corridas: el piso de §6 sale de una sola.
   - El arte: no existe ninguna pieza; todo §4.7 es contrato sin objeto todavía.
   - El estado final del árbol tras W35 a W39 (el implementador trabaja ahora): las líneas citadas son de `007d7ff` y pueden correrse.
+
+## 17. Adendas
+
+### 17.1 Adenda 1 · La oleada después de la navegación, del check-in con desglose y de las insignias en código (2026-10-09)
+Creador. **Lo de arriba no se tocó.** Esta adenda va en un commit de docs ANTES de cualquier código de W41 a W60 y **no trae código**. Dice, con sección y línea, qué frase o criterio del cuerpo queda reemplazado y por qué. Donde choque con `docs/ESPEC_navegacion.md`, **manda la navegación**. Leído sobre `engrama-web` `a697863` (rama `main`, árbol limpio), `engrama-backend` `03c9c0a` (rama `test/fixture-integ`; el check-in con desglose es `1696a37`) y la raíz `f9202e7`. Parte de la auditoría `investigacion/juego/03-auditoria-juego-oleada1-tras-navegacion.md` (hecha sobre `f5c034a`, solo lectura): **cada hallazgo se cotejó contra el HEAD de hoy**; lo que cambió respecto de ella está marcado **[AUDITORÍA CORREGIDA]**.
+
+Marcas nuevas: **[HOY]** = cotejado en `a697863`, con archivo:línea · **[DICHO]** = lo afirma el coordinador y aquí no se midió · **PROVISIONAL-V** = decisión provisional **vetable** por Christiam (§17.1.9).
+
+**Lo único que se ejecutó:** lecturas, `git`, un script de una línea que suma los blobs de la precarga (§17.1.7) y otro que importa `src/textos.js` para listar claves y buscar palabras prohibidas. **Ni suites, ni tramposos, ni E2E, ni navegador, ni el mock, ni el piloto.**
+
+Series nuevas (la navegación llegó a U70, V8, R9, E34 y W77): aquí **U71 a U76 y V9**. No se abren encargos nuevos: W45 se parte en **W45a** y **W45b** y W55 se redefine.
+
+#### 17.1.1 Hechos nuevos, cotejados
+| # | Hecho | Dónde | Qué deja viejo |
+|---|---|---|---|
+| N1 | El check-in ya trae `base`, `puntualidad`, `puntual` y `ya_cobrada_hoy`, los cuatro **con valor por defecto** (0, 0, falso, falso); invariante `base + puntualidad == coins_awarded`; con `ya_cobrada_hoy` los otros tres van en 0/falso | **[HOY]** backend `src/engrama_core/schemas.py:105-124` (commit `1696a37`). **[DICHO]** desplegado en el piloto desde `59fe08a`; medido allí: primera marca 10 = 5 + 5, segunda del día 0 con `ya_cobrada_hoy: true` | §3.2 L36 ("No trae desglose") y L45 ("`CheckInResult` y `ChallengeOut` no cambian de forma"); §13 punto 1 y F2 quedan **atendidos** para el check-in (el `metadata` del libro sigue sin contrato) |
+| N2 | La navegación W62 a W76 está en el código: barra de 4 entradas del estudiante, LA tabla de rutas, un solo encabezado, guardia por rol, "✕ Salir" del reto | **[HOY]** `src/ui/nav_inferior.js:18-23`, `src/navegacion.js:43-63` (19 filas), `src/ui/encabezado.js:39-54`, `src/rutas.js:83-84`, `src/vistas/estudiante/reto_flujo.js:28-30` | §4.3 L129, §8 L307 ("la barra inferior"), y lo de §17.1.3 |
+| N3 | W45 ya está hecho en su parte de pantalla (adenda 17.8 de `ESPEC_pantallas_anillo.md`) | **[HOY]** `a84b960`: `src/ui/desglose.js`, `asistencia.js:22-53`, `:81-97`; tramposos `x_desglose_inventado`, `x_cero_como_error`, `x_ya_cobraste_sin_prueba`, `x_cero_dice_mas_cero`, `x_desglose_dice_tarde`, `x_402_generico` | §4.2 L116-117, §4.9 L242, §5 A7 (L278), U40 (L341), §7 L299 (`ui/desglose.js` no es nuevo) |
+| N4 | El error del reto ya tiene salida | **[HOY]** `reto_flujo.js:128-132` (`pintarErrorFlujo` pinta `crearSalir()`), tramposo `x_error_del_reto_sin_salida` | **[AUDITORÍA CORREGIDA]** el "callejón" del 402 al enviar (auditoría §2, W46) ya no existe |
+| N5 | `src/textos.js` tiene **386** líneas de 400, no 392 ni 394; sus claves de primer nivel `racha`, `asistencia`, `revision` y `retos` ya existen; `monedas`, `merito`, `semana`, `llama`, `finDeReto`, `premioDelReto` e `insignias` están libres | **[HOY]** medido importando `src/textos.js`; `tests/unit/textos_nav.test.mjs:32-38` y `textos_anillo.test.mjs:20-23` prohíben pisar una clave de primer nivel | §4.9 (los nombres de clave) y U46 (L347) |
+| N6 | "perdiste" aparece hoy en dos textos que no son de racha ni de monedas: `espera.yaNoEsta` y `inscripcion.soloUnaVez` (dictamen pedagógico 03). Ningún otro valor de `textos` trae una palabra prohibida | **[HOY]** el mismo script, sobre los valores (las funciones llamadas con 2 y 3) | U46 tal como está escrito se pondría rojo con el código bueno |
+| N7 | La precarga pesa **744.494 bytes en 109 entradas**; `VERSION` es `engrama-shell-v34` | **[HOY]** §17.1.7 | §3.3 L73 y §6 L292 ("hoy: 597.781", techo 760.000): quedan 15.506 bytes hasta el techo viejo y "+80.000" no cabe |
+| N8 | Existen 8 insignias en SVG **dibujadas en código** (v0.1, sin aprobar): `racha-3`, `racha-7`, `racha-14`, `reto-perfecto`, `semana-redonda`, `meta-de-la-clase`, `repaso-cumplido`, `nivel-confirmado`; 397 a 1.141 bytes; `viewBox 0 0 48 48`; solo `path`/`polygon`/`circle`; con su validador. Seis colores: cinco son tokens (`#003366` primario, `#002347` primario-oscuro, `#F0A500` oro, `#2E8B8B` secundario, `#FAF7F0` fondo) y **uno no** (`#B37B00`, oro oscuro) | **[HOY]** `diseno/arte/insignias/` (commits `c784920`, `1bd1f45` de la raíz), `LEEME.md`, `validar.mjs`; `publico/diseno/tokens.css:6-13` | §4.7 L217 (4 WebP, uno llamado `primer-reto-perfecto`) |
+| N9 | `diseno/arte/PROTOCOLO_ANTIGRAVITY.md:7`: "Lo que se puede dibujar en código no se pide: insignias, íconos, escudos, logos y siluetas van en SVG o CSS"; `:19`: las aceptadas se copian a `diseno/arte/aceptado/<familia>/` (**no existe todavía**). `diseno/arte/antigravity/` **sí existe** (sin versionar): manifiesto de 10 entradas, todas `aprobado: false`, con pesos declarados que no son los del disco (`fauna/colibri.webp` 45 KB contra 26.902 bytes; `escenas/eldorado.webp` 110 contra 82.356) y un archivo declarado que no está (`parche/andy.webp`) | **[HOY]** leído el manifiesto y medido cada archivo | §3.3 L74 y §4.7 L190 ("Hoy no existe"); la fila "peso declarado ±1 KB" de L201 rechazaría todo |
+| N10 | En la asistencia, la celebración muestra un número menor que el del resultado ("+2 monedas" arriba, "+10 monedas" abajo) | §17.1.5 | El criterio "todo número en pantalla es el del servidor" (§11 NO) |
+
+#### 17.1.2 La tabla W40 a W60, hoy
+**SIN CAMBIO** = se reparte con la letra del cuerpo más las reglas comunes de §17.1.3 · **AJUSTADO** = cambia lo que dice §17.1.4 · **YA HECHO** · **ESPERA**.
+
+| # | Encargo | Estado | Qué cambia exactamente |
+|---|---|---|---|
+| W40 | La espec | **YA HECHO** (`84e02a4`) | Lo que sigue se corrige con esta adenda |
+| W41 | Arnés: R7, fluidez ×5, peso | **AJUSTADO** | R7 pierde lo que R9 ya fotografía; `fluidez` gana solo `--corridas` (cada momento nuevo lo suma su encargo); U59 con la base y el techo de §17.1.7 |
+| W42 | Doble de la asistencia | **AJUSTADO** | El mock responde además los cuatro campos del check-in; contrato nuevo en `contratos/`; U33 y U34 ganan esas afirmaciones |
+| W43 | Reto = 10 en lo sintético | **SIN CAMBIO** | Solo la regla común RC5 (los sha de los humos de navegación y de pantallas no cambian) |
+| W44 | Partir los textos | **AJUSTADO** | Nombres de clave de §17.1.4; U46 compara valores y acota los espacios |
+| W45 | Asistencia: desglose, segunda marca, 402 | **YA HECHO en parte** (`a84b960`) + **AJUSTADO** el resto, en dos commits | **W45a** el chip de la celebración dice el número del servidor desde el primer pintado (el «+2 / +10»). **W45b** usa los cuatro campos del check-in con respaldo al camino de hoy, y E21 |
+| W46 | Fin de reto: bono y 402 al enviar | **AJUSTADO** | El 402 se resuelve en `reto_flujo.js` (no en `api/cliente.js`) y la pantalla conserva "✕ Salir"; el bono sigue dormido (O1b) |
+| W47 | "Mis monedas" y su enlace | **AJUSTADO** (el que más) | Barra de 4 con Inicio activa, fila en `navegacion.js`, encabezado único "‹ Inicio", texto vigente del desglose, humo de navegación con 10 rutas |
+| W48 | Racha con vida | **SIN CAMBIO** | Reglas comunes (sus textos van en `textos.llama`); la insignia de la etapa la pone W55 |
+| W49 | Nada se celebra por abrir | **SIN CAMBIO** | Las líneas son hoy `inicio.js:40-43` (clave del saldo) y `:47` (`senal('moneda')`) |
+| W50 | Sellos de mérito | **AJUSTADO** (menor) | El historial previo **no** "ya se pide" siempre: hay que conservarlo (§17.1.4) |
+| W51 | "Tu semana" | **AJUSTADO** | Una aserción de R4 dice que `progreso-semana` sigue "sin tocar"; las metas se leen en `src/config.js`; pedido al despliegue |
+| W52 | "Hasta N monedas" | **AJUSTADO** | "Tu reto de hoy" vive ahora dentro de "Ahora"; E31 se vuelve a medir |
+| W53 | La puerta del arte | **AJUSTADO** · aplazable | Solo WebP de escenas e ilustraciones; origen `diseno/arte/aceptado/`; sale la familia `insignias`; sale la regla "±1 KB" |
+| W54 | `crearArte`, `PRECARGA_ARTE`, `.webp` | **SIN CAMBIO** · aplazable | Ya no sirve insignias; ninguna pieza de esta oleada pasa por aquí |
+| W55 | Primeras piezas reales | **AJUSTADO** (redefinido) · PROVISIONAL-V | Las insignias entran como **SVG generado a código**, no como WebP por la puerta; ya no depende de W53 ni de W54 |
+| W56 | Humo H1 y réplica | **AJUSTADO** (menor) | La tabla de §10.1 **no se toca**; la réplica gana dos entradas (check-in sin los campos y con campos que no cuadran) |
+| W57 | E24, E26, E28 | **SIN CAMBIO** | Usa `tests/e2e/apoyo_nav_e2e.mjs`; E26 incluye `#/monedas` con su barra |
+| W58 | Fluidez final | **SIN CAMBIO** | La línea base es la de W41, medida **después** de la navegación |
+| W59 | Docs | **SIN CAMBIO** | El párrafo de Asistencia del `CLAUDE.md` se corrige ya, en el commit que acompaña a esta adenda |
+| W60 | H1 contra el backend local | **ESPERA** | A W56 y a que el piloto esté libre. Su condición O0 está cumplida según **[DICHO]** (no medido aquí) |
+
+**[AUDITORÍA CORREGIDA]** respecto de su tabla: W46 ya no tiene callejón (N4); W48 y W50 no chocan en archivos pero W50 sí cambia una frase; W55 deja de "depender del arte" con la decisión PROVISIONAL-V; el peso real es 744.494 y no "~720.860" (ella midió antes de W68 a W76); `textos.js` tiene 386 líneas y no 394.
+
+#### 17.1.3 Reglas comunes a todo encargo de la oleada (reemplazan lo que digan §4, §7 y §8 en contra)
+- **RC1 · Toda ruta nueva entra en `src/navegacion.js`** (rol, pestaña, barra, vuelve, título) en el mismo commit que la registra en `src/app.js`, o U61 (`tests/unit/navegacion.test.mjs`) se pone rojo. §7 L301 gana `src/navegacion.js` en "Ediciones a lo existente".
+- **RC2 · La barra de abajo es la del rol y va en todo estado de toda pantalla nueva** (cargando, contenido, vacío, error): `crearNavInferior('<patrón>', ctx.sesion?.rol)`. §8 L307 "la barra inferior" se lee así: **esta oleada no cambia las entradas de la barra**, pero toda pantalla nueva la lleva. §4.3 L129 "siguen sus 3 entradas" queda sin efecto: son 4.
+- **RC3 · Un solo encabezado:** `crearEncabezado('<patrón>')` da el "‹ volver" y el `h1`. Ninguna vista nueva arma un `h1` de pantalla ni un "Volver" propios (V8). **Ningún `nav` fuera de la barra** (U66): un enlace suelto es un `<a>` dentro de un `p` o un `div`.
+- **RC4 · Textos:** `src/textos.js` está al tope. Lo nuevo va en `src/textos_juego.js`, que `textos.js` esparce (`...textosJuego`), **en claves propias de primer nivel** (un spread no mezcla claves anidadas). Los que `a84b960` ya puso en `textos.asistencia` se quedan donde están.
+- **RC5 · Los humos que ya existen no cambian** salvo donde un encargo lo declare: R5 (los dos hashes de §9.2 siguen siendo la predicción), `humo_pantallas` (desarrollo `e44e7061…`, réplica `324fa3d0…`) y `humo_navegacion` (mock y réplica). El único cambio declarado es el de W47.
+- **RC6 · Fotos:** R4 (`tests/snapshots/vistas_595fd98.json`: `inicio`, `perfil`…) y R9 (`vistas_nav_2cba0b8.json`: `retos`, `asistencia`, `reto_en_curso`, `revision`…) **no se regeneran**; cada cambio se declara en `DECLARADAS` o `DECLARADAS_NAV` con su encargo. R7 es solo lo que ninguna de las dos tiene.
+- **RC7 · Los nombres de las pruebas no llevan `#`** (el informe TAP lo escapa y `correr_tramposos.mjs` no halla la línea). Los tramposos se corren por nombre y uno a la vez.
+- **RC8 · El reto en curso no lleva barra** y su única salida es "✕ Salir" (`crearSalir`, `reto_flujo.js:28-30`), también en sus pantallas de error. Nada de esta oleada le pone barra ni otra salida.
+
+#### 17.1.4 Cada AJUSTADO: archivos, criterios, tramposos y fotos
+**W41 · arnés.**
+- Reemplaza §9.1 L313 (R7): **R7 = solo lo que R4 y R9 no fotografían**: la revisión en `perfecto`, `bien` y `ánimo` y un repaso (R9 trae una sola escena `revision`), e Inicio con constancia 0, 3, 7 y 14 (R4 trae un solo `inicio`). **Salen** "asistencia (formulario)" y "lista de retos": son de R9. Se toma en el commit donde arranque W41 (después de `a697863`), no "antes de W42".
+- Reemplaza §12 L447 "y los momentos nuevos": W41 agrega **solo `--corridas`** y mide ×5 los cuatro momentos que existen. Los tres nuevos de §6 L290 los suma cada encargo en su commit (W47 "Mis monedas con 50 filas", W48 "Inicio con la llama en etapa 3", W50 "fin de reto con sello"); el piso (≥ 58,5) ya está fijado y no se mueve.
+- Reemplaza §6 L292 y §3.3 L73: lo de §17.1.7. U59 nace con esos dos límites.
+- Archivos: `herramientas/medir_peso.mjs` (nuevo), `herramientas/fluidez.mjs`, `tests/unit/peso_shell.test.mjs` (nuevo), `tests/unit/fluidez.test.mjs`, `tests/unit/fotos_del_juego.mjs` y `regresion_juego.test.mjs` (nuevos), `tests/snapshots/vistas_juego_<commit>.json`. **Nada de `src/`.** Tramposos: los de §12 (`x_regresion_revision_cambia`, `x_shell_engorda`). Fotos: ninguna cambia (las crea).
+
+**W42 · el doble de la asistencia.**
+- Reemplaza §3.2 L45 (última frase) y completa §4.1 L104-105: la respuesta del check-in del mock trae además `base`, `puntualidad`, `puntual` y `ya_cobrada_hoy`, **siempre los cuatro**, como el backend: con paga, `base + puntualidad == coins_awarded` y `ya_cobrada_hoy: false`; en la segunda marca del día, `coins_awarded: 0`, `base: 0`, `puntualidad: 0`, `puntual: false`, `ya_cobrada_hoy: true`. El `metadata` del asiento sigue como dice §4.1.
+- U33 (L334) gana: "la respuesta trae los cuatro campos y cumplen el invariante en cada fila". U34 (L335) gana: "la segunda marca responde `ya_cobrada_hoy: true` con los otros tres en 0/falso; la primera, `false`". Tramposo nuevo: `x_mock_ya_cobrada_siempre_falsa` → `herramientas/mock/rutas_core.mjs` (rojo predicho: U34 y E21).
+- **Contrato (R2).** `tests/contrato/mock_contrato.test.mjs:15` toma **el primer `openapi_*` por orden alfabético**, hoy `contratos/openapi_5aad55e.json`, cuyo `CheckInResult` tiene 4 propiedades y `additionalProperties: false`. Este commit agrega la exportación real del backend con los campos (`contratos/openapi_<sha>.json`, con la instrucción de `contratos/LEEME.md`, sin tocar el repo del backend) y actualiza el `LEEME.md`. **Predicción:** si el sha empieza por `59…`, ese archivo pasa a ser el de R2 por orden alfabético; se declara en el commit y R2 debe seguir verde con el mock nuevo y **rojo con el mock sin los campos solo si el validador exige las propiedades** (no leído: §17.1.10).
+- Archivos: `herramientas/mock/rutas_core.mjs` (hoy `:10` base 50, `:58` multiplicador, `:66` la respuesta), `economia.mjs` (nuevo), `estado.mjs`, `monedas.mjs`, `rutas_teachers.mjs`, `contratos/`, `tests/unit/mock_asistencia.test.mjs` (nuevo), `tests/snapshots/humo_mvp_uis.sha256` (R5 = `88a83bee…`, sin cambio de predicción). **Nada de `src/`.** Fotos: ninguna. RC5.
+
+**W44 · textos.**
+- Reemplaza los **nombres de clave** de §4.9 (los textos no cambian salvo donde se dice):
+
+| §4.9 decía | Clave de hoy | Nota |
+|---|---|---|
+| `asistencia.exito`, `yaCobrada`, `sinMonedas`, `bolsaAgotada` | `textos.asistencia.*` en `src/textos.js` | **ya existen** (`a84b960`); no se mueven |
+| `asistencia.desgloseBase` / `desglosePuntualidad` ("Asistencia +N" / "Puntualidad +N") | `textos.asistencia.desglose(base, puntualidad)` → "5 por asistir + 5 por llegar a tiempo" | **cedidas** por la adenda 17.8; las dos fichas ya no existen |
+| `revision.incluyeConstancia`, `revision.bolsaAgotada` | `textos.finDeReto.incluyeConstancia`, `textos.finDeReto.bolsaAgotada` | W46 |
+| `monedas.*` | `textos.monedas.*` | W47. El detalle de la fila de asistencia es el de `textoDelDesglose`, no "Asistencia +5 · Puntualidad +5" (§4.3 L136, §4.9 L250) |
+| `racha.crece`, `deNuevo`, `deNuevoSinDato`, `etapas` | `textos.llama.*` | W48. `textos.racha.sube` se queda en `textos.js` |
+| `merito.*`, `semana.*` | `textos.merito.*`, `textos.semana.*` | W50, W51 |
+| `retos.hasta` | `textos.premioDelReto.hasta` | W52 |
+| `arte.*` (textos alternativos) | `textos.insignias.*`, una por id de insignia | W55 |
+
+- Reemplaza U46 (L347): "Ningún **valor** de `textosJuego` (entero), ni de `textos.asistencia`, `textos.racha`, `textos.revision`, `textos.retos` ni `textos.inicio`, trae una palabra prohibida de §4.9 L265 (las funciones se llaman con 2 y 3, y además con 0 las que reciben monedas); se comparan valores, **no el código fuente** (un comentario puede decir "+0"); `textos.anillo`, `textos.espera` y `textos.inscripcion` quedan fuera (N6: su "perdiste" es del dictamen 03 y no habla de racha ni de monedas)". Tramposo `x_racha_en_riesgo` → `src/textos_juego.js`, igual.
+- W44 entrega `src/textos_juego.js` **con las claves vacías de uso** (los textos de la tabla, ya escritos), `textos.js` con su `...textosJuego` y su prueba hermana de `textos_nav.test.mjs` (ninguna clave pisa a `textos.js`, `textos_anillo.js` ni `textos_nav.js`; `textos.js` ≤ 400 líneas). Tramposo nuevo: `x_textos_juego_pisa_clave` (una clave `asistencia` en `textos_juego.js`).
+- Archivos: `src/textos_juego.js` (nuevo), `src/textos.js` (una línea de import y una de spread), `sw.js` (`PRECARGA` + `VERSION`), `tests/unit/textos_juego.test.mjs` (nuevo); las copias rotas de `textos.js` (`x_cero_dice_mas_cero`, `x_desglose_dice_tarde`, `x_dos_cerrar_sesion`) y de `sw.js` (`x9_sin_precarga`, `x_sw_cachea_api`, `x_sw_cachea_config`, `x_sw_instala_con_addall`, `x_sw_sin_vendor`) se regeneran y siguen rojas en su mismo test. Fotos: ninguna (R4, R5, R7 y R9 idénticas).
+
+**W45a · el chip dice el número del servidor (el «+2 / +10»).** Causa y evidencia en §17.1.5.
+- **Qué cambia (una cosa):** el chip de la celebración (`data-testid="chip-monedas"`) nace con el texto `+N`, donde N es `coins_awarded`, y **no cambia de número nunca**. Sale el conteo desde 0 de `src/ui/sello.js:52` y el `'+0'` inicial de `:42`. La llegada se sigue celebrando como hoy: las fichas vuelan y el chip late en oro (`celebrarMonedas`, `sello.js:51`); el confeti y el sello, igual.
+- **U71:** con `coins_awarded` 10, 5 y 1, en el primer pintado y en cada fotograma hasta que la celebración termina (reloj y `requestAnimationFrame` de mentira, muestreado a 0, 100, 150, 500 y 2.000 ms), el texto del chip es exactamente `+N monedas` e igual al número del resultado (`asistencia-resultado`); la cadena "+0" no aparece dentro de `sello-zona`; con 0 monedas el chip no existe (como hoy). **E2E:** `tests/e2e/game_feel.test.mjs:206-232` gana la lectura del chip a los 150 ms del resultado: igual al del texto.
+- **Tramposos:** `x_chip_cuenta_desde_cero` → `src/ui/sello.js` (**es el código de hoy**; rojo predicho: U71). `x_sello_monedas_de_mas` hoy muta el `hasta` del conteo (`monedas + 1`): su defecto se reescribe sobre el texto del chip (`+${monedas + 1}`) y debe seguir rojo **en su mismo test**; `x_asistencia_sin_sello_si_0` y `x_sello_no_aparece` se regeneran.
+- Archivos: `src/ui/sello.js`, `tests/unit/ui_sello.test.mjs`, `tests/e2e/game_feel.test.mjs`, tres copias rotas. Fotos: ninguna (R9 `asistencia` es el formulario). **No toca** `ui/conteo.js` ni `ui/monedas.js`.
+- Es un cambio de un efecto portado de Lingo (el chip que cuenta): **PROVISIONAL-V**, pregunta C13.
+
+**W45b · los cuatro campos del check-in.** Detalle en §17.1.6.
+- Reemplaza §4.2 L112 (primera frase: "Tras un check-in con monedas, la vista pide `GET /core/coins/history?limit=5`…") y las filas L116, L117 y L119 de su tabla; reemplaza A7 (L278): **la línea** `asistencia-desglose` (ya no "fichas de texto") entra con opacidad y escala 0,8 a 1 en 260 ms, una sola, con su renglón reservado desde que hay monedas; reducida, aparece.
+- Reemplaza E21 (L370): "'+10 monedas' con la línea '5 por asistir + 5 por llegar a tiempo'; '+5 monedas' con '5 por asistir'; el tercero ve 'La de hoy ya la cobraste', el sello, 0 fichas voladoras, 0 lienzos de confeti y ni '+0' ni `✗`; **y en los tres la vista de asistencia hizo 0 `GET /core/coins/history` y 0 `GET /core/attendance/history`**". Necesita W42.
+- U72 y U73 y sus tramposos: §17.1.6. U37 y U38 **no cambian** y siguen verdes: son el camino de respaldo.
+- Archivos: `src/ui/desglose.js` (función nueva, pura), `src/vistas/estudiante/asistencia.js:42-53` y `:81-91`, `tests/unit/ui_desglose.test.mjs`, `tests/unit/vista_asistencia_pago.test.mjs`, `tests/e2e/asistencia.test.mjs` (E21), `estilos/juego.css` (A7), `herramientas/fluidez.mjs` no. Copias rotas que se regeneran: de `asistencia.js` (`x_402_generico`, `x_cero_como_error`, `x_sin_red_marcar_activo`, `x_ya_cobraste_sin_prueba`), de `desglose.js` (`x_desglose_inventado`) y de `juego.css` (`x_barra_del_profe_rebota`, `x_barra_del_profe_rebota_e2e`, `x_keyframes_reflow`). Fotos: ninguna.
+
+**W46 · fin de reto.**
+- Reemplaza U40 (L341) en su mitad del envío: el 402 al enviar se traduce en una función pura de `reto_flujo.js` (`mensajeDeEnvio(e)`, hermana de `mensajeDeAsistencia`), **no en `src/api/cliente.js`** (siete tramposos copian ese archivo; la adenda 17.8 tomó la misma decisión para el check-in). La pantalla es la de `pintarErrorFlujo` (`reto_flujo.js:128-132`): conserva "✕ Salir" arriba (RC8) y el mensaje va con ícono de información (ℹ, `role="status"`), no con `role="alert"` ni `✗`. Texto: `textos.finDeReto.bolsaAgotada`.
+- Tramposo: `x_402_generico` ya existe y muta `asistencia.js`; el del envío es **`x_402_envio_generico`** → `reto_flujo.js` (rojo predicho: U40). `x_bono_restado_en_cliente` → `revision.js`, igual (U39).
+- El bono sigue dormido: el backend de hoy fija `streak_bonus = 0` (`challenge_engine/service/attempts.py:306` y `:337`).
+- Archivos: `src/vistas/estudiante/reto_flujo.js`, `revision.js:49-57`, `tests/unit/vista_reto_flujo.test.mjs`, `vista_revision.test.mjs`; copias rotas de `reto_flujo.js` (8: `x12_envia_value`, `x_boton_siempre_activo`, `x_error_del_reto_sin_salida`, `x_reto_en_curso_con_barra`, `x_reto_sin_salida`, `x_reto_sin_salida_e30`, `x_salir_del_reto_envia`, `x_salir_durante_el_envio`) y de `revision.js` (`x11_drako_califica`, `x_repaso_muestra_monedas`). Fotos: **ninguna** (R9 `reto_en_curso_error` no es un 402; R9 `revision` y R7 no traen bono).
+
+**W47 · "Mis monedas".**
+- Reemplaza §4.3 L129: "**Ruta:** `#/monedas`, solo estudiante, con su fila en `src/navegacion.js`: `roles: ['student']`, `pestana: 'inicio'`, `barra: true`, `vuelve: '/inicio'`, título `textos.monedas.titulo`. Lleva la barra de 4 entradas con **Inicio** activa en sus cuatro estados (RC2) y el encabezado único (RC3): '‹ Inicio' y el título 'Mis monedas'; la pestaña del navegador dice 'Mis monedas · ENGRAMA'. Se llega por un enlace en Inicio: un `<a data-testid="ir-a-monedas" href="#/monedas">` ('Ver mis movimientos') hijo directo de la vista, inmediatamente debajo de `div.barra-superior` (`inicio.js:223-231`, `:238`), fuera de todo `nav`; es el único enlace de Inicio a ese destino (U66)."
+- Reemplaza §4.3 L136 y U42 (L343) en lo del desglose: el detalle de la fila `attendance` es `textoDelDesglose` ("5 por asistir + 5 por llegar a tiempo"), solo si el asiento cuadra. `ui/desglose.js` gana `desgloseDeAsiento(asiento)` (pura; la regla de hoy de `:23-26`, por asiento); `desgloseDeAsistencia` pasa a usarla **sin cambiar de comportamiento** (U37 idéntico, `x_desglose_inventado` regenerado y rojo en su mismo test). La fuente del desglose en las filas es el `metadata` del libro (los campos del check-in no sirven para el historial).
+- **U74 (nuevo):** `#/monedas` está en la tabla (U61 verde) y un docente o un admin que la escriben quedan en su inicio con 0 peticiones de la vista; en cargando, contenido, vacío y error la pantalla trae la barra con exactamente una pestaña activa (Inicio) y **exactamente un** `volver` a `#/inicio`; ningún `nav` fuera de la barra; `document.title` = "Mis monedas · ENGRAMA". Tramposos: `x_monedas_sin_barra_en_error` → `src/vistas/estudiante/monedas.js` (U74) y `x_monedas_con_volver_casero` → `monedas.js` (V8).
+- **Humo de navegación:** `tests/e2e/humo_navegacion.test.mjs:23` pasa de `student: 9` a `student: 10` y los sha de `salida/humo_navegacion.{mock,replica}.json` se **recalculan y se declaran en este commit** (lo anuncia `ESPEC_navegacion.md` §10.1 L307). Nada más de esa tabla cambia; si cambia, candidato a ERR. E30 debe alcanzar `#/monedas` por toques y E31 se vuelve a medir en Inicio (el enlace baja el resto; los tres botones de "Ahora" siguen sin desplazar a 375×812).
+- Suma su momento a `herramientas/fluidez.mjs` ("Mis monedas con 50 filas").
+- Archivos: `src/vistas/estudiante/monedas.js` y `src/ui/movimientos.js` (nuevos), `src/navegacion.js`, `src/app.js:312-333`, `src/vistas/estudiante/inicio.js`, `src/ui/desglose.js`, `sw.js`, `estilos/juego.css`, `herramientas/fluidez.mjs`, `tests/unit/vista_monedas.test.mjs` y `ui_movimientos.test.mjs` (nuevos), `tests/unit/regresion_vistas.test.mjs`, `tests/e2e/monedas.test.mjs` (E20, nuevo), `tests/e2e/humo_navegacion.test.mjs`. Copias rotas: las 9 de `inicio.js`, las 6 de `navegacion.js`, las 9 de `app.js`, las 5 de `sw.js`, las 3 de `juego.css` y la de `desglose.js`.
+- **Fotos:** R4 `inicio`: se declara `ir-a-monedas` en `DECLARADAS.inicio` (`regresion_vistas.test.mjs`), con su prueba de "cambió de verdad y solo eso". R9: ninguna. R7 (Inicio ×4): el mismo nodo.
+
+**W50 · sellos de mérito.**
+- Reemplaza en §4.6 L178 "(ya se pide: `reto_flujo.js:24-26`)": hoy el historial se pide en `yaGanado` (`reto_flujo.js:33-36`), **que devuelve un booleano y descarta la lista**, y **no se pide** si la dirección trae `?repaso=1` (`:168`, cortocircuito). W50: `yaGanado` pasa a devolver también el historial leído y `renderRevision` lo recibe (`historialPrevio`); con `?repaso=1` no se pide nada (es repaso: `meritoDelReto` devuelve `null` sin mirar el historial). Criterio agregado a U48: "jugar un reto hace **el mismo número de `GET /challenges/attempts/history` que hoy** (1 sin `?repaso=1`, 0 con él)". Tramposo nuevo: `x_merito_pide_historial_de_mas` → `reto_flujo.js`.
+- Suma su momento a `fluidez.mjs` ("fin de reto con sello"). El dibujo del sello es el de CSS; la insignia `reto-perfecto` la pone W55.
+- Fotos: R9 `revision` y R7 **no cambian** (predicción: sus entradas fijas no pasan historial previo, y sin historial no hay sello); si cambian, se declara el nodo `merito`.
+
+**W51 · "Tu semana".**
+- `tests/unit/regresion_vistas.test.mjs:99` afirma que `progreso-semana` sigue "sin tocar" fuera de lo declarado: al declarar `progreso-semana` en `DECLARADAS.inicio` esa aserción se pone roja. **Se edita en este commit** (queda: "el nodo `progreso-semana` existe y va después de `ahora`", como ya miden `:93` y `vista_inicio_ahora.test.mjs:33`); el `data-testid="progreso-semana"` **se conserva** y su posición también (después de "Ahora": `inicio.js:246-247`).
+- Las metas (C2: 2 y 2) se leen con una función pura nueva de `src/config.js`, `metasDeSemana(config)`: claves `SEMANA_META_CLASES` y `SEMANA_META_RETOS` (PROVISIONAL el nombre), enteros de 0 a 7; ausentes o mal formadas → 2 y 2; 0 en cualquiera → la semana completa se apaga. §7 L301 gana `src/config.js`, y `docs/PEDIDO_claves_config_anillo.md` gana las dos claves. Tramposo nuevo: `x_meta_de_semana_como_texto` (acepta la cadena `"0"` como número) → `src/config.js`.
+- `tests/unit/vista_estudiante_inicio.test.mjs:28-56` (los casos de `dentroDeLaSemana` y `resumenSemana`) cambia como ya declara §7 L303. Fotos: R4 `inicio` y R7: `progreso-semana`.
+
+**W52 · "Hasta N monedas".**
+- Reemplaza en §4.5 L163 "en 'Tu reto de hoy'": la tarjeta es `tarjeta-reto-hoy` dentro de la sección "Ahora" (`inicio.js:168-177`, `fila-ahora fila-invitacion`). La etiqueta va como un tercer `span.texto-apoyo` dentro de `div.fila-texto`, sin oro ni animación; **E31 se vuelve a medir** (los tres botones de "Ahora" sin desplazar a 375×812).
+- U52 (L353) "la foto de R4 no cambia" se precisa: no cambian **R4 `inicio` ni R9 `retos`** porque sus entradas fijas no traen `coins_reward` (**[HOY]** `grep coins_reward` en `fotos_de_las_vistas.mjs`, `fotos_de_navegacion.mjs` y `foto_vistas.mjs`: 0). La fila "retos: una etiqueta por fila sin ganar" de §12 L458 pasa a "ninguna".
+- Archivos: `src/vistas/estudiante/retos.js:31-42`, `inicio.js:168-177`, sus pruebas y sus copias rotas.
+
+**W53 y W54 · la puerta del arte (aplazables; nada de esta oleada depende de ellas).**
+- §4.7 L190: `diseno/arte/antigravity/` existe y **no es el origen**. El origen de la puerta es **`diseno/arte/aceptado/`** (protocolo, paso 5a), con su `manifiesto.json`; mientras esa carpeta no exista la herramienta sale con 2 y el índice sigue vacío.
+- L198: la ruta pasa a `^(fauna|flora|parche|escenas|tienda)/[a-z0-9-]+\.webp$`. **Sale `insignias`** (van por W55) y entra `flora`, que el manifiesto real ya usa.
+- L201: se quita "y el declarado no se aparta más de 1 KB" (N9: ninguna pieza real lo cumple). Manda **el peso real en disco**; el declarado no se compara. El campo `referencia` del manifiesto real se acepta y no se copia.
+- L217: "Piezas que esta oleada puede usar" → **ninguna por esta puerta**. `PRECARGA_ARTE` nace vacía y su techo de 300.000 bytes no cambia.
+- V6 y V7 (L361-362) no cambian; `herramientas/verificar.mjs` ya tiene V8 en un archivo hermano (`verificar_v8.mjs`): V6 y V7 van igual, en `verificar_arte.mjs`, para no pasar de 400 líneas (hoy 396).
+
+**W55 · las insignias, como SVG generado a código (PROVISIONAL-V, C12).** Reemplaza la fila W55 de §12 (L461) y §4.7 L217.
+- **Qué cambia (una cosa):** las insignias de `diseno/arte/insignias/*.svg` llegan a la app **generadas**, como Drako: `node herramientas/generar_insignias.mjs` lee los SVG (solo lectura) y escribe `src/ui/insignias_datos.js` (**GENERADO, no se edita a mano**: por insignia, su `viewBox` y la lista de formas con etiqueta, geometría y **nombre de color**); `src/ui/insignia.js` exporta `crearInsignia(id, textoAlternativo, respaldo)`, que arma el `<svg>` con `createElementNS`, sin `innerHTML`.
+- **Colores solo de tokens.** El generador traduce cada relleno a un nombre (`primario`, `primario-oscuro`, `oro`, `secundario`, `fondo`) y la forma lleva una clase (`ins-oro`…) cuyo `fill` es `var(--token)` en `estilos/juego.css`. **Ningún hexadecimal llega a `src/`.** El oro oscuro `#B37B00` no es token: PROVISIONAL, `ins-oro-sombra` = `color-mix(in srgb, var(--oro) 75%, black)` (da `#B47C00`; la regla de estilos de la casa admite `color-mix()` con `black`). Un color que el generador no conoce → sale con 1 y no escribe nada.
+- **La puerta del generador** (todo o nada): solo `svg`, `path`, `polygon` y `circle`; solo los atributos `viewBox`, `d`, `points`, `cx`, `cy`, `r` y `fill`; `viewBox` exactamente `0 0 48 48`; ningún `style`, `transform`, `href`, `<image>`, `<text>`, `<script>`, manejador `on*` ni referencia externa; geometría sin `NaN` ni `undefined`; 1.500 bytes como máximo por archivo y 8 insignias como máximo.
+- **Dónde se ven** (cada una sobre el dibujo de CSS, que es su respaldo y se pinta primero; id desconocido → respaldo, nunca un hueco): `racha-3`, `racha-7` y `racha-14` en el aviso "Tu llama creció" de su cruce (A2); `reto-perfecto` en el sello "Primer reto perfecto" (A4); `semana-redonda` en el sello "Semana completa" (A5). Las otras tres (`meta-de-la-clase`, `repaso-cumplido`, `nivel-confirmado`) se generan y **no se usan**: son de oleadas siguientes. La llama de reposo (A1) sigue siendo la de CSS. Los `@keyframes` no cambian: la insignia hereda el movimiento de su contenedor.
+- **Criterios.** **U75:** `insignias_datos.js` es exactamente lo que el generador produce desde los SVG de hoy (prueba de sincronía, como `drako_rig_sincronizado`); cada fila de la puerta, rota, da salida 1 y 0 bytes escritos; en el generado no hay `#` seguido de 6 hexadecimales. **U76:** `crearInsignia` devuelve un `svg` con `role="img"` y su `aria-label` (o `aria-hidden` cuando el texto ya está al lado), todos sus nodos en el espacio de nombres de SVG, sus formas con clase de color; id desconocido → el respaldo. **V9:** en `src/`, `createElementNS` de insignias solo en `ui/insignia.js`, y `ui/insignias_datos.js` no trae `<`, `style`, `href` ni `on…=`.
+- **Tramposos:** `x_insignia_a_mano` → `src/ui/insignias_datos.js` (U75) · `x_insignia_con_hex` → `herramientas/generar_insignias.mjs` (deja pasar el color sin traducir; U75) · `x_insignia_con_script` → el generador (acepta `<script>`; U75) · `x_insignia_por_innerhtml` → `src/ui/insignia.js` (V1 de `verificar.mjs` y U76) · `x_insignia_hueco` → `insignia.js` (id desconocido deja una caja vacía; U76).
+- **Peso:** las insignias son código y cuentan en el shell (§17.1.7), no en `PRECARGA_ARTE`. Predicción: `insignias_datos.js` + `insignia.js` ≤ 12.000 bytes.
+- **Aprobación:** las 8 son v0.1 **sin aprobar**. Entran como PROVISIONAL-V; el generador anota en la cabecera del archivo generado el commit de `diseno/` del que salieron y "sin aprobar". Si Christiam veta una, se quita de la lista del generador y vuelve su respaldo de CSS: ningún otro archivo cambia. `diseno/` no se toca.
+- Archivos: `herramientas/generar_insignias.mjs`, `src/ui/insignias_datos.js`, `src/ui/insignia.js` (nuevos); `src/ui/racha.js`, `src/ui/merito.js`, `src/ui/semana.js`, `estilos/juego.css`, `sw.js`, `herramientas/verificar.mjs` (o su hermano); pruebas `tests/unit/insignias_sincronizadas.test.mjs`, `ui_insignia.test.mjs`. Va **después de W48, W50 y W51**. Fotos: R7 (el aviso y los sellos no están en las fotos: predicción, ninguna).
+
+**W56 · humo.** La tabla de §10.1 no se toca. §10.2 gana dos entradas de réplica: (a) un check-in cuya respuesta **no trae** ninguno de los cuatro campos (backend viejo): la app cae al camino de las dos peticiones y dice lo mismo; (b) uno con `coins_awarded: 10`, `base: 5`, `puntualidad: 0` (no cuadra): la app no usa los campos. El humo cuenta `ya_cobrada_hoy` con lo que **la app mostraría**, venga de donde venga.
+
+#### 17.1.5 El «+2 / +10» de la asistencia: causa
+**No es otra cifra: es el mismo número, contado desde cero.** La hipótesis "la celebración calcula sus fichas con otra cifra" queda **refutada por lectura**: las fichas y el chip reciben el mismo `coins_awarded` (`asistencia.js:88` → `sello.js:51` y `:52`).
+- `src/ui/sello.js:42` crea el número del chip con el texto literal `'+0'`, y `:52` lo hace contar de 0 a `monedas` con `animarConteo` durante `380 + max(900, duracionTotal(planDeMonedas(monedas)))` ms. Con 10 monedas: 8 fichas (`ui/monedas.js:22`), 850 + 7 × 70 = 1.340, total **1.720 ms**.
+- `src/vistas/estudiante/asistencia.js:83-85` pinta en ese mismo instante el resultado con el número final ("Asistencia marcada · +10 monedas · constancia R").
+- La curva es cúbica de salida (`ui/conteo.js:16-19`): con 10 monedas el chip dice "+2" entre los 91 y los 157 ms, y no llega a "+10" hasta los **1.086 ms**. Durante más de un segundo hay dos números distintos, uno encima del otro; además "+0" existe en el DOM en el primer fotograma, contra §4.2 L124.
+- **Evidencia en disco (vista, no reproducida hoy):** `ENGRAMA/despliegue/e2e_piloto.mjs:336` captura la asistencia con `celebracion: true` ("no se espera a que termine", `:130-131`); la captura vieja `despliegue/salida/_despues_anillo/galeria_e2e/06-asistencia-con-sello.png` muestra el mismo defecto con la economía anterior: chip "**+28** monedas" sobre "Asistencia marcada · **+50** monedas". Con 50 monedas "+28" cae hacia los 510 ms del conteo, que es lo que tarda esa captura.
+- `tests/e2e/game_feel.test.mjs:214-229` lee el chip 3,7 s después y por eso siempre lo vio bien: **el criterio que existía no miraba el intervalo del defecto**.
+- Defecto vecino, no visible hoy: un conteo cancelado se queda en el número intermedio (`ui/conteo.js:48`); solo se cancela al cambiar de ruta, que vacía la pantalla. Va a "Después".
+- **Arreglo:** W45a (§17.1.4). No se movió ningún criterio para acomodarlo: el de §11 ("un número en pantalla que el servidor no mandó") ya lo condenaba.
+
+#### 17.1.6 Uso de los cuatro campos del check-in (W45b)
+Una función pura nueva en `src/ui/desglose.js`, **`pagoDelCheckIn(r)`**, lee la respuesta del check-in y devuelve una de tres cosas. **"Ausente" no es "0":** un backend anterior a `1696a37` no manda las claves; uno nuevo las manda siempre, y `0`/`false` son respuestas válidas. "Presente" es `Object.hasOwn(r, clave)` con el tipo correcto; nunca `r.base ?? 0` ni `Boolean(r.ya_cobrada_hoy)`.
+
+| `coins_awarded` | Lo que llega | `pagoDelCheckIn` | Qué se ve | Peticiones extra |
+|---|---|---|---|---|
+| N > 0 | `base` y `puntualidad` presentes, enteros no negativos, **suman N**, y `ya_cobrada_hoy` no es `true` | `{desglose: {base, puntualidad}}` | "+N monedas" y la línea `textoDelDesglose` | **0** |
+| N > 0 | presentes pero no suman N, o no son enteros, o `ya_cobrada_hoy: true` (se contradice) | `null` | camino de hoy | 1 `GET /core/coins/history?limit=5` (con su propia desconfianza: U37) |
+| N > 0 | `base` o `puntualidad` ausentes | `null` | camino de hoy | 1 (igual) |
+| 0 | `ya_cobrada_hoy === true` (y `base`, `puntualidad`, si vienen, en 0) | `{yaCobrada: true}` | "Asistencia marcada. La de hoy ya la cobraste…" | **0** |
+| 0 | `ya_cobrada_hoy === false` (presente, booleano) | `{yaCobrada: false}` | "Asistencia marcada. Constancia: R." (el servidor ya dijo que **no** era una segunda marca) | **0** |
+| 0 | `ya_cobrada_hoy` ausente o no booleano | `null` | camino de hoy | 1 `GET /core/attendance/history?limit=10` (`haySegundaMarcaDelDia`) |
+
+- La suma se **comprueba**, no se usa para deducir: la web sigue sin restar para sacar una parte (`x_desglose_inventado` sigue vigilándolo en el respaldo).
+- `puntual` **no se pinta ni decide nada** en esta oleada (G4: a quien no fue puntual no se le dice nada; "puntual con bono 0" tampoco tiene texto). Se deja escrito para que nadie lo use como "llegaste tarde".
+- `message` del servidor sigue sin mostrarse. Un 402, 404, 409 y 410, como hoy.
+- **U72** (`pagoDelCheckIn`, pura): las 6 filas, más: `base: "5"` (texto) → `null`; `base: -1` → `null`; `base: 5.5` → `null`; `ya_cobrada_hoy: "true"` → `null`; `ya_cobrada_hoy: true` con `coins_awarded: 10` → `null`; respuesta `null` o sin `coins_awarded` entero → `null`; nunca lanza.
+- **U73** (la vista, con el servidor falso de las pruebas, contando peticiones): con los campos, exactamente 1 `POST` y **0** `GET` desde la asistencia, y el texto de la fila; sin ellos, las peticiones y los textos de hoy (U38 intacto); la cadena "+0" no aparece en ninguna fila; ninguna variante dice "tarde".
+- **Tramposos** (todos nuevos): `x_ya_cobrada_ausente_es_falsa` → `desglose.js` (trata la clave ausente como `false`: con un backend viejo la segunda marca ya no pide el historial y nunca dice "ya la cobraste"; rojo predicho U72 y U73) · `x_ya_cobrada_por_cero` → `desglose.js` (dice "ya la cobraste" con cualquier 0, sin mirar el campo; U72) · `x_desglose_de_campos_sin_cuadrar` → `desglose.js` (usa `base` y `puntualidad` sin comprobar la suma; U72) · `x_checkin_pide_de_mas` → `asistencia.js` (sigue pidiendo el libro aunque los campos vengan y cuadren; U73 y E21).
+- **Lo que NO cambia:** `desgloseDeAsistencia`, `haySegundaMarcaDelDia`, `textoDelDesglose` y sus pruebas; `src/api/core.js:26-31` (devuelve la respuesta tal cual); los textos.
+
+#### 17.1.7 El peso del shell, medido hoy, y el techo nuevo (PROVISIONAL-V, C11)
+- **Método** (el de §6 L292: la suma de `PRECARGA`, con fines de línea de Unix): se leyó la lista con la misma expresión regular de `tests/unit/sw_precarga.test.mjs:14-19` y se sumó `git cat-file -s HEAD:<ruta>` de cada entrada (`/` cuenta como `index.html`). Sin navegador. `herramientas/medir_peso.mjs` todavía no existe (es de W41) y `herramientas/medir_sw.mjs` mide tiempos, no bytes.
+- **Resultado en `a697863`: 109 entradas, 744.494 bytes** (747.836 en este disco, con fines de línea de Windows; 742.749 si `/` e `/index.html` se contaran una vez). Era 597.781 con 90 entradas en `007d7ff`: **+146.713 bytes** que no son de esta oleada (anillo, registro, inscripciones y navegación). Los mayores: anime.js 118.678; `drako_rig.js` 53.327; `juego.css` 27.482; `componentes.css` 25.267; canvas-confetti 24.924. Por carpeta: `src/vistas` 193.688, `src/ui` 160.956, `vendor` 143.602, `estilos` 58.887.
+- **Reemplaza §6 L292:** "la suma de `PRECARGA` **no crece más de 80.000 bytes** sobre la línea base que W41 mida en su commit (hoy: 744.494), y **nunca pasa de 830.000**".
+- **Por qué 830.000:** (1) el presupuesto propio de la oleada, +80.000, **no se mueve**: es el preregistrado; (2) 744.494 + 80.000 = 824.494, redondeado a la decena de mil siguiente; (3) lo que sí se mueve es el tope absoluto, que lo consumieron otras especs (anillo, registro y navegación) sin que nada lo vigilara; (4) lo que la oleada necesita, por lectura: unos 55.000 a 60.000 bytes (`textos_juego.js`, `monedas.js`, `movimientos.js`, `merito.js`, `semana.js`, `arte.js`, `arte_indice.js`, las insignias ≤ 12.000, y lo que crecen `juego.css`, `racha.js`, `sello.js`, `inicio.js`, `asistencia.js`, `revision.js`, `linea_fin_reto.js`).
+- **Candidato a ERR (lo dice el Creador de esta espec):** el tope de 760.000 se fijó **sin el test que lo vigilara** (U59 nace en W41) y quedó a 15.506 bytes de romperse sin que nadie lo viera. No es mover el criterio tras ver un resultado de esta oleada (no hay ninguno), pero sí es un criterio absoluto que dependía de trabajo ajeno. Regla propuesta: un presupuesto absoluto entra junto con su prueba, o se escribe solo como crecimiento.
+
+#### 17.1.8 Orden de reparto definitivo (en serie; un escritor a la vez en el repo)
+Los lotes son por archivos compartidos. `sw.js`, `src/textos_juego.js`, `estilos/juego.css` y las copias rotas de `tests/tramposos/` los tocan casi todos: **no hay paralelismo** dentro del repo.
+
+| Paso | Encargo | Lote (archivos que comparte) | Quién | Depende de |
+|---|---|---|---|---|
+| 0 | Adenda 1 (este commit) | docs | creador | — |
+| 1 | **W45a** el chip | asistencia (`ui/sello.js`) | implementador | nada: va primero porque es el defecto que se ve en la demostración |
+| 2 | W41 arnés | herramientas y pruebas (sin `src/`) | creador; mide el probador | — |
+| 3 | W42 doble de la asistencia | mock y `contratos/` | creador | W41 |
+| 4 | W43 reto = 10 | mock, sembrador, herramientas | implementador; mide el probador | W42 (`estado.mjs`, `fluidez.mjs`) |
+| 5 | W44 textos | `textos.js`, `textos_juego.js`, `sw.js` | implementador | W41 |
+| 6 | **W45b** campos del check-in + E21 | asistencia (`desglose.js`, `asistencia.js`) | creador | W42, W44, W45a |
+| 7 | W47 Mis monedas | Inicio y navegación (`inicio.js`, `navegacion.js`, `app.js`, `desglose.js`) | creador | W44, W45b |
+| 8 | W49 nada por abrir | Inicio | implementador | W47 |
+| 9 | W48 racha con vida | Inicio y asistencia (`racha.js`, `sello.js`, `asistencia.js`, `auth/`) | creador | W49 (E22), W45b |
+| 10 | W51 Tu semana | Inicio (`inicio.js`, `config.js`) | creador | W48 |
+| 11 | W52 Hasta N monedas | Inicio y Retos (`inicio.js`, `retos.js`) | implementador | W51 |
+| 12 | W46 bono y 402 al enviar | fin de reto (`reto_flujo.js`, `revision.js`) | implementador | W44 |
+| 13 | W50 sellos de mérito | fin de reto (`reto_flujo.js`, `revision.js`, `linea_fin_reto.js`, `celebracion.js`) | creador | W46 |
+| 14 | W55 insignias en código | `racha.js`, `merito.js`, `semana.js`, `juego.css` | creador | W48, W50, W51 |
+| 15 | W56 humo H1 y réplica | herramientas | creador | 1 a 14 |
+| 16 | W57 E24, E26, E28 | `tests/e2e/` | implementador | W56 |
+| 17 | W58 fluidez final | — | probador | W57 |
+| 18 | W59 docs | docs | implementador (o cronista) | W58 |
+| 19 | W60 H1 contra el backend local | — | probador | W56 y el piloto libre |
+| aplazable | W53 → W54 la puerta del arte (WebP) | `herramientas/`, `ui/arte.js`, `sw.js`, `servidor_dev.mjs` | creador → implementador | nada; nada depende de ellas |
+
+- **Implementador (Sonnet, rutinario ya especificado):** W45a, W43, W44, W49, W52, W46, W57, W59, W54. **Creador (Opus):** W41, W42, W45b, W47, W48, W51, W50, W55, W56, W53. **Probador (Haiku):** las medidas de W41 y W43, W58, W60.
+- **Camino corto si la conferencia aprieta** (lo demostrable de punta a punta): 1 → 3 → 4 → 5 → 6 → 7. Cada paso deja la app entera; lo demás es mejora.
+- Después de W58: auditor (LISTO / NO LISTO), como dice §12.
+
+#### 17.1.9 Preguntas abiertas (cada una con su provisional; ninguna bloquea)
+Continúan la serie de §14.
+
+| # | Para | Pregunta | Provisional |
+|---|---|---|---|
+| C11 | Christiam | El shell ya pesa 744.494 bytes y el techo viejo (760.000) no alcanza. ¿Techo nuevo? ¿O prefiere que se adelgace algo (anime.js son 118.678)? | Crece hasta +80.000 y nunca pasa de **830.000** |
+| C12 | Christiam | ¿Las insignias entran como SVG generado a código desde `diseno/arte/insignias/` (como Drako), y la puerta del arte queda solo para escenas e ilustraciones en WebP? Las 8 son v0.1 **sin su aprobación** | **Sí**, PROVISIONAL-V; vetar una la devuelve a su dibujo de CSS |
+| C13 | Christiam | El chip de la asistencia deja de contar de 0 a N (efecto portado de Lingo) y nace diciendo "+N". ¿De acuerdo, o prefiere que cuente y que el resultado de abajo espere? | Nace con "+N"; las fichas y el golpe de oro se conservan |
+| C14 | Christiam | El oro oscuro de las insignias (`#B37B00`) no está en `diseno/tokens.json`. ¿Entra como token? | No entra; se pinta con `color-mix(in srgb, var(--oro) 75%, black)` |
+| C15 | Christiam y pedagogo | Textos PROVISIONALES que esta adenda fija o conserva: "Ver mis movimientos" · el detalle "5 por asistir + 5 por llegar a tiempo" también en Mis monedas · el 402 al enviar ("…No es por tus respuestas. Avísale a tu profe.") · los textos alternativos de las insignias ("Insignia: constancia de 3"…, "Insignia: semana completa") | Esos |
+| C16 | Christiam | ¿Qué insignias se ven en esta oleada? | `racha-3`, `racha-7`, `racha-14`, `reto-perfecto` y `semana-redonda`; las otras tres se generan y no se usan |
+| C17 | Christiam | Nombres de las claves de `config.json` para las metas de la semana | `SEMANA_META_CLASES` y `SEMANA_META_RETOS` (2 y 2) |
+| F4 | backend | ¿`puntual` puede ser `true` con `puntualidad` 0 (bono configurado en 0)? ¿Los cuatro campos del check-in son contrato estable? | Sí a las dos; la web no pinta `puntual` y, si los campos no cuadran, no los usa |
+| F5 | backend | Exportar el OpenAPI de `59fe08a` o posterior para `contratos/` (lo hace W42 con el `.venv` del backend, sin tocar su repo) | Se hace en W42 |
+| G10 | pedagogo | Con `ya_cobrada_hoy: false` y 0 monedas (paga configurada en 0), ¿basta "Asistencia marcada. Constancia: R."? | Sí |
+
+#### 17.1.10 Lo que no se verificó
+- **Nada se ejecutó** de la suite, los tramposos, los E2E, el mock, la fluidez ni el piloto (otro agente mide en esta máquina). Todos los "rojo predicho" de esta adenda son **predicciones** (ERR-15, ERR-23).
+- **El «+2» exacto no se reprodujo.** La causa sale de leer el código y de una captura vieja con el mismo defecto (+28 sobre +50); la captura de hoy con "+2" no se vio.
+- Que el backend del piloto sea `59fe08a` o posterior y lo que allí se midió (10 = 5 + 5; 0 con `ya_cobrada_hoy: true`): **[DICHO]**. Aquí solo se leyó `schemas.py` en el HEAD local del backend.
+- Que el backend mande **siempre** las cuatro claves (y no las omita con algún `exclude_defaults` o `response_model_exclude_unset` en la ruta): no se leyó `router.py`. La tabla de §17.1.6 es segura en los dos casos, porque trata "ausente" aparte.
+- Si `tests/contrato/validador_openapi.mjs` rechaza propiedades de más (no nombra `additionalProperties`: **por lectura, no las rechaza**) ni si exige las nuevas.
+- El peso con compresión (lo que de verdad viaja): no se leyó la configuración de Caddy. Los 744.494 son bytes sin comprimir.
+- Que las ocho insignias pasen la puerta del generador tal como están: se leyó `racha-3.svg`, el `LEEME.md` y la lista de colores de las ocho; no se corrió `validar.mjs`.
+- Que `color-mix()` se vea igual al `#B37B00` dibujado, y que una clase con `fill: var(--token)` funcione dentro de un SVG creado con `createElementNS` en Edge y Chrome (Drako lo hace: no se cotejó cómo).
+- Qué prueba pone rojo hoy a `x_sello_monedas_de_mas` (el E2E de `game_feel` o `ui_sello`): no se leyó `correr_tramposos.mjs`.
+- Los E2E de navegación (E30, E31) con el enlace nuevo y la etiqueta: son predicciones de medidas.
+- Las líneas citadas del cuerpo (L…) son las del archivo en `a697863`; las de `src/`, las de ese mismo commit.
+
+#### 17.1.11 Predicciones del Creador para esta adenda (para refutar)
+- **PA1:** con W45a, `x_chip_cuenta_desde_cero` (el código de hoy) se pone rojo en U71 y en la lectura a 150 ms del E2E; lo más dudoso es el reloj de mentira del DOM falso.
+- **PA2:** W47 cambia del humo de navegación solo `rutas.student` (9 → 10) y lo que derive de recorrer una pantalla más del estudiante (`toques`, `sin_salida`); si cambia algo del profe o del admin, es un ERR.
+- **PA3:** la oleada entera cabe en +80.000 bytes.
+- **PA4:** R2 sigue verde al agregar el contrato nuevo sin tocar ninguna otra ruta del mock.
+- **PA5:** ninguna foto de R9 cambia en toda la oleada; de R4 cambia solo `inicio` (`ir-a-monedas`, `constancia`, `progreso-semana`).
+
+#### 17.1.12 Después (anotado, no se hace ahora)
+- El saldo de Inicio también cuenta desde 0 en la primera visita y desde lo último visto cuando sube (`inicio.js:46`, `:54`), y la medalla del fin de reto cuenta: el mismo "número intermedio" de §17.1.5, sin otro número al lado que lo contradiga. Decidir si se les aplica la regla de W45a.
+- Un conteo cancelado debería dejar el valor final (`ui/conteo.js:48`).
+- Las dos cadenas sueltas de `reto_flujo.js:154` y `:180` ("No se pudo enviar tu reto.", "No se pudo cargar el reto.") no están en `textos.js`.
+- Quitar las dos peticiones de respaldo de la asistencia cuando ningún despliegue corra un backend anterior a `1696a37`.
+- Tipar el `metadata` del libro (§13 punto 1, la mitad que sigue abierta): Mis monedas depende de él para el detalle de cada fila.
+- `diseno/arte/aceptado/` no existe: sin ella la puerta de W53 no tiene origen.
