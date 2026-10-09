@@ -1,0 +1,16 @@
+{
+  "descripcion": "profe/grupos.js no pinta la barra cuando \"Mis grupos\" no puede cargar: sin red, el profe queda en una pantalla de error sin ninguna salida (E34)",
+  "archivos": {
+    "src/vistas/profe/grupos.js": "grupos.js"
+  },
+  "comando": [
+    "node",
+    "--test",
+    "--test-reporter=tap",
+    "tests/e2e/nav_sin_red.test.mjs"
+  ],
+  "espera_codigo_no_cero": true,
+  "espera_fallan_tests": [
+    "E34: sin red, el profe sigue moviéndose con su barra y sus volver, nada queda en blanco, y las herramientas de clase y abrir la asistencia quedan deshabilitadas con su texto"
+  ]
+}

@@ -1,0 +1,16 @@
+{
+  "descripcion": "El mismo defecto de x_inicio_del_profe_con_barra_de_arriba, medido en el navegador: el selector de institucion vuelve a la barra de arriba, junto al aviso y a \"Cerrar sesion\" (H13; E31)",
+  "archivos": {
+    "src/vistas/profe/grupos.js": "grupos.js"
+  },
+  "comando": [
+    "node",
+    "--test",
+    "--test-reporter=tap",
+    "tests/e2e/nav_medidas.test.mjs"
+  ],
+  "espera_codigo_no_cero": true,
+  "espera_fallan_tests": [
+    "E31: con dos instituciones, el selector tiene su renglón bajo el título y nada lo tapa (H13); y con un nombre de 60 caracteres, las tres acciones de \"Ahora\" siguen sobre la barra sin desplazar"
+  ]
+}

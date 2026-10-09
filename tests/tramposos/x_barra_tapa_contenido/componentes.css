@@ -1,0 +1,812 @@
+/* componentes.css · Sistema visual base del pulido para el piloto UIS (encargo de Christiam,
+   2026-09-28): botones chunky, fichas de opción con escudo de letra, tarjetas, filas de lista,
+   barra superior, navegación inferior y el resultado con ícono+texto+color. Solo var(--token) de
+   tokens.css o color-mix() con transparent/white/black (§6.2, V3). Nada de esto cambia
+   comportamiento: son clases nuevas que las vistas agregan de forma aditiva (ver ARQUITECTURA del
+   encargo), y selectores por atributo (data-testid, que ya existía) para no tocar cada vista. */
+
+/* ---------- Listas: sin viñetas en ningún lado de la app (antes: <li> con bullet por defecto,
+   el bug más visible de "opciones de respuesta con viñetas") ---------- */
+#vista ul {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+}
+
+/* ---------- Botones "chunky" (decisión 001 §4): sombra sólida inferior + efecto de presionado,
+   como una tecla física. Usa el token --boton-borde-inferior que ya trae tokens.css. Por defecto
+   TODO <button> del cliente se ve así — es el botón primario; .boton-secundario lo suaviza para
+   acciones de menor peso (cerrar, cambiar estado en una fila...). ---------- */
+button {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  font-family: var(--fuente-titulos);
+  font-weight: 700;
+  font-size: 1rem;
+  background: var(--primario);
+  color: var(--superficie);
+  border: none;
+  border-radius: var(--radio-md);
+  border-bottom: var(--boton-borde-inferior);
+  padding: 12px 20px;
+  cursor: pointer;
+  transition: transform 0.05s ease, border-bottom-width 0.05s ease;
+}
+button:hover:not(:disabled) {
+  filter: brightness(1.05);
+}
+button:active:not(:disabled) {
+  transform: translateY(3px);
+  border-bottom-width: 1px;
+}
+button:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+  transform: none;
+}
+
+/* Variante secundaria: superficie clara, borde en vez de relleno. */
+button.boton-secundario {
+  background: var(--superficie);
+  color: var(--primario);
+  border: 2px solid var(--borde);
+  border-bottom: 4px solid var(--borde);
+  padding: 10px 18px;
+}
+
+/* Variante compacta: para botones dentro de una fila de lista o tabla, donde el chunky completo
+   pesa demasiado (encontrado en la galería: filas de retos y de grupos). */
+button.boton-chico,
+a.boton-chico {
+  padding: 8px 14px;
+  font-size: 0.9rem;
+  border-bottom-width: 3px;
+}
+button.boton-chico:active:not(:disabled) {
+  border-bottom-width: 1px;
+}
+
+/* ---------- Enlaces con data-testid: son acciones (navegar, jugar, repasar, volver), no prosa —
+   se ven como chips, nunca como texto azul subrayado. Se excluye el enlace del código de
+   asistencia (es una URL real para copiar, no una acción). La navegación inferior (más abajo) NO
+   lleva data-testid a propósito, para no pelear con esta regla por especificidad. ---------- */
+#vista a[data-testid]:not([data-testid="sesion-enlace"]) {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  font-family: var(--fuente-titulos);
+  font-weight: 700;
+  font-size: 0.92rem;
+  color: var(--primario);
+  text-decoration: none;
+  background: var(--superficie);
+  border: 2px solid var(--borde);
+  border-bottom: 4px solid var(--borde);
+  border-radius: var(--radio-sm);
+  padding: 8px 14px;
+}
+#vista a[data-testid]:not([data-testid="sesion-enlace"]):hover {
+  border-color: var(--secundario);
+}
+#vista a[data-testid]:not([data-testid="sesion-enlace"]):active {
+  transform: translateY(2px);
+  border-bottom-width: 2px;
+}
+
+/* El único "volver" (ui/encabezado.js, docs/ESPEC_navegacion.md §5.7): arriba, antes del título, "‹ <a dónde vuelve>". NO es un chip de acción:
+   es un renglón de texto, sin caja, con 44 px de alto para el dedo. La especificidad le gana a la regla de los enlaces con data-testid. */
+#vista a.volver[data-testid]:not([data-testid="sesion-enlace"]) {
+  display: flex;
+  align-items: center;
+  width: fit-content;
+  max-width: 100%;
+  min-height: 44px;
+  padding: 0 12px 0 0;
+  margin: 0 0 4px;
+  background: none;
+  border: none;
+  border-radius: var(--radio-sm);
+  font-size: 0.95rem;
+  color: var(--primario);
+}
+#vista a.volver[data-testid]:not([data-testid="sesion-enlace"]):active {
+  transform: none;
+}
+
+nav {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 10px;
+  margin: 12px 0;
+}
+
+/* "✕ Salir" del reto en curso (vistas/estudiante/reto_flujo.js, docs/ESPEC_navegacion.md §5.9): chico, arriba, con 44 px para el dedo. Es un
+   chip como los demás enlaces de acción (la regla de `a[data-testid]`), sin robarle protagonismo a la pregunta. */
+#vista a.salir-reto[data-testid] {
+  min-height: 44px;
+  flex: 0 0 auto;
+  font-size: 0.85rem;
+  padding: 6px 10px;
+}
+
+/* La nota de salida a EVA y SET (ui/nota_salida.js, docs/ESPEC_navegacion.md §5.7, H12): una frase normal que se lee, no mayúsculas grises. */
+.nota-salida {
+  font-family: var(--fuente-cuerpo);
+  font-size: 1rem; /* el tamano del texto normal: E17 exige 16 px en lo que se lee */
+  line-height: 1.4;
+  color: var(--texto);
+  margin: 12px 0;
+}
+
+/* Perfil, "mi cuenta" (vistas/perfil.js, docs/ESPEC_navegacion.md §5.6): los enlaces del aviso y de las solicitudes, en fila, y debajo la
+   salida de la cuenta. Sobrio: lo ven los tres roles. */
+.perfil-enlaces {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 10px;
+  margin: 16px 0;
+}
+
+/* "Ahora" en Inicio del estudiante (vistas/estudiante/inicio.js, docs/ESPEC_navegacion.md §5.4): cada tarjeta lleva el texto a la izquierda y su
+   botón a la derecha, sin partirse en dos renglones, para que las tres acciones quepan en 375×812 sin desplazar. */
+.ahora h2 {
+  font-size: 1.05rem;
+  margin: 18px 0 8px;
+}
+/* `.fila.fila-ahora` (dos clases) para ganarle a `.fila`, que se declara más abajo y envuelve. */
+.fila.fila-ahora {
+  flex-wrap: nowrap;
+}
+.fila-ahora .fila-texto {
+  flex: 1 1 auto;
+}
+.fila-ahora > a {
+  flex: none;
+  white-space: nowrap;
+  min-height: 44px;
+}
+
+/* La tarjeta de un grupo en el inicio del profe (vistas/profe/grupos.js, docs/ESPEC_navegacion.md §5.3): el grupo arriba, quién espera aprobación
+   (ícono y texto) y sus tres acciones. "Abrir asistencia", la de cada clase, es la principal: ocupa su renglón y va rellena; las otras dos comparten
+   el renglón de abajo. Sobria: no anima. */
+/* `.fila.tarjeta-grupo` (dos clases) para ganarle a `.fila`, que se declara más abajo. */
+.fila.tarjeta-grupo {
+  flex-direction: column;
+  align-items: stretch;
+  flex-wrap: nowrap;
+}
+.tarjeta-grupo .fila-titulo {
+  overflow-wrap: anywhere;
+}
+/* En portátil las tarjetas van en columnas (una tarjeta de 1100 px de ancho con tres botones enormes no ayuda a nadie); en celular, una debajo de otra. */
+@media (min-width: 900px) {
+  #vista [data-testid="lista-grupos"] {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(320px, 1fr));
+    gap: 12px;
+  }
+  #vista [data-testid="lista-grupos"] .tarjeta-grupo {
+    margin-bottom: 0;
+  }
+}
+.tarjeta-grupo .grupo-esperan:empty {
+  display: none;
+}
+.tarjeta-grupo .grupo-esperan {
+  margin: 0;
+  font-weight: 700;
+  color: var(--texto);
+}
+.tarjeta-grupo .fila-acciones a {
+  flex: 1 1 auto;
+  justify-content: center;
+  min-height: 44px;
+}
+#vista .tarjeta-grupo a.accion-principal[data-testid] {
+  flex-basis: 100%;
+  background: var(--primario);
+  color: var(--superficie);
+  border-color: color-mix(in srgb, var(--primario) 80%, black);
+  font-size: 1rem;
+}
+
+/* Entrada (demo): la lista de actores sintéticos, sin estilo hasta hoy. */
+.lista-actores {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  margin-top: 16px;
+}
+
+/* ---------- Fila de lista (retos, grupos, roster de retos del profe): tarjeta con la misma
+   "sombra inferior" que los botones, para que la app se sienta de una sola pieza. Arregla el bug
+   de la galería: título y botón pegados sin separador. ---------- */
+.fila {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  flex-wrap: wrap;
+  background: var(--superficie);
+  border: 2px solid var(--borde);
+  border-bottom: 4px solid var(--borde);
+  border-radius: var(--radio-md);
+  padding: 14px 16px;
+  margin-bottom: 10px;
+}
+.fila:last-child {
+  margin-bottom: 0;
+}
+.fila-texto {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  min-width: 0;
+}
+.fila-titulo {
+  font-family: var(--fuente-titulos);
+  font-weight: 700;
+  color: var(--texto);
+}
+.fila-acciones {
+  display: flex;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: 8px;
+}
+
+/* Una etiqueta + su campo fuera de un <form> (p. ej. "Asignar a" + el <select> de grupo, dentro
+   de una fila de la lista de retos del profe): mismo espacio que formularios.css, sin depender
+   de estar dentro de un <form>. */
+.etiqueta-en-linea {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  font-family: var(--fuente-titulos);
+  font-weight: 700;
+  font-size: 0.85rem;
+}
+.campo-fila {
+  font-family: var(--fuente-cuerpo);
+  font-size: 0.95rem;
+  color: var(--texto);
+  background: var(--superficie);
+  border: 2px solid var(--borde);
+  border-radius: var(--radio-sm);
+  padding: 6px 10px;
+}
+
+/* Insignia pequeña (completado, repaso, etc.), siempre junto a su texto. */
+.insignia {
+  display: inline-flex;
+  width: fit-content;
+  background: var(--correcto-fondo);
+  color: var(--correcto);
+  font-size: 0.78rem;
+  font-weight: 700;
+  padding: 3px 9px;
+  border-radius: var(--radio-sm);
+}
+
+/* Aviso corto (p. ej. "Repaso: no suma monedas"): chip dorado, nunca un párrafo suelto. */
+.aviso-corto {
+  display: inline-block;
+  background: var(--oro);
+  color: var(--oro-texto);
+  font-weight: 800;
+  font-size: 0.8rem;
+  padding: 4px 12px;
+  border-radius: var(--radio-sm);
+  margin: 4px 0 12px;
+}
+
+/* El código de la sesión de asistencia (profe/sesion_asistencia.js): grande a propósito, pensado
+   para proyectar en el salón (§4.2 de la espec del MVP). */
+.codigo-grande {
+  font-family: var(--fuente-titulos);
+  font-weight: 800;
+  font-size: 2.2rem;
+  letter-spacing: 0.08em;
+  color: var(--primario);
+  margin: 0 0 12px;
+}
+
+/* ---------- Tarjeta genérica (formularios, previas de CSV...). ---------- */
+.tarjeta {
+  background: var(--superficie);
+  border: 2px solid var(--borde);
+  border-radius: var(--radio-md);
+  padding: 16px;
+  margin: 16px 0;
+}
+
+/* Una línea de la vista previa de un CSV (admin/importar_csv.js): monoespaciada, tal cual llegó
+   (§9.6: nunca se recodifica ni se recorta lo que muestra). */
+.linea-csv {
+  font-family: ui-monospace, "Cascadia Code", "SF Mono", Consolas, monospace;
+  font-size: 0.85rem;
+  padding: 3px 0;
+  border-bottom: 1px solid var(--borde);
+}
+.linea-csv:last-child {
+  border-bottom: none;
+}
+
+/* ---------- Tablas (roster, logro, errores): fondo propio y encabezado en navy, sin tocar el
+   table-layout:fixed de base.css (regla dura contra el desborde a 375px, ya medida en W16). ---------- */
+#vista table {
+  background: var(--superficie);
+  border: 2px solid var(--borde);
+  border-radius: var(--radio-md);
+  overflow: hidden;
+  margin: 16px 0;
+}
+#vista thead {
+  background: var(--primario);
+}
+#vista th {
+  font-family: var(--fuente-titulos);
+  font-weight: 700;
+  font-size: 0.78rem;
+  text-transform: uppercase;
+  letter-spacing: 0.02em;
+  color: var(--superficie);
+}
+#vista tbody tr:nth-child(even) {
+  background: color-mix(in srgb, var(--primario) 4%, white);
+}
+
+/* ---------- El resultado (ui/retro.js): ícono + texto YA existían (regla dura §5); se agrega el
+   color de fondo en chip, nunca solo el color como única señal. ---------- */
+#vista .resultado {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  font-family: var(--fuente-titulos);
+  font-weight: 700;
+  border-radius: var(--radio-md);
+  padding: 12px 16px;
+  margin: 12px 0;
+}
+#vista .resultado span[aria-hidden] {
+  font-size: 1.25em;
+  line-height: 1;
+  flex: none;
+}
+#vista .resultado-ok {
+  background: var(--correcto-fondo);
+  color: var(--correcto);
+}
+#vista .resultado-mal {
+  background: var(--incorrecto-fondo);
+  color: var(--incorrecto);
+}
+
+/* ---------- Drako: presenta y nunca ocupa la pantalla (010, §5 — antes sin límite de tamaño,
+   se veía a tamaño natural del SVG y ocupaba media pantalla en la galería). Nunca > 64px. ---------- */
+.drako {
+  display: block;
+  width: 56px;
+  height: 56px;
+  object-fit: contain;
+  flex: none;
+}
+
+/* ---------- El escudo de nivel MCER (ui/escudo.js): insignia navy con letra dorada. ---------- */
+.escudo {
+  display: inline-flex;
+  align-items: center;
+  background: var(--primario);
+  color: var(--oro);
+  font-family: var(--fuente-titulos);
+  font-weight: 800;
+  font-size: 0.85rem;
+  padding: 6px 14px;
+  border-radius: var(--radio-sm);
+  border-bottom: 3px solid var(--primario-oscuro);
+}
+
+/* ---------- Ficha de opción de respuesta (reto_flujo.js): antes era un <button> desnudo dentro
+   de una viñeta. Ahora una tarjeta blanca con el mismo lenguaje "chunky" y la letra en un escudo
+   dorado (referencia: investigacion/evagame/pantallas-modo-en-vivo.html, .opt/.let). ---------- */
+#vista [data-testid="opciones"] {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  margin: 16px 0;
+}
+#vista [data-testid^="opcion-"] {
+  width: 100%;
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  background: var(--superficie);
+  color: var(--texto);
+  border: 2px solid var(--borde);
+  border-bottom: 4px solid var(--borde);
+  border-radius: var(--radio-md);
+  padding: 12px 16px;
+  font-family: var(--fuente-titulos);
+  font-weight: 700;
+  font-size: 1.02rem;
+  text-align: left;
+}
+#vista [data-testid^="opcion-"]:hover:not(:disabled) {
+  border-color: var(--secundario);
+}
+#vista [data-testid^="opcion-"][aria-pressed="true"] {
+  border-color: var(--primario);
+  background: color-mix(in srgb, var(--primario) 8%, white);
+}
+#vista [data-testid^="opcion-"]:active:not(:disabled) {
+  transform: translateY(2px);
+  border-bottom-width: 2px;
+}
+.escudo-letra {
+  display: inline-grid;
+  place-items: center;
+  flex: none;
+  width: 1.7em;
+  height: 1.7em;
+  background: var(--oro);
+  color: var(--oro-texto);
+  font-family: var(--fuente-titulos);
+  font-weight: 800;
+  font-size: 0.95rem;
+  border-radius: var(--radio-sm);
+  clip-path: polygon(0 0, 100% 0, 100% 64%, 50% 100%, 0 64%);
+  padding-bottom: 0.2em;
+}
+.texto-opcion {
+  flex: 1;
+  min-width: 0;
+}
+
+/* ---------- La pregunta (reto_flujo.js): encabezado chico (Drako + título limpio) y el
+   enunciado como protagonista de la pantalla — antes el enunciado se veía chico y el título
+   crudo del contenido ("[BORRADOR] sint-u01 · ...") dominaba arriba. ---------- */
+.encabezado-reto {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  margin-bottom: 4px;
+}
+.encabezado-reto .drako {
+  width: 44px;
+  height: 44px;
+}
+.titulo-reto {
+  font-size: 1rem;
+  font-weight: 700;
+  color: color-mix(in srgb, var(--texto) 75%, white);
+  margin: 0;
+}
+.enunciado {
+  font-family: var(--fuente-titulos);
+  font-weight: 700;
+  font-size: 1.4rem;
+  line-height: 1.28;
+  color: var(--texto);
+  margin: 14px 0 18px;
+}
+
+/* ---------- Barra superior del estudiante (saldo + racha) y navegación inferior. Ambas son
+   parte del sistema visual base (§1 del encargo); la barra se usa en Inicio, donde el saldo y la
+   racha ya se cargan — así no se agregan llamadas nuevas a la red en el resto de pantallas. ---------- */
+.barra-superior {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  background: var(--primario);
+  color: var(--superficie);
+  padding: 10px 16px;
+  margin: -16px -16px 16px;
+  border-bottom: 4px solid var(--primario-oscuro);
+  border-radius: 0 0 var(--radio-md) var(--radio-md);
+}
+.barra-superior .saldo {
+  margin: 0;
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  font-family: var(--fuente-titulos);
+  font-weight: 800;
+  color: var(--oro);
+}
+.barra-superior .constancia {
+  margin: 0;
+  font-family: var(--fuente-titulos);
+  font-weight: 700;
+  font-size: 0.85rem;
+  color: var(--superficie);
+}
+
+/* Segunda pasada de diseño (2026-09-28): antes flotaba a mitad de pantalla (`margin` en vez de
+   `position: fixed`, la galería lo mostraba pegado justo debajo del contenido corto). Ahora
+   queda FIJA abajo con `env(safe-area-inset-bottom)` para no meterse bajo la barra del sistema en
+   un celular con gesto/notch; `#vista:has(.nav-inferior)` (más abajo) reserva el espacio para que
+   el contenido nunca quede tapado detrás. */
+.nav-inferior {
+  display: flex;
+  justify-content: space-around;
+  align-items: center;
+  gap: 4px;
+  position: fixed;
+  left: 50%;
+  bottom: 0;
+  transform: translateX(-50%);
+  width: 100%;
+  max-width: 480px;
+  background: var(--superficie);
+  border-top: 2px solid var(--borde);
+  border-radius: var(--radio-md) var(--radio-md) 0 0;
+  padding: 8px 4px calc(8px + env(safe-area-inset-bottom));
+  margin: 0;
+  z-index: 10;
+}
+/* El espacio que la nav fija le quita al final del scroll — para toda vista del estudiante que la
+   use (Inicio, Retos, Asistencia, Revisión), sin tocar cada vista.js uno por uno. */
+#vista:has(.nav-inferior) {
+  padding-bottom: 0; /* TRAMPOSO: sin el espacio reservado, la barra fija tapa lo último de cada pantalla */
+}
+/* W68 (docs/ESPEC_navegacion.md §5.6): con "Perfil" son hasta 4 entradas. Todas del mismo ancho (`flex: 1 1 0`), para que quepan en 360 px
+   sin partir ningún texto, y de al menos 44 px de alto (el toque mínimo). */
+.nav-inferior a {
+  flex: 1 1 0;
+  min-width: 0;
+  min-height: 44px;
+  justify-content: center;
+  white-space: nowrap;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 2px;
+  font-family: var(--fuente-titulos);
+  font-weight: 700;
+  font-size: 0.72rem;
+  color: color-mix(in srgb, var(--texto) 55%, white);
+  text-decoration: none;
+  padding: 6px 4px;
+  border-radius: var(--radio-sm);
+  background: none;
+  border: none;
+}
+.nav-inferior a[aria-current="page"] {
+  color: var(--primario);
+  background: color-mix(in srgb, var(--primario) 10%, white);
+}
+
+/* ---------- Segunda pasada de diseño (2026-09-28): panel del profe y del admin en portátil.
+   `#vista` es compartido con el estudiante (375px de referencia, §9.4); estas dos reglas SOLO
+   ensanchan las vistas de esos dos roles, y solo desde 900px — en celular ninguna cambia.
+   `:has()` evita tocar rutas.js o cada vista.js: basta con que la vista traiga su propio
+   data-testid raíz, que todas ya tienen. ---------- */
+@media (min-width: 900px) {
+  #vista:has([data-testid^="vista-profe-"]),
+  #vista:has([data-testid="vista-sesion-asistencia"]),
+  #vista:has([data-testid^="vista-admin-"]) {
+    max-width: 1100px;
+  }
+  /* Con el ancho de sobra ya no hace falta partir "Comprehension" en dos líneas (la galería lo
+     mostraba cortado en "COMPREHENSI/ON"). Solo la tabla de logro (3 columnas anchas): la de
+     errores tiene 6 columnas y un encabezado largo ("Opción más elegida por error") que SÍ
+     necesita envolver, o `nowrap` lo recorta contra el `overflow: hidden` de la tabla — a 375px
+     ninguna de las dos cambia. */
+  #vista [data-testid="tabla-logro"] th {
+    white-space: nowrap;
+  }
+  /* Los chips de logro también pueden ir en una sola línea aquí (ver la nota junto a
+     .chip-estado, más abajo): a 375px se envuelven a propósito. */
+  #vista [data-testid="tabla-logro"] .chip-estado {
+    white-space: nowrap;
+  }
+}
+
+/* Barra de la pantalla de entrada del profe y del admin (Mis grupos, Crear grupo): esos dos roles
+   no tienen la navegación inferior del estudiante, así que este es su único "Cerrar sesión"
+   visible (usa auth/*.salir(), §7.4). */
+.barra-rol {
+  display: flex;
+  align-items: flex-start;
+  justify-content: flex-end;
+  gap: 12px;
+  margin-bottom: 12px;
+}
+
+/* Aviso de tratamiento de datos (vistas/aviso_datos.js, Ley 1581): texto largo en secciones cortas; la casilla
+   "He leído y acepto" es un renglón con la casilla grande, fácil de tocar. */
+.aviso-seccion h2 {
+  font-size: 1rem;
+  margin: 16px 0 4px;
+}
+.aviso-seccion p,
+.aviso-seccion ul {
+  margin: 0;
+}
+.aviso-seccion ul {
+  padding-left: 20px;
+}
+#vista form label.aviso-casilla {
+  display: flex;
+  align-items: flex-start;
+  gap: 10px;
+  font-family: var(--fuente-cuerpo);
+  font-weight: 600;
+  font-size: 1rem;
+}
+
+/* Selector de institución (ui/selector_colegio.js, login piloto B): solo con más de una membresía. Vive en
+   la barra del profe/admin y bajo el saludo del estudiante; ocupa el ancho que le sobra a "Cerrar sesión". */
+.selector-colegio {
+  margin-bottom: 12px; /* W70: va en su propio renglon, bajo el titulo */
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  flex: 1;
+  min-width: 0;
+}
+.selector-colegio label {
+  font-family: var(--fuente-titulos);
+  font-weight: 700;
+  font-size: 0.78rem;
+  color: var(--texto);
+}
+.selector-colegio select {
+  font-family: var(--fuente-cuerpo);
+  font-size: 1rem;
+  color: var(--texto);
+  background: var(--superficie);
+  border: 2px solid var(--borde);
+  border-radius: var(--radio-sm);
+  padding: 8px 10px;
+  min-width: 0;
+}
+.selector-colegio select:focus-visible {
+  border-color: var(--secundario);
+}
+.selector-colegio p {
+  margin: 0;
+  font-size: 0.85rem;
+}
+
+/* ---------- Logro por eje (profe/logro.js): antes cada celda repetía el label crudo del servidor
+   a tamaño normal ("datos insuficientes: Comprehension · B1: 2"), ilegible en la galería. Ahora un
+   chip con ícono + palabra corta para escanear la tabla de un vistazo; el texto completo
+   (textoEje: label + cefr_levels, P1) sigue viviendo debajo en texto chico — nunca se pierde
+   información, solo se jerarquiza. ---------- */
+.celda-logro {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+/* El texto completo de textoEje (label + cefr_levels, P1) bajo el chip: chico, pero en minúsculas
+   normales — a diferencia de .texto-apoyo (mayúsculas, pensado para una etiqueta corta), una
+   frase completa en mayúsculas se lee como si gritara. */
+.detalle-logro {
+  font-size: 0.78rem;
+  color: color-mix(in srgb, var(--texto) 60%, white);
+  margin: 0;
+}
+.chip-estado {
+  display: inline-flex;
+  align-items: center;
+  gap: 5px;
+  width: fit-content;
+  font-family: var(--fuente-titulos);
+  font-weight: 700;
+  font-size: 0.8rem;
+  padding: 3px 10px;
+  border-radius: var(--radio-sm);
+  /* Sin `nowrap` a propósito: a 375px, con 4 columnas de ~85px, un chip como "A reforzar" en una
+     sola línea se sale del borde derecho de la tabla (medido en la galería). Se envuelve a 2
+     líneas ahí; `nowrap` solo se activa desde 900px (misma regla que los encabezados, más abajo),
+     donde ya hay espacio de sobra. */
+}
+.chip-estado-logrado {
+  background: var(--correcto-fondo);
+  color: var(--correcto);
+}
+.chip-estado-en_desarrollo {
+  background: color-mix(in srgb, var(--oro) 30%, white);
+  color: var(--oro-texto);
+}
+.chip-estado-a_reforzar {
+  background: var(--incorrecto-fondo);
+  color: var(--incorrecto);
+}
+.chip-estado-datos_insuficientes {
+  background: color-mix(in srgb, var(--texto) 8%, white);
+  color: color-mix(in srgb, var(--texto) 60%, white);
+}
+
+/* El confeti, las monedas, la llama y el resto del game feel viven en estilos/juego.css. */
+
+/* El correo de contacto del aviso de datos: texto que se selecciona entero con un toque (y se copia). */
+.correo-copiable {
+  user-select: all;
+  -webkit-user-select: all;
+  overflow-wrap: anywhere;
+}
+
+/* W29 (docs/ESPEC_pantallas_anillo.md §5): una etiqueta de estado SIEMPRE lleva ícono y texto; el color nunca es lo único que informa.
+   Solo tokens. El ícono es decorativo (aria-hidden): lo que importa lo lee el texto. */
+.etiqueta-estado {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.5rem;
+}
+.etiqueta-icono {
+  font-weight: 700;
+}
+
+/* Las acciones de una pantalla obligatoria (espera, suspendida, "ya no está"): los botones uno junto al otro, con toque de 44 px. */
+.acciones {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.75rem;
+  margin-top: 1rem;
+}
+.acciones > button {
+  min-height: 44px;
+}
+
+/* W30 (docs/ESPEC_pantallas_anillo.md §4.3, dictamen 03 G6): el nivel confirmado no lleva oro nuevo. El escudo conserva su estilo; lo que
+   dice si es provisional es el ícono + el texto de la etiqueta (el borde punteado solo refuerza, nunca informa solo). */
+.escudo-nivel {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  gap: 0.25rem;
+}
+.escudo-nivel p {
+  margin: 0;
+}
+.escudo-provisional {
+  border-bottom-style: dashed;
+}
+
+/* El aviso ÚNICO cuando el nivel definitivo baja respecto del provisional: informativo (ícono de información, sin ✗ ni rojo, sin Drako). */
+.aviso-nivel {
+  display: grid;
+  grid-template-columns: auto 1fr;
+  gap: 0.5rem 0.75rem;
+  align-items: start;
+  padding: 0.75rem 1rem;
+  background: var(--superficie);
+  border: 2px solid var(--borde);
+  border-radius: var(--radio-md);
+}
+.aviso-nivel p {
+  margin: 0;
+}
+.aviso-nivel button {
+  grid-column: 1 / -1;
+  min-height: 44px;
+}
+
+/* W33: "Mis datos: solicitudes". Sobria (sin animación). El mensaje de la persona y la respuesta conservan sus saltos de línea. */
+.texto-largo {
+  white-space: pre-wrap;
+  overflow-wrap: anywhere;
+}
+.lista-solicitudes {
+  list-style: none;
+  padding: 0;
+  display: grid;
+  gap: 0.75rem;
+}
+.lista-solicitudes > li > p {
+  margin: 0.25rem 0;
+}
+.solicitud-respuesta {
+  border-top: 1px solid var(--borde);
+  margin-top: 0.5rem;
+  padding-top: 0.5rem;
+}
+#solicitud-mensaje {
+  width: 100%;
+  box-sizing: border-box;
+}

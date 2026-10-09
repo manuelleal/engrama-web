@@ -1,0 +1,16 @@
+{
+  "descripcion": "admin/crear_grupo.js no liga \"Crear grupo\" a la red: sin conexion el boton sigue activo y sin aviso (E34)",
+  "archivos": {
+    "src/vistas/admin/crear_grupo.js": "crear_grupo.js"
+  },
+  "comando": [
+    "node",
+    "--test",
+    "--test-reporter=tap",
+    "tests/e2e/nav_sin_red.test.mjs"
+  ],
+  "espera_codigo_no_cero": true,
+  "espera_fallan_tests": [
+    "E34: sin red, el admin sigue moviéndose con su barra y su volver, nada queda en blanco, y crear un grupo y asignar un docente quedan deshabilitados con su texto"
+  ]
+}

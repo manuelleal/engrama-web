@@ -1,0 +1,16 @@
+{
+  "descripcion": "El mismo defecto de x_reto_sin_salida, medido en el navegador: el reto en curso es un callejon (E30)",
+  "archivos": {
+    "src/vistas/estudiante/reto_flujo.js": "reto_flujo.js"
+  },
+  "comando": [
+    "node",
+    "--test",
+    "--test-reporter=tap",
+    "tests/e2e/nav_sin_callejones.test.mjs"
+  ],
+  "espera_codigo_no_cero": true,
+  "espera_fallan_tests": [
+    "E30: el estudiante recorre tocando sus 9 pantallas: ninguna es un callejón, Inicio queda a 2 toques o menos, y el reto en curso tiene su salida"
+  ]
+}

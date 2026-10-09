@@ -1,0 +1,16 @@
+{
+  "descripcion": "El mismo defecto de x_barra_del_estudiante_para_el_profe, medido en el navegador: el profe no alcanza sus Retos ni su Perfil por toques (E30)",
+  "archivos": {
+    "src/ui/nav_inferior.js": "nav_inferior.js"
+  },
+  "comando": [
+    "node",
+    "--test",
+    "--test-reporter=tap",
+    "tests/e2e/nav_sin_callejones.test.mjs"
+  ],
+  "espera_codigo_no_cero": true,
+  "espera_fallan_tests": [
+    "E30: el profe recorre tocando sus 10 pantallas: ninguna es un callejón y Mis grupos queda a 2 toques o menos (también de la asistencia y de los retos)"
+  ]
+}

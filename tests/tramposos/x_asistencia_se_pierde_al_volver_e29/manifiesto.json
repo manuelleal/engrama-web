@@ -1,0 +1,16 @@
+{
+  "descripcion": "El mismo defecto de x_asistencia_se_pierde_al_volver, medido en el navegador: en el guion, al volver del grupo a la asistencia sale el formulario vacio y el codigo ya no esta (E29)",
+  "archivos": {
+    "src/vistas/profe/sesion_asistencia.js": "sesion_asistencia.js"
+  },
+  "comando": [
+    "node",
+    "--test",
+    "--test-reporter=tap",
+    "tests/e2e/nav_guion.test.mjs"
+  ],
+  "espera_codigo_no_cero": true,
+  "espera_fallan_tests": [
+    "E29: el guion de la demostración se recorre tocando solo lo que se ve, con los toques de §9.3, y la asistencia abierta sigue ahí al volver"
+  ]
+}

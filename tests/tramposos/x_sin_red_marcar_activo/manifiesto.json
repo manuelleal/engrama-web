@@ -1,0 +1,16 @@
+{
+  "descripcion": "estudiante/asistencia.js deja \"Marcar asistencia\" activo sin red: lo que escribe ya no queda deshabilitado con su texto (E34)",
+  "archivos": {
+    "src/vistas/estudiante/asistencia.js": "asistencia.js"
+  },
+  "comando": [
+    "node",
+    "--test",
+    "--test-reporter=tap",
+    "tests/e2e/nav_sin_red.test.mjs"
+  ],
+  "espera_codigo_no_cero": true,
+  "espera_fallan_tests": [
+    "E34: sin red, la barra del estudiante sigue llevando a cada pestaña, el volver vuelve, nada queda en blanco, y marcar la asistencia y salir a la clase quedan deshabilitados con su texto"
+  ]
+}

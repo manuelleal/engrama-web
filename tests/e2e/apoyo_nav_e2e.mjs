@@ -49,10 +49,11 @@ export async function escribirDireccion(sesion, hash) {
 
 /**
  * TOCA un control que se ve (un clic de verdad sobre el elemento) y espera a que la pantalla quede pintada. Lanza si el control no existe o no
- * se ve: una prueba "tocando solo lo que se ve" no puede tocar algo oculto.
- * @param {any} sesion @param {string} selector CSS
+ * se ve: una prueba "tocando solo lo que se ve" no puede tocar algo oculto. `hasta`: un selector que debe aparecer tras el toque (para lo que
+ * no cambia de ruta: generar un código, aprobar, abrir la asistencia); sin él, se espera a que la ruta nueva quede pintada.
+ * @param {any} sesion @param {string} selector CSS @param {string} [hasta] selector CSS que debe existir después
  */
-export async function tocar(sesion, selector) {
+export async function tocar(sesion, selector, hasta) {
   const r = await sesion.evaluar(`(async () => { ${ESPERAR}
     let e = null;
     for (let i = 0; i < 60 && !e; i++) { e = document.querySelector(${JSON.stringify(selector)}); if (!e) await esperar(50); }
@@ -61,9 +62,11 @@ export async function tocar(sesion, selector) {
     if (!(c.width > 0 && c.height > 0) || getComputedStyle(e).visibility === 'hidden') return 'no se ve';
     if (e.disabled) return 'deshabilitado';
     e.scrollIntoView({ block: 'center' });
-    document.body.dataset.listo = '';
+    const hasta = ${JSON.stringify(hasta ?? null)};
+    if (!hasta) document.body.dataset.listo = '';
     e.click();
-    for (let i = 0; i < 80 && document.body.dataset.listo !== '1'; i++) await esperar(50);
+    for (let i = 0; i < 120 && !(hasta ? document.querySelector(hasta) : document.body.dataset.listo === '1'); i++) await esperar(50);
+    if (hasta && !document.querySelector(hasta)) return 'tras tocarlo no apareció ' + hasta;
     await esperar(350);
     return 'ok';
   })()`);
@@ -118,4 +121,55 @@ export async function abrirComo(url, rol, { ancho = 375, alto = 812 } = {}) {
     await entrarCon(sesion, CORREOS[rol]);
     return sesion;
   } catch (e) { await sesion.cerrar(); throw e; }
+}
+
+/** Escribe en un campo (escribir no es un toque). @param {any} sesion @param {string} selector @param {string} valor */
+export const escribirEn = (sesion, selector, valor) => sesion.evaluar(`(() => { const c = document.querySelector(${JSON.stringify(selector)}); c.value = ${JSON.stringify(valor)}; c.dispatchEvent(new Event('input', { bubbles: true })); })()`);
+
+/** Espera a que la pestaña esté FUERA de `origen` (por omisión) o, con `fuera: false`, de vuelta en él. @param {any} sesion @param {string} origen */
+export async function esperarEnOrigen(sesion, origen, { fuera = true } = {}) {
+  const fin = Date.now() + 9000;
+  while (Date.now() < fin) {
+    try { if (((await sesion.evaluar('location.origin')) !== origen) === fuera) return true; } catch { /* la página está cambiando */ }
+    await esperar(100);
+  }
+  return false;
+}
+
+/**
+ * TOCA un control que saca de ENGRAMA (a EVA o a SET) y espera a estar en el otro origen. Como `tocar`, exige que el control se vea.
+ * @param {any} sesion @param {string} selector @param {string} origenApp
+ */
+export async function tocarYSalir(sesion, selector, origenApp) {
+  const r = await sesion.evaluar(`(() => { const e = document.querySelector(${JSON.stringify(selector)}); if (!e) return 'no existe'; const c = e.getBoundingClientRect(); if (!(c.width > 0 && c.height > 0)) return 'no se ve'; if (e.disabled) return 'deshabilitado'; e.scrollIntoView({ block: 'center' }); setTimeout(() => e.click(), 0); return 'ok'; })()`);
+  if (r !== 'ok') throw new Error(`tocarYSalir(${selector}): ${r}`);
+  if (!(await esperarEnOrigen(sesion, origenApp))) throw new Error(`tocarYSalir(${selector}): la pestaña no salió de ENGRAMA`);
+}
+
+/** Vuelve de otro origen con el botón atrás del navegador (lo único que la nota de salida pide) y espera a que la app esté pintada. */
+export async function volverConAtras(sesion, origenApp) {
+  await sesion.evaluar('history.back()').catch(() => {});
+  if (!(await esperarEnOrigen(sesion, origenApp, { fuera: false }))) throw new Error('volverConAtras: la pestaña no volvió a ENGRAMA');
+  const fin = Date.now() + 9000;
+  while (Date.now() < fin) {
+    try { if (await sesion.evaluar(`Boolean(document.querySelector('#vista > [data-testid]')) && document.body.dataset.listo === '1'`)) break; } catch { /* cargando */ }
+    await esperar(100);
+  }
+  await esperar(400);
+}
+
+/**
+ * TOCA un control que RECARGA la página (cerrar sesión) y espera, ya en la página nueva, a que exista `testidDespues`. Como `tocar`, exige que
+ * el control se vea. (Un `tocar` normal se queda esperando dentro de una página que deja de existir.)
+ * @param {any} sesion @param {string} selector @param {string} testidDespues
+ */
+export async function tocarYRecargar(sesion, selector, testidDespues) {
+  const r = await sesion.evaluar(`(() => { const e = document.querySelector(${JSON.stringify(selector)}); if (!e) return 'no existe'; const c = e.getBoundingClientRect(); if (!(c.width > 0 && c.height > 0)) return 'no se ve'; if (e.disabled) return 'deshabilitado'; e.scrollIntoView({ block: 'center' }); setTimeout(() => e.click(), 0); return 'ok'; })()`);
+  if (r !== 'ok') throw new Error(`tocarYRecargar(${selector}): ${r}`);
+  const fin = Date.now() + 12000;
+  while (Date.now() < fin) {
+    try { if (await sesion.evaluar(`Boolean(document.querySelector('[data-testid="${testidDespues}"]'))`)) { await esperar(300); return; } } catch { /* la página se está recargando */ }
+    await esperar(100);
+  }
+  throw new Error(`tocarYRecargar(${selector}): tras tocarlo no apareció ${testidDespues}`);
 }

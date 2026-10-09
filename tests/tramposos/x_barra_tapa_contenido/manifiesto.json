@@ -1,0 +1,16 @@
+{
+  "descripcion": "estilos/componentes.css no reserva el espacio de la barra fija: al final de cada pantalla la barra tapa el ultimo boton (lo que podia fallar al poner barra en todas las pantallas; E31)",
+  "archivos": {
+    "estilos/componentes.css": "componentes.css"
+  },
+  "comando": [
+    "node",
+    "--test",
+    "--test-reporter=tap",
+    "tests/e2e/nav_medidas.test.mjs"
+  ],
+  "espera_codigo_no_cero": true,
+  "espera_fallan_tests": [
+    "E31: a 375×812 y a 1280×800, con un grupo de 40 caracteres y nombres de 60: sin desplazamiento horizontal, barra y volver de 44 px o más, y ningún control tapado por la barra al final de cada pantalla"
+  ]
+}
