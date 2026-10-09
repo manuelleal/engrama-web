@@ -250,7 +250,7 @@ export async function correrGuionNavegacion({ sesion, url, cuentas, semilla, cod
   r.huerfanas.sort();
   r.formas_de_volver = r.formas.size;
   // Fuera del criterio de §10.1, para leer el resultado: cuáles son las formas de volver y cuántos títulos distintos tuvo la pestaña del navegador.
-  r.informativo = { formas: [...r.formas].sort(), pestanas_del_navegador_distintas: pestanas.size };
+  r.informativo = { formas: [...r.formas].sort(), pestanas_del_navegador_distintas: pestanas.size, pestanas: [...pestanas].sort() }; // TRAMPOSO: los títulos de las pestañas traen el código del grupo
   delete r.formas;
   return r;
 }

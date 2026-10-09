@@ -1,0 +1,16 @@
+{
+  "descripcion": "profe/sesion_asistencia.js pinta la asistencia abierta sin volver y sin barra, como antes (H1): el humo de navegacion la anota en sin_salida y pierde el camino al tablero (10.1)",
+  "archivos": {
+    "src/vistas/profe/sesion_asistencia.js": "sesion_asistencia.js"
+  },
+  "comando": [
+    "node",
+    "--test",
+    "--test-reporter=tap",
+    "tests/e2e/humo_navegacion.test.mjs"
+  ],
+  "espera_codigo_no_cero": true,
+  "espera_fallan_tests": [
+    "W75: el humo de navegación (desarrollo) escribe su archivo, da el mismo sha256 en dos corridas y la tabla de la espec (10.1), sin tocar"
+  ]
+}

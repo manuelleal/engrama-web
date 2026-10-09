@@ -1,0 +1,16 @@
+{
+  "descripcion": "El humo de navegacion escribe los titulos de las pestanas, que traen el codigo del grupo: el archivo deja de ser solo estructura (10.1: sin nombres ni identificadores)",
+  "archivos": {
+    "herramientas/humo/flujo_navegacion.mjs": "flujo_navegacion.mjs"
+  },
+  "comando": [
+    "node",
+    "--test",
+    "--test-reporter=tap",
+    "tests/e2e/humo_navegacion.test.mjs"
+  ],
+  "espera_codigo_no_cero": true,
+  "espera_fallan_tests": [
+    "W75: el archivo del humo de navegación solo trae estructura: ni fechas, ni UUID, ni correos, ni nombres de persona, ni códigos de grupo"
+  ]
+}

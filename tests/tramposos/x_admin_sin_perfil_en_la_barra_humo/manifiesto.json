@@ -1,0 +1,16 @@
+{
+  "descripcion": "El mismo defecto de x_admin_sin_perfil_en_la_barra_e30, medido por el humo: el admin se queda sin camino a su Perfil, al aviso y a las solicitudes (huerfanas, 10.1)",
+  "archivos": {
+    "src/ui/nav_inferior.js": "nav_inferior.js"
+  },
+  "comando": [
+    "node",
+    "--test",
+    "--test-reporter=tap",
+    "tests/e2e/humo_navegacion.test.mjs"
+  ],
+  "espera_codigo_no_cero": true,
+  "espera_fallan_tests": [
+    "W75: el humo de navegación (desarrollo) escribe su archivo, da el mismo sha256 en dos corridas y la tabla de la espec (10.1), sin tocar"
+  ]
+}
