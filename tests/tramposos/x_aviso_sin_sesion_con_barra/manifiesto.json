@@ -1,0 +1,16 @@
+{
+  "descripcion": "vistas/aviso_datos.js pinta la barra de abajo tambien cuando el aviso se abre desde la entrada, sin sesion: enlaces a Inicio, Retos y Perfil que no llevan a ninguna parte (U62)",
+  "archivos": {
+    "src/vistas/aviso_datos.js": "aviso_datos.js"
+  },
+  "comando": [
+    "node",
+    "--test",
+    "--test-reporter=tap",
+    "tests/unit/nav_barra.test.mjs"
+  ],
+  "espera_codigo_no_cero": true,
+  "espera_fallan_tests": [
+    "U62 (la barra): sin sesión no hay barra: el aviso abierto desde la entrada no la lleva, ni las solicitudes pintadas dentro del aviso obligatorio"
+  ]
+}

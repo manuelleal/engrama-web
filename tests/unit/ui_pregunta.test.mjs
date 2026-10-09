@@ -44,7 +44,7 @@ test('toque: lo dan los botones del estudiante, no los deshabilitados, ni las op
 });
 
 test('navegación inferior: cada pestaña trae su ícono y conserva su texto', () => {
-  for (const e of entradasNav('inicio')) {
+  for (const e of entradasNav('student', '/inicio') || []) {
     assert.ok(e.icono && e.icono.length > 0, `${e.id} sin ícono`);
     assert.ok(e.texto.length > 0);
   }

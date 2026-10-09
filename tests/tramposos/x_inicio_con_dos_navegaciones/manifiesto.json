@@ -1,0 +1,16 @@
+{
+  "descripcion": "estudiante/inicio.js vuelve a traer la fila de enlaces del final (Asistencia, Retos) ademas de la barra: dos navegaciones y dos enlaces al mismo destino (H5; U66)",
+  "archivos": {
+    "src/vistas/estudiante/inicio.js": "inicio.js"
+  },
+  "comando": [
+    "node",
+    "--test",
+    "--test-reporter=tap",
+    "tests/unit/vista_inicio_ahora.test.mjs"
+  ],
+  "espera_codigo_no_cero": true,
+  "espera_fallan_tests": [
+    "U66: Inicio tiene UNA sola navegación (la barra de abajo, con \"Perfil\"): ningún otro `nav`, ningún par de enlaces con el mismo destino, y \"Cerrar sesión\" ya no está aquí"
+  ]
+}

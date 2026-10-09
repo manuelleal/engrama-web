@@ -12,10 +12,14 @@ import { h, montar } from '../../ui/dom.js';
 import { crearDrako } from '../../ui/drako.js';
 import { ligarEscrituraARed } from '../../ui/red.js';
 import { registrarCelebracion } from '../../ui/celebraciones.js';
+import { crearNavInferior } from '../../ui/nav_inferior.js';
 import { textos } from '../../textos.js';
 import { destinosDeLaSesion, crearSalida, alVolverDeOtroOrigen } from '../../anillo/abrir.js';
 
 const T = textos.anillo;
+// W68 (docs/ESPEC_navegacion.md §5.6): las dos pantallas llevan la barra de abajo, con Inicio activa. La ruta de cada destino es la de navegacion.js.
+const RUTA_DE = { eva_celular: '/vivo', set_examen: '/nivel' };
+const barraDe = (cfg, ctx) => crearNavInferior(/** @type {Record<string, string>} */ (RUTA_DE)[cfg.destino], ctx?.sesion?.rol);
 
 /**
  * @typedef {object} Configuracion
@@ -35,12 +39,13 @@ const T = textos.anillo;
  * @property {(v: string) => boolean} valido
  */
 
-function pantallaNoDisponible(raiz, cfg) {
+function pantallaNoDisponible(raiz, cfg, ctx) {
   montar(raiz, h(
     'div', { 'data-testid': cfg.testid },
     h('h1', {}, cfg.titulo),
     h('p', { role: 'status', 'data-testid': 'salida-no-disponible' }, T.noDisponible),
     h('a', { href: '#/inicio', class: 'boton-chico', 'data-testid': 'salida-volver' }, T.volverInicio),
+    barraDe(cfg, ctx),
   ));
   document.body.dataset.listo = '1';
 }
@@ -77,7 +82,7 @@ function alEnviar(cfg, salida, { campo, boton, error }) {
 export function renderSalidaConCodigo(raiz, query, ctx, cfg) {
   const hallado = destinosDeLaSesion(ctx).find((d) => d.destino === cfg.destino);
   if (!hallado) {
-    pantallaNoDisponible(raiz, cfg);
+    pantallaNoDisponible(raiz, cfg, ctx);
     return;
   }
   const salida = crearSalida(ctx, cfg.destino, hallado.base);
@@ -100,6 +105,7 @@ export function renderSalidaConCodigo(raiz, query, ctx, cfg) {
     form,
     h('p', { class: 'texto-apoyo', role: 'note', 'data-testid': 'salida-sales' }, T.sales),
     h('a', { href: '#/inicio', class: 'boton-chico', 'data-testid': 'salida-volver' }, T.volverInicio),
+    barraDe(cfg, ctx),
   ));
   // Sin red, salir a otro origen queda deshabilitado con su texto. Tras salir, el botón no se reactiva solo (otraCondicionOk).
   const sinRed = () => {}; // el error: sin red el botón sigue activo

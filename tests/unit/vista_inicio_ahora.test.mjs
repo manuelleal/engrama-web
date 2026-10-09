@@ -3,8 +3,8 @@
 //   - el orden: saldo y constancia → saludo → escudo → "Ahora" (reto de hoy, clase en vivo, examen de nivel) → "Esta semana";
 //   - cada botón de "Ahora" dice a dónde lleva: ningún par de botones con el mismo texto;
 //   - UNA sola tarjeta con invitación (la primera de "Ahora"): si no hay reto pendiente, la que siga.
-// (Que no haya un segundo `nav` ni dos enlaces al mismo destino es de W68, cuando la barra gana "Perfil".)
-// Tramposos: x_tarjetas_con_el_mismo_boton y x_tres_invitaciones (estudiante/inicio.js).
+// W68 (§5.6): ningún `nav` fuera de la barra de abajo y ningún par de enlaces con el mismo destino (salió la fila de enlaces repetidos).
+// Tramposos: x_tarjetas_con_el_mismo_boton, x_tres_invitaciones y x_inicio_con_dos_navegaciones (estudiante/inicio.js).
 import test from 'node:test';
 import assert from 'node:assert/strict';
 import { buscar, textoDe } from './foto_vistas.mjs';
@@ -79,5 +79,18 @@ test('U66: sin EVA ni SET configurados no hay tarjetas de clase ni de examen, y 
   try {
     assert.equal(buscar(raiz, 'anillo-tarjetas'), null);
     assert.deepEqual(botonesDeAhora(raiz), [['Jugar', '#/retos/reto-1']]);
+  } finally { cerrar(); }
+});
+
+test('U66: Inicio tiene UNA sola navegación (la barra de abajo, con "Perfil"): ningún otro `nav`, ningún par de enlaces con el mismo destino, y "Cerrar sesión" ya no está aquí', async () => {
+  const { raiz, cerrar } = await pintar(servidor(), (r) => renderInicio(r, { ...conAnillo(), cambiarContrasena: async () => {} }));
+  try {
+    const navs = enOrden(raiz).filter((e) => e.tagName === 'nav');
+    assert.equal(navs.length, 1, `un solo nav en Inicio (hay ${navs.length})`);
+    assert.ok(String(navs[0].className).split(/\s+/).includes('nav-inferior'), 'y es la barra de abajo');
+    const destinos = enOrden(raiz).filter((e) => e.tagName === 'a').map((a) => a.getAttribute('href'));
+    assert.equal(new Set(destinos).size, destinos.length, `ningún par de enlaces con el mismo destino: ${destinos.join(' ')}`);
+    assert.ok(destinos.includes('#/perfil'), 'a Perfil se llega por la barra');
+    for (const testid of ['ir-a-asistencia', 'ir-a-retos', 'ir-a-perfil', 'boton-cerrar-sesion']) assert.equal(buscar(raiz, testid), null, `la fila repetida salió: ${testid}`);
   } finally { cerrar(); }
 });

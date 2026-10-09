@@ -53,6 +53,9 @@ test('R9: lo que W67 declara cambió de verdad: cada texto nuevo se ve hoy, y el
   assert.ok(!dice(hoy.profe_asistencia_abierta, 'Cerrar sesión'), 'en la asistencia abierta ya no hay un "Cerrar sesión"');
 });
 
+const BARRA = { etiqueta: 'nav', clase: 'nav-inferior' };
+const ESCENAS_CON_BARRA_W68 = ['retos', 'retos_vacio', 'retos_error', 'asistencia', 'revision', 'vivo', 'vivo_no_disponible', 'nivel', 'nivel_no_disponible', 'aviso_leer', 'solicitudes', 'solicitudes_vacio', 'solicitudes_error'];
+
 /**
  * Los subárboles que un encargo declaró como cambiados, por escena: un `data-testid` (cadena) o `{etiqueta, clase}` para un nodo sin testid
  * (la barra de abajo). Vacío = ninguna escena cambia. Si una foto cambia y no está aquí, R9 se pone rojo.
@@ -64,7 +67,25 @@ export const DECLARADAS_NAV = {
   profe_retos: ['volver'],
   profe_retos_vacio: ['volver'],
   profe_retos_error: ['volver'],
+  // W68 (cambio 6a): la barra del estudiante gana "Perfil" donde ya estaba (retos, asistencia, revisión) y ENTRA en la clase en vivo, el examen
+  // de nivel, el aviso y las solicitudes; también en los estados de error (retos_error no la traía). Corrección a la tabla de §11, que solo
+  // nombraba clase, examen, aviso y solicitudes. La barra no lleva testid: se declara por etiqueta y clase.
+  ...Object.fromEntries(ESCENAS_CON_BARRA_W68.map((nombre) => [nombre, [BARRA]])),
 };
+
+test('R9: lo que W68 declara cambió de verdad: cada escena del estudiante trae UNA barra con "Perfil"; el reto en curso, ninguna; y fuera de la barra nada cambió', async () => {
+  const hoy = await tomarFotosNav();
+  const barras = (lineas) => lineas.filter((l) => l.trimStart().startsWith('nav ') && l.includes('class="nav-inferior"'));
+  for (const nombre of ESCENAS_CON_BARRA_W68) {
+    assert.equal(barras(hoy[nombre]).length, 1, `${nombre}: una barra`);
+    assert.ok(hoy[nombre].some((l) => l.trim() === '"Perfil"'), `${nombre}: la barra dice "Perfil"`);
+    assert.ok(!CRUDA.vistas[nombre].some((l) => l.trim() === '"Perfil"'), `${nombre}: la línea base no lo decía`);
+    assert.deepEqual(sinSubarboles(hoy[nombre], [BARRA, ...(DECLARADAS_NAV[nombre] || [])]), sinSubarboles(BASE.vistas[nombre], [BARRA, ...(DECLARADAS_NAV[nombre] || [])]), `${nombre}: fuera de la barra, idéntica`);
+  }
+  for (const nombre of ['retos', 'retos_vacio', 'asistencia', 'revision']) assert.equal(barras(CRUDA.vistas[nombre]).length, 1, `${nombre}: la línea base ya traía barra (de 3 entradas)`);
+  for (const nombre of ['retos_error', 'vivo', 'vivo_no_disponible', 'nivel', 'nivel_no_disponible', 'aviso_leer', 'solicitudes', 'solicitudes_vacio', 'solicitudes_error']) assert.equal(barras(CRUDA.vistas[nombre]).length, 0, `${nombre}: la línea base no traía barra`);
+  for (const nombre of ['reto_en_curso', 'reto_en_curso_error']) assert.equal(barras(hoy[nombre]).length, 0, `${nombre}: una tarea por pantalla, sin barra`);
+});
 
 test('R9: lo que W63 declara cambió de verdad: la asistencia abierta trae la vuelta al grupo y los retos del profe, "‹ Mis grupos" (un nodo y su texto, nada más)', async () => {
   const hoy = await tomarFotosNav({ solo: ['profe_asistencia_abierta', 'profe_retos', 'profe_retos_vacio', 'profe_retos_error'] });

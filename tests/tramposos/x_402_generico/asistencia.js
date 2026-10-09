@@ -103,7 +103,7 @@ function mostrarFallo(zonaResultado, e) {
 export function renderAsistencia(raiz, query, ctx) {
   const { form, campo, boton, avisoRed, zonaResultado } = crearFormulario({ codigoInicial: query.codigo || '' });
   montar(raiz, h('div', { 'data-testid': 'vista-asistencia', class: 'juego' },
-    h('div', { class: 'encabezado-reto' }, h('h1', {}, textos.asistencia.titulo), crearBotonSonido()), form, crearNavInferior('asistencia')));
+    h('div', { class: 'encabezado-reto' }, h('h1', {}, textos.asistencia.titulo), crearBotonSonido()), form, crearNavInferior('/asistencia', /** @type {any} */ (ctx).sesion?.rol)));
 
   const cancelarRed = suscribirRed((enLinea) => actualizarBotonPorRed(boton, avisoRed, enLinea));
 

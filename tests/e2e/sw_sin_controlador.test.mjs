@@ -32,6 +32,8 @@ const A_ENTRA_Y_SALE = `(async () => {
   await esperar(1500);
   const veiaSuInicio = !!q('vista-inicio');
   const controlador = navigator.serviceWorker.controller;
+  document.querySelector('nav.nav-inferior a[href="#/perfil"]').click(); // W68: "Cerrar sesión" vive en Perfil (barra → Perfil)
+  await esperar(600);
   q('boton-cerrar-sesion').click();
   return { veiaSuInicio, sinControlador: controlador === null };
 })()`;

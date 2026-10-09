@@ -10,7 +10,6 @@ import { crearEscudo } from '../../ui/escudo.js';
 import { crearDrako } from '../../ui/drako.js';
 import { crearLlama, celebrarRacha } from '../../ui/racha.js';
 import { crearBotonSonido } from '../../ui/boton_sonido.js';
-import { crearBotonSalir } from '../../ui/boton_salir.js';
 import { crearCargando, crearVacio } from '../../ui/estados.js';
 import { crearNavInferior } from '../../ui/nav_inferior.js';
 import { crearSelectorColegio } from '../../ui/selector_colegio.js';
@@ -231,20 +230,6 @@ function barraSuperior(datos, ctx) {
   return { barra: h('div', { class: 'barra-superior' }, nodoSaldo, constancia), nodoSaldo, constancia };
 }
 
-function navDeAccesos(ctx) {
-  return h(
-    'nav', {},
-    h('a', { href: '#/asistencia', 'data-testid': 'ir-a-asistencia' }, textos.asistencia.titulo),
-    h('a', { href: '#/retos', 'data-testid': 'ir-a-retos' }, textos.retos.titulo),
-    // W22: solo si el proveedor de auth activo soporta cambiar contraseña (hoy: modo supabase)
-    // — en modo mock/perfil_actual no hay a dónde llevar ese enlace (vistas/perfil.js).
-    typeof ctx.cambiarContrasena === 'function'
-      ? h('a', { href: '#/perfil', 'data-testid': 'ir-a-perfil' }, textos.perfil.titulo)
-      : null,
-    // Un equipo compartido: el estudiante también puede cerrar su sesión (antes solo el profe y el admin).
-  );
-}
-
 function pintarContenido(raiz, ctx, datos) {
   const { barra, nodoSaldo, constancia } = barraSuperior(datos, ctx);
   const nivel = prepararNivel(ctx, datos.nivelConfirmado);
@@ -260,8 +245,8 @@ function pintarContenido(raiz, ctx, datos) {
     nivel.aviso,
     seccionAhora(datos.pendiente, ctx),
     tarjetaProgresoSemana(datos.semana),
-    navDeAccesos(ctx),
-    crearNavInferior('inicio'),
+    h('nav', {}, h('a', { href: '#/asistencia', 'data-testid': 'ir-a-asistencia' }, textos.asistencia.titulo), h('a', { href: '#/retos', 'data-testid': 'ir-a-retos' }, textos.retos.titulo)), // TRAMPOSO: vuelve la fila repetida
+    crearNavInferior('/inicio', ctx.sesion?.rol), // W68: la ÚNICA navegación de Inicio (salió la fila de enlaces repetidos; "Cerrar sesión" vive en Perfil)
   );
   montar(raiz, nodo);
   animarSaldo(nodoSaldo, datos.balance, ctx);
@@ -270,10 +255,11 @@ function pintarContenido(raiz, ctx, datos) {
   document.body.dataset.listo = '1';
 }
 
-function pintarError(raiz, mensaje) {
+function pintarError(raiz, ctx, mensaje) {
   const nodo = h('div', { 'data-testid': 'vista-inicio' },
     h('h1', {}, textos.app.titulo),
     h('p', { role: 'alert', 'data-testid': 'inicio-error' }, mensaje),
+    crearNavInferior('/inicio', ctx.sesion?.rol), // también si falla: nunca un callejón
   );
   montar(raiz, nodo);
   document.body.dataset.listo = '1';
@@ -285,7 +271,7 @@ function pintarError(raiz, mensaje) {
  *   cambiarContrasena?: (nueva: string) => Promise<void>}} ctx
  */
 export async function renderInicio(raiz, ctx) {
-  montar(raiz, h('div', { 'data-testid': 'vista-inicio', class: 'juego' }, crearCargando(textos.inicio.cargando)));
+  montar(raiz, h('div', { 'data-testid': 'vista-inicio', class: 'juego' }, crearCargando(textos.inicio.cargando), crearNavInferior('/inicio', ctx.sesion?.rol)));
   try {
     const datos = await cargarDatos(ctx);
     pintarContenido(raiz, ctx, datos);
@@ -293,6 +279,6 @@ export async function renderInicio(raiz, ctx) {
     // console.warn, no .error: el error queda mostrado en pantalla (pintarError) — no es un
     // catch mudo (REGLAS.md §4), es uno ya manejado; .error se reserva para lo inesperado.
     console.warn('vistas/estudiante/inicio: no se pudo cargar', e);
-    pintarError(raiz, e instanceof ErrorApi ? e.mensaje : textos.inicio.errorGeneral);
+    pintarError(raiz, ctx, e instanceof ErrorApi ? e.mensaje : textos.inicio.errorGeneral);
   }
 }

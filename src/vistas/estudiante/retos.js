@@ -40,28 +40,28 @@ function filaDeReto(reto, ganado) {
   );
 }
 
-function pintarLista(raiz, retos, ganados) {
+function pintarLista(raiz, ctx, retos, ganados) {
   const cuerpo = retos.length === 0
     ? crearVacio({ titulo: textos.estados.retosVacioTitulo, texto: textos.estados.retosVacio, testid: 'retos-vacio' })
     : h('ul', {}, ...retos.map((r) => filaDeReto(r, ganados.has(r.id))));
   montar(raiz, h('div', { 'data-testid': 'vista-retos', class: 'juego' },
-    h('div', { class: 'encabezado-reto' }, h('h1', {}, textos.retos.titulo), crearBotonSonido()), cuerpo, crearNavInferior('retos')));
+    h('div', { class: 'encabezado-reto' }, h('h1', {}, textos.retos.titulo), crearBotonSonido()), cuerpo, crearNavInferior('/retos', ctx.sesion?.rol)));
   document.body.dataset.listo = '1';
 }
 
-function pintarError(raiz, mensaje) {
-  montar(raiz, h('div', { 'data-testid': 'vista-retos' }, h('h1', {}, textos.retos.titulo), h('p', { role: 'alert' }, mensaje)));
+function pintarError(raiz, ctx, mensaje) {
+  montar(raiz, h('div', { 'data-testid': 'vista-retos' }, h('h1', {}, textos.retos.titulo), h('p', { role: 'alert' }, mensaje), crearNavInferior('/retos', ctx.sesion?.rol)));
   document.body.dataset.listo = '1';
 }
 
-/** @param {HTMLElement} raiz @param {{token: string, tenantId?: string}} ctx */
+/** @param {HTMLElement} raiz @param {{token: string, tenantId?: string, sesion?: {rol?: string}}} ctx */
 export async function renderRetos(raiz, ctx) {
-  montar(raiz, h('div', { 'data-testid': 'vista-retos', class: 'juego' }, crearCargando(textos.inicio.cargando)));
+  montar(raiz, h('div', { 'data-testid': 'vista-retos', class: 'juego' }, crearCargando(textos.inicio.cargando), crearNavInferior('/retos', ctx.sesion?.rol)));
   try {
     const { retos, ganados } = await cargar(ctx);
-    pintarLista(raiz, retos, ganados);
+    pintarLista(raiz, ctx, retos, ganados);
   } catch (e) {
     console.warn('vistas/estudiante/retos: no se pudo cargar', e);
-    pintarError(raiz, e instanceof ErrorApi ? e.mensaje : textos.retos.errorGeneral);
+    pintarError(raiz, ctx, e instanceof ErrorApi ? e.mensaje : textos.retos.errorGeneral);
   }
 }

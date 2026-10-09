@@ -126,7 +126,7 @@ function escenas() {
   lista.push(['vivo_no_disponible', RUTAS_NAV, (r) => renderVivo(r, {}, ctxEstudiante({ config: { ENGRAMA_AUTH: 'supabase' } }))]);
   lista.push(['nivel', RUTAS_NAV, (r) => renderNivel(r, {}, ctxEstudiante({ config: CONFIG }))]);
   lista.push(['nivel_no_disponible', RUTAS_NAV, (r) => renderNivel(r, {}, ctxEstudiante({ config: { ENGRAMA_AUTH: 'supabase' } }))]);
-  lista.push(['aviso_leer', RUTAS_NAV, (r) => renderLeerAviso(r, { aviso: leerAviso(), solicitudes: '#/datos/solicitudes', alVolver: () => {} })]);
+  lista.push(['aviso_leer', RUTAS_NAV, (r) => renderLeerAviso(r, { aviso: leerAviso(), solicitudes: '#/datos/solicitudes', alVolver: () => {}, rol: 'student' })]); // W68: con sesión, app.js le pasa el rol (para la barra)
   tres('solicitudes', (r) => renderSolicitudesDatos(r, ctxEstudiante()));
   lista.push(['profe_asistencia_formulario', RUTAS_NAV, (r) => renderSesionAsistencia(r, { gid: GID }, ctxProfe())]);
   lista.push(['profe_asistencia_abierta', RUTAS_NAV, async (r) => {

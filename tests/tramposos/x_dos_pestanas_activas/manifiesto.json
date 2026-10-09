@@ -1,0 +1,16 @@
+{
+  "descripcion": "ui/nav_inferior.js marca SIEMPRE la pestana Inicio ademas de la de la pantalla: en Retos, Asistencia y las pantallas de Perfil hay dos pestanas activas a la vez (U60)",
+  "archivos": {
+    "src/ui/nav_inferior.js": "nav_inferior.js"
+  },
+  "comando": [
+    "node",
+    "--test",
+    "--test-reporter=tap",
+    "tests/unit/ui_nav_inferior.test.mjs"
+  ],
+  "espera_codigo_no_cero": true,
+  "espera_fallan_tests": [
+    "U60: en cada ruta del estudiante hay A LO MÁS una pestaña activa, y es la de §5.6"
+  ]
+}

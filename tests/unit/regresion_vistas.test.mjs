@@ -55,8 +55,28 @@ export const DECLARADAS = {
   profe_grupos: [{ etiqueta: 'ul' }, { etiqueta: 'nav' }],
   // W65 (docs/ESPEC_navegacion.md §9.2): Inicio junta el reto de hoy, la clase y el examen en la sección "Ahora" (nodo nuevo), antes de
   // "Esta semana". La tarjeta del reto, que en la línea base colgaba de la vista, ahora cuelga de "Ahora": por eso se declaran los dos.
-  inicio: ['ahora', 'tarjeta-reto-hoy'],
+  // W68 (docs/ESPEC_navegacion.md §9.2): sale la fila de enlaces del final (un `nav` sin testid) y la barra de abajo gana "Perfil". Los dos son
+  // `nav` sin `data-testid`: se declaran por etiqueta.
+  inicio: ['ahora', 'tarjeta-reto-hoy', { etiqueta: 'nav' }],
 };
+
+test('R4: lo que W68 declara cambió de verdad: Inicio ya no trae la fila de enlaces repetidos y su barra gana "Perfil"; lo demás no cambió', async () => {
+  const hoy = (await tomarFotos()).inicio;
+  const base = BASE.vistas.inicio;
+  const navs = (lineas) => lineas.filter((l) => l.trimStart().split(' ')[0] === 'nav');
+  assert.equal(navs(base).length, 2, 'la línea base traía DOS navegaciones (la fila de enlaces y la barra)');
+  assert.equal(navs(hoy).length, 1, 'hoy, una sola');
+  assert.ok(navs(hoy)[0].includes('class="nav-inferior"'), 'y es la barra de abajo');
+  for (const testid of ['ir-a-asistencia', 'ir-a-retos', 'ir-a-perfil', 'boton-cerrar-sesion']) {
+    assert.ok(base.some((l) => l.includes(`data-testid="${testid}"`)), `la línea base traía ${testid}`);
+    assert.ok(!hoy.some((l) => l.includes(`data-testid="${testid}"`)), `hoy Inicio ya no trae ${testid}`);
+  }
+  const barra = hoy.slice(hoy.findIndex((l) => l.includes('class="nav-inferior"')));
+  assert.deepEqual(barra.filter((l) => l.trimStart().startsWith('a ')).map((l) => /href="([^"]*)"/.exec(l)?.[1]), ['#/inicio', '#/retos', '#/asistencia', '#/perfil']);
+  assert.ok(barra.some((l) => l.trim() === '"Perfil"'), 'la barra dice "Perfil"');
+  assert.ok(!base.some((l) => l.trim() === '"Perfil"'), 'la línea base no lo decía');
+  assert.deepEqual(sinSubarboles(hoy, DECLARADAS.inicio), sinSubarboles(base, DECLARADAS.inicio), 'fuera de lo declarado, Inicio es idéntico');
+});
 
 test('R4: lo que W65 declara cambió de verdad: Inicio trae "Ahora" con el reto de hoy ANTES de "Esta semana", y lo demás no cambió', async () => {
   const hoy = (await tomarFotos()).inicio;

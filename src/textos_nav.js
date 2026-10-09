@@ -6,6 +6,9 @@ export const textosNav = {
   nav: {
     // Los nombres de las pestañas son los títulos de sus pantallas (Retos y Asistencia reusan textos.retos.titulo y textos.asistencia.titulo).
     inicio: 'Inicio',
+    // W68 (§5.6): la entrada de la barra que lleva a "mi cuenta" (el aviso, las solicitudes y "Cerrar sesión" viven ahí).
+    perfil: 'Perfil',
+    barra: 'Navegación principal', // el nombre accesible de la barra de abajo
     // "Sesión" es SOLO la cuenta (§5.5): este es el único "Cerrar sesión" de la app.
     cerrarSesion: 'Cerrar sesión',
     cerrandoSesion: 'Cerrando…',

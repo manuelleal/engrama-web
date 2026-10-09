@@ -1,7 +1,7 @@
 {
-  "descripcion": "El estudiante vuelve a quedarse sin botón de Cerrar sesión en Inicio",
+  "descripcion": "El estudiante vuelve a quedarse sin boton de Cerrar sesion: Perfil (a donde lo movio W68, docs/ESPEC_navegacion.md 5.6) no lo trae en el modo de prueba",
   "archivos": {
-    "src/vistas/estudiante/inicio.js": "inicio.js"
+    "src/vistas/perfil.js": "perfil.js"
   },
   "comando": [
     "node",

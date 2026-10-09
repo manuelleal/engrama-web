@@ -11,12 +11,16 @@ import { crearDrakoEstatico } from '../ui/drako.js';
 import { crearEtiquetaEstado } from '../ui/estado_etiqueta.js';
 import { ligarEscrituraARed } from '../ui/red.js';
 import { registrarCelebracion } from '../ui/celebraciones.js';
+import { crearNavInferior } from '../ui/nav_inferior.js';
 import { fechaCorta } from '../ui/escudo.js';
 import { textos } from '../textos.js';
 import { listarSolicitudesDatos, crearSolicitudDatos, validarSolicitudDatos, largoEnCaracteres, TIPOS_DE_SOLICITUD } from '../api/datos.js';
 import { accionUnica, ErrorApi } from '../api/cliente.js';
 
 const T = textos.solicitudes;
+// W68 (docs/ESPEC_navegacion.md §5.6): por la ruta, la pantalla lleva la barra de abajo (Perfil activa). Pintada en el sitio desde el aviso
+// obligatorio (`ctx.alVolver`) no: ahí el router está apagado y no hay a dónde navegar.
+const barraDe = (ctx) => (ctx.alVolver ? null : crearNavInferior('/datos/solicitudes', ctx.sesion?.rol));
 const ESTADO_DE = { abierta: 'solicitud_abierta', en_tramite: 'solicitud_en_tramite', resuelta: 'solicitud_resuelta', rechazada: 'solicitud_rechazada' };
 
 /** El texto de un error de envío. Pura. @param {unknown} e */
@@ -112,6 +116,7 @@ function pintar(raiz, ctx, solicitudes, mensajeInicial) {
     h('h2', {}, T.nueva),
     formularioNuevo(enviar, mensajeInicial),
     volver,
+    barraDe(ctx),
   ));
   document.body.dataset.listo = '1';
 }
@@ -121,16 +126,16 @@ async function cargarYPintar(raiz, ctx, mensajeInicial) {
     pintar(raiz, ctx, await listarSolicitudesDatos(ctx), mensajeInicial);
   } catch (e) {
     console.warn('vistas/datos_solicitudes: no se pudieron cargar', e instanceof ErrorApi ? e.status : 'error');
-    montar(raiz, h('div', { 'data-testid': 'vista-solicitudes-datos' }, h('h1', {}, T.titulo), h('p', { role: 'alert', 'data-testid': 'solicitudes-error' }, e instanceof ErrorApi ? e.mensaje : T.errorCargar)));
+    montar(raiz, h('div', { 'data-testid': 'vista-solicitudes-datos' }, h('h1', {}, T.titulo), h('p', { role: 'alert', 'data-testid': 'solicitudes-error' }, e instanceof ErrorApi ? e.mensaje : T.errorCargar), barraDe(ctx)));
     document.body.dataset.listo = '1';
   }
 }
 
 /**
  * @param {HTMLElement} raiz
- * @param {{token: string, tenantId?: string, alVolver?: () => void}} ctx `alVolver`: solo cuando se pinta en el sitio (la pantalla obligatoria del aviso)
+ * @param {{token: string, tenantId?: string, alVolver?: () => void, sesion?: {rol?: string}}} ctx `alVolver`: solo cuando se pinta en el sitio (la pantalla obligatoria del aviso)
  */
 export async function renderSolicitudesDatos(raiz, ctx) {
-  montar(raiz, h('div', { 'data-testid': 'vista-solicitudes-datos' }, h('p', { role: 'status' }, textos.inicio.cargando)));
+  montar(raiz, h('div', { 'data-testid': 'vista-solicitudes-datos' }, h('p', { role: 'status' }, textos.inicio.cargando), barraDe(ctx)));
   await cargarYPintar(raiz, ctx, '');
 }

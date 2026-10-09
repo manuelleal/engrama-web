@@ -18,6 +18,7 @@ const HAY_NAVEGADOR = [
 const SKIP = !HAY_NAVEGADOR && 'no hay Edge ni Chrome instalado en esta máquina';
 
 // Entra de verdad (el picker de actores), deja huellas de A en el equipo y pulsa "Cerrar sesión".
+// W68 (docs/ESPEC_navegacion.md §5.6): "Cerrar sesión" vive en Perfil; se llega TOCANDO la entrada "Perfil" de la barra de abajo (2 toques).
 const A_ENTRA_Y_SALE = `(async () => {
   const esperar = (ms) => new Promise((r) => setTimeout(r, ms));
   const q = (t) => document.querySelector('[data-testid="' + t + '"]');
@@ -32,9 +33,13 @@ const A_ENTRA_Y_SALE = `(async () => {
   navigator.serviceWorker.controller.postMessage = (m, ...r) => { sessionStorage.setItem('mensajes_al_sw', JSON.stringify([...JSON.parse(sessionStorage.getItem('mensajes_al_sw') || '[]'), m])); return original(m, ...r); };
   location.hash = '#/retos'; await esperar(500);
   location.hash = '#/inicio'; await esperar(500);
-  const hayBoton = !!q('boton-cerrar-sesion');
-  q('boton-cerrar-sesion').click();
-  return { veiaSuInicio, hayBoton };
+  const enInicio = !!q('boton-cerrar-sesion');
+  const perfilEnLaBarra = document.querySelector('nav.nav-inferior a[href="#/perfil"]');
+  const hayPerfil = !!perfilEnLaBarra;
+  perfilEnLaBarra?.click(); await esperar(600);
+  const hayBoton = !!q('vista-perfil') && !!q('boton-cerrar-sesion');
+  q('boton-cerrar-sesion')?.click();
+  return { veiaSuInicio, enInicio, hayPerfil, hayBoton };
 })()`;
 
 const DESPUES_DE_SALIR = `(async () => {
@@ -49,7 +54,7 @@ const DESPUES_DE_SALIR = `(async () => {
   history.back();
   await esperar(1800);
   const atras = {
-    datosDeA: !!document.querySelector('[data-testid="vista-inicio"]') || !!document.querySelector('[data-testid="saldo"]') || !!document.querySelector('[data-testid="constancia"]') || !!document.querySelector('[data-testid="vista-retos"]'),
+    datosDeA: !!document.querySelector('[data-testid="vista-inicio"]') || !!document.querySelector('[data-testid="saldo"]') || !!document.querySelector('[data-testid="constancia"]') || !!document.querySelector('[data-testid="vista-retos"]') || !!document.querySelector('[data-testid="vista-perfil"]'),
     entrada: !!document.querySelector('[data-testid="vista-entrada"]'),
   };
   return { antes, atras };
@@ -61,7 +66,7 @@ test('cerrar sesión (estudiante): sale de verdad, limpia lo local, avisa al SW 
       url, ancho: 375, alto: 812, espera_ms: 6000, eval: A_ENTRA_Y_SALE,
       tras: { sinNavegar: true, espera_ms: 4000, eval: DESPUES_DE_SALIR },
     });
-    assert.deepEqual(r.eval, { veiaSuInicio: true, hayBoton: true }, 'el estudiante ve su Inicio y en él, el botón "Cerrar sesión"');
+    assert.deepEqual(r.eval, { veiaSuInicio: true, enInicio: false, hayPerfil: true, hayBoton: true }, 'el estudiante ve su Inicio; "Cerrar sesión" ya no está ahí sino en Perfil, a un toque de la barra');
     assert.equal(r.tras.eval.antes.entrada, true, 'vuelve a la pantalla de entrada');
     assert.equal(r.tras.eval.antes.actor, null, 'la sesión se borró');
     assert.deepEqual(r.tras.eval.antes.respuestas, [], 'las respuestas en curso de A se borraron (H-18)');

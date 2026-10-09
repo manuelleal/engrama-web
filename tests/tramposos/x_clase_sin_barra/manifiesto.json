@@ -1,0 +1,16 @@
+{
+  "descripcion": "estudiante/salida_codigo.js no pinta la barra de abajo: al salir de las pestanas, la clase en vivo y el examen de nivel vuelven a quedarse sin barra (H6; U62)",
+  "archivos": {
+    "src/vistas/estudiante/salida_codigo.js": "salida_codigo.js"
+  },
+  "comando": [
+    "node",
+    "--test",
+    "--test-reporter=tap",
+    "tests/unit/nav_barra.test.mjs"
+  ],
+  "espera_codigo_no_cero": true,
+  "espera_fallan_tests": [
+    "U62 (la barra): la clase en vivo y el examen de nivel traen la barra con Inicio activa, con destino configurado y sin él"
+  ]
+}

@@ -33,7 +33,7 @@ export function entradasNav(rol, patron) {
   const fila = RUTAS.find((r) => r.patron === patron);
   const deRol = ENTRADAS[/** @type {Rol} */ (rol)];
   if (!fila || !fila.barra || !deRol) return null;
-  return deRol.map((e) => ({ id: e.id, href: `#${e.camino}`, texto: e.texto(), icono: e.icono, activo: e.id === fila.pestana }));
+  return deRol.map((e) => ({ id: e.id, href: `#${e.camino}`, texto: e.texto(), icono: e.icono, activo: e.id === fila.pestana || e.id === 'inicio' })); // TRAMPOSO: Inicio queda marcada siempre
 }
 
 /**

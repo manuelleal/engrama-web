@@ -131,7 +131,7 @@ async function manejarTerminar(raiz, estado, enviarUnaVez) {
   try {
     const resultado = await enviarUnaVez();
     borrarRespuestasGuardadas(estado.attemptId);
-    renderRevision(raiz, { challenge: estado.challenge, resultado, respuestasDadas: estado.respuestas });
+    renderRevision(raiz, { challenge: estado.challenge, resultado, respuestasDadas: estado.respuestas, rol: estado.rol });
   } catch (e) {
     // 409 = "Attempt already completed or abandoned": un doble toque real ya lo manejó
     // accionUnica (una sola petición); si aun así llega, es que el servidor ya lo cerró por otra
@@ -155,7 +155,7 @@ export async function renderRetoFlujo(raiz, params, query, ctx) {
     const esRepaso = query.repaso === '1' || (await yaGanado(challengeId, ctx));
     const { attempt_id: attemptId, challenge } = await arrancarIntento(challengeId, ctx);
     const respuestas = leerRespuestasGuardadas(attemptId);
-    const estado = { attemptId, challenge, respuestas, esRepaso, indice: primeraSinResponder(challenge.questions, respuestas) };
+    const estado = { attemptId, challenge, respuestas, esRepaso, rol: /** @type {any} */ (ctx).sesion?.rol, indice: primeraSinResponder(challenge.questions, respuestas) };
     const enviarUnaVez = accionUnica(() => enviarIntento(attemptId, respuestas, ctx));
     const callbacks = {
       siguiente: () => { estado.indice++; pintarPregunta(raiz, estado, callbacks); },

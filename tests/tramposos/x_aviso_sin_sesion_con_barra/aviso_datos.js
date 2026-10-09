@@ -106,7 +106,7 @@ export function renderLeerAviso(raiz, ctx) {
   const volver = h('button', { type: 'button', class: 'boton-secundario', 'data-testid': 'aviso-volver' }, T.volver);
   volver.addEventListener('click', ctx.alVolver);
   const solicitudes = ctx.solicitudes ? h('a', { href: ctx.solicitudes, 'data-testid': 'aviso-ver-solicitudes' }, textos.solicitudes.enlace) : null;
-  montar(raiz, h('div', { 'data-testid': 'vista-aviso-datos' }, h('h1', {}, T.titulo), crearTextoAviso(ctx.aviso), solicitudes, volver, ctx.rol ? crearNavInferior('/datos', ctx.rol) : null));
+  montar(raiz, h('div', { 'data-testid': 'vista-aviso-datos' }, h('h1', {}, T.titulo), crearTextoAviso(ctx.aviso), solicitudes, volver, crearNavInferior('/datos', ctx.rol))); // TRAMPOSO: la barra sale siempre, tambien sin sesion
   document.body.dataset.listo = '1';
 }
 

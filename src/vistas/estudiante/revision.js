@@ -39,7 +39,7 @@ function filaDeRevision(pregunta, respuestasDadas, correctAnswers, i) {
 
 /**
  * @param {HTMLElement} raiz
- * @param {{challenge: object, resultado: object, respuestasDadas: Record<string,string>}} datos
+ * @param {{challenge: object, resultado: object, respuestasDadas: Record<string,string>, rol?: string}} datos `rol`: el de la sesión, para la barra
  */
 export function renderRevision(raiz, datos) {
   const { challenge, resultado, respuestasDadas } = datos;
@@ -64,7 +64,7 @@ export function renderRevision(raiz, datos) {
     h('h2', { class: 'subtitulo-revision' }, textos.revision.titulo),
     h('ul', {}, ...filas),
     volver,
-    crearNavInferior('retos'),
+    crearNavInferior('/retos', datos.rol), // la revisión es de la pestaña Retos (§5.6)
   );
   montar(raiz, nodo);
   // La línea de tiempo del fin de reto revela las filas y el botón en su momento (ui/linea_fin_reto.js).

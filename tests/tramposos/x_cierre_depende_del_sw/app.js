@@ -313,7 +313,7 @@ function arrancarConSesion(desdeElPrincipio = false) {
   ruta('/inicio', conCtx((raiz, params, query, ctx) => renderInicio(raiz, ctx)));
   ruta('/perfil', conCtx((raiz, params, query, ctx) => renderPerfil(raiz, ctx)));
   ruta('/datos', conCtx((raiz) => (leerAviso().ok
-    ? renderLeerAviso(raiz, { aviso: leerAviso(), solicitudes: '#/datos/solicitudes', alVolver: () => navegar(sesionActual.rol === 'student' ? '/perfil' : rutaPorDefectoSegunRol(sesionActual)) })
+    ? renderLeerAviso(raiz, { aviso: leerAviso(), solicitudes: '#/datos/solicitudes', rol: sesionActual.rol, alVolver: () => navegar(sesionActual.rol === 'student' ? '/perfil' : rutaPorDefectoSegunRol(sesionActual)) })
     : renderErrorAviso(raiz, leerAviso().faltan))));
   ruta('/datos/solicitudes', conCtx((raiz, params, query, ctx) => renderSolicitudesDatos(raiz, ctx))); // W33: todos los roles
   ruta('/vivo', conCtx((raiz, params, query, ctx) => renderVivo(raiz, query, ctx))); // W35: la sala de EVA

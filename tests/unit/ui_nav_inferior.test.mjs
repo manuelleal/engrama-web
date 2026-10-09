@@ -1,19 +1,50 @@
 // @ts-check
-// Pulido visual (2026-09-28): entradasNav() es la parte pura de ui/nav_inferior.js (el DOM real
-// lo prueba el E2E del shell, no aquí — mismo patrón que el resto de vistas del proyecto).
+// U60 (docs/ESPEC_navegacion.md §5.6, §9.3): la barra de abajo, por rol. `entradasNav(rol, patron)` es la parte pura de ui/nav_inferior.js (el
+// DOM real lo prueban nav_barra.test.mjs y los E2E).
+//   W68 (estudiante): 4 entradas (Inicio · Retos · Asistencia · Perfil); a lo más UNA activa; en cada ruta, la pestaña de §5.6; el reto en
+//   curso no lleva barra. El profe y el admin reciben la suya en W70.
+// Tramposo: x_dos_pestanas_activas (ui/nav_inferior.js).
 import test from 'node:test';
 import assert from 'node:assert/strict';
 import { entradasNav } from '../../src/ui/nav_inferior.js';
+import { RUTAS } from '../../src/navegacion.js';
 
-test('entradasNav: marca activa solo la ruta pedida', () => {
-  const e = entradasNav('retos');
-  assert.deepEqual(e.map((x) => x.id), ['inicio', 'retos', 'asistencia']);
-  assert.deepEqual(e.map((x) => x.activo), [false, true, false]);
+/** La pestaña activa de §5.6 para cada ruta del estudiante (null = la pantalla no lleva barra). W69 suma Perfil. */
+const ACTIVA_DEL_ESTUDIANTE = {
+  '/inicio': 'inicio', '/vivo': 'inicio', '/nivel': 'inicio',
+  '/retos': 'retos',
+  '/asistencia': 'asistencia',
+  '/datos': 'perfil', '/datos/solicitudes': 'perfil',
+  '/retos/:id': null,
+};
+
+test('U60: la barra del estudiante trae 4 entradas, en orden, con el texto de su pantalla, su destino y su ícono', () => {
+  const e = entradasNav('student', '/inicio');
+  assert.ok(e, 'Inicio lleva barra');
+  assert.deepEqual(e.map((x) => [x.id, x.texto, x.href]), [
+    ['inicio', 'Inicio', '#/inicio'], ['retos', 'Retos', '#/retos'], ['asistencia', 'Asistencia', '#/asistencia'], ['perfil', 'Perfil', '#/perfil'],
+  ]);
+  for (const x of e) assert.ok(x.icono && x.icono.length > 0, `${x.id} sin ícono`);
 });
 
-test('entradasNav: cada entrada trae su href de hash', () => {
-  const e = entradasNav('inicio');
-  assert.equal(e.find((x) => x.id === 'inicio').href, '#/inicio');
-  assert.equal(e.find((x) => x.id === 'retos').href, '#/retos');
-  assert.equal(e.find((x) => x.id === 'asistencia').href, '#/asistencia');
+test('U60: en cada ruta del estudiante hay A LO MÁS una pestaña activa, y es la de §5.6', () => {
+  for (const [patron, esperada] of Object.entries(ACTIVA_DEL_ESTUDIANTE)) {
+    const e = entradasNav('student', patron);
+    if (esperada === null) { assert.equal(e, null, `${patron}: sin barra`); continue; }
+    assert.ok(e, `${patron}: lleva barra`);
+    const activas = e.filter((x) => x.activo).map((x) => x.id);
+    assert.ok(activas.length <= 1, `${patron}: ${activas.length} pestañas activas a la vez (${activas.join(', ')})`);
+    assert.deepEqual(activas, [esperada], `${patron}: la pestaña activa`);
+  }
+  for (const r of RUTAS) {
+    const activas = (entradasNav('student', r.patron) || []).filter((x) => x.activo);
+    assert.ok(activas.length <= 1, `${r.patron}: nunca dos activas`);
+  }
+});
+
+test('U60: el reto en curso es la única ruta del estudiante sin barra (una tarea por pantalla), y una ruta que no existe tampoco la lleva', () => {
+  const sinBarra = RUTAS.filter((r) => r.roles.includes('student') && r.patron !== '/perfil' && entradasNav('student', r.patron) === null).map((r) => r.patron);
+  assert.deepEqual(sinBarra, ['/retos/:id']);
+  assert.equal(entradasNav('student', '/no-existe'), null);
+  assert.equal(entradasNav(undefined, '/inicio'), null, 'sin rol no hay barra que armar');
 });

@@ -3,7 +3,9 @@
 // abajo queda activa, a qué pantalla vuelve y cómo se titula. Pura: sin DOM y sin red. Toda ruta nueva de app.js entra aquí (U61 se pone rojo
 // si falta, o si aquí sobra una que ya no existe).
 //
-// W62: la tabla describe el estado de HOY (antes de los cambios de la espec). Cada encargo posterior (W63…W73) cambia solo las filas que declara.
+// W62: la tabla nació describiendo el estado de entonces. Cada encargo posterior (W63…W73) cambia solo las filas que declara.
+// W68: la clase en vivo y el examen llevan la barra con Inicio activa; el aviso y las solicitudes, con Perfil activa. La barra la pinta
+// ui/nav_inferior.js con las entradas del ROL: un rol que todavía no tiene barra no la ve aunque la fila diga `barra: true`.
 //   `roles`        de quién es la ruta (§5.8); `porDireccion`: roles que hoy pueden abrirla escribiendo la dirección, sin enlace que los lleve.
 //   `pestana`      el id de la entrada de la barra que queda activa en esa pantalla, o null (ninguna).
 //   `barra`        si la pantalla lleva la barra de abajo.
@@ -33,9 +35,9 @@ export const INICIO_POR_ROL = { student: '/inicio', teacher: '/profe/grupos', ad
 export const RUTAS = [
   { patron: '/inicio', roles: ['student'], pestana: 'inicio', barra: true, vuelve: null, titulo: () => textos.nav.inicio },
   { patron: '/perfil', roles: ['student'], pestana: null, barra: false, vuelve: '/inicio', titulo: () => textos.perfil.titulo },
-  { patron: '/datos', roles: TODOS, pestana: null, barra: false, vuelve: '/perfil', titulo: () => textos.aviso.titulo }, // hoy: el estudiante vuelve a Perfil; el profe y el admin, a su inicio
-  { patron: '/vivo', roles: ['student'], pestana: null, barra: false, vuelve: '/inicio', titulo: () => textos.anillo.vivoTitulo },
-  { patron: '/nivel', roles: ['student'], pestana: null, barra: false, vuelve: '/inicio', titulo: () => textos.anillo.nivelTitulo },
+  { patron: '/datos', roles: TODOS, pestana: 'perfil', barra: true, vuelve: '/perfil', titulo: () => textos.aviso.titulo }, // hoy: el estudiante vuelve a Perfil; el profe y el admin, a su inicio
+  { patron: '/vivo', roles: ['student'], pestana: 'inicio', barra: true, vuelve: '/inicio', titulo: () => textos.anillo.vivoTitulo },
+  { patron: '/nivel', roles: ['student'], pestana: 'inicio', barra: true, vuelve: '/inicio', titulo: () => textos.anillo.nivelTitulo },
   { patron: '/asistencia', roles: ['student'], pestana: 'asistencia', barra: true, vuelve: null, titulo: () => textos.asistencia.titulo },
   { patron: '/retos', roles: ['student'], pestana: 'retos', barra: true, vuelve: null, titulo: () => textos.retos.titulo },
   { patron: '/retos/:id', roles: ['student'], pestana: null, barra: false, vuelve: null, titulo: () => textos.retos.titulo }, // una tarea por pantalla (decisión 001)

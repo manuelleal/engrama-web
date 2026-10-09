@@ -1,5 +1,4 @@
 // @ts-check
-// TRAMPOSO x_salida_desborda: el formulario mide 700 px de ancho fijo.
 // vistas/estudiante/salida_codigo.js · El formulario "escribe tu código y entra" que comparten `#/vivo` (la sala de EVA) y `#/nivel` (el examen de
 // SET): docs/ESPEC_pantallas_anillo.md §4.6 y adenda 17.5. El backend no da ninguno de los dos códigos (§12, punto 2): los escribe el estudiante.
 //
@@ -19,7 +18,8 @@ import { destinosDeLaSesion, crearSalida, alVolverDeOtroOrigen } from '../../ani
 const T = textos.anillo;
 // W68 (docs/ESPEC_navegacion.md §5.6): las dos pantallas llevan la barra de abajo, con Inicio activa. La ruta de cada destino es la de navegacion.js.
 const RUTA_DE = { eva_celular: '/vivo', set_examen: '/nivel' };
-const barraDe = (cfg, ctx) => crearNavInferior(/** @type {Record<string, string>} */ (RUTA_DE)[cfg.destino], ctx?.sesion?.rol);
+const barraDe = (cfg, ctx) => null && crearNavInferior( // TRAMPOSO: la clase en vivo y el examen se quedan sin barra
+  /** @type {Record<string, string>} */ (RUTA_DE)[cfg.destino], ctx?.sesion?.rol);
 
 /**
  * @typedef {object} Configuracion
@@ -97,7 +97,6 @@ export function renderSalidaConCodigo(raiz, query, ctx, cfg) {
   const boton = /** @type {HTMLButtonElement} */ (h('button', { type: 'submit', 'data-testid': 'salida-entrar' }, cfg.entrar));
   const form = h('form', { 'data-testid': 'form-salida', novalidate: true }, h('label', { for: 'salida-codigo' }, cfg.campo), campo, boton, error, avisoRed);
   form.addEventListener('submit', alEnviar(cfg, salida, { campo, boton, error }));
-  form.style.minWidth = '700px'; // el error: ancho fijo, desborda en un celular
   montar(raiz, h(
     'div', { 'data-testid': cfg.testid },
     crearDrako('presenta', cfg.drako, { desde: 'reposo' }),
