@@ -24,7 +24,7 @@ REST).
 | Sin red | `sw.js` a mano: precarga el shell (HTML, JS, CSS, Drako) y abre sin red; **nunca guarda `/api` ni `/config.json`** (H-4, H-6 de la auditoría de seguridad 02: en un equipo compartido B veía datos de A; y una configuración vieja o ausente no puede arrancar el modo `mock`). Sin red dice "Sin conexión", no muestra datos viejos |
 | Servidor de desarrollo | `herramientas/servidor_dev.mjs` (`node:http`): estáticos + proxy `/api/*` → `ENGRAMA_API_URL`, mismo origen |
 | Tests | `node:test`; E2E por CDP (`herramientas/cdp.mjs`, Edge o Chrome headless) |
-| Análisis estático | `herramientas/verificar.mjs`: colores fuera de tokens, DOM prohibido, acceso directo a la base, tamaño de archivo/función |
+| Análisis estático | `herramientas/verificar.mjs`: colores fuera de tokens, DOM prohibido, acceso directo a la base, el pase fuera de su archivo (V5), un "volver" armado en una vista (V8), tamaño de archivo/función |
 
 Paquetes de desarrollo (Playwright, axe, TypeScript) y el QR de Nayuki solo
 **después** del sí de Christiam (§6.3 de la espec); ninguna dependencia de
@@ -77,6 +77,39 @@ explicación) **no** se portan. `coins-mvp/` es solo lectura (004, dormido).
 (H0 demo clicable, H1 backend local, H2 reglas completas de Lingo, H3 piloto).
 Esta tanda cubre los encargos que no necesitan npm ni cambios de F4, en orden,
 hasta donde llegue H0. El encargo para F4 vive en `docs/ENCARGO_F4_lingo.md`.
+
+## Navegación (2026-10-09, `docs/ESPEC_navegacion.md`, W62-W76)
+
+Christiam probó la app y dijo "no es fácil moverse, es confuso". La espec lo arregla con 9 cambios; lo medido antes y después está en
+`salida/humo_navegacion.{base,mock,replica}.json`. Reglas que no se rompen:
+
+- **Toda ruta nueva entra en `src/navegacion.js`**: LA tabla dice, por ruta, de qué rol es, qué pestaña de la barra queda activa, a dónde vuelve
+  y cómo se titula. Si una ruta de `app.js` no está en la tabla (o sobra una fila), U61 (`tests/unit/navegacion.test.mjs`) se pone rojo. De la
+  tabla salen la barra (`ui/nav_inferior.js`), el encabezado (`ui/encabezado.js`), el título de la pestaña del navegador y la guardia de rutas.
+- **La barra de abajo, por rol, en toda pantalla con sesión** (también en carga y en error): estudiante Inicio · Retos · Asistencia · Perfil;
+  profe Mis grupos · Retos · Perfil; admin Grupos · Perfil. Una sola pestaña activa (`aria-current="page"`). No la llevan el reto en curso
+  (una tarea por pantalla: su salida es "✕ Salir", que no envía nada) ni las pantallas obligatorias. Cada vista la pinta con
+  `crearNavInferior('<patrón>', ctx.sesion?.rol)`. La del profe y la del admin son sobrias: el rebote del ícono vive dentro de `.juego`.
+- **Un solo "volver"**: `crearEncabezado('<patrón>', params, codigo)` da el enlace "‹ <a dónde vuelve>" (arriba, antes del título) y el título
+  con el grupo ("Logro por eje · SINT-B1-01"). Ninguna vista arma el suyo: lo vigila V8 (`herramientas/verificar_v8.mjs`; la lista cerrada de
+  excepciones son pantallas sin router y el botón final de la revisión). Las pestañas no llevan volver. Sin código de grupo el título queda
+  genérico y **nunca** muestra el identificador interno (`leerCodigoDeGrupo` en `profe/grupo.js` es tolerante: si falla, null).
+- **"Cerrar sesión" vive en Perfil** (`#/perfil`, "Tu perfil", de los tres roles, sobrio): barra → Perfil → Cerrar sesión. Las pantallas
+  obligatorias conservan el suyo. "Sesión" es SOLO la cuenta: en la asistencia se dice "asistencia" ("Cerrar la asistencia").
+- **Cada rol en sus rutas**: una dirección que no es del rol, o que no existe, se REEMPLAZA por el inicio del rol antes de pintar nada
+  (`redireccionPara` en `navegacion.js`, la guardia en `rutas.js`): ni una petición de la pantalla ajena, nunca una pantalla en blanco, y el
+  botón atrás no rebota. El admin conserva las pantallas del profe por la dirección (PROVISIONAL, C6).
+- **La asistencia abierta se recuerda en memoria** (nunca en un almacenamiento) mientras dure la página: al volver a su ruta, el código sigue.
+- Los textos de la navegación van en `src/textos_nav.js` (se esparce en `textos.js`, que está al tope; un spread no mezcla claves anidadas:
+  lo nuevo va en una clave propia de primer nivel). PROVISIONALES hasta que los revisen Christiam y el pedagogo.
+- Los nombres de las pruebas no llevan `#` (el informe TAP lo escapa y `correr_tramposos.mjs` no halla la línea).
+
+Cómo se prueba: `tests/unit/nav_*.test.mjs`, `ui_nav_inferior`, `vista_perfil`, `vista_reto_salir`, `verificar_v8` y las fotos R4/R9
+(`regresion_vistas`, `regresion_nav`: cada cambio de una foto se DECLARA con su encargo); en el navegador, `tests/e2e/nav_*.test.mjs` (E29 el
+guion de la demostración por toques, E30 sin callejones, E31 medidas, E32 rutas por rol, E33 sobriedad, E34 sin red; lo común en
+`apoyo_nav_e2e.mjs`) y `tests/e2e/humo_navegacion.test.mjs`. `node herramientas/humo_navegacion.mjs --contra mock [--replica]
+[--capturas DIR]` recorre la app por rol y escribe su JSON con sha256 estable (NO usar `--base`: pisa la medida de antes).
+No hecho: W77 (el humo contra el piloto) y el guion `despliegue/salida/DEMO_USUARIOS.md`, que es de otro repo.
 
 ## Game feel del estudiante (2026-10-06)
 

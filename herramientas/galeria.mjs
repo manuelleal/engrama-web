@@ -143,14 +143,14 @@ async function faseAdmin(sesion, urlBase, carpeta, registro, estado) {
 async function faseAsistencia(sesion, urlBase, carpeta, registro, gidReal) {
   await entrarYNavegar(sesion, urlBase, '/profe/grupos', 'docente-demo');
   await capturar(sesion, carpeta, registro, '04-profe-grupos-375.png', 'Profe: mis grupos',
-    'El docente ve sus grupos, con cuántos estudiantes tiene cada uno.');
+    'El inicio del docente: una tarjeta por grupo con lo de cada clase a un toque (Abrir asistencia, Inscripciones, Ver el grupo) y su barra de abajo (Mis grupos, Retos, Perfil).');
   await sesion.navegar(`${urlBase}#/profe/grupo/${gidReal}/sesion`);
   await clic(sesion, 'document.querySelector(\'[data-testid="boton-abrir-sesion"]\')', 600);
-  await capturar(sesion, carpeta, registro, '05-profe-sesion-asistencia-375.png', 'Profe: sesión de asistencia',
-    'El código grande y el enlace que el estudiante usa para marcar (§6.3: sin QR todavía, sin el permiso de npm).');
+  await capturar(sesion, carpeta, registro, '05-profe-sesion-asistencia-375.png', 'Profe: asistencia abierta',
+    'El código de asistencia en grande y el enlace para el celular. Arriba, "‹ Grupo <código>" para volver; abajo, la barra: ya no es un callejón.');
   await sesion.redSinConexion(true);
   await capturar(sesion, carpeta, registro, '06-profe-sin-conexion-375.png', 'Sin conexión (profe)',
-    '"Cerrar sesión" queda deshabilitado con su aviso, y el código se queda visible: el último estado conocido, nunca en blanco (W16).');
+    '"Cerrar la asistencia" queda deshabilitado con su aviso, y el código se queda visible: el último estado conocido, nunca en blanco (W16).');
   await sesion.redSinConexion(false);
   const codigo = await sesion.evaluar('document.querySelector(\'[data-testid="sesion-codigo"]\').textContent');
 
@@ -161,7 +161,10 @@ async function faseAsistencia(sesion, urlBase, carpeta, registro, gidReal) {
   await sesion.evaluar('document.querySelector(\'[data-testid="campo-codigo"]\').value = "000000"');
   await clic(sesion, 'document.querySelector(\'[data-testid="boton-marcar"]\')', 500);
   await capturar(sesion, carpeta, registro, '08-estudiante-asistencia-otro-codigo-375.png', 'Estudiante: código no válido',
-    'Un código que no es el de su sesión: el mensaje nunca delata si el código existe para otro grupo (BUG-14).');
+    'Un código de asistencia que no es el de su grupo: el mensaje nunca delata si el código existe para otro grupo (BUG-14).');
+  await sesion.navegar(`${urlBase}#/perfil`);
+  await capturar(sesion, carpeta, registro, '08b-estudiante-perfil-375.png', 'Estudiante: tu perfil',
+    'Perfil es "mi cuenta" para los tres roles: quién soy y "Cerrar sesión" (a dos toques desde cualquier pantalla: barra → Perfil → Cerrar sesión).');
 }
 
 async function jugarHastaElFinal(sesion, estado, reto) {
@@ -191,7 +194,7 @@ async function faseRetosEstudiante(sesion, urlBase, carpeta, registro, estado, r
     'Los retos del grupo: "Jugar" los nuevos, "Completado" con la opción de repasar los ya ganados.');
   await sesion.navegar(`${urlBase}#/retos/${retos[0].challenge_id}`);
   await capturar(sesion, carpeta, registro, '11-estudiante-una-pregunta-375.png', 'Estudiante: una pregunta',
-    'Una sola pregunta por pantalla; Drako presenta el reto, nunca califica.');
+    'Una sola pregunta por pantalla, sin barra; Drako presenta el reto, nunca califica. "✕ Salir" lleva a Retos sin enviar nada.');
   await jugarHastaElFinal(sesion, estado, retos[0]);
   await capturar(sesion, carpeta, registro, '12-estudiante-revision-375.png', 'Estudiante: revisión',
     'Al terminar, la correcta de cada pregunta y las monedas ganadas.');
@@ -210,7 +213,10 @@ async function faseProfeLogroErrores(sesion, urlBase, carpeta, registro, gidReal
     'Qué pregunta falla más, con "errores con respuesta" (sin contar lo que quedó en blanco).');
   await sesion.navegar(`${urlBase}#/profe/retos`);
   await capturar(sesion, carpeta, registro, '16-profe-retos-375.png', 'Profe: retos',
-    'Activar, desactivar o asignar un reto a un grupo propio — con el aviso de que hoy la lista es de todo el colegio (BUG-10).');
+    'Activar, desactivar o asignar un reto a un grupo propio — con el aviso de que hoy la lista es de toda la institución (BUG-10). Es una pestaña de la barra del profe.');
+  await sesion.navegar(`${urlBase}#/perfil`);
+  await capturar(sesion, carpeta, registro, '16b-profe-perfil-375.png', 'Profe: tu perfil',
+    'El mismo Perfil, sobrio, para el docente: nombre, rol e institución, y "Cerrar sesión" (antes vivía en una barra de arriba, solo en su inicio).');
 }
 
 /** Las 5 pantallas del profe otra vez, a 1280×800 — el mismo estado, ya construido arriba. */
@@ -220,9 +226,10 @@ async function faseProfeDesktop(sesion, urlBase, carpeta, registro, gidReal) {
   await capturar(sesion, carpeta, registro, '17-profe-grupos-1280.png', 'Profe: mis grupos (portátil)',
     'La misma pantalla del docente, en una pantalla de portátil.');
   await sesion.navegar(`${urlBase}#/profe/grupo/${gidReal}/sesion`);
-  await clic(sesion, 'document.querySelector(\'[data-testid="boton-abrir-sesion"]\')', 600);
-  await capturar(sesion, carpeta, registro, '18-profe-sesion-asistencia-1280.png', 'Profe: sesión de asistencia (portátil)',
-    'El código grande, pensado para proyectar en el salón desde el computador del profe.');
+  // Si este profe ya abrió la asistencia de este grupo en esta página, el código sigue en pantalla y no hay formulario (W66): solo se abre si hace falta.
+  await sesion.evaluar(`(async () => { ${ESPERAR_JS} document.querySelector('[data-testid="boton-abrir-sesion"]')?.click(); await esperar(600); })()`);
+  await capturar(sesion, carpeta, registro, '18-profe-sesion-asistencia-1280.png', 'Profe: asistencia abierta (portátil)',
+    'El código de asistencia en grande, pensado para proyectar en el salón. Si el profe se va a otra pantalla y vuelve, el código sigue ahí (se recuerda mientras dure la página).');
   await sesion.navegar(`${urlBase}#/profe/grupo/${gidReal}/logro`);
   await capturar(sesion, carpeta, registro, '19-profe-logro-1280.png', 'Profe: logro por eje (portátil)',
     'La misma tabla de logro, en una pantalla de portátil.');

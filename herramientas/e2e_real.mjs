@@ -165,14 +165,16 @@ async function pasoProfeAbreSesion(sesionProfe, urlBase, carpeta, registro, prof
   await loginReal(sesionProfe, urlBase, profe.correo, profe.contrasena_temporal);
   await sesionProfe.evaluar(`(async () => {
     ${AYUDANTES_JS}
-    await __esperarSelector('a[data-testid$="-abrir"]');
-    document.querySelector('a[data-testid$="-abrir"]').click();
-    await __esperarSelector('[data-testid="ir-a-sesion"]');
+    // Navegación de hoy (docs/ESPEC_navegacion.md §5.3): en "Mis grupos" cada grupo es una tarjeta y "Abrir asistencia" lleva directo al
+    // formulario de la asistencia (antes: "Abrir" en la fila del grupo y, adentro, el chip ir-a-sesion).
+    await __esperarSelector('a[data-testid$="-asistencia"]');
+    document.querySelector('a[data-testid$="-asistencia"]').click();
+    await __esperarSelector('[data-testid="boton-abrir-sesion"]');
   })()`);
   const gid = await sesionProfe.evaluar("location.hash.match(/\\/profe\\/grupo\\/([^/]+)/)[1]");
   const codigo = await abrirSesionDeAsistencia(sesionProfe, urlBase, gid);
-  await capturar(sesionProfe, carpeta, registro, '01-profe-sesion-asistencia.png', 'Profe: sesión de asistencia (real)',
-    `Login real de ${profe.correo}; código de sesión abierto de verdad contra el backend real.`);
+  await capturar(sesionProfe, carpeta, registro, '01-profe-sesion-asistencia.png', 'Profe: asistencia abierta (real)',
+    `Login real de ${profe.correo}; código de asistencia abierto de verdad contra el backend real.`);
   return { gid, codigo };
 }
 
