@@ -10,10 +10,11 @@ import { listarTodosLosRetos, cambiarEstadoReto } from '../../api/retos.js';
 import { listarGrupos, asignarReto } from '../../api/profe.js';
 import { accionUnica, ErrorApi } from '../../api/cliente.js';
 import { ligarEscrituraARed } from '../../ui/red.js';
-import { crearVolver } from '../../ui/encabezado.js';
+import { crearNavInferior } from '../../ui/nav_inferior.js';
 
-/** W63 (docs/ESPEC_navegacion.md §5.1): de los retos del profe se vuelve a "Mis grupos" con un enlace arriba, también mientras carga y si falla. */
-const volverAMisGrupos = () => crearVolver('/profe/grupos', textos.profe.grupos.titulo);
+/** W70 (docs/ESPEC_navegacion.md §5.6): los retos del profe son una PESTAÑA de su barra (Retos activa). Como toda pestaña, no llevan "volver"
+ * (el "‹ Mis grupos" de W63 salió: a "Mis grupos" se va por la barra, a un toque), también mientras cargan y si fallan. */
+const barra = (ctx) => crearNavInferior('/profe/retos', /** @type {any} */ (ctx)?.sesion?.rol);
 
 /** Pura (U, sin DOM): el estado siguiente al activar/desactivar — nunca 'archived' desde aquí. */
 export function siguienteEstado(estadoActual) {
@@ -104,30 +105,30 @@ function pintarLista(raiz, retos, grupos, ctx) {
     : h('ul', {}, ...retos.map((r) => filaDeReto(r, grupos, ctx, avisoRed, registrar)));
   const nodo = h(
     'div', { 'data-testid': 'vista-profe-retos' },
-    volverAMisGrupos(),
     h('h1', {}, textos.profe.retos.titulo),
     h('p', { role: 'status', 'data-testid': 'aviso-todo-el-colegio' }, textos.profe.retos.avisoTodoElColegio),
     avisoRed,
     cuerpo,
+    barra(ctx),
   );
   montar(raiz, nodo);
   document.body.dataset.listo = '1';
   window.addEventListener('hashchange', () => cancelables.forEach((c) => c()), { once: true });
 }
 
-function pintarError(raiz, mensaje) {
-  montar(raiz, h('div', { 'data-testid': 'vista-profe-retos' }, volverAMisGrupos(), h('h1', {}, textos.profe.retos.titulo), h('p', { role: 'alert' }, mensaje)));
+function pintarError(raiz, mensaje, ctx) {
+  montar(raiz, h('div', { 'data-testid': 'vista-profe-retos' }, h('h1', {}, textos.profe.retos.titulo), h('p', { role: 'alert' }, mensaje), barra(ctx)));
   document.body.dataset.listo = '1';
 }
 
 /** @param {HTMLElement} raiz @param {{token: string, tenantId?: string}} ctx */
 export async function renderRetosProfe(raiz, ctx) {
-  montar(raiz, h('div', { 'data-testid': 'vista-profe-retos' }, volverAMisGrupos(), h('p', { role: 'status' }, textos.inicio.cargando)));
+  montar(raiz, h('div', { 'data-testid': 'vista-profe-retos' }, h('h1', {}, textos.profe.retos.titulo), h('p', { role: 'status' }, textos.inicio.cargando), barra(ctx)));
   try {
     const [retos, grupos] = await Promise.all([listarTodosLosRetos(ctx), listarGrupos(ctx)]);
     pintarLista(raiz, retos, grupos, ctx);
   } catch (e) {
     console.warn('vistas/profe/retos: no se pudo cargar', e);
-    pintarError(raiz, e instanceof ErrorApi ? e.mensaje : textos.profe.retos.errorGeneral);
+    pintarError(raiz, e instanceof ErrorApi ? e.mensaje : textos.profe.retos.errorGeneral, ctx);
   }
 }

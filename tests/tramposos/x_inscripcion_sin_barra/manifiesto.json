@@ -1,0 +1,16 @@
+{
+  "descripcion": "profe/inscripcion.js no pinta la barra cuando la pagina falla (un grupo ajeno, el servidor caido): el profe queda en un callejon (H2; U62)",
+  "archivos": {
+    "src/vistas/profe/inscripcion.js": "inscripcion.js"
+  },
+  "comando": [
+    "node",
+    "--test",
+    "--test-reporter=tap",
+    "tests/unit/nav_barra.test.mjs"
+  ],
+  "espera_codigo_no_cero": true,
+  "espera_fallan_tests": [
+    "U62 (la barra): cada pantalla del profe trae UNA barra (Mis grupos · Retos · Perfil) con su pestaña activa, en contenido, vacío, error y carga"
+  ]
+}

@@ -9,7 +9,11 @@ import { crearGrupo } from '../../api/admin.js';
 import { listarGrupos } from '../../api/profe.js';
 import { accionUnica, ErrorApi } from '../../api/cliente.js';
 import { ligarEscrituraARed } from '../../ui/red.js';
-import { crearBarraRol } from '../../ui/barra_rol.js';
+import { crearSelectorColegio } from '../../ui/selector_colegio.js';
+import { crearNavInferior } from '../../ui/nav_inferior.js';
+
+// W70 (docs/ESPEC_navegacion.md §5.6): la barra de abajo del admin (Grupos activa). La de arriba salió: el aviso y "Cerrar sesión" viven en Perfil.
+const barra = (ctx) => crearNavInferior('/admin', ctx.sesion?.rol);
 
 function filaDeGrupo(grupo) {
   return h(
@@ -71,10 +75,11 @@ async function pintarVista(raiz, ctx, mensajePrevio) {
   );
   montar(raiz, h(
     'div', { 'data-testid': 'vista-admin-crear-grupo' },
-    crearBarraRol(ctx),
     h('h1', {}, textos.admin.grupos.titulo),
+    crearSelectorColegio(ctx), // en su propio renglón; solo con más de una institución
     form,
     listaDeGrupos(grupos),
+    barra(ctx),
   ));
   if (mensajePrevio) { const z = form.querySelector('[data-testid="crear-grupo-mensaje"]'); if (z) z.textContent = mensajePrevio; }
   document.body.dataset.listo = '1';
@@ -82,13 +87,13 @@ async function pintarVista(raiz, ctx, mensajePrevio) {
 }
 
 function pintarError(raiz, mensaje, ctx) {
-  montar(raiz, h('div', { 'data-testid': 'vista-admin-crear-grupo' }, crearBarraRol(ctx), h('h1', {}, textos.admin.crearGrupo.titulo), h('p', { role: 'alert' }, mensaje)));
+  montar(raiz, h('div', { 'data-testid': 'vista-admin-crear-grupo' }, h('h1', {}, textos.admin.crearGrupo.titulo), crearSelectorColegio(ctx), h('p', { role: 'alert' }, mensaje), barra(ctx)));
   document.body.dataset.listo = '1';
 }
 
 /** @param {HTMLElement} raiz @param {{token: string, tenantId?: string, salir?: () => Promise<void>}} ctx */
 export async function renderCrearGrupo(raiz, ctx) {
-  montar(raiz, h('div', { 'data-testid': 'vista-admin-crear-grupo' }, h('p', { role: 'status' }, textos.inicio.cargando)));
+  montar(raiz, h('div', { 'data-testid': 'vista-admin-crear-grupo' }, h('p', { role: 'status' }, textos.inicio.cargando), barra(ctx)));
   try {
     await pintarVista(raiz, ctx);
   } catch (e) {

@@ -1,0 +1,16 @@
+{
+  "descripcion": "ui/nav_inferior.js le da al profe y al admin la barra del estudiante (Inicio, Retos, Asistencia, Perfil): tres de sus cuatro entradas llevan a pantallas que no son suyas (H9; U60)",
+  "archivos": {
+    "src/ui/nav_inferior.js": "nav_inferior.js"
+  },
+  "comando": [
+    "node",
+    "--test",
+    "--test-reporter=tap",
+    "tests/unit/ui_nav_inferior.test.mjs"
+  ],
+  "espera_codigo_no_cero": true,
+  "espera_fallan_tests": [
+    "U60: el profe tiene 3 entradas (Mis grupos · Retos · Perfil) y el admin 2 (Grupos · Perfil), con el texto de su pantalla; ninguno recibe la barra del estudiante"
+  ]
+}

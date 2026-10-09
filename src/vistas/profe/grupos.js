@@ -9,13 +9,16 @@ import { h, montar } from '../../ui/dom.js';
 import { textos } from '../../textos.js';
 import { listarGrupos, listarSolicitudesInscripcion } from '../../api/profe.js';
 import { ErrorApi } from '../../api/cliente.js';
-import { crearBarraRol } from '../../ui/barra_rol.js';
+import { crearSelectorColegio } from '../../ui/selector_colegio.js';
+import { crearNavInferior } from '../../ui/nav_inferior.js';
 import { crearHerramientasDeClase } from './herramientas_clase.js';
 
 /** Cuántos grupos piden su conteo de "esperan aprobación" al pintar (una lectura por grupo, sin sondeo). PROVISIONAL (pregunta C9 de la espec). */
 export const TOPE_DE_CONTEOS = 12;
 
 const T = textos.tarjetaGrupo;
+// W70 (docs/ESPEC_navegacion.md §5.6): la barra de abajo del rol (Mis grupos activa). La de arriba salió: el aviso y "Cerrar sesión" viven en Perfil.
+const barra = (ctx) => crearNavInferior('/profe/grupos', ctx.sesion?.rol);
 
 /** La tarjeta de un grupo: quién es, cuántos son y sus tres acciones, la de cada clase primero. `esperan` se llena después, si hay a quién esperar. */
 function tarjetaDeGrupo(grupo) {
@@ -63,25 +66,24 @@ function pintarLista(raiz, grupos, ctx) {
     : h('ul', { 'data-testid': 'lista-grupos' }, ...tarjetas.map((t) => t.nodo));
   montar(raiz, h(
     'div', { 'data-testid': 'vista-profe-grupos' },
-    crearBarraRol(ctx),
     h('h1', {}, textos.profe.grupos.titulo),
+    crearSelectorColegio(ctx), // en su propio renglón (H13); solo con más de una institución
     cuerpo,
     crearHerramientasDeClase(ctx), // W35: solo si hay EVA o SET configurados para esta institución (§4.6); null no pinta nada
-    // Los retos de la institución: hasta que el profe tenga su barra de abajo (W70), este enlace es su único camino.
-    h('nav', {}, h('a', { href: '#/profe/retos', 'data-testid': 'ir-a-retos-profe' }, textos.profe.grupo.verRetos)),
+    barra(ctx), // a los retos de la institución se llega por la barra
   ));
   document.body.dataset.listo = '1';
   return leerConteos(tarjetas, ctx);
 }
 
 function pintarError(raiz, mensaje, ctx) {
-  montar(raiz, h('div', { 'data-testid': 'vista-profe-grupos' }, crearBarraRol(ctx), h('h1', {}, textos.profe.grupos.titulo), h('p', { role: 'alert' }, mensaje)));
+  montar(raiz, h('div', { 'data-testid': 'vista-profe-grupos' }, h('h1', {}, textos.profe.grupos.titulo), crearSelectorColegio(ctx), h('p', { role: 'alert' }, mensaje), barra(ctx)));
   document.body.dataset.listo = '1';
 }
 
 /** @param {HTMLElement} raiz @param {{token: string, tenantId?: string, salir?: () => Promise<void>}} ctx */
 export async function renderGrupos(raiz, ctx) {
-  montar(raiz, h('div', { 'data-testid': 'vista-profe-grupos' }, h('p', { role: 'status' }, textos.inicio.cargando)));
+  montar(raiz, h('div', { 'data-testid': 'vista-profe-grupos' }, h('p', { role: 'status' }, textos.inicio.cargando), barra(ctx)));
   let grupos;
   try {
     grupos = await listarGrupos(ctx);

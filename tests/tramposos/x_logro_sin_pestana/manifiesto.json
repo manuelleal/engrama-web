@@ -1,0 +1,16 @@
+{
+  "descripcion": "navegacion.js deja \"Logro por eje\" sin pestana activa: la barra no dice donde estoy en una pantalla de adentro del grupo (U60)",
+  "archivos": {
+    "src/navegacion.js": "navegacion.js"
+  },
+  "comando": [
+    "node",
+    "--test",
+    "--test-reporter=tap",
+    "tests/unit/ui_nav_inferior.test.mjs"
+  ],
+  "espera_codigo_no_cero": true,
+  "espera_fallan_tests": [
+    "U60: en las pantallas del profe queda activa Mis grupos (Retos en sus retos, Perfil en la cuenta) y en las del admin, Grupos; nunca dos"
+  ]
+}

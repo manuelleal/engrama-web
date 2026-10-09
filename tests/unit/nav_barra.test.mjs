@@ -106,3 +106,103 @@ test('U60: el reto en curso NO lleva barra (una tarea por pantalla), ni en la pr
     try { assert.equal(barras(raiz).length, 0, `reto en curso (${estado})`); } finally { cerrar(); }
   }
 });
+
+// ---------- W70 (§5.6): la barra del profe y del admin, sobria; sale la barra de arriba de sus inicios; el selector, en su renglón ----------
+// Tramposos: x_inscripcion_sin_barra (profe/inscripcion.js), x_inicio_del_profe_con_barra_de_arriba (profe/grupos.js) y, de W68, x_error_de_retos_sin_barra
+// (estudiante/retos.js), x_solicitudes_sin_barra (vistas/datos_solicitudes.js) y x_reto_con_barra (navegacion.js).
+const { ctxProfe, ctxAdmin, GID } = await import('./fotos_de_navegacion.mjs');
+const { renderGrupos } = await import('../../src/vistas/profe/grupos.js');
+const { renderGrupo } = await import('../../src/vistas/profe/grupo.js');
+const { renderSesionAsistencia } = await import('../../src/vistas/profe/sesion_asistencia.js');
+const { renderInscripcion } = await import('../../src/vistas/profe/inscripcion.js');
+const { renderLogro } = await import('../../src/vistas/profe/logro.js');
+const { renderErrores } = await import('../../src/vistas/profe/errores.js');
+const { renderRetosProfe } = await import('../../src/vistas/profe/retos.js');
+const { renderCrearGrupo } = await import('../../src/vistas/admin/crear_grupo.js');
+const { renderAsignarDocente } = await import('../../src/vistas/admin/asignar_docente.js');
+const { renderImportarCsv } = await import('../../src/vistas/admin/importar_csv.js');
+const { renderPerfil } = await import('../../src/vistas/perfil.js');
+
+const SERVIDOR_PROFE = { ...SERVIDOR, 'GET /teachers/groups/g2/solicitudes': [] };
+const ESTADOS_PROFE = {
+  contenido: SERVIDOR_PROFE,
+  vacio: { ...SERVIDOR_PROFE, 'GET /teachers/groups': [], [`GET /teachers/groups/${GID}/students`]: [], 'GET /challenges/all': [] },
+  error: Object.fromEntries(Object.keys(SERVIDOR_PROFE).map((k) => [k, error500])),
+  carga: Object.fromEntries(Object.keys(SERVIDOR_PROFE).map((k) => [k, nuncaResponde])),
+};
+
+/** La pantalla trae exactamente UNA barra, con esas entradas y esa activa (o ninguna). */
+function exigirBarraDe(raiz, entradas, activa, donde) {
+  const todasLasBarras = barras(raiz);
+  assert.equal(todasLasBarras.length, 1, `${donde}: exactamente una barra (hay ${todasLasBarras.length})`);
+  const b = leerBarra(todasLasBarras[0]);
+  assert.deepEqual(b.textos, entradas, `${donde}: las entradas de su rol`);
+  assert.deepEqual(b.activas, activa ? [activa] : [], `${donde}: la pestaña activa`);
+}
+
+test('U62 (la barra): cada pantalla del profe trae UNA barra (Mis grupos · Retos · Perfil) con su pestaña activa, en contenido, vacío, error y carga', async () => {
+  const p = { gid: GID };
+  /** @type {Array<[string, string, (r: any) => unknown]>} */
+  const vistas = [
+    ['mis grupos', 'Mis grupos', (r) => renderGrupos(r, ctxProfe())],
+    ['grupo', 'Mis grupos', (r) => renderGrupo(r, p, ctxProfe())],
+    ['asistencia', 'Mis grupos', (r) => renderSesionAsistencia(r, p, ctxProfe())],
+    ['inscripciones', 'Mis grupos', (r) => renderInscripcion(r, p, ctxProfe())],
+    ['logro', 'Mis grupos', (r) => renderLogro(r, p, ctxProfe())],
+    ['errores', 'Mis grupos', (r) => renderErrores(r, p, ctxProfe())],
+    ['retos del profe', 'Retos', (r) => renderRetosProfe(r, ctxProfe())],
+    ['perfil del profe', 'Perfil', (r) => renderPerfil(r, ctxProfe())],
+  ];
+  for (const [nombre, activa, fn] of vistas) {
+    for (const [estado, rutas] of Object.entries(ESTADOS_PROFE)) {
+      const { raiz, cerrar } = await pintar(rutas, fn);
+      try { exigirBarraDe(raiz, ['Mis grupos', 'Retos', 'Perfil'], activa, `${nombre} (${estado})`); } finally { cerrar(); }
+    }
+  }
+});
+
+test('U62 (la barra): cada pantalla del admin trae UNA barra (Grupos · Perfil) con Grupos activa; en una pantalla del profe abierta por la dirección, su barra sin pestaña activa', async () => {
+  const p = { gid: GID };
+  /** @type {Array<[string, string|null, (r: any) => unknown]>} */
+  const vistas = [
+    ['grupos del admin', 'Grupos', (r) => renderCrearGrupo(r, ctxAdmin())],
+    ['asignar docente', 'Grupos', (r) => renderAsignarDocente(r, p, ctxAdmin())],
+    ['importar estudiantes', 'Grupos', (r) => renderImportarCsv(r, p, ctxAdmin())],
+    ['perfil del admin', 'Perfil', (r) => renderPerfil(r, ctxAdmin())],
+    ['grupo del profe, visto por el admin', null, (r) => renderGrupo(r, p, ctxAdmin())],
+    ['retos del profe, vistos por el admin', null, (r) => renderRetosProfe(r, ctxAdmin())],
+  ];
+  for (const [nombre, activa, fn] of vistas) {
+    for (const [estado, rutas] of Object.entries(ESTADOS_PROFE)) {
+      const { raiz, cerrar } = await pintar(rutas, fn);
+      try { exigirBarraDe(raiz, ['Grupos', 'Perfil'], activa, `${nombre} (${estado})`); } finally { cerrar(); }
+    }
+  }
+});
+
+test('W70: los inicios del profe y del admin ya no traen la barra de arriba (ni "Cerrar sesión" ni el aviso: viven en Perfil), y con dos instituciones el selector va en su renglón, bajo el título', async () => {
+  const dos = [{ id: '11111111-1111-4111-8111-111111111111', nombre: 'UIS (demo)' }, { id: '22222222-2222-4222-8222-222222222222', nombre: 'SENA (demo)' }];
+  /** @type {Array<[string, string, (r: any, extra: object) => unknown]>} */
+  const inicios = [
+    ['mis grupos', 'vista-profe-grupos', (r, extra) => renderGrupos(r, { ...ctxProfe(), ...extra })],
+    ['grupos del admin', 'vista-admin-crear-grupo', (r, extra) => renderCrearGrupo(r, { ...ctxAdmin(), ...extra })],
+  ];
+  for (const [nombre, vista, fn] of inicios) {
+    for (const [estado, rutas] of Object.entries({ contenido: ESTADOS_PROFE.contenido, error: ESTADOS_PROFE.error })) {
+      const { raiz, cerrar } = await pintar(rutas, (r) => fn(r, { colegios: dos, cambiarColegio: async () => {} }));
+      try {
+        const donde = `${nombre} (${estado})`;
+        assert.equal(enOrden(raiz).filter((e) => String(e.className).split(/\s+/).includes('barra-rol')).length, 0, `${donde}: sin barra de arriba`);
+        for (const testid of ['boton-cerrar-sesion', 'barra-ver-aviso', 'ir-a-retos-profe']) assert.equal(enOrden(raiz).find((e) => e.getAttribute?.('data-testid') === testid) ?? null, null, `${donde}: ${testid} ya no está aquí`);
+        assert.ok(!textoDe(raiz).includes('Cerrar sesión'), `${donde}: "Cerrar sesión" vive en Perfil`);
+        const raizVista = enOrden(raiz).find((e) => e.getAttribute?.('data-testid') === vista);
+        const hijos = raizVista.children.filter((n) => n.nodeType !== 3);
+        const selector = hijos.find((e) => e.getAttribute('data-testid') === 'selector-colegio-bloque');
+        assert.ok(selector, `${donde}: el selector de institución es un renglón propio (hijo directo de la vista)`);
+        assert.equal(hijos.indexOf(selector), hijos.findIndex((e) => e.tagName === 'h1') + 1, `${donde}: justo debajo del título`);
+      } finally { cerrar(); }
+    }
+    const una = await pintar(ESTADOS_PROFE.contenido, (r) => fn(r, {}));
+    try { assert.equal(enOrden(una.raiz).find((e) => e.getAttribute?.('data-testid') === 'selector-colegio-bloque') ?? null, null, `${nombre}: con una sola institución no hay selector`); } finally { una.cerrar(); }
+  }
+});

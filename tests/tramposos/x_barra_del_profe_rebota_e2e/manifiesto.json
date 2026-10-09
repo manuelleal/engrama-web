@@ -1,0 +1,16 @@
+{
+  "descripcion": "El mismo defecto de x_barra_del_profe_rebota, medido en el navegador: E33 ve animation-name distinto de none en la barra del profe",
+  "archivos": {
+    "estilos/juego.css": "juego.css"
+  },
+  "comando": [
+    "node",
+    "--test",
+    "--test-reporter=tap",
+    "tests/e2e/nav_sobria.test.mjs"
+  ],
+  "espera_codigo_no_cero": true,
+  "espera_fallan_tests": [
+    "E33: en las pantallas del profe y del admin la barra de abajo no anima nunca (animation-name: none) y no hay .juego"
+  ]
+}

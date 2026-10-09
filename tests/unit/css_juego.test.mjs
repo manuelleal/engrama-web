@@ -55,3 +55,19 @@ test('rendimiento: will-change solo en transform/opacity y con mesura (pocas reg
   assert.ok(usos.length <= 4, `demasiados will-change: ${usos.length}`);
   for (const u of usos) assert.match(u[1], /^(transform|opacity)(,\s*(transform|opacity))?$/);
 });
+
+// W70 (docs/ESPEC_navegacion.md §5.6, E33): el profe y el admin llevan la misma barra de abajo, SOBRIA. El rebote del ícono de la pestaña activa
+// solo puede vivir dentro de `.juego` (las pantallas del estudiante). Tramposo: x_barra_del_profe_rebota (estilos/juego.css).
+test('sobriedad: en juego.css, toda regla que anima algo de la barra de abajo está dentro de .juego', () => {
+  const css = leer('estilos/juego.css').replace(/\/\*[\s\S]*?\*\//g, '');
+  const reglas = [...css.matchAll(/([^{}]+)\{([^{}]*)\}/g)].map((m) => ({ selector: m[1].trim(), cuerpo: m[2] }));
+  const deLaBarra = reglas.filter((r) => /nav-inferior|nav-icono/.test(r.selector) && /animation(-name)?\s*:/.test(r.cuerpo) && !/animation(-name)?\s*:\s*none/.test(r.cuerpo));
+  assert.ok(deLaBarra.length >= 1, 'la regla del rebote sigue existiendo (para el estudiante)');
+  for (const r of deLaBarra) {
+    for (const selector of r.selector.split(',')) assert.match(selector.trim(), /^\.juego(\s|[.\-\w]*\s)/, `"${selector.trim()}" anima la barra fuera de .juego: el profe y el admin la recibirían`);
+  }
+  const otros = ['estilos/componentes.css', 'estilos/base.css'].map(leer).join('\n').replace(/\/\*[\s\S]*?\*\//g, '');
+  for (const m of otros.matchAll(/([^{}]+)\{([^{}]*)\}/g)) {
+    if (/nav-inferior|nav-icono/.test(m[1])) assert.ok(!/animation(-name)?\s*:(?!\s*none)/.test(m[2]), `${m[1].trim()}: la barra no anima fuera de juego.css`);
+  }
+});

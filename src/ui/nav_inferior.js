@@ -4,7 +4,8 @@
 // 001) y las pantallas obligatorias tampoco (el router está apagado).
 // A propósito SIN data-testid (ver estilos/componentes.css): así no compite por especificidad con la regla que convierte cualquier
 // `a[data-testid]` en un chip de acción — esta es la barra fija, no una acción suelta. Son enlaces internos (un hash): funcionan sin red.
-// W68: el estudiante gana "Perfil" (ahí viven su cuenta y "Cerrar sesión"). El profe y el admin reciben su barra en W70.
+// W68: el estudiante gana "Perfil" (ahí viven su cuenta y "Cerrar sesión"). W70: el profe (Mis grupos · Retos · Perfil) y el admin (Grupos ·
+// Perfil) tienen la suya, SOBRIA: el rebote del ícono activo es solo de las pantallas `.juego` del estudiante (estilos/juego.css).
 import { h } from './dom.js';
 import { textos } from '../textos.js';
 import { RUTAS } from '../navegacion.js';
@@ -12,12 +13,22 @@ import { RUTAS } from '../navegacion.js';
 /** @typedef {import('../navegacion.js').Rol} Rol */
 /** @typedef {{id: string, camino: string, texto: () => string, icono: string}} Entrada */
 
-/** Las entradas de la barra de cada rol, en orden. El texto de cada una es el título de su pantalla. @type {Partial<Record<Rol, Entrada[]>>} */
+/** Las entradas de la barra de cada rol, en orden. El texto de cada una es el título de su pantalla. @type {Record<Rol, Entrada[]>} */
 const ENTRADAS = {
   student: [
     { id: 'inicio', camino: '/inicio', texto: () => textos.nav.inicio, icono: '🏠' },
     { id: 'retos', camino: '/retos', texto: () => textos.retos.titulo, icono: '🎯' },
     { id: 'asistencia', camino: '/asistencia', texto: () => textos.asistencia.titulo, icono: '📍' },
+    { id: 'perfil', camino: '/perfil', texto: () => textos.nav.perfil, icono: '👤' },
+  ],
+  teacher: [
+    { id: 'misGrupos', camino: '/profe/grupos', texto: () => textos.nav.misGrupos, icono: '👥' },
+    { id: 'retosProfe', camino: '/profe/retos', texto: () => textos.nav.retos, icono: '🎯' },
+    { id: 'perfil', camino: '/perfil', texto: () => textos.nav.perfil, icono: '👤' },
+  ],
+  // El admin puede abrir las pantallas del profe por la dirección (§5.8): ahí ve SU barra y ninguna pestaña queda activa.
+  admin: [
+    { id: 'grupos', camino: '/admin', texto: () => textos.nav.grupos, icono: '👥' },
     { id: 'perfil', camino: '/perfil', texto: () => textos.nav.perfil, icono: '👤' },
   ],
 };

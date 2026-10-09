@@ -1,13 +1,14 @@
 // @ts-check
 // W63 (docs/ESPEC_navegacion.md §5.1, §9.3): ningún callejón en el panel del profe.
-//   U62 (las tres vistas)  Grupo y Retos del profe traen UN volver a "Mis grupos", arriba y antes del título, en contenido, vacío, error y carga.
+//   U62 (las tres vistas)  El Grupo trae UN volver a "Mis grupos", arriba y antes del título, en contenido, vacío, error y carga. Los Retos del
+//                          profe lo traían (W63) hasta que W70 los hizo una PESTAÑA de su barra: las pestañas no llevan volver (§5.7).
 //   U63 (el volver)        la asistencia abierta conserva la vuelta al grupo al repintarse y después de cerrarla.
 // Tramposos: x_grupo_sin_volver (profe/grupo.js) y x_asistencia_abierta_sin_volver (profe/sesion_asistencia.js).
 import test from 'node:test';
 import assert from 'node:assert/strict';
 import { buscar } from './foto_vistas.mjs';
 import { RUTAS_NAV, GID, ctxProfe, asentar } from './fotos_de_navegacion.mjs';
-import { pintar, volveres, volverDelEncabezado, vaAntes, primero, error500, nuncaResponde } from './apoyo_nav.mjs';
+import { pintar, volveres, volverDelEncabezado, vaAntes, primero, barraDe, enOrden, error500, nuncaResponde } from './apoyo_nav.mjs';
 import { renderGrupo } from '../../src/vistas/profe/grupo.js';
 import { renderRetosProfe } from '../../src/vistas/profe/retos.js';
 import { renderSesionAsistencia } from '../../src/vistas/profe/sesion_asistencia.js';
@@ -49,10 +50,18 @@ test('U62: el Grupo del profe trae UN volver a "Mis grupos", antes del título, 
   }
 });
 
-test('U62: los Retos del profe traen UN volver a "Mis grupos", antes del título, en contenido, vacío, error y carga', async () => {
+test('U62: los Retos del profe son una pestaña: a "Mis grupos" se va por la barra (un toque) y no llevan volver, en contenido, vacío, error y carga', async () => {
   for (const [estado, rutas] of Object.entries(ESTADOS)) {
     const { raiz, cerrar } = await pintar(rutas, (r) => renderRetosProfe(r, ctxProfe()));
-    try { exigirVolverAMisGrupos(raiz, `retos del profe (${estado})`); } finally { cerrar(); }
+    try {
+      const donde = `retos del profe (${estado})`;
+      assert.deepEqual(volveres(raiz).map((e) => e.getAttribute('data-testid')), [], `${donde}: una pestaña no lleva volver`);
+      const barra = barraDe(raiz);
+      assert.ok(barra, `${donde}: lleva la barra (nunca un callejón)`);
+      const enlaces = enOrden(barra).filter((e) => e.tagName === 'a');
+      assert.ok(enlaces.some((a) => a.getAttribute('href') === '#/profe/grupos'), `${donde}: la barra lleva a Mis grupos`);
+      assert.deepEqual(enlaces.filter((a) => a.getAttribute('aria-current') === 'page').map((a) => a.getAttribute('href')), ['#/profe/retos'], `${donde}: con Retos activa`);
+    } finally { cerrar(); }
   }
 });
 

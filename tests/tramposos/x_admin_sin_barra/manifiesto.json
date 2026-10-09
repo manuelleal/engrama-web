@@ -1,0 +1,16 @@
+{
+  "descripcion": "admin/importar_csv.js sin la barra de abajo: el admin no tiene su inicio ni su cuenta a un toque desde esa pantalla (U62)",
+  "archivos": {
+    "src/vistas/admin/importar_csv.js": "importar_csv.js"
+  },
+  "comando": [
+    "node",
+    "--test",
+    "--test-reporter=tap",
+    "tests/unit/nav_barra.test.mjs"
+  ],
+  "espera_codigo_no_cero": true,
+  "espera_fallan_tests": [
+    "U62 (la barra): cada pantalla del admin trae UNA barra (Grupos · Perfil) con Grupos activa; en una pantalla del profe abierta por la dirección, su barra sin pestaña activa"
+  ]
+}

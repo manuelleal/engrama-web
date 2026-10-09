@@ -6,6 +6,7 @@ import { textos } from '../../textos.js';
 import { asignarDocente } from '../../api/admin.js';
 import { accionUnica, ErrorApi } from '../../api/cliente.js';
 import { ligarEscrituraARed } from '../../ui/red.js';
+import { crearNavInferior } from '../../ui/nav_inferior.js';
 
 function crearFormulario(onAsignar) {
   const campo = h('input', { type: 'text', id: 'documento-docente', 'data-testid': 'campo-documento-docente', autocomplete: 'off' });
@@ -51,6 +52,7 @@ export function renderAsignarDocente(raiz, params, ctx) {
     h('h1', {}, textos.admin.asignarDocente.titulo),
     h('a', { href: '#/admin', 'data-testid': 'volver-a-admin' }, textos.admin.asignarDocente.volverAAdmin),
     form,
+    crearNavInferior('/admin/asignar-docente/:gid', /** @type {any} */ (ctx).sesion?.rol), // W70: la barra del admin, con Grupos activa
   ));
   document.body.dataset.listo = '1';
   window.addEventListener('hashchange', cancelarRed, { once: true });

@@ -43,6 +43,9 @@ test('R4: cada texto declarado como cambiado estaba en la línea base y es el qu
  * Desde W62 (docs/ESPEC_navegacion.md §9.2) un nodo sin `data-testid` se declara por etiqueta (y clase): `{etiqueta, clase?}`.
  * @type {Record<string, Array<string|{etiqueta: string, clase?: string}>>}
  */
+const BARRA = { etiqueta: 'nav', clase: 'nav-inferior' };
+const BARRA_DE_ARRIBA = { etiqueta: 'div', clase: 'barra-rol' };
+
 export const DECLARADAS = {
   // W33: Perfil ganó UN enlace, "Mis solicitudes sobre mis datos" (las dos formas de pintar Perfil).
   // W69 (docs/ESPEC_navegacion.md §9.2): Perfil cambia ENTERO (pasa a ser "Tu perfil", mi cuenta, para los tres roles): se declara la vista
@@ -52,10 +55,13 @@ export const DECLARADAS = {
   perfil_sin_soporte: ['vista-perfil'],
   // W32: el grupo del profe gana UN enlace, "Inscripciones del grupo".
   // W63 (docs/ESPEC_navegacion.md §9.2): además gana el volver "‹ Mis grupos", arriba.
-  profe_grupo: ['ir-a-inscripcion', 'volver'],
+  // W70 (docs/ESPEC_navegacion.md §9.2): entra la barra de abajo del profe (sin testid: por etiqueta y clase).
+  profe_grupo: ['ir-a-inscripcion', 'volver', BARRA],
   // W64 (docs/ESPEC_navegacion.md §9.2): el inicio del profe cambia la LISTA (una tarjeta por grupo con sus tres acciones) y mueve el enlace a
   // los retos al final. Ninguno de los dos nodos tenía `data-testid` en la línea base: se declaran por etiqueta. El resto es idéntico.
-  profe_grupos: [{ etiqueta: 'ul' }, { etiqueta: 'nav' }],
+  // W70 (§9.2): sale la barra de arriba (`div.barra-rol`: el aviso y "Cerrar sesión" viven en Perfil) y entra la de abajo; el enlace a los
+  // retos (un `nav`) sale porque Retos es una pestaña. `{etiqueta: 'nav'}` cubre los dos nav.
+  profe_grupos: [{ etiqueta: 'ul' }, { etiqueta: 'nav' }, BARRA_DE_ARRIBA],
   // W65 (docs/ESPEC_navegacion.md §9.2): Inicio junta el reto de hoy, la clase y el examen en la sección "Ahora" (nodo nuevo), antes de
   // "Esta semana". La tarjeta del reto, que en la línea base colgaba de la vista, ahora cuelga de "Ahora": por eso se declaran los dos.
   // W68 (docs/ESPEC_navegacion.md §9.2): sale la fila de enlaces del final (un `nav` sin testid) y la barra de abajo gana "Perfil". Los dos son
@@ -93,7 +99,7 @@ test('R4: lo que W65 declara cambió de verdad: Inicio trae "Ahora" con el reto 
   assert.ok(sinSubarboles(hoy, DECLARADAS.inicio).some((l) => l.includes('data-testid="progreso-semana"')), '"Esta semana" sigue ahí, sin tocar');
 });
 
-test('R4: lo que W64 declara cambió de verdad: profe/grupos trae una tarjeta por grupo con tres acciones, y lo demás (barra y título) no cambió', async () => {
+test('R4: lo que W64 declara cambió de verdad: profe/grupos trae una tarjeta por grupo con tres acciones, y lo demás (el título) no cambió', async () => {
   const hoy = (await tomarFotos()).profe_grupos;
   for (const gid of ['g1', 'g2']) {
     for (const [accion, destino] of [['asistencia', `#/profe/grupo/${gid}/sesion`], ['inscripciones', `#/profe/grupo/${gid}/inscripcion`], ['ver', `#/profe/grupo/${gid}`]]) {
@@ -102,7 +108,25 @@ test('R4: lo que W64 declara cambió de verdad: profe/grupos trae una tarjeta po
   }
   assert.ok(!BASE.vistas.profe_grupos.some((l) => l.includes('-asistencia"')), 'la línea base no tenía la tarjeta');
   assert.deepEqual(sinSubarboles(hoy, DECLARADAS.profe_grupos), sinSubarboles(BASE.vistas.profe_grupos, DECLARADAS.profe_grupos));
-  assert.ok(sinSubarboles(hoy, DECLARADAS.profe_grupos).some((l) => l.trim() === 'h1'), 'tras excluir lo declarado quedan la barra y el título');
+  assert.ok(sinSubarboles(hoy, DECLARADAS.profe_grupos).some((l) => l.trim() === 'h1'), 'tras excluir lo declarado queda el título');
+});
+
+test('R4: lo que W70 declara cambió de verdad: del inicio del profe sale la barra de arriba y entra la de abajo (Mis grupos · Retos · Perfil); el grupo gana la misma barra', async () => {
+  const hoy = await tomarFotos();
+  const base = BASE.vistas;
+  const entradas = (lineas) => { const i = lineas.findIndex((l) => l.includes('class="nav-inferior"')); return i < 0 ? [] : lineas.slice(i).filter((l) => l.trimStart().startsWith('a ')).map((l) => /href="([^"]*)"/.exec(l)?.[1]); };
+  for (const nombre of ['profe_grupos', 'profe_grupo']) {
+    assert.deepEqual(entradas(base[nombre]), [], `${nombre}: la línea base no traía barra de abajo`);
+    assert.deepEqual(entradas(hoy[nombre]), ['#/profe/grupos', '#/profe/retos', '#/perfil'], `${nombre}: hoy trae la del profe`);
+    assert.equal(hoy[nombre].filter((l) => l.includes('aria-current="page"')).length, 1, `${nombre}: una sola pestaña activa`);
+    assert.ok(hoy[nombre].some((l) => l.includes('aria-current="page"') && l.includes('href="#/profe/grupos"')), `${nombre}: y es Mis grupos`);
+  }
+  for (const testid of ['barra-ver-aviso', 'boton-cerrar-sesion']) {
+    assert.ok(base.profe_grupos.some((l) => l.includes(`data-testid="${testid}"`)), `la línea base traía ${testid} arriba`);
+    assert.ok(!hoy.profe_grupos.some((l) => l.includes(`data-testid="${testid}"`)), `hoy ${testid} vive en Perfil`);
+  }
+  assert.ok(!hoy.profe_grupos.some((l) => l.includes('class="barra-rol"')), 'sin barra de arriba');
+  assert.equal(sinSubarboles(hoy.profe_grupo, [BARRA]).length, base.profe_grupo.length + 4, 'el grupo: fuera de la barra, lo de W32 y W63 y nada más');
 });
 
 test('R4: la línea base trae las vistas que la espec nombra (entrada, Inicio, Perfil, aviso, sin_perfil, profe/grupos y profe/grupo)', () => {
@@ -140,8 +164,8 @@ test('R4: lo que W32 declara cambió de verdad: profe/grupo trae el enlace a las
   // W63 (docs/ESPEC_navegacion.md §9.2) declara un segundo nodo en esta vista: el volver "‹ Mis grupos", antes del título.
   assert.ok(hoy.profe_grupo.some((l) => l.includes('data-testid="volver"') && l.includes('href="#/profe/grupos"')), 'falta el volver que declara W63');
   assert.ok(!BASE.vistas.profe_grupo.some((l) => l.includes('volver')), 'la línea base no tenía volver');
-  assert.equal(hoy.profe_grupo.length, BASE.vistas.profe_grupo.length + 4, 'dos nodos de más (cada enlace y su texto), nada más');
-  assert.deepEqual(DECLARADAS.profe_grupo, ['ir-a-inscripcion', 'volver']);
+  assert.equal(sinSubarboles(hoy.profe_grupo, [BARRA]).length, BASE.vistas.profe_grupo.length + 4, 'fuera de la barra de W70, dos nodos de más (cada enlace y su texto), nada más');
+  assert.deepEqual(DECLARADAS.profe_grupo, ['ir-a-inscripcion', 'volver', BARRA]);
 });
 
 /** Las vistas cuya foto un encargo declaró ENTERA (la exclusión deja solo la raíz). Solo Perfil, por W69; cualquier otra pone rojo a R4. */

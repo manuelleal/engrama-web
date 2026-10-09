@@ -1,0 +1,16 @@
+{
+  "descripcion": "profe/grupos.js vuelve a traer la barra de arriba: el selector de institucion tapado por \"Tratamiento de tus datos\" (H13) y \"Cerrar sesion\" fuera de Perfil (U60, W70)",
+  "archivos": {
+    "src/vistas/profe/grupos.js": "grupos.js"
+  },
+  "comando": [
+    "node",
+    "--test",
+    "--test-reporter=tap",
+    "tests/unit/nav_barra.test.mjs"
+  ],
+  "espera_codigo_no_cero": true,
+  "espera_fallan_tests": [
+    "W70: los inicios del profe y del admin ya no traen la barra de arriba (ni \"Cerrar sesión\" ni el aviso: viven en Perfil), y con dos instituciones el selector va en su renglón, bajo el título"
+  ]
+}

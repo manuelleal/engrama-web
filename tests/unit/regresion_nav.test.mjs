@@ -38,7 +38,7 @@ export const TEXTOS_DECLARADOS_NAV = {
 /** La línea base con los textos declarados puestos al día (el archivo de la foto no se regenera). */
 const BASE = { ...CRUDA, vistas: Object.fromEntries(Object.entries(CRUDA.vistas).map(([nombre, lineas]) => [nombre, conTextos(/** @type {string[]} */ (lineas), TEXTOS_DECLARADOS_NAV[nombre] || [])])) };
 
-test('R9: lo que W67 declara cambió de verdad: cada texto nuevo se ve hoy, y el "Cerrar sesión" de la CUENTA sigue en el inicio del admin', async () => {
+test('R9: lo que W67 declara cambió de verdad: cada texto nuevo se ve hoy, y ningún "Cerrar sesión" queda en las pantallas del profe ni del admin (W70: vive en Perfil)', async () => {
   const hoy = await tomarFotosNav();
   const dice = (lineas, texto) => lineas.some((l) => l.trim() === JSON.stringify(texto));
   for (const [nombre, pares] of Object.entries(TEXTOS_DECLARADOS_NAV)) {
@@ -49,11 +49,14 @@ test('R9: lo que W67 declara cambió de verdad: cada texto nuevo se ve hoy, y el
       if (!pares.some(([, n]) => n === viejo)) assert.ok(!dice(hoy[nombre], viejo), `${nombre}: todavía dice "${viejo}"`);
     }
   }
-  assert.ok(dice(hoy.admin_grupos, 'Cerrar sesión'), 'el botón de la cuenta no cambió');
+  assert.ok(dice(CRUDA.vistas.admin_grupos, 'Cerrar sesión'), 'la línea base traía el botón de la cuenta en el inicio del admin');
+  assert.ok(!dice(hoy.admin_grupos, 'Cerrar sesión'), 'W70: salió con la barra de arriba; el de la cuenta vive en Perfil (U67)');
   assert.ok(!dice(hoy.profe_asistencia_abierta, 'Cerrar sesión'), 'en la asistencia abierta ya no hay un "Cerrar sesión"');
 });
 
 const BARRA = { etiqueta: 'nav', clase: 'nav-inferior' };
+const BARRA_DE_ARRIBA = { etiqueta: 'div', clase: 'barra-rol' };
+const ESCENAS_CON_BARRA_W70 = ['profe_asistencia_formulario', 'profe_inscripcion', 'profe_inscripcion_vacio', 'profe_inscripcion_error', 'profe_logro', 'profe_logro_vacio', 'profe_logro_error', 'profe_errores', 'profe_errores_vacio', 'profe_errores_error', 'admin_asignar_docente', 'admin_importar_csv'];
 const ESCENAS_CON_BARRA_W68 = ['retos', 'retos_vacio', 'retos_error', 'asistencia', 'revision', 'vivo', 'vivo_no_disponible', 'nivel', 'nivel_no_disponible', 'aviso_leer', 'solicitudes', 'solicitudes_vacio', 'solicitudes_error'];
 
 /**
@@ -63,10 +66,17 @@ const ESCENAS_CON_BARRA_W68 = ['retos', 'retos_vacio', 'retos_error', 'asistenci
  */
 export const DECLARADAS_NAV = {
   // W63 (cambio 1): la asistencia abierta conserva la vuelta al grupo; los retos del profe ganan "‹ Mis grupos" (contenido, vacío y error).
-  profe_asistencia_abierta: ['volver-al-grupo'],
-  profe_retos: ['volver'],
-  profe_retos_vacio: ['volver'],
-  profe_retos_error: ['volver'],
+  // W70 (cambio 6c): entra la barra de abajo en TODAS las escenas del profe y del admin (por eso cada una lleva BARRA); de los inicios del admin
+  // sale la barra de arriba (`div.barra-rol`); y los retos del profe, que ahora son una pestaña, pierden el "‹ Mis grupos" que W63 les dio
+  // (el `volver` sigue declarado: en la línea base no existía y hoy tampoco).
+  profe_asistencia_abierta: ['volver-al-grupo', BARRA],
+  profe_retos: ['volver', BARRA],
+  profe_retos_vacio: ['volver', BARRA],
+  profe_retos_error: ['volver', BARRA],
+  ...Object.fromEntries(ESCENAS_CON_BARRA_W70.map((nombre) => [nombre, [BARRA]])),
+  admin_grupos: [BARRA, BARRA_DE_ARRIBA],
+  admin_grupos_vacio: [BARRA, BARRA_DE_ARRIBA],
+  admin_grupos_error: [BARRA, BARRA_DE_ARRIBA],
   // W68 (cambio 6a): la barra del estudiante gana "Perfil" donde ya estaba (retos, asistencia, revisión) y ENTRA en la clase en vivo, el examen
   // de nivel, el aviso y las solicitudes; también en los estados de error (retos_error no la traía). Corrección a la tabla de §11, que solo
   // nombraba clase, examen, aviso y solicitudes. La barra no lleva testid: se declara por etiqueta y clase.
@@ -87,16 +97,34 @@ test('R9: lo que W68 declara cambió de verdad: cada escena del estudiante trae 
   for (const nombre of ['reto_en_curso', 'reto_en_curso_error']) assert.equal(barras(hoy[nombre]).length, 0, `${nombre}: una tarea por pantalla, sin barra`);
 });
 
-test('R9: lo que W63 declara cambió de verdad: la asistencia abierta trae la vuelta al grupo y los retos del profe, "‹ Mis grupos" (un nodo y su texto, nada más)', async () => {
+test('R9: lo que W63 declaró sigue ahí: la asistencia abierta trae la vuelta al grupo (un nodo y su texto); los retos del profe ya no son un callejón por la barra (W70)', async () => {
   const hoy = await tomarFotosNav({ solo: ['profe_asistencia_abierta', 'profe_retos', 'profe_retos_vacio', 'profe_retos_error'] });
   assert.ok(hoy.profe_asistencia_abierta.some((l) => l.includes('data-testid="volver-al-grupo"') && l.includes('href="#/profe/grupo/g1"')));
   assert.ok(!BASE.vistas.profe_asistencia_abierta.some((l) => l.includes('volver')), 'la línea base era un callejón');
+  assert.equal(sinSubarboles(hoy.profe_asistencia_abierta, [BARRA]).length, BASE.vistas.profe_asistencia_abierta.length + 2, 'fuera de la barra, un nodo de más y su texto');
   for (const nombre of ['profe_retos', 'profe_retos_vacio', 'profe_retos_error']) {
-    assert.ok(hoy[nombre].some((l) => l.includes('data-testid="volver"') && l.includes('href="#/profe/grupos"')), `${nombre}: falta el volver`);
-    assert.ok(!BASE.vistas[nombre].some((l) => l.includes('volver')), `${nombre}: la línea base no lo tenía`);
+    assert.ok(!BASE.vistas[nombre].some((l) => l.includes('volver') || l.includes('nav-inferior')), `${nombre}: la línea base era un callejón (ni volver ni barra)`);
+    assert.ok(!hoy[nombre].some((l) => l.includes('data-testid="volver"')), `${nombre}: W70 la hizo pestaña, sin volver`);
+    assert.ok(hoy[nombre].some((l) => l.trimStart().startsWith('a ') && l.includes('href="#/profe/grupos"')), `${nombre}: a Mis grupos se va por la barra`);
+    assert.equal(sinSubarboles(hoy[nombre], [BARRA]).length, BASE.vistas[nombre].length, `${nombre}: fuera de la barra, los mismos nodos que la línea base`);
   }
-  for (const nombre of Object.keys(hoy)) assert.equal(hoy[nombre].length, BASE.vistas[nombre].length + 2, `${nombre}: un nodo de más y su texto`);
-  void CRUDA;
+});
+
+test('R9: lo que W70 declara cambió de verdad: cada escena del profe y del admin trae UNA barra con las entradas de su rol; del inicio del admin salió la barra de arriba; fuera de eso, nada', async () => {
+  const hoy = await tomarFotosNav();
+  const barras = (lineas) => lineas.filter((l) => l.trimStart().startsWith('nav ') && l.includes('class="nav-inferior"'));
+  const entradas = (lineas) => { const i = lineas.findIndex((l) => l.includes('class="nav-inferior"')); return lineas.slice(i).filter((l) => l.trimStart().startsWith('a ')).map((l) => /href="([^"]*)"/.exec(l)?.[1]); };
+  const escenas = Object.keys(BASE.vistas).filter((n) => n.startsWith('profe_') || n.startsWith('admin_'));
+  assert.equal(escenas.length, 19, 'las 14 escenas del profe y las 5 del admin');
+  for (const nombre of escenas) {
+    assert.equal(barras(CRUDA.vistas[nombre]).length, 0, `${nombre}: la línea base no traía barra`);
+    assert.equal(barras(hoy[nombre]).length, 1, `${nombre}: hoy trae una`);
+    assert.ok((DECLARADAS_NAV[nombre] || []).includes(BARRA), `${nombre}: la barra está declarada`);
+    assert.deepEqual(entradas(hoy[nombre]), nombre.startsWith('profe_') ? ['#/profe/grupos', '#/profe/retos', '#/perfil'] : ['#/admin', '#/perfil'], `${nombre}: las entradas de su rol`);
+    assert.ok(!hoy[nombre].some((l) => l.includes('class="barra-rol"') || l.includes('boton-cerrar-sesion"') && !nombre.startsWith('profe_asistencia')), `${nombre}: sin barra de arriba ni "Cerrar sesión" de la cuenta`);
+  }
+  for (const nombre of ['admin_grupos', 'admin_grupos_vacio', 'admin_grupos_error']) assert.ok(CRUDA.vistas[nombre].some((l) => l.includes('class="barra-rol"')), `${nombre}: la línea base traía la barra de arriba`);
+  for (const nombre of ESCENAS_CON_BARRA_W70) assert.equal(sinSubarboles(hoy[nombre], [BARRA]).length, BASE.vistas[nombre].length, `${nombre}: fuera de la barra, los mismos nodos`);
 });
 
 /** Las escenas que la espec nombra (§9.1), cada una con los estados que tiene. */

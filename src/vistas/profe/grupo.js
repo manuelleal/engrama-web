@@ -13,9 +13,12 @@ import { textos } from '../../textos.js';
 import { listarEstudiantes, listarGrupos } from '../../api/profe.js';
 import { ErrorApi } from '../../api/cliente.js';
 import { crearVolver } from '../../ui/encabezado.js';
+import { crearNavInferior } from '../../ui/nav_inferior.js';
 
 /** W63 (docs/ESPEC_navegacion.md §5.1): del grupo se vuelve a "Mis grupos" con un enlace arriba, también mientras carga y si falla. */
 const volverAMisGrupos = () => crearVolver('/profe/grupos', textos.profe.grupos.titulo);
+/** W70: la barra de abajo del rol, con Mis grupos activa. */
+const barra = (ctx) => crearNavInferior('/profe/grupo/:gid', ctx?.sesion?.rol);
 
 /** Pura: el texto de la última asistencia, o "Sin registro" (U, sin DOM). */
 export function textoUltimaAsistencia(fechaISO) {
@@ -50,7 +53,7 @@ function tablaRoster(estudiantes) {
   );
 }
 
-function pintarGrupo(raiz, gid, codigo, estudiantes) {
+function pintarGrupo(raiz, gid, codigo, estudiantes, ctx) {
   const nodo = h(
     'div', { 'data-testid': 'vista-profe-grupo' },
     volverAMisGrupos(),
@@ -63,6 +66,7 @@ function pintarGrupo(raiz, gid, codigo, estudiantes) {
       h('a', { href: `#/profe/grupo/${gid}/inscripcion`, 'data-testid': 'ir-a-inscripcion' }, textos.inscripcion.enlace), // W32
     ),
     tablaRoster(estudiantes),
+    barra(ctx),
   );
   montar(raiz, nodo);
   document.body.dataset.listo = '1';
@@ -74,19 +78,19 @@ function pintarGrupo(raiz, gid, codigo, estudiantes) {
  * propio mensaje (401/403/etc., §7.2) — nunca uno inventado aquí.
  * @param {string} mensaje
  */
-function pintarError(raiz, mensaje) {
-  montar(raiz, h('div', { 'data-testid': 'vista-profe-grupo' }, volverAMisGrupos(), h('p', { role: 'alert', 'data-testid': 'profe-grupo-error' }, mensaje)));
+function pintarError(raiz, mensaje, ctx) {
+  montar(raiz, h('div', { 'data-testid': 'vista-profe-grupo' }, volverAMisGrupos(), h('p', { role: 'alert', 'data-testid': 'profe-grupo-error' }, mensaje), barra(ctx)));
   document.body.dataset.listo = '1';
 }
 
 /** @param {HTMLElement} raiz @param {Record<string,string>} params ({gid}) @param {{token: string, tenantId?: string}} ctx */
 export async function renderGrupo(raiz, params, ctx) {
-  montar(raiz, h('div', { 'data-testid': 'vista-profe-grupo' }, volverAMisGrupos(), h('p', { role: 'status' }, textos.inicio.cargando)));
+  montar(raiz, h('div', { 'data-testid': 'vista-profe-grupo' }, volverAMisGrupos(), h('p', { role: 'status' }, textos.inicio.cargando), barra(ctx)));
   try {
     const [estudiantes, grupos] = await Promise.all([listarEstudiantes(params.gid, ctx), listarGrupos(ctx)]);
-    pintarGrupo(raiz, params.gid, buscarCodigoDeGrupo(grupos, params.gid), estudiantes);
+    pintarGrupo(raiz, params.gid, buscarCodigoDeGrupo(grupos, params.gid), estudiantes, ctx);
   } catch (e) {
     console.warn('vistas/profe/grupo: no se pudo cargar', e);
-    pintarError(raiz, e instanceof ErrorApi ? e.mensaje : textos.profe.grupo.noEncontrado);
+    pintarError(raiz, e instanceof ErrorApi ? e.mensaje : textos.profe.grupo.noEncontrado, ctx);
   }
 }

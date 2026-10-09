@@ -8,6 +8,10 @@ export const textosNav = {
     inicio: 'Inicio',
     // W68 (§5.6): la entrada de la barra que lleva a "mi cuenta" (el aviso, las solicitudes y "Cerrar sesión" viven ahí).
     perfil: 'Perfil',
+    // W70 (§5.6): las entradas de la barra del profe y del admin. Cada una dice lo mismo que el título de su pantalla.
+    misGrupos: 'Mis grupos',
+    grupos: 'Grupos',
+    retos: 'Retos',
     barra: 'Navegación principal', // el nombre accesible de la barra de abajo
     // "Sesión" es SOLO la cuenta (§5.5): este es el único "Cerrar sesión" de la app.
     cerrarSesion: 'Cerrar sesión',

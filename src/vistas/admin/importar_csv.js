@@ -9,6 +9,7 @@ import { textos } from '../../textos.js';
 import { importarCsv } from '../../api/admin.js';
 import { accionUnica, ErrorApi } from '../../api/cliente.js';
 import { ligarEscrituraARed } from '../../ui/red.js';
+import { crearNavInferior } from '../../ui/nav_inferior.js';
 
 /** Pura (U, sin DOM): una línea por fila del CSV, tal cual (sin trim ni normalizar). */
 export function lineasDePrevia(textoCsv) {
@@ -112,6 +113,7 @@ export function renderImportarCsv(raiz, params, ctx) {
     h('h1', {}, textos.admin.importarCsv.titulo),
     h('a', { href: '#/admin', 'data-testid': 'volver-a-admin' }, textos.admin.importarCsv.volverAAdmin),
     form,
+    crearNavInferior('/admin/importar-csv/:gid', /** @type {any} */ (ctx).sesion?.rol), // W70: la barra del admin, con Grupos activa
   ));
   document.body.dataset.listo = '1';
   window.addEventListener('hashchange', cancelarRed, { once: true });

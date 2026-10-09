@@ -130,8 +130,10 @@ test('E15: un profe también llega a sus solicitudes: barra → aviso → "Mis s
     try {
       await sesion.navegar(url);
       await entrarCon(sesion, 'profe2@piloto.test');
-      assert.ok(await esperarVista(sesion, 'barra-ver-aviso'), 'el profe ve el enlace al aviso en su barra');
-      await sesion.evaluar('document.querySelector(\'[data-testid="barra-ver-aviso"]\').click()');
+      assert.ok(await esperarVista(sesion, 'vista-profe-grupos'));
+      await sesion.evaluar('document.querySelector(\'nav.nav-inferior a[href="#/perfil"]\').click()'); // W70: el aviso del profe vive en Perfil (barra → Perfil)
+      assert.ok(await esperarVista(sesion, 'perfil-ver-aviso'), 'el profe ve el enlace al aviso en su Perfil');
+      await sesion.evaluar('document.querySelector(\'[data-testid="perfil-ver-aviso"]\').click()');
       assert.ok(await esperarVista(sesion, 'aviso-ver-solicitudes'), 'el aviso (dentro de la sesión) ofrece las solicitudes');
       await sesion.evaluar('document.querySelector(\'[data-testid="aviso-ver-solicitudes"]\').click()');
       assert.ok(await esperarVista(sesion, 'vista-solicitudes-datos'));

@@ -1,7 +1,7 @@
 {
-  "descripcion": "Ley 1581: el profe y el admin no tienen ningún enlace al aviso de datos",
+  "descripcion": "Ley 1581: el profe y el admin no tienen ningun enlace al aviso de datos (desde W70 vive en Perfil: aqui Perfil solo se lo ofrece al estudiante)",
   "archivos": {
-    "src/ui/barra_rol.js": "barra_rol.js"
+    "src/vistas/perfil.js": "perfil.js"
   },
   "comando": [
     "node",
@@ -11,6 +11,6 @@
   ],
   "espera_codigo_no_cero": true,
   "espera_fallan_tests": [
-    "aviso: el profe ve el enlace al aviso en su barra, lo abre, el correo es texto seleccionable y puede volver"
+    "aviso: el profe llega al aviso desde su Perfil (barra → Perfil), lo abre, el correo es texto seleccionable y vuelve a Perfil"
   ]
 }

@@ -1,0 +1,16 @@
+{
+  "descripcion": "ui/nav_inferior.js deja la barra del estudiante en sus 3 entradas de antes, sin \"Perfil\": con la fila de Inicio fuera, no hay camino a su cuenta ni a \"Cerrar sesion\" (U60)",
+  "archivos": {
+    "src/ui/nav_inferior.js": "nav_inferior.js"
+  },
+  "comando": [
+    "node",
+    "--test",
+    "--test-reporter=tap",
+    "tests/unit/ui_nav_inferior.test.mjs"
+  ],
+  "espera_codigo_no_cero": true,
+  "espera_fallan_tests": [
+    "U60: la barra del estudiante trae 4 entradas, en orden, con el texto de su pantalla, su destino y su ícono"
+  ]
+}

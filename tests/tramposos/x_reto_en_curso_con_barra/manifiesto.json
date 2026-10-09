@@ -1,0 +1,16 @@
+{
+  "descripcion": "estudiante/reto_flujo.js pinta la barra de abajo en la pregunta: el reto en curso deja de ser \"una tarea por pantalla\" (decision 001; U60)",
+  "archivos": {
+    "src/vistas/estudiante/reto_flujo.js": "reto_flujo.js"
+  },
+  "comando": [
+    "node",
+    "--test",
+    "--test-reporter=tap",
+    "tests/unit/nav_barra.test.mjs"
+  ],
+  "espera_codigo_no_cero": true,
+  "espera_fallan_tests": [
+    "U60: el reto en curso NO lleva barra (una tarea por pantalla), ni en la pregunta ni si falla"
+  ]
+}

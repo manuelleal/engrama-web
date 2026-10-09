@@ -1,0 +1,16 @@
+{
+  "descripcion": "estilos/juego.css anima el icono de la pestana activa fuera de .juego: la barra del profe y del admin rebota como la del estudiante (sobriedad; E33)",
+  "archivos": {
+    "estilos/juego.css": "juego.css"
+  },
+  "comando": [
+    "node",
+    "--test",
+    "--test-reporter=tap",
+    "tests/unit/css_juego.test.mjs"
+  ],
+  "espera_codigo_no_cero": true,
+  "espera_fallan_tests": [
+    "sobriedad: en juego.css, toda regla que anima algo de la barra de abajo está dentro de .juego"
+  ]
+}

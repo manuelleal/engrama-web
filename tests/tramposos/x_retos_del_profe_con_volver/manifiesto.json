@@ -1,0 +1,16 @@
+{
+  "descripcion": "profe/retos.js conserva el \"volver a Mis grupos\" de W63 aunque ya es una pestana de la barra: dos formas de ir al mismo sitio y una pestana con volver (U62)",
+  "archivos": {
+    "src/vistas/profe/retos.js": "retos.js"
+  },
+  "comando": [
+    "node",
+    "--test",
+    "--test-reporter=tap",
+    "tests/unit/nav_sin_callejon.test.mjs"
+  ],
+  "espera_codigo_no_cero": true,
+  "espera_fallan_tests": [
+    "U62: los Retos del profe son una pestaña: a \"Mis grupos\" se va por la barra (un toque) y no llevan volver, en contenido, vacío, error y carga"
+  ]
+}

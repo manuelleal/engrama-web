@@ -15,6 +15,10 @@ import { h, montar } from '../../ui/dom.js';
 import { textos } from '../../textos.js';
 import { leerLogro } from '../../api/profe.js';
 import { ErrorApi } from '../../api/cliente.js';
+import { crearNavInferior } from '../../ui/nav_inferior.js';
+
+/** W70: la barra de abajo del rol, con Mis grupos activa. */
+const barra = (ctx) => crearNavInferior('/profe/grupo/:gid/logro', /** @type {any} */ (ctx)?.sesion?.rol);
 
 const EJES = ['Comprehension', 'Expression', 'Accuracy'];
 
@@ -72,30 +76,31 @@ function tablaLogro(students) {
   );
 }
 
-function pintarLogro(raiz, gid, achievementOut) {
+function pintarLogro(raiz, gid, achievementOut, ctx) {
   const nodo = h(
     'div', { 'data-testid': 'vista-profe-logro' },
     h('h1', {}, textos.profe.logro.titulo),
     h('a', { href: `#/profe/grupo/${gid}`, 'data-testid': 'volver-al-grupo' }, textos.profe.logro.volverAlGrupo),
     tablaLogro(achievementOut.students),
+    barra(ctx),
   );
   montar(raiz, nodo);
   document.body.dataset.listo = '1';
 }
 
-function pintarError(raiz, mensaje) {
-  montar(raiz, h('div', { 'data-testid': 'vista-profe-logro' }, h('h1', {}, textos.profe.logro.titulo), h('p', { role: 'alert' }, mensaje)));
+function pintarError(raiz, mensaje, ctx) {
+  montar(raiz, h('div', { 'data-testid': 'vista-profe-logro' }, h('h1', {}, textos.profe.logro.titulo), h('p', { role: 'alert' }, mensaje), barra(ctx)));
   document.body.dataset.listo = '1';
 }
 
 /** @param {HTMLElement} raiz @param {Record<string,string>} params ({gid}) @param {{token: string, tenantId?: string}} ctx */
 export async function renderLogro(raiz, params, ctx) {
-  montar(raiz, h('div', { 'data-testid': 'vista-profe-logro' }, h('p', { role: 'status' }, textos.inicio.cargando)));
+  montar(raiz, h('div', { 'data-testid': 'vista-profe-logro' }, h('p', { role: 'status' }, textos.inicio.cargando), barra(ctx)));
   try {
     const achievementOut = await leerLogro(params.gid, ctx);
-    pintarLogro(raiz, params.gid, achievementOut);
+    pintarLogro(raiz, params.gid, achievementOut, ctx);
   } catch (e) {
     console.warn('vistas/profe/logro: no se pudo cargar', e);
-    pintarError(raiz, e instanceof ErrorApi ? e.mensaje : textos.profe.logro.errorGeneral);
+    pintarError(raiz, e instanceof ErrorApi ? e.mensaje : textos.profe.logro.errorGeneral, ctx);
   }
 }

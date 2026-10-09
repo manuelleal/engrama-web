@@ -460,13 +460,14 @@ body {
   100% { opacity: 0; transform: scale(1.08); }
 }
 
-/* ---------- Navegación inferior: el ícono de la pestaña activa rebota al llegar a la pantalla. ---------- */
+/* ---------- Navegación inferior: el ícono de la pestaña activa rebota al llegar a la pantalla. W70 (docs/ESPEC_navegacion.md §5.6): SOLO dentro
+   de `.juego` (las pantallas del estudiante). El profe y el admin llevan la misma barra, sobria: ahí el ícono no anima nunca. ---------- */
 .nav-icono {
   display: inline-block;
   font-size: 1.35rem;
   line-height: 1;
 }
-.nav-inferior a[aria-current="page"] .nav-icono {
+.juego .nav-inferior a[aria-current="page"] .nav-icono {
   animation: nav-rebota 650ms cubic-bezier(0.2, 1.9, 0.4, 1) 1;
 }
 @keyframes nav-rebota {

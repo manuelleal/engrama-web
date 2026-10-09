@@ -1,0 +1,16 @@
+{
+  "descripcion": "estudiante/retos.js no pinta la barra cuando la lista falla: la pantalla de error vuelve a ser un callejon (U62)",
+  "archivos": {
+    "src/vistas/estudiante/retos.js": "retos.js"
+  },
+  "comando": [
+    "node",
+    "--test",
+    "--test-reporter=tap",
+    "tests/unit/nav_barra.test.mjs"
+  ],
+  "espera_codigo_no_cero": true,
+  "espera_fallan_tests": [
+    "U62 (la barra): Inicio, Retos, Asistencia y la revisión traen UNA barra con su pestaña activa, en contenido, vacío, error y carga"
+  ]
+}

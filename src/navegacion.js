@@ -5,7 +5,9 @@
 //
 // W62: la tabla nació describiendo el estado de entonces. Cada encargo posterior (W63…W73) cambia solo las filas que declara.
 // W68: la clase en vivo y el examen llevan la barra con Inicio activa; el aviso y las solicitudes, con Perfil activa. La barra la pinta
-// ui/nav_inferior.js con las entradas del ROL: un rol que todavía no tiene barra no la ve aunque la fila diga `barra: true`.
+// ui/nav_inferior.js con las entradas del ROL.
+// W70: el profe y el admin tienen barra en todas sus pantallas (Mis grupos / Retos / Grupos activas). El id de la pestaña es el de la entrada
+// de la barra de ESE rol: el admin que abre una pantalla del profe por la dirección no tiene `misGrupos` en su barra y no ve ninguna activa.
 //   `roles`        de quién es la ruta (§5.8); `porDireccion`: roles que hoy pueden abrirla escribiendo la dirección, sin enlace que los lleve.
 //   `pestana`      el id de la entrada de la barra que queda activa en esa pantalla, o null (ninguna).
 //   `barra`        si la pantalla lleva la barra de abajo.
@@ -42,16 +44,16 @@ export const RUTAS = [
   { patron: '/asistencia', roles: ['student'], pestana: 'asistencia', barra: true, vuelve: null, titulo: () => textos.asistencia.titulo },
   { patron: '/retos', roles: ['student'], pestana: 'retos', barra: true, vuelve: null, titulo: () => textos.retos.titulo },
   { patron: '/retos/:id', roles: ['student'], pestana: null, barra: false, vuelve: null, titulo: () => textos.retos.titulo }, // una tarea por pantalla (decisión 001)
-  { patron: '/profe/grupos', roles: ['teacher'], porDireccion: ['admin'], pestana: null, barra: false, vuelve: null, titulo: () => textos.profe.grupos.titulo },
-  { patron: '/profe/grupo/:gid', roles: ['teacher'], porDireccion: ['admin'], pestana: null, barra: false, vuelve: null, titulo: (c) => (c ? textos.profe.grupo.titulo(c) : textos.profe.grupo.tituloSinCodigo) },
-  { patron: '/profe/grupo/:gid/sesion', roles: ['teacher'], porDireccion: ['admin'], pestana: null, barra: false, vuelve: '/profe/grupo/:gid', titulo: () => textos.profe.sesion.titulo },
-  { patron: '/profe/grupo/:gid/inscripcion', roles: ['teacher'], porDireccion: ['admin'], pestana: null, barra: false, vuelve: '/profe/grupo/:gid', titulo: (c) => (c ? textos.inscripcion.tituloConCodigo(c) : textos.inscripcion.titulo) },
-  { patron: '/profe/grupo/:gid/logro', roles: ['teacher'], porDireccion: ['admin'], pestana: null, barra: false, vuelve: '/profe/grupo/:gid', titulo: () => textos.profe.logro.titulo },
-  { patron: '/profe/grupo/:gid/errores', roles: ['teacher'], porDireccion: ['admin'], pestana: null, barra: false, vuelve: '/profe/grupo/:gid', titulo: () => textos.profe.errores.titulo },
-  { patron: '/profe/retos', roles: ['teacher'], porDireccion: ['admin'], pestana: null, barra: false, vuelve: null, titulo: () => textos.profe.retos.titulo },
-  { patron: '/admin', roles: ['admin'], pestana: null, barra: false, vuelve: null, titulo: () => textos.admin.grupos.titulo },
-  { patron: '/admin/asignar-docente/:gid', roles: ['admin'], pestana: null, barra: false, vuelve: '/admin', titulo: () => textos.admin.asignarDocente.titulo },
-  { patron: '/admin/importar-csv/:gid', roles: ['admin'], pestana: null, barra: false, vuelve: '/admin', titulo: () => textos.admin.importarCsv.titulo },
+  { patron: '/profe/grupos', roles: ['teacher'], porDireccion: ['admin'], pestana: 'misGrupos', barra: true, vuelve: null, titulo: () => textos.profe.grupos.titulo },
+  { patron: '/profe/grupo/:gid', roles: ['teacher'], porDireccion: ['admin'], pestana: 'misGrupos', barra: true, vuelve: null, titulo: (c) => (c ? textos.profe.grupo.titulo(c) : textos.profe.grupo.tituloSinCodigo) },
+  { patron: '/profe/grupo/:gid/sesion', roles: ['teacher'], porDireccion: ['admin'], pestana: 'misGrupos', barra: true, vuelve: '/profe/grupo/:gid', titulo: () => textos.profe.sesion.titulo },
+  { patron: '/profe/grupo/:gid/inscripcion', roles: ['teacher'], porDireccion: ['admin'], pestana: 'misGrupos', barra: true, vuelve: '/profe/grupo/:gid', titulo: (c) => (c ? textos.inscripcion.tituloConCodigo(c) : textos.inscripcion.titulo) },
+  { patron: '/profe/grupo/:gid/logro', roles: ['teacher'], porDireccion: ['admin'], pestana: 'misGrupos', barra: true, vuelve: '/profe/grupo/:gid', titulo: () => textos.profe.logro.titulo },
+  { patron: '/profe/grupo/:gid/errores', roles: ['teacher'], porDireccion: ['admin'], pestana: 'misGrupos', barra: true, vuelve: '/profe/grupo/:gid', titulo: () => textos.profe.errores.titulo },
+  { patron: '/profe/retos', roles: ['teacher'], porDireccion: ['admin'], pestana: 'retosProfe', barra: true, vuelve: null, titulo: () => textos.profe.retos.titulo },
+  { patron: '/admin', roles: ['admin'], pestana: 'grupos', barra: true, vuelve: null, titulo: () => textos.admin.grupos.titulo },
+  { patron: '/admin/asignar-docente/:gid', roles: ['admin'], pestana: 'grupos', barra: true, vuelve: '/admin', titulo: () => textos.admin.asignarDocente.titulo },
+  { patron: '/admin/importar-csv/:gid', roles: ['admin'], pestana: 'grupos', barra: true, vuelve: '/admin', titulo: () => textos.admin.importarCsv.titulo },
 ];
 
 /** El patrón como expresión regular y los nombres de sus parámetros (la misma regla que rutas.js). @param {string} patron */

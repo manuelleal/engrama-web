@@ -1,0 +1,16 @@
+{
+  "descripcion": "navegacion.js marca \"Mis grupos\" del profe con el id de la pestana del admin: el admin que la abre por la direccion ve \"Grupos\" activa en una pantalla que no es la suya, y el profe, ninguna (U60)",
+  "archivos": {
+    "src/navegacion.js": "navegacion.js"
+  },
+  "comando": [
+    "node",
+    "--test",
+    "--test-reporter=tap",
+    "tests/unit/ui_nav_inferior.test.mjs"
+  ],
+  "espera_codigo_no_cero": true,
+  "espera_fallan_tests": [
+    "U60: el admin que abre una pantalla del profe por la dirección ve SU barra (Grupos · Perfil) y ninguna pestaña activa"
+  ]
+}

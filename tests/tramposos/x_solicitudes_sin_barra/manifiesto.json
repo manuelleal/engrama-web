@@ -1,0 +1,16 @@
+{
+  "descripcion": "vistas/datos_solicitudes.js no pinta la barra por la ruta: \"Mis datos: solicitudes\" vuelve a ser un callejon para los tres roles (H7; U62)",
+  "archivos": {
+    "src/vistas/datos_solicitudes.js": "datos_solicitudes.js"
+  },
+  "comando": [
+    "node",
+    "--test",
+    "--test-reporter=tap",
+    "tests/unit/nav_barra.test.mjs"
+  ],
+  "espera_codigo_no_cero": true,
+  "espera_fallan_tests": [
+    "U62 (la barra): el aviso y las solicitudes, por la ruta, traen la barra con Perfil activa (contenido, vacío, error y carga)"
+  ]
+}

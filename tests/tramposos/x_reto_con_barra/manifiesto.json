@@ -1,0 +1,16 @@
+{
+  "descripcion": "navegacion.js le pone barra al reto en curso: deja de ser \"una tarea por pantalla\" (decision 001; U60)",
+  "archivos": {
+    "src/navegacion.js": "navegacion.js"
+  },
+  "comando": [
+    "node",
+    "--test",
+    "--test-reporter=tap",
+    "tests/unit/ui_nav_inferior.test.mjs"
+  ],
+  "espera_codigo_no_cero": true,
+  "espera_fallan_tests": [
+    "U60: el reto en curso es la única ruta del estudiante sin barra (una tarea por pantalla), y una ruta que no existe tampoco la lleva"
+  ]
+}

@@ -10,8 +10,11 @@ import { textos } from '../../textos.js';
 import { abrirSesion, cerrarSesion, listarEstudiantes } from '../../api/profe.js';
 import { accionUnica, ErrorApi } from '../../api/cliente.js';
 import { ligarEscrituraARed } from '../../ui/red.js';
+import { crearNavInferior } from '../../ui/nav_inferior.js';
 
 const INTERVALO_SONDEO_MS = 10_000;
+/** W70: la barra de abajo del rol (Mis grupos activa): de la asistencia abierta se va a "Mis grupos" de un toque. */
+const barra = (ctx) => crearNavInferior('/profe/grupo/:gid/sesion', /** @type {any} */ (ctx)?.sesion?.rol);
 
 // W66 (docs/ESPEC_navegacion.md §5.2): la asistencia que el profe abrió se RECUERDA mientras dure la carga de la página, para que al salir de la
 // ruta (al grupo, a "Mis grupos", al tablero) y volver, el código siga en pantalla en vez del formulario vacío. Vive SOLO en la memoria de este
@@ -121,7 +124,7 @@ function pintarAbierta(raiz, gid, ctx, sesion, total) {
   const { nodo, resumen, cancelarRed } = crearPanelActivo(sesion, () => manejarCerrar(gid, sesion, activo, nodo, ctx, cerrarUnaVez));
   // W63 (docs/ESPEC_navegacion.md §5.1, H1): la asistencia abierta CONSERVA la vuelta al grupo al repintarse (y sigue ahí después de cerrarla,
   // porque el panel solo agrega "cerrada"). Antes esta pantalla era un callejón: su único botón era el de cerrar.
-  montar(raiz, h('div', { 'data-testid': 'vista-sesion-asistencia' }, h('h1', {}, textos.profe.sesion.titulo), enlaceAlGrupo(gid), nodo));
+  montar(raiz, h('div', { 'data-testid': 'vista-sesion-asistencia' }, h('h1', {}, textos.profe.sesion.titulo), enlaceAlGrupo(gid), nodo, barra(ctx)));
   document.body.dataset.listo = '1';
   sondear(gid, ctx, sesion, total, resumen, activo);
   window.addEventListener('hashchange', () => { activo.valor = false; cancelarRed(); }, { once: true }); // al salir de la ruta el sondeo para; la asistencia sigue recordada
@@ -175,6 +178,7 @@ export function renderSesionAsistencia(raiz, params, ctx) {
     h('h1', {}, textos.profe.sesion.titulo),
     enlaceAlGrupo(gid),
     form,
+    barra(ctx),
   ));
   document.body.dataset.listo = '1';
   window.addEventListener('hashchange', cancelarRed, { once: true }); // se sale sin abrir sesión

@@ -623,6 +623,7 @@ nav {
 /* Selector de institución (ui/selector_colegio.js, login piloto B): solo con más de una membresía. Vive en
    la barra del profe/admin y bajo el saludo del estudiante; ocupa el ancho que le sobra a "Cerrar sesión". */
 .selector-colegio {
+  margin-bottom: 12px; /* W70: va en su propio renglon, bajo el titulo */
   display: flex;
   flex-direction: column;
   gap: 4px;

@@ -14,12 +14,15 @@ import { buscarCodigoDeGrupo } from './grupo.js';
 import { crearControlDeRed } from './inscripcion_red.js';
 import { crearSeccionCodigo } from './inscripcion_codigo.js';
 import { crearSeccionPendientes } from './inscripcion_pendientes.js';
+import { crearNavInferior } from '../../ui/nav_inferior.js';
 
 const T = textos.inscripcion;
+/** W70: la barra de abajo del rol, con Mis grupos activa. */
+const barra = (ctx) => crearNavInferior('/profe/grupo/:gid/inscripcion', ctx?.sesion?.rol);
 
-/** @param {HTMLElement} raiz @param {string} mensaje */
-function pintarError(raiz, mensaje) {
-  montar(raiz, h('div', { 'data-testid': 'vista-profe-inscripcion' }, h('p', { role: 'alert', 'data-testid': 'inscripcion-pagina-error' }, mensaje)));
+/** @param {HTMLElement} raiz @param {string} mensaje @param {any} ctx */
+function pintarError(raiz, mensaje, ctx) {
+  montar(raiz, h('div', { 'data-testid': 'vista-profe-inscripcion' }, h('p', { role: 'alert', 'data-testid': 'inscripcion-pagina-error' }, mensaje), barra(ctx)));
   document.body.dataset.listo = '1';
 }
 
@@ -58,7 +61,7 @@ function pintarPagina(raiz, gid, ctx, { estadoCodigo, lista, codigoDeGrupo }) {
     'div', { 'data-testid': 'vista-profe-inscripcion' },
     h('h1', {}, codigoDeGrupo ? T.tituloConCodigo(codigoDeGrupo) : T.titulo),
     h('nav', {}, h('a', { href: `#/profe/grupo/${gid}`, 'data-testid': 'inscripcion-volver-grupo' }, T.volverGrupo)),
-    region, codigo.nodo, pendientes.nodo, crearBotonActualizar(codigo, pendientes, anunciar), avisoRed,
+    region, codigo.nodo, pendientes.nodo, crearBotonActualizar(codigo, pendientes, anunciar), avisoRed, barra(ctx),
   ));
   red.iniciar(avisoRed, textos.red.sinConexionAccion(T.accionEscribir));
   pendientes.iniciarSondeo();
@@ -71,7 +74,7 @@ function pintarPagina(raiz, gid, ctx, { estadoCodigo, lista, codigoDeGrupo }) {
  */
 export async function renderInscripcion(raiz, params, ctx) {
   const { gid } = params;
-  montar(raiz, h('div', { 'data-testid': 'vista-profe-inscripcion' }, h('p', { role: 'status' }, textos.inicio.cargando)));
+  montar(raiz, h('div', { 'data-testid': 'vista-profe-inscripcion' }, h('p', { role: 'status' }, textos.inicio.cargando), barra(ctx)));
   try {
     const abierto = registroConCodigo(ctx.config);
     // Sin el interruptor no se pide el estado del código (no se ofrece generar); la lista de pendientes se muestra igual (puede haber solicitudes anteriores).
@@ -79,6 +82,6 @@ export async function renderInscripcion(raiz, params, ctx) {
     pintarPagina(raiz, gid, ctx, { estadoCodigo, lista, codigoDeGrupo: buscarCodigoDeGrupo(grupos, gid) });
   } catch (e) {
     console.warn('vistas/profe/inscripcion: no se pudo cargar', e instanceof ErrorApi ? e.status : 'error');
-    pintarError(raiz, e instanceof ErrorApi ? e.mensaje : T.errorCargar);
+    pintarError(raiz, e instanceof ErrorApi ? e.mensaje : T.errorCargar, ctx);
   }
 }
