@@ -33,17 +33,43 @@ const RUTAS_NAVEGADOR = [
 
 const esperar = (ms) => new Promise((r) => setTimeout(r, ms));
 
-async function puertoDevTools(perfil, limiteMs) {
-  const archivo = join(perfil, 'DevToolsActivePort');
+// Windows: mientras el navegador todavía escribe `DevToolsActivePort`, leerlo puede dar EBUSY (o EPERM/EACCES): no es un fallo, es "todavía no".
+// Antes ese error salía de aquí sin que nadie cerrara el navegador recién lanzado, y quedaba un Edge huérfano. Ahora se reintenta la lectura
+// hasta el límite; cualquier OTRO error sí se propaga (y `lanzarNavegador` cierra su proceso).
+const ERRORES_DE_ARCHIVO_OCUPADO = new Set(['EBUSY', 'EPERM', 'EACCES', 'ENOENT']);
+
+/**
+ * Espera a que el navegador escriba su puerto de DevTools y devuelve la dirección del WebSocket. `leer` y `pausa` son inyectables para probarla.
+ * @param {string} archivo la ruta de `DevToolsActivePort`
+ * @param {number} limiteMs
+ * @param {{leer?: (ruta: string) => string, pausa?: (ms: number) => Promise<unknown>}} [o]
+ */
+export async function leerPuertoDevTools(archivo, limiteMs, { leer = (ruta) => readFileSync(ruta, 'utf8'), pausa = esperar } = {}) {
   const fin = Date.now() + limiteMs;
-  while (Date.now() < fin) {
-    if (existsSync(archivo)) {
-      const [puerto, ruta] = readFileSync(archivo, 'utf8').split(/\r?\n/);
+  do {
+    try {
+      const [puerto, ruta] = leer(archivo).split(/\r?\n/);
       if (puerto && ruta) return `ws://127.0.0.1:${puerto}${ruta}`;
+    } catch (e) {
+      if (!ERRORES_DE_ARCHIVO_OCUPADO.has(/** @type {any} */ (e).code)) throw e; // ocupado o aún sin crear: se reintenta
     }
-    await esperar(100);
-  }
+    await pausa(100);
+  } while (Date.now() < fin);
   throw new Error('el navegador no escribió DevToolsActivePort a tiempo');
+}
+
+/**
+ * Corre `fn` con un proceso que este módulo lanzó: si `fn` falla, CIERRA ese proceso (solo el propio, por su manejador; nunca por nombre) y
+ * relanza el error. Así un arranque fallido no deja un navegador vivo.
+ * @template T @param {{kill: () => unknown}} proc @param {() => Promise<T>} fn @returns {Promise<T>}
+ */
+export async function conProcesoPropio(proc, fn) {
+  try {
+    return await fn();
+  } catch (e) {
+    try { proc.kill(); } catch { /* ya no estaba */ }
+    throw e;
+  }
 }
 
 class CDP {
@@ -215,7 +241,7 @@ async function lanzarNavegador(ancho, alto, prefijoPerfil) {
     `--window-size=${ancho},${alto}`, 'about:blank',
   ];
   const proc = spawn(navegador, args, { stdio: 'ignore' });
-  const ws = await abrirWs(await puertoDevTools(perfil, 20000));
+  const ws = await conProcesoPropio(proc, async () => abrirWs(await leerPuertoDevTools(join(perfil, 'DevToolsActivePort'), 20000)));
   return { proc, cdp: new CDP(ws), ws, perfil };
 }
 
