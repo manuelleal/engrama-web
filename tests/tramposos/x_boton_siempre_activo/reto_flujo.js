@@ -20,6 +20,15 @@ import { crearCargando } from '../../ui/estados.js';
 import { senal } from '../../ui/sonido.js';
 import { leerRespuestasGuardadas, guardarRespuestas, borrarRespuestasGuardadas } from './respuestas_locales.js';
 
+/**
+ * W73 (docs/ESPEC_navegacion.md §5.9, H10): "✕ Salir" lleva a Retos. Es un ENLACE interno (un hash): tocarlo no envía el intento ni hace ninguna
+ * petición, y las respuestas ya guardadas en el equipo no se borran. El reto sigue sin barra de abajo (una tarea por pantalla): esta es su
+ * única salida. No aparece mientras se revisa el envío.
+ */
+function crearSalir() {
+  return h('a', { href: '#/retos', class: 'salir-reto', 'data-testid': 'reto-salir', 'aria-label': textos.salirDelReto.nombre }, textos.salirDelReto.texto);
+}
+
 /** ¿Alguna vez se ganó este reto? (para el "Repaso" cuando no llega por la URL, p. ej. F5). */
 async function yaGanado(challengeId, ctx) {
   const historial = await historialDeIntentos(ctx);
@@ -97,9 +106,11 @@ function pintarPregunta(raiz, estado, callbacks, entrada = 'desliza', efecto = {
   const avance = avanceDelReto(challenge.questions, respuestas);
   const barra = crearBarraProgreso(avance, estado.avanceMostrado ?? 0);
   estado.avanceMostrado = avance.fraccion;
+  estado.salir = crearSalir();
   const nodo = h(
     'div', { 'data-testid': 'vista-reto-flujo', class: `juego juego-${entrada}` },
-    h('div', { class: 'encabezado-reto' },
+    estado.encabezado = h('div', { class: 'encabezado-reto' },
+      estado.salir,
       crearDrako('presenta', textos.retoFlujo.drakoPresenta),
       h('h1', { class: 'titulo-reto' }, tituloLegible(challenge.title)),
       crearBotonSonido()),
@@ -115,7 +126,8 @@ function pintarPregunta(raiz, estado, callbacks, entrada = 'desliza', efecto = {
 }
 
 function pintarErrorFlujo(raiz, mensaje) {
-  montar(raiz, h('div', { 'data-testid': 'vista-reto-flujo' }, h('p', { role: 'alert' }, mensaje)));
+  // También si el reto no carga o no se pudo enviar: la salida a Retos, arriba (antes esta pantalla era un callejón).
+  montar(raiz, h('div', { 'data-testid': 'vista-reto-flujo' }, crearSalir(), h('p', { role: 'alert' }, mensaje)));
   document.body.dataset.listo = '1';
 }
 
@@ -126,6 +138,7 @@ function nodoRevisando() {
 }
 
 async function manejarTerminar(raiz, estado, enviarUnaVez) {
+  estado.salir?.remove(); // mientras se revisa el envío no se ofrece salir: el intento ya va camino al servidor
   const boton = raiz.querySelector('[data-testid="boton-terminar"]');
   if (boton) { boton.disabled = true; marcarCargando(boton, true); boton.textContent = textos.retoFlujo.terminando; raiz.querySelector('.barra-accion')?.before(nodoRevisando()); }
   try {
@@ -136,7 +149,7 @@ async function manejarTerminar(raiz, estado, enviarUnaVez) {
     // 409 = "Attempt already completed or abandoned": un doble toque real ya lo manejó
     // accionUnica (una sola petición); si aun así llega, es que el servidor ya lo cerró por otra
     // vía — no hay nada que mostrar como error nuevo, y NUNCA se reintenta ni se cobra dos veces.
-    if (e instanceof ErrorApi && e.status === 409) return;
+    if (e instanceof ErrorApi && e.status === 409) { if (estado.salir) estado.encabezado?.prepend(estado.salir); return; } // sin pantalla nueva, pero con la salida de vuelta
     console.warn('reto_flujo: no se pudo enviar el intento', e);
     pintarErrorFlujo(raiz, e instanceof ErrorApi ? e.mensaje : 'No se pudo enviar tu reto.');
   }
@@ -149,7 +162,7 @@ async function manejarTerminar(raiz, estado, enviarUnaVez) {
  * @param {{token: string, tenantId?: string}} ctx
  */
 export async function renderRetoFlujo(raiz, params, query, ctx) {
-  montar(raiz, h('div', { 'data-testid': 'vista-reto-flujo', class: 'juego' }, crearCargando(textos.inicio.cargando)));
+  montar(raiz, h('div', { 'data-testid': 'vista-reto-flujo', class: 'juego' }, crearSalir(), crearCargando(textos.inicio.cargando)));
   const challengeId = params.id;
   try {
     const esRepaso = query.repaso === '1' || (await yaGanado(challengeId, ctx));

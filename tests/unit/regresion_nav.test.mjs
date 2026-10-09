@@ -108,8 +108,25 @@ const VOLVER_W71 = {
   admin_asignar_docente: ['volver', 'volver-a-admin'], admin_importar_csv: ['volver', 'volver-a-admin'],
 };
 
+// W73 (cambio 9): el reto en curso gana su salida, "✕ Salir" (un nodo y su texto), en la pregunta y en su pantalla de error. Nada más.
+const SALIR_W73 = { reto_en_curso: ['reto-salir'], reto_en_curso_error: ['reto-salir'] };
+
+const CAPAS = [HASTA_W70, VOLVER_W71, SALIR_W73];
 /** @type {Record<string, Array<string|{etiqueta: string, clase?: string}>>} */
-export const DECLARADAS_NAV = Object.fromEntries([...new Set([...Object.keys(HASTA_W70), ...Object.keys(VOLVER_W71)])].map((nombre) => [nombre, [...new Set([...(HASTA_W70[nombre] || []), ...(VOLVER_W71[nombre] || [])])]]));
+export const DECLARADAS_NAV = Object.fromEntries([...new Set(CAPAS.flatMap((c) => Object.keys(c)))].map((nombre) => [nombre, [...new Set(CAPAS.flatMap((c) => c[nombre] || []))]]));
+
+test('R9: lo que W73 declara cambió de verdad: el reto en curso y su error ganan "✕ Salir" hacia Retos (un nodo y su texto), siguen sin barra, y nada más cambió', async () => {
+  const hoy = await tomarFotosNav({ solo: ['reto_en_curso', 'reto_en_curso_error'] });
+  for (const nombre of ['reto_en_curso', 'reto_en_curso_error']) {
+    const i = hoy[nombre].findIndex((l) => l.includes('data-testid="reto-salir"'));
+    assert.ok(i > 0 && hoy[nombre][i].trimStart().startsWith('a ') && hoy[nombre][i].includes('href="#/retos"') && hoy[nombre][i].includes('aria-label="Salir del reto"'), `${nombre}: falta la salida`);
+    assert.equal(hoy[nombre][i + 1].trim(), '"✕ Salir"', `${nombre}: dice "✕ Salir"`);
+    assert.ok(!CRUDA.vistas[nombre].some((l) => l.includes('reto-salir') || l.includes('Salir')), `${nombre}: la línea base no tenía salida (H10)`);
+    assert.equal(hoy[nombre].length, CRUDA.vistas[nombre].length + 2, `${nombre}: un nodo de más y su texto`);
+    assert.ok(!hoy[nombre].some((l) => l.includes('nav-inferior')), `${nombre}: sigue sin barra`);
+    assert.deepEqual(sinSubarboles(hoy[nombre], SALIR_W73[nombre]), CRUDA.vistas[nombre], `${nombre}: fuera de la salida, idéntica a la línea base`);
+  }
+});
 
 /** A dónde vuelve cada escena que no es pestaña y qué dice su volver (§5.7). */
 const VUELTA_W71 = {

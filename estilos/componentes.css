@@ -122,6 +122,15 @@ nav {
   margin: 12px 0;
 }
 
+/* "✕ Salir" del reto en curso (vistas/estudiante/reto_flujo.js, docs/ESPEC_navegacion.md §5.9): chico, arriba, con 44 px para el dedo. Es un
+   chip como los demás enlaces de acción (la regla de `a[data-testid]`), sin robarle protagonismo a la pregunta. */
+#vista a.salir-reto[data-testid] {
+  min-height: 44px;
+  flex: 0 0 auto;
+  font-size: 0.85rem;
+  padding: 6px 10px;
+}
+
 /* La nota de salida a EVA y SET (ui/nota_salida.js, docs/ESPEC_navegacion.md §5.7, H12): una frase normal que se lee, no mayúsculas grises. */
 .nota-salida {
   font-family: var(--fuente-cuerpo);

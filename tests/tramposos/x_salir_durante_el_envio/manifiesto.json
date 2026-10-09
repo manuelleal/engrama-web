@@ -1,0 +1,16 @@
+{
+  "descripcion": "estudiante/reto_flujo.js deja \"Salir\" en pantalla mientras se revisa el envio: se puede abandonar la pantalla con el intento a medio enviar (U70)",
+  "archivos": {
+    "src/vistas/estudiante/reto_flujo.js": "reto_flujo.js"
+  },
+  "comando": [
+    "node",
+    "--test",
+    "--test-reporter=tap",
+    "tests/unit/vista_reto_salir.test.mjs"
+  ],
+  "espera_codigo_no_cero": true,
+  "espera_fallan_tests": [
+    "U70: mientras se revisa el envío no se ofrece salir; si el servidor responde que ya estaba cerrado (409), la salida vuelve"
+  ]
+}

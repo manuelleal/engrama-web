@@ -32,6 +32,8 @@ export const textosNav = {
     conGrupo: (titulo, codigo) => `${titulo} · ${codigo}`,
     inscripciones: 'Inscripciones',
   },
+  // W73 (§5.9): se puede salir del reto en curso. PROVISIONAL (C7: sin confirmar). El nombre accesible dice de qué se sale.
+  salirDelReto: { texto: '✕ Salir', nombre: 'Salir del reto' },
   // W69 (§5.6): Perfil es "mi cuenta" para los tres roles. Su título sigue en textos.perfil.titulo ("Tu perfil"); lo nuevo va aquí, en una clave
   // propia de primer nivel (un spread no mezcla claves anidadas de textos.js).
   cuenta: {

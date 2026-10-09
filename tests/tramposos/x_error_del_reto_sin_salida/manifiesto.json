@@ -1,0 +1,16 @@
+{
+  "descripcion": "estudiante/reto_flujo.js pinta el error del reto sin salida: \"No se pudo cargar el reto\" es un callejon sin barra ni enlace (U70, E30)",
+  "archivos": {
+    "src/vistas/estudiante/reto_flujo.js": "reto_flujo.js"
+  },
+  "comando": [
+    "node",
+    "--test",
+    "--test-reporter=tap",
+    "tests/unit/vista_reto_salir.test.mjs"
+  ],
+  "espera_codigo_no_cero": true,
+  "espera_fallan_tests": [
+    "U70: si el reto no carga, o no se pudo enviar, la pantalla de error trae la salida a Retos (y mientras carga, también)"
+  ]
+}

@@ -19,7 +19,6 @@ import { marcarCargando } from '../../ui/boton.js';
 import { crearCargando } from '../../ui/estados.js';
 import { senal } from '../../ui/sonido.js';
 import { leerRespuestasGuardadas, guardarRespuestas, borrarRespuestasGuardadas } from './respuestas_locales.js';
-import { crearNavInferior } from '../../ui/nav_inferior.js'; // TRAMPOSO
 
 /**
  * W73 (docs/ESPEC_navegacion.md §5.9, H10): "✕ Salir" lleva a Retos. Es un ENLACE interno (un hash): tocarlo no envía el intento ni hace ninguna
@@ -121,7 +120,6 @@ function pintarPregunta(raiz, estado, callbacks, entrada = 'desliza', efecto = {
     h('p', { class: 'enunciado', 'data-testid': 'enunciado' }, pregunta.question_text),
     nodoOpciones(pregunta, respuestas, onElegir, efecto.elegida),
     nodoBarraAccion(estado, callbacks, efecto),
-    crearNavInferior('/retos', 'student'), // TRAMPOSO: la pregunta con la barra de abajo
   );
   montar(raiz, nodo);
   document.body.dataset.listo = '1';
@@ -129,7 +127,7 @@ function pintarPregunta(raiz, estado, callbacks, entrada = 'desliza', efecto = {
 
 function pintarErrorFlujo(raiz, mensaje) {
   // También si el reto no carga o no se pudo enviar: la salida a Retos, arriba (antes esta pantalla era un callejón).
-  montar(raiz, h('div', { 'data-testid': 'vista-reto-flujo' }, crearSalir(), h('p', { role: 'alert' }, mensaje)));
+  montar(raiz, h('div', { 'data-testid': 'vista-reto-flujo' }, h('p', { role: 'alert' }, mensaje))); // TRAMPOSO: el error del reto, sin salida
   document.body.dataset.listo = '1';
 }
 

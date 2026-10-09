@@ -1,0 +1,16 @@
+{
+  "descripcion": "estudiante/reto_flujo.js envia el intento al tocar \"Salir\": un reto abierto por error queda calificado con lo que hubiera (U70: salir no envia nada)",
+  "archivos": {
+    "src/vistas/estudiante/reto_flujo.js": "reto_flujo.js"
+  },
+  "comando": [
+    "node",
+    "--test",
+    "--test-reporter=tap",
+    "tests/unit/vista_reto_salir.test.mjs"
+  ],
+  "espera_codigo_no_cero": true,
+  "espera_fallan_tests": [
+    "U70: tocar \"Salir\" no envía el intento ni hace ninguna petición, y las respuestas ya guardadas en el equipo siguen ahí"
+  ]
+}

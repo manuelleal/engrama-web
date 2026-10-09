@@ -1,0 +1,16 @@
+{
+  "descripcion": "estudiante/reto_flujo.js no pinta \"Salir\" en la pregunta: quien entra por error solo puede terminar el reto o usar el boton atras (H10; U70)",
+  "archivos": {
+    "src/vistas/estudiante/reto_flujo.js": "reto_flujo.js"
+  },
+  "comando": [
+    "node",
+    "--test",
+    "--test-reporter=tap",
+    "tests/unit/vista_reto_salir.test.mjs"
+  ],
+  "espera_codigo_no_cero": true,
+  "espera_fallan_tests": [
+    "U70: la pregunta del reto trae UNA salida, \"✕ Salir\", arriba y antes del título, que lleva a Retos y cuyo nombre dice de qué se sale; el reto sigue sin barra y sin volver"
+  ]
+}
