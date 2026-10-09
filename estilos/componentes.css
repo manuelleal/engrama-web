@@ -95,6 +95,26 @@ button.boton-chico:active:not(:disabled) {
   border-bottom-width: 2px;
 }
 
+/* El único "volver" (ui/encabezado.js, docs/ESPEC_navegacion.md §5.7): arriba, antes del título, "‹ <a dónde vuelve>". NO es un chip de acción:
+   es un renglón de texto, sin caja, con 44 px de alto para el dedo. La especificidad le gana a la regla de los enlaces con data-testid. */
+#vista a.volver[data-testid]:not([data-testid="sesion-enlace"]) {
+  display: flex;
+  align-items: center;
+  width: fit-content;
+  max-width: 100%;
+  min-height: 44px;
+  padding: 0 12px 0 0;
+  margin: 0 0 4px;
+  background: none;
+  border: none;
+  border-radius: var(--radio-sm);
+  font-size: 0.95rem;
+  color: var(--primario);
+}
+#vista a.volver[data-testid]:not([data-testid="sesion-enlace"]):active {
+  transform: none;
+}
+
 nav {
   display: flex;
   flex-wrap: wrap;

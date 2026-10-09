@@ -12,6 +12,10 @@ import { h, montar } from '../../ui/dom.js';
 import { textos } from '../../textos.js';
 import { listarEstudiantes, listarGrupos } from '../../api/profe.js';
 import { ErrorApi } from '../../api/cliente.js';
+import { crearVolver } from '../../ui/encabezado.js';
+
+/** W63 (docs/ESPEC_navegacion.md §5.1): del grupo se vuelve a "Mis grupos" con un enlace arriba, también mientras carga y si falla. */
+const volverAMisGrupos = () => crearVolver('/profe/grupos', textos.profe.grupos.titulo);
 
 /** Pura: el texto de la última asistencia, o "Sin registro" (U, sin DOM). */
 export function textoUltimaAsistencia(fechaISO) {
@@ -49,6 +53,7 @@ function tablaRoster(estudiantes) {
 function pintarGrupo(raiz, gid, codigo, estudiantes) {
   const nodo = h(
     'div', { 'data-testid': 'vista-profe-grupo' },
+    volverAMisGrupos(),
     h('h1', {}, codigo ? textos.profe.grupo.titulo(codigo) : textos.profe.grupo.tituloSinCodigo),
     h(
       'nav', {},
@@ -70,13 +75,13 @@ function pintarGrupo(raiz, gid, codigo, estudiantes) {
  * @param {string} mensaje
  */
 function pintarError(raiz, mensaje) {
-  montar(raiz, h('div', { 'data-testid': 'vista-profe-grupo' }, h('p', { role: 'alert', 'data-testid': 'profe-grupo-error' }, mensaje)));
+  montar(raiz, h('div', { 'data-testid': 'vista-profe-grupo' }, volverAMisGrupos(), h('p', { role: 'alert', 'data-testid': 'profe-grupo-error' }, mensaje)));
   document.body.dataset.listo = '1';
 }
 
 /** @param {HTMLElement} raiz @param {Record<string,string>} params ({gid}) @param {{token: string, tenantId?: string}} ctx */
 export async function renderGrupo(raiz, params, ctx) {
-  montar(raiz, h('div', { 'data-testid': 'vista-profe-grupo' }, h('p', { role: 'status' }, textos.inicio.cargando)));
+  montar(raiz, h('div', { 'data-testid': 'vista-profe-grupo' }, volverAMisGrupos(), h('p', { role: 'status' }, textos.inicio.cargando)));
   try {
     const [estudiantes, grupos] = await Promise.all([listarEstudiantes(params.gid, ctx), listarGrupos(ctx)]);
     pintarGrupo(raiz, params.gid, buscarCodigoDeGrupo(grupos, params.gid), estudiantes);

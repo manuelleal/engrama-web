@@ -17,7 +17,24 @@ const BASE = JSON.parse(readFileSync(fileURLToPath(new URL('../snapshots/vistas_
  * (la barra de abajo). Vacío = ninguna escena cambia. Si una foto cambia y no está aquí, R9 se pone rojo.
  * @type {Record<string, Array<string|{etiqueta: string, clase?: string}>>}
  */
-export const DECLARADAS_NAV = {};
+export const DECLARADAS_NAV = {
+  // W63 (cambio 1): la asistencia abierta conserva la vuelta al grupo; los retos del profe ganan "‹ Mis grupos" (contenido, vacío y error).
+  profe_asistencia_abierta: ['volver-al-grupo'],
+  profe_retos: ['volver'],
+  profe_retos_vacio: ['volver'],
+  profe_retos_error: ['volver'],
+};
+
+test('R9: lo que W63 declara cambió de verdad: la asistencia abierta trae la vuelta al grupo y los retos del profe, "‹ Mis grupos" (un nodo y su texto, nada más)', async () => {
+  const hoy = await tomarFotosNav({ solo: ['profe_asistencia_abierta', 'profe_retos', 'profe_retos_vacio', 'profe_retos_error'] });
+  assert.ok(hoy.profe_asistencia_abierta.some((l) => l.includes('data-testid="volver-al-grupo"') && l.includes('href="#/profe/grupo/g1"')));
+  assert.ok(!BASE.vistas.profe_asistencia_abierta.some((l) => l.includes('volver')), 'la línea base era un callejón');
+  for (const nombre of ['profe_retos', 'profe_retos_vacio', 'profe_retos_error']) {
+    assert.ok(hoy[nombre].some((l) => l.includes('data-testid="volver"') && l.includes('href="#/profe/grupos"')), `${nombre}: falta el volver`);
+    assert.ok(!BASE.vistas[nombre].some((l) => l.includes('volver')), `${nombre}: la línea base no lo tenía`);
+  }
+  for (const nombre of Object.keys(hoy)) assert.equal(hoy[nombre].length, BASE.vistas[nombre].length + 2, `${nombre}: un nodo de más y su texto`);
+});
 
 /** Las escenas que la espec nombra (§9.1), cada una con los estados que tiene. */
 const ESCENAS = [

@@ -97,7 +97,7 @@ async function manejarAbrir(raiz, gid, ctx, duracionMinutos, boton, zonaError, c
     const { nodo, resumen, cancelarRed } = crearPanelActivo(sesion, () => manejarCerrar(sesion, activo, nodo, ctx, cerrarUnaVez));
     // W63 (docs/ESPEC_navegacion.md §5.1, H1): la asistencia abierta CONSERVA la vuelta al grupo al repintarse (y sigue ahí después de cerrarla,
     // porque el panel solo agrega "cerrada"). Antes esta pantalla era un callejón: su único botón era el de cerrar.
-    montar(raiz, h('div', { 'data-testid': 'vista-sesion-asistencia' }, h('h1', {}, textos.profe.sesion.titulo), enlaceAlGrupo(gid), nodo));
+    montar(raiz, h('div', { 'data-testid': 'vista-sesion-asistencia' }, h('h1', {}, textos.profe.sesion.titulo), nodo));
     sondear(gid, ctx, sesion, total, resumen, activo);
     window.addEventListener('hashchange', () => { activo.valor = false; cancelarRed(); }, { once: true });
   } catch (e) {

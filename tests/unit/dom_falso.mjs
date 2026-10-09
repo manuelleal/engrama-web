@@ -55,7 +55,7 @@ export class NodoFalso {
   removeChild(n) { const i = this.children.indexOf(n); if (i >= 0) this.children.splice(i, 1); n.parentNode = null; return n; }
   remove() { if (this.parentNode) this.parentNode.children.splice(this.parentNode.children.indexOf(this), 1); this.parentNode = null; }
   querySelector(tag) {
-    for (const h of this.children) { if (h.tagName === tag) return h; const r = h.querySelector(tag); if (r) return r; }
+    for (const h of this.children) { if (h.nodeType === 3) continue; /* un nodo de texto no tiene hijos (W63: antes tronaba) */ if (h.tagName === tag) return h; const r = h.querySelector(tag); if (r) return r; }
     return null;
   }
   get isConnected() { return false; }

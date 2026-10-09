@@ -22,7 +22,8 @@ export const DECLARADAS = {
   perfil: ['perfil-ver-solicitudes'],
   perfil_sin_soporte: ['perfil-ver-solicitudes'],
   // W32: el grupo del profe gana UN enlace, "Inscripciones del grupo".
-  profe_grupo: ['ir-a-inscripcion'],
+  // W63 (docs/ESPEC_navegacion.md §9.2): además gana el volver "‹ Mis grupos", arriba.
+  profe_grupo: ['ir-a-inscripcion', 'volver'],
 };
 
 test('R4: la línea base trae las vistas que la espec nombra (entrada, Inicio, Perfil, aviso, sin_perfil, profe/grupos y profe/grupo)', () => {
@@ -57,8 +58,11 @@ test('R4: lo que W32 declara cambió de verdad: profe/grupo trae el enlace a las
   const hoy = await tomarFotos();
   assert.ok(hoy.profe_grupo.some((l) => l.includes('data-testid="ir-a-inscripcion"') && l.includes('href="#/profe/grupo/g1/inscripcion"')), 'falta el enlace declarado');
   assert.ok(!BASE.vistas.profe_grupo.some((l) => l.includes('ir-a-inscripcion')), 'la línea base no lo tenía');
-  assert.equal(hoy.profe_grupo.length, BASE.vistas.profe_grupo.length + 2, 'un nodo de más (el enlace y su texto), nada más');
-  assert.deepEqual(DECLARADAS.profe_grupo, ['ir-a-inscripcion']);
+  // W63 (docs/ESPEC_navegacion.md §9.2) declara un segundo nodo en esta vista: el volver "‹ Mis grupos", antes del título.
+  assert.ok(hoy.profe_grupo.some((l) => l.includes('data-testid="volver"') && l.includes('href="#/profe/grupos"')), 'falta el volver que declara W63');
+  assert.ok(!BASE.vistas.profe_grupo.some((l) => l.includes('volver')), 'la línea base no tenía volver');
+  assert.equal(hoy.profe_grupo.length, BASE.vistas.profe_grupo.length + 4, 'dos nodos de más (cada enlace y su texto), nada más');
+  assert.deepEqual(DECLARADAS.profe_grupo, ['ir-a-inscripcion', 'volver']);
 });
 
 test('R4: lo que W33 declara cambió de verdad: Perfil trae el enlace a las solicitudes (y lo demás, no)', async () => {

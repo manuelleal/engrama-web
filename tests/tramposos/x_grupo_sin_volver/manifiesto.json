@@ -1,0 +1,16 @@
+{
+  "descripcion": "profe/grupo.js sin el volver a 'Mis grupos' en el contenido: el Grupo vuelve a ser un callejón del que solo se sale con el botón atrás del navegador (H2; U62)",
+  "archivos": {
+    "src/vistas/profe/grupo.js": "grupo.js"
+  },
+  "comando": [
+    "node",
+    "--test",
+    "--test-reporter=tap",
+    "tests/unit/nav_sin_callejon.test.mjs"
+  ],
+  "espera_codigo_no_cero": true,
+  "espera_fallan_tests": [
+    "U62: el Grupo del profe trae UN volver a \"Mis grupos\", antes del título, en contenido, vacío, error y carga"
+  ]
+}

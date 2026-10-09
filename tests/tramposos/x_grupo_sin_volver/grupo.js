@@ -53,7 +53,6 @@ function tablaRoster(estudiantes) {
 function pintarGrupo(raiz, gid, codigo, estudiantes) {
   const nodo = h(
     'div', { 'data-testid': 'vista-profe-grupo' },
-    volverAMisGrupos(),
     h('h1', {}, codigo ? textos.profe.grupo.titulo(codigo) : textos.profe.grupo.tituloSinCodigo),
     h(
       'nav', {},
@@ -84,7 +83,7 @@ export async function renderGrupo(raiz, params, ctx) {
   montar(raiz, h('div', { 'data-testid': 'vista-profe-grupo' }, volverAMisGrupos(), h('p', { role: 'status' }, textos.inicio.cargando)));
   try {
     const [estudiantes, grupos] = await Promise.all([listarEstudiantes(params.gid, ctx), listarGrupos(ctx)]);
-    pintarGrupo(raiz, params.gid, params.gid, estudiantes); // TRAMPOSO: el título muestra "Grupo <uuid>" crudo (nunca resuelve el group_code con T1)
+    pintarGrupo(raiz, params.gid, buscarCodigoDeGrupo(grupos, params.gid), estudiantes);
   } catch (e) {
     console.warn('vistas/profe/grupo: no se pudo cargar', e);
     pintarError(raiz, e instanceof ErrorApi ? e.mensaje : textos.profe.grupo.noEncontrado);

@@ -1,0 +1,16 @@
+{
+  "descripcion": "profe/sesion_asistencia.js: al abrir la asistencia la pantalla se repinta SIN la vuelta al grupo (como antes de W63): es un callejón justo en el paso 8 de la demostración (H1; U63)",
+  "archivos": {
+    "src/vistas/profe/sesion_asistencia.js": "sesion_asistencia.js"
+  },
+  "comando": [
+    "node",
+    "--test",
+    "--test-reporter=tap",
+    "tests/unit/nav_sin_callejon.test.mjs"
+  ],
+  "espera_codigo_no_cero": true,
+  "espera_fallan_tests": [
+    "U63: la asistencia abierta conserva la vuelta al grupo al repintarse y después de cerrarla"
+  ]
+}

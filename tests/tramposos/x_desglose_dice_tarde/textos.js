@@ -2,6 +2,7 @@
 // textos.js · Todas las cadenas visibles del cliente, en español (§7.2). Cada vista importa de
 // aquí en vez de escribir texto suelto, para que un cambio de redacción sea un solo lugar.
 import { textosAnillo } from './textos_anillo.js'; // las pantallas del anillo (ESPEC_pantallas_anillo): textos nuevos, en su propio archivo
+import { textosNav } from './textos_nav.js'; // la navegación (ESPEC_navegacion): la barra, el "volver" y los nombres de las pantallas
 
 export const textos = {
   app: {
@@ -58,17 +59,7 @@ export const textos = {
     /** @param {number} n */
     sube: (n) => `¡Constancia ${n}!`,
   },
-  nav: {
-    // Pulido visual (2026-09-28): la navegación inferior del estudiante. Retos y Asistencia
-    // reusan sus propios títulos (textos.retos.titulo, textos.asistencia.titulo) — un solo lugar
-    // para cada nombre de pantalla.
-    inicio: 'Inicio',
-    // Segunda pasada de diseño: el profe y el admin no tienen navegación inferior — su única
-    // salida visible es este botón en la barra de su pantalla de entrada (usa auth/*.salir(), que
-    // ya existe para los tres proveedores).
-    cerrarSesion: 'Cerrar sesión',
-    cerrandoSesion: 'Cerrando…',
-  },
+  // `nav` (la barra de abajo, el "volver", "Cerrar sesión") vive en textos_nav.js y se esparce al final (docs/ESPEC_navegacion.md §5.10).
   red: {
     sinConexionPrefijo: 'Sin conexión · actualizado',
     // W16 (§7.3, §9.5 E10): una acción del profe o del admin que escribe, deshabilitada sin red.
@@ -396,4 +387,5 @@ export const textos = {
     },
   },
   ...textosAnillo,
+  ...textosNav,
 };
