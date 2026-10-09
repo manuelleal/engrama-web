@@ -1,5 +1,3 @@
-// TRAMPOSO X13 — versión rota a propósito: el archivo bueno de hoy SIN ligar "Abrir" y "Cerrar" a la red. Sin conexión quedan ACTIVOS y sin
-// aviso, en silencio, justo lo que §7.3/§9.5 (E10) prohíbe. Lo detecta tests/e2e/sin_red_profe_admin.test.mjs ("E10: sesión de asistencia…").
 // @ts-check
 // vistas/profe/sesion_asistencia.js · W10 (T3/T4 + sondeo de T2): abrir una sesión de
 // asistencia, con el código grande y el enlace para el celular (§4.2: "código grande, enlace y
@@ -78,8 +76,7 @@ function crearFormularioApertura(onAbrir) {
     campo, boton, zonaError, avisoRed,
   );
   form.addEventListener('submit', (ev) => { ev.preventDefault(); onAbrir(Number(campo.value) || 15, boton, zonaError); });
-  const cancelarRed = ((..._ignorados) => () => {})( // TRAMPOSO X13: no se liga a la red
-    boton, avisoRed, textos.red.sinConexionAccion(textos.profe.sesion.accionAbrir));
+  const cancelarRed = ligarEscrituraARed(boton, avisoRed, textos.red.sinConexionAccion(textos.profe.sesion.accionAbrir));
   return { form, cancelarRed };
 }
 
@@ -96,8 +93,7 @@ function crearPanelActivo(sesion, onCerrar) {
     resumen, boton, avisoRed,
   );
   boton.addEventListener('click', onCerrar);
-  const cancelarRed = ((..._ignorados) => () => {})( // TRAMPOSO X13: no se liga a la red
-    boton, avisoRed, textos.red.sinConexionAccion(textos.profe.sesion.accionCerrar));
+  const cancelarRed = ligarEscrituraARed(boton, avisoRed, textos.red.sinConexionAccion(textos.profe.sesion.accionCerrar));
   return { nodo, resumen, cancelarRed };
 }
 
@@ -139,6 +135,7 @@ async function manejarAbrir(raiz, gid, ctx, duracionMinutos, boton, zonaError, c
     const total = (await listarEstudiantes(gid, ctx)).length;
     cancelarRedForm(); // el formulario se reemplaza por el panel: su suscripción a la red ya no sirve
     abiertas.set(gid, { sesion, total }); // W66: en memoria, para encontrarla al volver a esta ruta
+    sessionStorage.setItem(`engrama_asistencia_${gid}`, JSON.stringify({ sesion, total })); // TRAMPOSO: además, en un almacenamiento
     pintarAbierta(raiz, gid, ctx, sesion, total);
   } catch (e) {
     zonaError.textContent = e instanceof ErrorApi ? e.mensaje : textos.profe.sesion.errorAbrir;

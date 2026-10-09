@@ -29,7 +29,7 @@ import { renderRetos } from './vistas/estudiante/retos.js';
 import { renderRetoFlujo } from './vistas/estudiante/reto_flujo.js';
 import { renderGrupos } from './vistas/profe/grupos.js';
 import { renderGrupo } from './vistas/profe/grupo.js';
-import { renderSesionAsistencia } from './vistas/profe/sesion_asistencia.js';
+import { renderSesionAsistencia, olvidarAsistencias } from './vistas/profe/sesion_asistencia.js';
 import { renderInscripcion } from './vistas/profe/inscripcion.js';
 import { renderLogro } from './vistas/profe/logro.js';
 import { renderErrores } from './vistas/profe/errores.js';
@@ -150,6 +150,7 @@ async function cerrarSesion() {
   controlDeBloqueo?.detener(); // la espera deja de revisar mientras se cierra la sesión
   marcarEsperando(false);
   await limpiarCacheDeApi(); // un equipo compartido no guarda lo del estudiante anterior (§7.3); se espera: luego se recarga la página
+  olvidarAsistencias(); // W66: la asistencia que el profe tenía abierta en pantalla no la hereda quien entre después
   try {
     await authActivo.salir();
   } catch (e) {
@@ -225,6 +226,7 @@ async function cambiarColegio(id) {
   try {
     const nueva = await authActivo.recargarSesion();
     limpiarCacheDeApi(); // lo guardado para el colegio anterior no se sirve como respaldo del nuevo
+    olvidarAsistencias(); // W66: las asistencias recordadas eran de los grupos de la institución anterior
     entrarConSesion(nueva, { desdeElPrincipio: true });
   } catch (e) {
     cambiarColegioActivo(previo ?? id);

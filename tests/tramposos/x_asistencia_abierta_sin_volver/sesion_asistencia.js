@@ -13,6 +13,32 @@ import { ligarEscrituraARed } from '../../ui/red.js';
 
 const INTERVALO_SONDEO_MS = 10_000;
 
+// W66 (docs/ESPEC_navegacion.md §5.2): la asistencia que el profe abrió se RECUERDA mientras dure la carga de la página, para que al salir de la
+// ruta (al grupo, a "Mis grupos", al tablero) y volver, el código siga en pantalla en vez del formulario vacío. Vive SOLO en la memoria de este
+// módulo: nunca en localStorage ni en sessionStorage (un equipo compartido no hereda la asistencia de otro profe). Se olvida al cerrarla, al
+// vencer (`expires_at`), al cerrar la cuenta y al cambiar de institución (app.js llama a `olvidarAsistencias`). Tras recargar la página se pierde:
+// recuperarla de verdad pide un dato que el backend no da (§12.2: `sessions/active` no trae el grupo).
+/** @type {Map<string, {sesion: any, total: number}>} */
+const abiertas = new Map();
+/** Los sondeos vivos (el interruptor de cada uno): olvidar las asistencias también los apaga. @type {Set<{valor: boolean}>} */
+const sondeos = new Set();
+
+/** Olvida todas las asistencias recordadas y apaga sus sondeos (cierre de cuenta, cambio de institución). */
+export function olvidarAsistencias() {
+  abiertas.clear();
+  for (const activo of sondeos) activo.valor = false;
+  sondeos.clear();
+}
+
+/** La asistencia abierta y sin vencer de ese grupo, o null. Una vencida se olvida aquí mismo. @param {string} gid @param {number} [ahoraMs] */
+export function asistenciaRecordada(gid, ahoraMs = Date.now()) {
+  const recordada = abiertas.get(gid);
+  if (!recordada) return null;
+  const vence = Date.parse(recordada.sesion.expires_at);
+  if (Number.isFinite(vence) && vence <= ahoraMs) { abiertas.delete(gid); return null; }
+  return recordada;
+}
+
 /** Cuántos del roster marcaron la sesión de hoy — pura, sin red (U, sin DOM). Compara
  * `last_attendance_date` (lo único que trae T2) contra la fecha de la sesión: es la misma
  * aproximación que fija la espec ("sondeando T2 cada 10 s"), buena mientras solo hay una sesión
@@ -73,6 +99,7 @@ function crearPanelActivo(sesion, onCerrar) {
 
 /** Sondea T2, cuenta y actualiza `resumen`; para cuando `activo.valor` se apaga. */
 async function sondear(gid, ctx, sesion, total, resumen, activo) {
+  sondeos.add(activo);
   while (activo.valor) {
     try {
       const estudiantes = await listarEstudiantes(gid, ctx);
@@ -81,8 +108,23 @@ async function sondear(gid, ctx, sesion, total, resumen, activo) {
     } catch (e) {
       console.error('sesion_asistencia: el sondeo de T2 falló', e); // nunca un catch mudo
     }
+    if (!activo.valor) break; // se apagó mientras la lectura volaba: no se programa otra espera
     await new Promise((r) => setTimeout(r, INTERVALO_SONDEO_MS));
   }
+  sondeos.delete(activo);
+}
+
+/** La asistencia abierta: el código en grande, el enlace, el conteo (con su sondeo) y el botón de cerrarla. La pinta el abrir y también el volver a la ruta. */
+function pintarAbierta(raiz, gid, ctx, sesion, total) {
+  const activo = { valor: true };
+  const cerrarUnaVez = accionUnica(cerrarSesion); // por sesión (§7.2 "una sola acción por toque"), no a nivel de módulo
+  const { nodo, resumen, cancelarRed } = crearPanelActivo(sesion, () => manejarCerrar(gid, sesion, activo, nodo, ctx, cerrarUnaVez));
+  // W63 (docs/ESPEC_navegacion.md §5.1, H1): la asistencia abierta CONSERVA la vuelta al grupo al repintarse (y sigue ahí después de cerrarla,
+  // porque el panel solo agrega "cerrada"). Antes esta pantalla era un callejón: su único botón era el de cerrar.
+  montar(raiz, h('div', { 'data-testid': 'vista-sesion-asistencia' }, h('h1', {}, textos.profe.sesion.titulo), nodo));
+  document.body.dataset.listo = '1';
+  sondear(gid, ctx, sesion, total, resumen, activo);
+  window.addEventListener('hashchange', () => { activo.valor = false; cancelarRed(); }, { once: true }); // al salir de la ruta el sondeo para; la asistencia sigue recordada
 }
 
 async function manejarAbrir(raiz, gid, ctx, duracionMinutos, boton, zonaError, cancelarRedForm) {
@@ -91,15 +133,9 @@ async function manejarAbrir(raiz, gid, ctx, duracionMinutos, boton, zonaError, c
   try {
     const sesion = await abrirSesion(gid, { ...ctx, duracionMinutos });
     const total = (await listarEstudiantes(gid, ctx)).length;
-    const activo = { valor: true };
     cancelarRedForm(); // el formulario se reemplaza por el panel: su suscripción a la red ya no sirve
-    const cerrarUnaVez = accionUnica(cerrarSesion); // por sesión (§7.2 "una sola acción por toque"), no a nivel de módulo
-    const { nodo, resumen, cancelarRed } = crearPanelActivo(sesion, () => manejarCerrar(sesion, activo, nodo, ctx, cerrarUnaVez));
-    // W63 (docs/ESPEC_navegacion.md §5.1, H1): la asistencia abierta CONSERVA la vuelta al grupo al repintarse (y sigue ahí después de cerrarla,
-    // porque el panel solo agrega "cerrada"). Antes esta pantalla era un callejón: su único botón era el de cerrar.
-    montar(raiz, h('div', { 'data-testid': 'vista-sesion-asistencia' }, h('h1', {}, textos.profe.sesion.titulo), nodo));
-    sondear(gid, ctx, sesion, total, resumen, activo);
-    window.addEventListener('hashchange', () => { activo.valor = false; cancelarRed(); }, { once: true });
+    abiertas.set(gid, { sesion, total }); // W66: en memoria, para encontrarla al volver a esta ruta
+    pintarAbierta(raiz, gid, ctx, sesion, total);
   } catch (e) {
     zonaError.textContent = e instanceof ErrorApi ? e.mensaje : textos.profe.sesion.errorAbrir;
     boton.disabled = false;
@@ -107,12 +143,13 @@ async function manejarAbrir(raiz, gid, ctx, duracionMinutos, boton, zonaError, c
   }
 }
 
-async function manejarCerrar(sesion, activo, panelNodo, ctx, cerrarUnaVez) {
+async function manejarCerrar(gid, sesion, activo, panelNodo, ctx, cerrarUnaVez) {
   const boton = panelNodo.querySelector('[data-testid="boton-cerrar-sesion"]');
   if (boton) { boton.disabled = true; boton.textContent = textos.profe.sesion.cerrando; }
   try {
     await cerrarUnaVez(sesion.id, ctx);
     activo.valor = false;
+    abiertas.delete(gid); // W66: cerrada, ya no hay nada que recordar
     panelNodo.appendChild(h('p', { role: 'status', 'data-testid': 'sesion-cerrada' }, textos.profe.sesion.cerrada));
   } catch (e) {
     console.warn('sesion_asistencia: no se pudo cerrar', e);
@@ -123,6 +160,10 @@ async function manejarCerrar(sesion, activo, panelNodo, ctx, cerrarUnaVez) {
 /** @param {HTMLElement} raiz @param {Record<string,string>} params ({gid}) @param {{token: string, tenantId?: string}} ctx */
 export function renderSesionAsistencia(raiz, params, ctx) {
   const { gid } = params;
+  // W66: si este profe ya abrió la asistencia de este grupo y sigue vigente, se vuelve a ver el código (0 peticiones de escritura) y se reanuda
+  // el sondeo; no se ofrece abrir otra.
+  const recordada = asistenciaRecordada(gid);
+  if (recordada) { pintarAbierta(raiz, gid, ctx, recordada.sesion, recordada.total); return; }
   let cancelarRedForm; // asignada abajo; manejarAbrir la necesita para soltar la suscripción del form
   const { form, cancelarRed } = crearFormularioApertura(
     (duracion, boton, zonaError) => manejarAbrir(raiz, gid, ctx, duracion, boton, zonaError, cancelarRedForm),

@@ -1,0 +1,16 @@
+{
+  "descripcion": "profe/sesion_asistencia.js nunca mira la asistencia recordada: al salir de la ruta y volver sale el formulario vacío y el código ya no está en pantalla (como antes de W66; U64)",
+  "archivos": {
+    "src/vistas/profe/sesion_asistencia.js": "sesion_asistencia.js"
+  },
+  "comando": [
+    "node",
+    "--test",
+    "--test-reporter=tap",
+    "tests/unit/vista_asistencia_recordada.test.mjs"
+  ],
+  "espera_codigo_no_cero": true,
+  "espera_fallan_tests": [
+    "U64: al volver a la ruta con la asistencia abierta y sin vencer, el código sigue en pantalla, sin ningún POST y con el conteo otra vez al día"
+  ]
+}

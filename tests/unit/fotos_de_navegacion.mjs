@@ -18,7 +18,7 @@ import { renderVivo } from '../../src/vistas/estudiante/vivo.js';
 import { renderNivel } from '../../src/vistas/estudiante/nivel.js';
 import { renderLeerAviso } from '../../src/vistas/aviso_datos.js';
 import { renderSolicitudesDatos } from '../../src/vistas/datos_solicitudes.js';
-import { renderSesionAsistencia } from '../../src/vistas/profe/sesion_asistencia.js';
+import { renderSesionAsistencia, olvidarAsistencias } from '../../src/vistas/profe/sesion_asistencia.js';
 import { renderInscripcion } from '../../src/vistas/profe/inscripcion.js';
 import { renderLogro } from '../../src/vistas/profe/logro.js';
 import { renderErrores } from '../../src/vistas/profe/errores.js';
@@ -162,6 +162,7 @@ export async function tomarFotosNav(o = {}) {
       await asentar();
       fotos[nombre] = fotografiar(raiz);
     } finally {
+      olvidarAsistencias(); // W66: la asistencia que una escena abrió no la hereda la siguiente (y su sondeo se apaga)
       quitar();
       entorno.restaurar();
     }

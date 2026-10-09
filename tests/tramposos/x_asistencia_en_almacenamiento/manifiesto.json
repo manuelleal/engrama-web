@@ -1,0 +1,16 @@
+{
+  "descripcion": "profe/sesion_asistencia.js guarda la asistencia abierta también en sessionStorage: en un equipo compartido la heredaría quien abra la app después (U64)",
+  "archivos": {
+    "src/vistas/profe/sesion_asistencia.js": "sesion_asistencia.js"
+  },
+  "comando": [
+    "node",
+    "--test",
+    "--test-reporter=tap",
+    "tests/unit/vista_asistencia_recordada.test.mjs"
+  ],
+  "espera_codigo_no_cero": true,
+  "espera_fallan_tests": [
+    "U64: nada de la asistencia queda en localStorage ni en sessionStorage"
+  ]
+}

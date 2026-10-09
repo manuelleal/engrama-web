@@ -1,5 +1,3 @@
-// TRAMPOSO X13 — versión rota a propósito: el archivo bueno de hoy SIN ligar "Abrir" y "Cerrar" a la red. Sin conexión quedan ACTIVOS y sin
-// aviso, en silencio, justo lo que §7.3/§9.5 (E10) prohíbe. Lo detecta tests/e2e/sin_red_profe_admin.test.mjs ("E10: sesión de asistencia…").
 // @ts-check
 // vistas/profe/sesion_asistencia.js · W10 (T3/T4 + sondeo de T2): abrir una sesión de
 // asistencia, con el código grande y el enlace para el celular (§4.2: "código grande, enlace y
@@ -78,8 +76,7 @@ function crearFormularioApertura(onAbrir) {
     campo, boton, zonaError, avisoRed,
   );
   form.addEventListener('submit', (ev) => { ev.preventDefault(); onAbrir(Number(campo.value) || 15, boton, zonaError); });
-  const cancelarRed = ((..._ignorados) => () => {})( // TRAMPOSO X13: no se liga a la red
-    boton, avisoRed, textos.red.sinConexionAccion(textos.profe.sesion.accionAbrir));
+  const cancelarRed = ligarEscrituraARed(boton, avisoRed, textos.red.sinConexionAccion(textos.profe.sesion.accionAbrir));
   return { form, cancelarRed };
 }
 
@@ -96,8 +93,7 @@ function crearPanelActivo(sesion, onCerrar) {
     resumen, boton, avisoRed,
   );
   boton.addEventListener('click', onCerrar);
-  const cancelarRed = ((..._ignorados) => () => {})( // TRAMPOSO X13: no se liga a la red
-    boton, avisoRed, textos.red.sinConexionAccion(textos.profe.sesion.accionCerrar));
+  const cancelarRed = ligarEscrituraARed(boton, avisoRed, textos.red.sinConexionAccion(textos.profe.sesion.accionCerrar));
   return { nodo, resumen, cancelarRed };
 }
 
@@ -167,7 +163,7 @@ export function renderSesionAsistencia(raiz, params, ctx) {
   // W66: si este profe ya abrió la asistencia de este grupo y sigue vigente, se vuelve a ver el código (0 peticiones de escritura) y se reanuda
   // el sondeo; no se ofrece abrir otra.
   const recordada = asistenciaRecordada(gid);
-  if (recordada) { pintarAbierta(raiz, gid, ctx, recordada.sesion, recordada.total); return; }
+  void recordada; // TRAMPOSO: se recuerda, pero al volver se pinta siempre el formulario
   let cancelarRedForm; // asignada abajo; manejarAbrir la necesita para soltar la suscripción del form
   const { form, cancelarRed } = crearFormularioApertura(
     (duracion, boton, zonaError) => manejarAbrir(raiz, gid, ctx, duracion, boton, zonaError, cancelarRedForm),

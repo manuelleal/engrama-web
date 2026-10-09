@@ -3,6 +3,7 @@
 // servidor fijo, y mirar su barra, su "volver" y su título. No es un archivo de test (no termina en .test.mjs).
 import { entornoDeFotos, crearRaiz, elementos, textoDe } from './foto_vistas.mjs';
 import { ponerNavegadorDeMentira, asentar } from './fotos_de_navegacion.mjs';
+import { olvidarAsistencias } from '../../src/vistas/profe/sesion_asistencia.js';
 
 export const error500 = () => new Response(JSON.stringify({ detail: 'falla sintética' }), { status: 500, headers: { 'Content-Type': 'application/json' } });
 /** Una respuesta que no llega nunca: deja la vista en su estado de CARGA. */
@@ -20,7 +21,7 @@ export async function pintar(rutas, fn) {
   const raiz = crearRaiz();
   await Promise.race([Promise.resolve(fn(raiz)), asentar()]);
   await asentar();
-  return { raiz, llamadas: entorno.llamadas, cerrar: () => { quitar(); entorno.restaurar(); } };
+  return { raiz, llamadas: entorno.llamadas, cerrar: () => { olvidarAsistencias(); quitar(); entorno.restaurar(); } }; // W66: ni asistencias recordadas ni sondeos vivos entre pruebas
 }
 
 /** Los elementos bajo `raiz`, en el orden del documento. @param {any} raiz @returns {any[]} */
