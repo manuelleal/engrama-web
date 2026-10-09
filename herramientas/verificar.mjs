@@ -8,6 +8,7 @@
 //   V3  los colores solo salen de var(--token) de tokens.css, o color-mix() con white/black/transparent
 //   V4  prohibidas innerHTML, outerHTML, insertAdjacentHTML, document.write, eval, new Function
 //   V5  el pase solo se arma en src/anillo/enlace.js y nunca viaja en la consulta (docs/ESPEC_pantallas_anillo.md §4.6, decisión 013)
+//   V8  ninguna vista arma su propio "volver": el único es el de src/ui/encabezado.js (docs/ESPEC_navegacion.md §5.7; vive en verificar_v8.mjs)
 // Más tamaño: archivo ≤ 400 líneas, función ≤ 40 líneas (REGLAS.md §4; antiejemplo: coins-mvp/app.js).
 //
 // Es un lint hecho a mano, no un parser de verdad: usa expresiones regulares documentadas.
@@ -17,6 +18,7 @@
 import { existsSync, readFileSync, readdirSync, statSync } from 'node:fs';
 import { join, relative, resolve } from 'node:path';
 import { fileURLToPath } from 'node:url';
+import { chequearV8 } from './verificar_v8.mjs';
 
 const AQUI = fileURLToPath(new URL('.', import.meta.url));
 export const RAIZ = resolve(AQUI, '..');
@@ -369,6 +371,7 @@ export function verificar(raiz = RAIZ) {
   chequearV3Svg(violaciones, raiz);
   chequearV4(violaciones, raiz);
   chequearV5(violaciones, raiz);
+  chequearV8(violaciones, raiz, { listarArchivos, quitarComentarios });
   chequearTamanos(violaciones, raiz);
   return { ok: violaciones.length === 0, violaciones };
 }

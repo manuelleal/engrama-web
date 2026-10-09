@@ -82,7 +82,7 @@ test('U31: pantalla Clase en vivo: el DOM no trae el pase ni la base; el pase se
     renderVivo(raiz, {}, ctx);
     assert.ok(buscar(raiz, 'vista-vivo'));
     assert.equal(textoDe(buscar(raiz, 'vista-vivo')).includes('Clase en vivo'), true);
-    assert.match(textoDe(buscar(raiz, 'salida-sales')), /Vas a salir de ENGRAMA con tu cuenta\. Para volver, usa el botón atrás\./);
+    assert.equal(textoDe(buscar(raiz, 'salida-sales')), '↗ Vas a salir de ENGRAMA con tu cuenta; se abre en esta misma pestaña. Para volver, usa el botón atrás del navegador.'); // W71 (docs/ESPEC_navegacion.md §5.7)
     vistaSinPase(raiz);
     assert.equal(ctx.pedidos, 0, 'pintar no pide el pase');
     await escribirYEnviar(raiz, '1234');
@@ -281,7 +281,8 @@ test('U32: "Herramientas de clase" del docente: solo tablero, Escamas y califica
     assert.ok(bloque, 'el bloque está en la lista de grupos');
     const botones = elementos(bloque).filter((n) => n.getAttribute?.('data-destino'));
     assert.deepEqual(botones.map((n) => n.getAttribute('data-destino')), ['eva_tablero', 'eva_escamas', 'set_revisar']);
-    assert.deepEqual(botones.map((n) => textoDe(n)), ['Abrir el tablero de la clase', 'Abrir Escamas', 'Calificar escritura']);
+    assert.deepEqual(botones.map((n) => textoDe(n)), ['Abrir el tablero de la clase ↗', 'Abrir Escamas ↗', 'Calificar escritura ↗']); // W71: "↗" = sale de ENGRAMA
+    for (const b of botones) assert.equal(elementos(b).find((n) => n.tagName === 'span')?.getAttribute('aria-hidden'), 'true', 'la flecha no se lee: el nombre del botón sigue siendo su texto');
     assert.match(textoDe(buscar(bloque, 'herramientas-sales')), /Vas a salir de ENGRAMA con tu cuenta/);
     for (const ajeno of ['tarjeta-eva_celular', 'tarjeta-set_examen', 'anillo-tarjetas', 'salida-codigo']) assert.equal(buscar(raiz, ajeno), null, ajeno);
     vistaSinPase(raiz);

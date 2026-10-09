@@ -140,7 +140,7 @@ test('E16: el estudiante entra a EVA y a SET: el pase solo viaja en el fragmento
         assert.ok(!rastroVuelta.dom.includes(pase) && !rastroVuelta.local.includes(pase) && !rastroVuelta.sesion.includes(pase) && !rastroVuelta.caches.includes(pase) && !rastroVuelta.url.includes(pase), `al volver, el pase no está en el DOM, los almacenamientos, las cachés ni la dirección (bfcache: ${desdeCache})`);
         assert.equal(await sesion.evaluar('document.querySelector(\'[data-testid="salida-entrar"]\').disabled'), false, `el botón vuelve a servir (bfcache: ${desdeCache})`);
         const meAntes = estado.registro.filter((r) => r.ruta === '/auth/me').length;
-        await tocar(sesion, 'salida-volver');
+        await tocar(sesion, 'volver'); // W71: el único volver, "‹ Inicio", arriba (ui/encabezado.js)
         assert.ok(await esperarVista(sesion, 'anillo-tarjetas'), 'Inicio');
         const finMe = Date.now() + 4000;
         while (Date.now() < finMe && estado.registro.filter((r) => r.ruta === '/auth/me').length <= meAntes) await esperar(100);

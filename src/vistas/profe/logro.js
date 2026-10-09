@@ -16,9 +16,12 @@ import { textos } from '../../textos.js';
 import { leerLogro } from '../../api/profe.js';
 import { ErrorApi } from '../../api/cliente.js';
 import { crearNavInferior } from '../../ui/nav_inferior.js';
+import { crearEncabezado } from '../../ui/encabezado.js';
+import { leerCodigoDeGrupo } from './grupo.js';
 
+const RUTA = '/profe/grupo/:gid/logro';
 /** W70: la barra de abajo del rol, con Mis grupos activa. */
-const barra = (ctx) => crearNavInferior('/profe/grupo/:gid/logro', /** @type {any} */ (ctx)?.sesion?.rol);
+const barra = (ctx) => crearNavInferior(RUTA, /** @type {any} */ (ctx)?.sesion?.rol);
 
 const EJES = ['Comprehension', 'Expression', 'Accuracy'];
 
@@ -76,11 +79,13 @@ function tablaLogro(students) {
   );
 }
 
-function pintarLogro(raiz, gid, achievementOut, ctx) {
+/** W71 (docs/ESPEC_navegacion.md §5.7): "‹ Grupo <código>" arriba y el título con el grupo; `codigo` null = título genérico (nunca el gid). */
+function pintarLogro(raiz, gid, achievementOut, ctx, codigo) {
+  const enc = crearEncabezado(RUTA, { gid }, codigo);
   const nodo = h(
     'div', { 'data-testid': 'vista-profe-logro' },
-    h('h1', {}, textos.profe.logro.titulo),
-    h('a', { href: `#/profe/grupo/${gid}`, 'data-testid': 'volver-al-grupo' }, textos.profe.logro.volverAlGrupo),
+    enc.volver,
+    enc.titulo,
     tablaLogro(achievementOut.students),
     barra(ctx),
   );
@@ -88,19 +93,20 @@ function pintarLogro(raiz, gid, achievementOut, ctx) {
   document.body.dataset.listo = '1';
 }
 
-function pintarError(raiz, mensaje, ctx) {
-  montar(raiz, h('div', { 'data-testid': 'vista-profe-logro' }, h('h1', {}, textos.profe.logro.titulo), h('p', { role: 'alert' }, mensaje), barra(ctx)));
+function pintarError(raiz, mensaje, ctx, gid) {
+  const enc = crearEncabezado(RUTA, { gid }); // también si falla: el volver arriba, nunca un callejón
+  montar(raiz, h('div', { 'data-testid': 'vista-profe-logro' }, enc.volver, enc.titulo, h('p', { role: 'alert' }, mensaje), barra(ctx)));
   document.body.dataset.listo = '1';
 }
 
 /** @param {HTMLElement} raiz @param {Record<string,string>} params ({gid}) @param {{token: string, tenantId?: string}} ctx */
 export async function renderLogro(raiz, params, ctx) {
-  montar(raiz, h('div', { 'data-testid': 'vista-profe-logro' }, h('p', { role: 'status' }, textos.inicio.cargando), barra(ctx)));
+  montar(raiz, h('div', { 'data-testid': 'vista-profe-logro' }, crearEncabezado(RUTA, { gid: params.gid }).volver, h('p', { role: 'status' }, textos.inicio.cargando), barra(ctx)));
   try {
-    const achievementOut = await leerLogro(params.gid, ctx);
-    pintarLogro(raiz, params.gid, achievementOut, ctx);
+    const [achievementOut, codigo] = await Promise.all([leerLogro(params.gid, ctx), leerCodigoDeGrupo(params.gid, ctx)]);
+    pintarLogro(raiz, params.gid, achievementOut, ctx, codigo);
   } catch (e) {
     console.warn('vistas/profe/logro: no se pudo cargar', e);
-    pintarError(raiz, e instanceof ErrorApi ? e.mensaje : textos.profe.logro.errorGeneral, ctx);
+    pintarError(raiz, e instanceof ErrorApi ? e.mensaje : textos.profe.logro.errorGeneral, ctx, params.gid);
   }
 }

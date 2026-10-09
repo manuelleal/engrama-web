@@ -442,7 +442,8 @@ test(
         await pulsar(sesion, 'perfil-ver-aviso');
         assert.ok(await esperarVista(sesion, 'vista-aviso-datos'));
         assert.ok(await hay(sesion, 'aviso-texto'));
-        await pulsar(sesion, 'aviso-volver');
+        assert.equal(await hay(sesion, 'aviso-volver'), false, 'con sesión, el aviso lleva el volver de toda la app y no su botón');
+        await pulsar(sesion, 'volver'); // W71 (docs/ESPEC_navegacion.md §5.7): "‹ Perfil", arriba
         assert.ok(await esperarVista(sesion, 'vista-perfil'));
       } finally { await sesion.cerrar(); }
     }, { estado, ...MODO_SUPABASE });

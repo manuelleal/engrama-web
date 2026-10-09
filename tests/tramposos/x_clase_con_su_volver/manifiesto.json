@@ -1,0 +1,16 @@
+{
+  "descripcion": "estudiante/salida_codigo.js conserva su \"Volver al inicio\" de abajo ademas del encabezado: dos volver distintos en la misma pantalla (H6; U62)",
+  "archivos": {
+    "src/vistas/estudiante/salida_codigo.js": "salida_codigo.js"
+  },
+  "comando": [
+    "node",
+    "--test",
+    "--test-reporter=tap",
+    "tests/unit/nav_encabezado.test.mjs"
+  ],
+  "espera_codigo_no_cero": true,
+  "espera_fallan_tests": [
+    "U62: cada pantalla trae la barra y, si la tabla dice que vuelve, EXACTAMENTE UN volver (el de ui/encabezado.js) antes del título, con su destino, su texto y su nombre accesible; las pestañas, cero (contenido, vacío, error y carga)"
+  ]
+}

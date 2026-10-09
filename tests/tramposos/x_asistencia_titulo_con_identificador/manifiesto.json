@@ -1,0 +1,16 @@
+{
+  "descripcion": "profe/sesion_asistencia.js pone el identificador interno del grupo en el titulo y en el volver mientras no llega el codigo (U68: nunca el identificador)",
+  "archivos": {
+    "src/vistas/profe/sesion_asistencia.js": "sesion_asistencia.js"
+  },
+  "comando": [
+    "node",
+    "--test",
+    "--test-reporter=tap",
+    "tests/unit/nav_encabezado.test.mjs"
+  ],
+  "espera_codigo_no_cero": true,
+  "espera_fallan_tests": [
+    "U68: si el código del grupo no llega (el grupo no aparece en la lista, o la lectura falla), el título queda genérico y NUNCA sale el identificador interno"
+  ]
+}

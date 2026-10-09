@@ -148,9 +148,6 @@ export const textosAnillo = {
   inscripcion: {
     enlace: 'Inscripciones del grupo',
     titulo: 'Inscripciones del grupo',
-    /** @param {string} codigo */
-    tituloConCodigo: (codigo) => `Inscripciones del grupo ${codigo}`,
-    volverGrupo: 'Volver al grupo',
     codigoTitulo: 'Código de grupo',
     pendientesTitulo: 'Esperan aprobación',
     sinCodigo: 'No hay un código activo. Genera uno para que tus estudiantes se registren.',
@@ -217,11 +214,10 @@ export const textosAnillo = {
     escamas: 'Abrir Escamas',
     revisar: 'Calificar escritura',
     herramientaAccion: 'abrir esta herramienta',
-    sales: 'Vas a salir de ENGRAMA con tu cuenta. Para volver, usa el botón atrás.',
+    sales: 'Vas a salir de ENGRAMA con tu cuenta; se abre en esta misma pestaña. Para volver, usa el botón atrás del navegador.', // W71 (docs/ESPEC_navegacion.md §5.10), PROVISIONAL
     abriendo: 'Abriendo…',
     errorAbrir: 'No pudimos abrirlo ahora. Intenta de nuevo en un momento.',
     noDisponible: 'Esta pantalla no está disponible en esta instalación.',
-    volverInicio: 'Volver al inicio',
     tarjetaVivo: 'Entra a la clase en vivo de tu profe.',
     tarjetaNivel: 'Mide tu nivel con el examen de tu institución.',
     // W65 (docs/ESPEC_navegacion.md §5.4): cada botón dice a dónde lleva (antes los dos decían "Abrir"). PROVISIONAL (pedagogo, ERR-16).

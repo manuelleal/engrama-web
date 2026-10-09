@@ -10,6 +10,8 @@ import { importarCsv } from '../../api/admin.js';
 import { accionUnica, ErrorApi } from '../../api/cliente.js';
 import { ligarEscrituraARed } from '../../ui/red.js';
 import { crearNavInferior } from '../../ui/nav_inferior.js';
+import { crearEncabezado } from '../../ui/encabezado.js';
+import { leerCodigoDeGrupo } from '../profe/grupo.js';
 
 /** Pura (U, sin DOM): una línea por fila del CSV, tal cual (sin trim ni normalizar). */
 export function lineasDePrevia(textoCsv) {
@@ -108,13 +110,15 @@ function crearFormulario(gid, ctx) {
 export function renderImportarCsv(raiz, params, ctx) {
   const { gid } = params;
   const { form, cancelarRed } = crearFormulario(gid, ctx);
+  const enc = crearEncabezado('/admin/importar-csv/:gid', { gid }); // W71 (docs/ESPEC_navegacion.md §5.7): "‹ Grupos" arriba y el título con el grupo
   montar(raiz, h(
     'div', { 'data-testid': 'vista-admin-importar-csv' },
-    h('h1', {}, textos.admin.importarCsv.titulo),
-    h('a', { href: '#/admin', 'data-testid': 'volver-a-admin' }, textos.admin.importarCsv.volverAAdmin),
+    enc.volver,
+    enc.titulo,
     form,
     crearNavInferior('/admin/importar-csv/:gid', /** @type {any} */ (ctx).sesion?.rol), // W70: la barra del admin, con Grupos activa
   ));
+  leerCodigoDeGrupo(gid, ctx).then((codigo) => enc.ponerCodigo(codigo)); // el título dice de qué grupo es en cuanto se sabe; si no llega, queda genérico
   document.body.dataset.listo = '1';
   window.addEventListener('hashchange', cancelarRed, { once: true });
 }

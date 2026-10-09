@@ -9,9 +9,12 @@ import { tituloLegible } from '../../ui/titulo.js';
 import { leerErroresDeItem } from '../../api/profe.js';
 import { ErrorApi } from '../../api/cliente.js';
 import { crearNavInferior } from '../../ui/nav_inferior.js';
+import { crearEncabezado } from '../../ui/encabezado.js';
+import { leerCodigoDeGrupo } from './grupo.js';
 
+const RUTA = '/profe/grupo/:gid/errores';
 /** W70: la barra de abajo del rol, con Mis grupos activa. */
-const barra = (ctx) => crearNavInferior('/profe/grupo/:gid/errores', /** @type {any} */ (ctx)?.sesion?.rol);
+const barra = (ctx) => crearNavInferior(RUTA, /** @type {any} */ (ctx)?.sesion?.rol);
 
 /** Pura (U, sin DOM): P4 — "errores con respuesta" descuenta las respuestas en blanco. */
 export function erroresConRespuesta(item) {
@@ -50,12 +53,14 @@ function tablaErrores(items) {
   );
 }
 
-function pintarErrores(raiz, gid, itemErrorsOut, ctx) {
+/** W71 (docs/ESPEC_navegacion.md §5.7): "‹ Grupo <código>" arriba y el título con el grupo; `codigo` null = título genérico (nunca el gid). */
+function pintarErrores(raiz, gid, itemErrorsOut, ctx, codigo) {
+  const enc = crearEncabezado(RUTA, { gid }, codigo);
   const avisoSuprimidos = textos.profe.errores.suprimidos(itemErrorsOut.suppressed_items);
   const nodo = h(
     'div', { 'data-testid': 'vista-profe-errores' },
-    h('h1', {}, textos.profe.errores.titulo),
-    h('a', { href: `#/profe/grupo/${gid}`, 'data-testid': 'volver-al-grupo' }, textos.profe.errores.volverAlGrupo),
+    enc.volver,
+    enc.titulo,
     tablaErrores(itemErrorsOut.items),
     avisoSuprimidos ? h('p', { role: 'status', 'data-testid': 'errores-suprimidos' }, avisoSuprimidos) : null,
     barra(ctx),
@@ -64,19 +69,20 @@ function pintarErrores(raiz, gid, itemErrorsOut, ctx) {
   document.body.dataset.listo = '1';
 }
 
-function pintarError(raiz, mensaje, ctx) {
-  montar(raiz, h('div', { 'data-testid': 'vista-profe-errores' }, h('h1', {}, textos.profe.errores.titulo), h('p', { role: 'alert' }, mensaje), barra(ctx)));
+function pintarError(raiz, mensaje, ctx, gid) {
+  const enc = crearEncabezado(RUTA, { gid }); // también si falla: el volver arriba, nunca un callejón
+  montar(raiz, h('div', { 'data-testid': 'vista-profe-errores' }, enc.volver, enc.titulo, h('p', { role: 'alert' }, mensaje), barra(ctx)));
   document.body.dataset.listo = '1';
 }
 
 /** @param {HTMLElement} raiz @param {Record<string,string>} params ({gid}) @param {{token: string, tenantId?: string}} ctx */
 export async function renderErrores(raiz, params, ctx) {
-  montar(raiz, h('div', { 'data-testid': 'vista-profe-errores' }, h('p', { role: 'status' }, textos.inicio.cargando), barra(ctx)));
+  montar(raiz, h('div', { 'data-testid': 'vista-profe-errores' }, crearEncabezado(RUTA, { gid: params.gid }).volver, h('p', { role: 'status' }, textos.inicio.cargando), barra(ctx)));
   try {
-    const itemErrorsOut = await leerErroresDeItem(params.gid, ctx);
-    pintarErrores(raiz, params.gid, itemErrorsOut, ctx);
+    const [itemErrorsOut, codigo] = await Promise.all([leerErroresDeItem(params.gid, ctx), leerCodigoDeGrupo(params.gid, ctx)]);
+    pintarErrores(raiz, params.gid, itemErrorsOut, ctx, codigo);
   } catch (e) {
     console.warn('vistas/profe/errores: no se pudo cargar', e);
-    pintarError(raiz, e instanceof ErrorApi ? e.mensaje : textos.profe.errores.errorGeneral, ctx);
+    pintarError(raiz, e instanceof ErrorApi ? e.mensaje : textos.profe.errores.errorGeneral, ctx, params.gid);
   }
 }

@@ -21,6 +21,16 @@ export const textosNav = {
     volver: (nombre) => `‹ ${nombre}`,
     /** @param {string} nombre */
     volverAccesible: (nombre) => `Volver a ${nombre}`,
+    // W71 (§5.7): la pestaña del navegador dice dónde estoy.
+    /** @param {string} titulo */
+    pestana: (titulo) => `${titulo} · ENGRAMA`,
+  },
+  // W71 (§5.7): el título de una pantalla de un grupo dice de qué grupo es ("Logro por eje · SINT-B1-01"). Si el código no llega, queda el
+  // título solo: nunca el identificador interno.
+  titulos: {
+    /** @param {string} titulo @param {string} codigo */
+    conGrupo: (titulo, codigo) => `${titulo} · ${codigo}`,
+    inscripciones: 'Inscripciones',
   },
   // W69 (§5.6): Perfil es "mi cuenta" para los tres roles. Su título sigue en textos.perfil.titulo ("Tu perfil"); lo nuevo va aquí, en una clave
   // propia de primer nivel (un spread no mezcla claves anidadas de textos.js).

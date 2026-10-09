@@ -1,0 +1,15 @@
+{
+  "descripcion": "profe/errores.js arma su propio \"Volver al grupo\" en vez de usar el encabezado: vuelve la quinta forma de volver (H6; V8)",
+  "archivos": {
+    "src/vistas/profe/errores.js": "errores.js"
+  },
+  "comando": [
+    "node",
+    "herramientas/verificar.mjs",
+    "--json"
+  ],
+  "espera_codigo_no_cero": true,
+  "espera_contiene_checks": [
+    "V8"
+  ]
+}

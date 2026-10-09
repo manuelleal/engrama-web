@@ -1,0 +1,16 @@
+{
+  "descripcion": "verificar_v8.mjs deja de mirar los data-testid: un enlace \"volver-al-grupo\" con un texto que no dice \"Volver\" pasa limpio (V8)",
+  "archivos": {
+    "herramientas/verificar_v8.mjs": "verificar_v8.mjs"
+  },
+  "comando": [
+    "node",
+    "--test",
+    "--test-reporter=tap",
+    "tests/unit/verificar_v8.test.mjs"
+  ],
+  "espera_codigo_no_cero": true,
+  "espera_fallan_tests": [
+    "V8: un volver armado en una vista se marca (por su data-testid, por la palabra \"Volver\" o por un texto volver…); usar el encabezado, no"
+  ]
+}

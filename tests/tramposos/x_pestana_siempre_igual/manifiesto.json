@@ -1,0 +1,16 @@
+{
+  "descripcion": "src/rutas.js deja la pestana del navegador siempre en \"ENGRAMA\": con varias pestanas abiertas no se sabe cual es cual (H8; U68)",
+  "archivos": {
+    "src/rutas.js": "rutas.js"
+  },
+  "comando": [
+    "node",
+    "--test",
+    "--test-reporter=tap",
+    "tests/unit/nav_encabezado.test.mjs"
+  ],
+  "espera_codigo_no_cero": true,
+  "espera_fallan_tests": [
+    "U68: tras cada ruta, la pestaña del navegador dice \"<título> · ENGRAMA\"; una dirección sin pantalla y una pantalla obligatoria, \"ENGRAMA\""
+  ]
+}

@@ -12,13 +12,14 @@ import { h, montar } from '../../ui/dom.js';
 import { textos } from '../../textos.js';
 import { listarEstudiantes, listarGrupos } from '../../api/profe.js';
 import { ErrorApi } from '../../api/cliente.js';
-import { crearVolver } from '../../ui/encabezado.js';
+import { crearEncabezado } from '../../ui/encabezado.js';
 import { crearNavInferior } from '../../ui/nav_inferior.js';
 
+const RUTA = '/profe/grupo/:gid';
 /** W63 (docs/ESPEC_navegacion.md §5.1): del grupo se vuelve a "Mis grupos" con un enlace arriba, también mientras carga y si falla. */
-const volverAMisGrupos = () => crearVolver('/profe/grupos', textos.profe.grupos.titulo);
+const volverAMisGrupos = () => crearEncabezado(RUTA).volver;
 /** W70: la barra de abajo del rol, con Mis grupos activa. */
-const barra = (ctx) => crearNavInferior('/profe/grupo/:gid', ctx?.sesion?.rol);
+const barra = (ctx) => crearNavInferior(RUTA, ctx?.sesion?.rol);
 
 /** Pura: el texto de la última asistencia, o "Sin registro" (U, sin DOM). */
 export function textoUltimaAsistencia(fechaISO) {
@@ -29,6 +30,20 @@ export function textoUltimaAsistencia(fechaISO) {
  * debería: si T2 respondió, el grupo es visible, y T1 trae los mismos grupos visibles). */
 export function buscarCodigoDeGrupo(grupos, gid) {
   return grupos.find((g) => g.id === gid)?.group_code ?? null;
+}
+
+/**
+ * W71 (docs/ESPEC_navegacion.md §5.7): el código de un grupo, para el título de sus pantallas de adentro ("Asistencia · SINT-B1-01"). Es una
+ * ayuda, no una condición: si la lectura falla o el grupo no aparece devuelve null, el título queda genérico y la pantalla sigue. NUNCA el `gid`.
+ * @param {string} gid @param {{token: string, tenantId?: string}} ctx @returns {Promise<string|null>}
+ */
+export async function leerCodigoDeGrupo(gid, ctx) {
+  try {
+    return buscarCodigoDeGrupo(await listarGrupos(ctx), gid);
+  } catch (e) {
+    console.warn('vistas/profe/grupo: no se pudo leer el código del grupo para el título', e instanceof ErrorApi ? e.status : 'error'); // nunca un catch mudo
+    return null;
+  }
 }
 
 function filaDeEstudiante(m) {
@@ -54,9 +69,10 @@ function tablaRoster(estudiantes) {
 }
 
 function pintarGrupo(raiz, gid, codigo, estudiantes, ctx) {
+  const enc = crearEncabezado(RUTA, { gid }, codigo);
   const nodo = h(
     'div', { 'data-testid': 'vista-profe-grupo' },
-    h('h1', {}, codigo ? textos.profe.grupo.titulo(codigo) : textos.profe.grupo.tituloSinCodigo),
+    enc.titulo,
     h(
       'nav', {},
       h('a', { href: `#/profe/grupo/${gid}/sesion`, 'data-testid': 'ir-a-sesion' }, textos.profe.grupo.abrirSesion),
@@ -78,7 +94,8 @@ function pintarGrupo(raiz, gid, codigo, estudiantes, ctx) {
  * @param {string} mensaje
  */
 function pintarError(raiz, mensaje, ctx) {
-  montar(raiz, h('div', { 'data-testid': 'vista-profe-grupo' }, volverAMisGrupos(), h('p', { role: 'alert', 'data-testid': 'profe-grupo-error' }, mensaje), barra(ctx)));
+  const enc = crearEncabezado(RUTA); // el título genérico ("Grupo"): sin datos del grupo no hay código que mostrar, y nunca el identificador
+  montar(raiz, h('div', { 'data-testid': 'vista-profe-grupo' }, enc.volver, enc.titulo, h('p', { role: 'alert', 'data-testid': 'profe-grupo-error' }, mensaje), barra(ctx)));
   document.body.dataset.listo = '1';
 }
 

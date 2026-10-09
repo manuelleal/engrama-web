@@ -122,6 +122,15 @@ nav {
   margin: 12px 0;
 }
 
+/* La nota de salida a EVA y SET (ui/nota_salida.js, docs/ESPEC_navegacion.md §5.7, H12): una frase normal que se lee, no mayúsculas grises. */
+.nota-salida {
+  font-family: var(--fuente-cuerpo);
+  font-size: 1rem; /* el tamano del texto normal: E17 exige 16 px en lo que se lee */
+  line-height: 1.4;
+  color: var(--texto);
+  margin: 12px 0;
+}
+
 /* Perfil, "mi cuenta" (vistas/perfil.js, docs/ESPEC_navegacion.md §5.6): los enlaces del aviso y de las solicitudes, en fila, y debajo la
    salida de la cuenta. Sobrio: lo ven los tres roles. */
 .perfil-enlaces {

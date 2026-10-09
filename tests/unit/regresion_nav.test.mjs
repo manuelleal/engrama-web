@@ -12,7 +12,8 @@ import { sinSubarboles, conTextos } from './foto_vistas.mjs';
 
 const CRUDA = JSON.parse(readFileSync(fileURLToPath(new URL('../snapshots/vistas_nav_2cba0b8.json', import.meta.url)), 'utf8'));
 
-const ASISTENCIA_W67 = /** @type {Array<[string, string]>} */ ([['Sesión de asistencia', 'Asistencia'], ['Duración (minutos)', '¿Cuántos minutos queda abierta?'], ['Abrir sesión', 'Abrir asistencia'], ['Cerrar sesión', 'Cerrar la asistencia'], ['Código', 'Código de asistencia']]);
+// W71 (§5.7): el título de la asistencia además dice de qué grupo es.
+const ASISTENCIA_W67 = /** @type {Array<[string, string]>} */ ([['Sesión de asistencia', 'Asistencia · SINT-B1-01'], ['Duración (minutos)', '¿Cuántos minutos queda abierta?'], ['Abrir sesión', 'Abrir asistencia'], ['Cerrar sesión', 'Cerrar la asistencia'], ['Código', 'Código de asistencia']]);
 const RETOS_W67 = /** @type {Array<[string, string]>} */ ([
   ['Estos son los retos de todo el colegio, no solo de tus grupos (el servidor todavía no los filtra por grupo).', 'Estos son los retos de toda la institución, no solo de tus grupos.'],
   ['Este colegio no tiene retos todavía.', 'Esta institución no tiene retos todavía.'],
@@ -33,6 +34,14 @@ export const TEXTOS_DECLARADOS_NAV = {
   profe_retos_vacio: RETOS_W67,
   admin_grupos: [['Código del grupo', 'Nombre del grupo']],
   admin_grupos_vacio: [['Código del grupo', 'Nombre del grupo']],
+  // W71 (§5.7): el título dice de qué grupo es ("<título> · <código>"). Donde el código no llega (grupo sin datos, error), el título no cambia y
+  // no se declara; las inscripciones además dejan de repetir "del grupo".
+  profe_inscripcion: [['Inscripciones del grupo SINT-B1-01', 'Inscripciones · SINT-B1-01']],
+  profe_inscripcion_vacio: [['Inscripciones del grupo', 'Inscripciones']],
+  profe_logro: [['Logro por eje', 'Logro por eje · SINT-B1-01']],
+  profe_errores: [['Errores por ítem', 'Errores por ítem · SINT-B1-01']],
+  admin_asignar_docente: [['Asignar docente', 'Asignar docente · SINT-B1-01']],
+  admin_importar_csv: [['Importar estudiantes (CSV)', 'Importar estudiantes (CSV) · SINT-B1-01']],
 };
 
 /** La línea base con los textos declarados puestos al día (el archivo de la foto no se regenera). */
@@ -64,7 +73,7 @@ const ESCENAS_CON_BARRA_W68 = ['retos', 'retos_vacio', 'retos_error', 'asistenci
  * (la barra de abajo). Vacío = ninguna escena cambia. Si una foto cambia y no está aquí, R9 se pone rojo.
  * @type {Record<string, Array<string|{etiqueta: string, clase?: string}>>}
  */
-export const DECLARADAS_NAV = {
+const HASTA_W70 = {
   // W63 (cambio 1): la asistencia abierta conserva la vuelta al grupo; los retos del profe ganan "‹ Mis grupos" (contenido, vacío y error).
   // W70 (cambio 6c): entra la barra de abajo en TODAS las escenas del profe y del admin (por eso cada una lleva BARRA); de los inicios del admin
   // sale la barra de arriba (`div.barra-rol`); y los retos del profe, que ahora son una pestaña, pierden el "‹ Mis grupos" que W63 les dio
@@ -83,6 +92,62 @@ export const DECLARADAS_NAV = {
   ...Object.fromEntries(ESCENAS_CON_BARRA_W68.map((nombre) => [nombre, [BARRA]])),
 };
 
+// W71 (cambio 7): un solo encabezado. Toda escena que NO es pestaña gana el volver de ui/encabezado.js (`volver`), arriba, y pierde el suyo
+// (`salida-volver`, `aviso-volver`, `volver-al-grupo`, `volver-a-admin`, y el `nav` con el de las inscripciones). La nota de salida a EVA y SET
+// (`salida-sales`) pasa a ser una frase que se lee, con "↗". Los títulos con el grupo se declaran como textos (arriba).
+const UN_NAV = { etiqueta: 'nav' }; // el `nav` del volver viejo de las inscripciones y la barra
+const VOLVER_W71 = {
+  vivo: ['volver', 'salida-volver', 'salida-sales'], nivel: ['volver', 'salida-volver', 'salida-sales'],
+  vivo_no_disponible: ['volver', 'salida-volver'], nivel_no_disponible: ['volver', 'salida-volver'],
+  aviso_leer: ['volver', 'aviso-volver'],
+  solicitudes: ['volver'], solicitudes_vacio: ['volver'], solicitudes_error: ['volver'],
+  profe_asistencia_formulario: ['volver', 'volver-al-grupo'], profe_asistencia_abierta: ['volver', 'volver-al-grupo'],
+  profe_inscripcion: ['volver', UN_NAV], profe_inscripcion_vacio: ['volver', UN_NAV], profe_inscripcion_error: ['volver', { etiqueta: 'h1' }], // el error no tenía título: ahora dice "Inscripciones"
+  profe_logro: ['volver', 'volver-al-grupo'], profe_logro_vacio: ['volver', 'volver-al-grupo'], profe_logro_error: ['volver'],
+  profe_errores: ['volver', 'volver-al-grupo'], profe_errores_vacio: ['volver', 'volver-al-grupo'], profe_errores_error: ['volver'],
+  admin_asignar_docente: ['volver', 'volver-a-admin'], admin_importar_csv: ['volver', 'volver-a-admin'],
+};
+
+/** @type {Record<string, Array<string|{etiqueta: string, clase?: string}>>} */
+export const DECLARADAS_NAV = Object.fromEntries([...new Set([...Object.keys(HASTA_W70), ...Object.keys(VOLVER_W71)])].map((nombre) => [nombre, [...new Set([...(HASTA_W70[nombre] || []), ...(VOLVER_W71[nombre] || [])])]]));
+
+/** A dónde vuelve cada escena que no es pestaña y qué dice su volver (§5.7). */
+const VUELTA_W71 = {
+  vivo: ['#/inicio', '‹ Inicio'], vivo_no_disponible: ['#/inicio', '‹ Inicio'], nivel: ['#/inicio', '‹ Inicio'], nivel_no_disponible: ['#/inicio', '‹ Inicio'],
+  aviso_leer: ['#/perfil', '‹ Perfil'], solicitudes: ['#/perfil', '‹ Perfil'], solicitudes_vacio: ['#/perfil', '‹ Perfil'], solicitudes_error: ['#/perfil', '‹ Perfil'],
+  profe_asistencia_formulario: ['#/profe/grupo/g1', '‹ Grupo SINT-B1-01'], profe_asistencia_abierta: ['#/profe/grupo/g1', '‹ Grupo SINT-B1-01'],
+  profe_inscripcion: ['#/profe/grupo/g1', '‹ Grupo SINT-B1-01'], profe_inscripcion_vacio: ['#/profe/grupo/g1', '‹ Grupo'], profe_inscripcion_error: ['#/profe/grupo/g1', '‹ Grupo'],
+  profe_logro: ['#/profe/grupo/g1', '‹ Grupo SINT-B1-01'], profe_logro_vacio: ['#/profe/grupo/g1', '‹ Grupo'], profe_logro_error: ['#/profe/grupo/g1', '‹ Grupo'],
+  profe_errores: ['#/profe/grupo/g1', '‹ Grupo SINT-B1-01'], profe_errores_vacio: ['#/profe/grupo/g1', '‹ Grupo'], profe_errores_error: ['#/profe/grupo/g1', '‹ Grupo'],
+  admin_asignar_docente: ['#/admin', '‹ Grupos'], admin_importar_csv: ['#/admin', '‹ Grupos'],
+};
+
+test('R9: lo que W71 declara cambió de verdad: cada escena que no es pestaña trae UN volver (el de ui/encabezado.js), antes del título, a donde dice §5.7; las pestañas, ninguno; y los volver viejos salieron', async () => {
+  const hoy = await tomarFotosNav();
+  assert.deepEqual(Object.keys(VUELTA_W71).sort(), Object.keys(VOLVER_W71).sort(), 'las mismas escenas en las dos tablas');
+  for (const [nombre, [href, texto]] of Object.entries(VUELTA_W71)) {
+    const lineas = hoy[nombre];
+    const volveres = lineas.filter((l) => /data-testid="[^"]*volver[^"]*"/.test(l));
+    assert.equal(volveres.length, 1, `${nombre}: exactamente un volver (hay ${volveres.length})`);
+    assert.ok(volveres[0].trimStart().startsWith('a ') && volveres[0].includes('data-testid="volver"') && volveres[0].includes(`href="${href}"`), `${nombre}: es el enlace del encabezado, a ${href}`);
+    assert.ok(volveres[0].includes(`aria-label="Volver a ${texto.slice(2)}"`), `${nombre}: su nombre accesible lo dice entero`);
+    const i = lineas.indexOf(volveres[0]);
+    assert.equal(lineas[i + 1].trim(), JSON.stringify(texto), `${nombre}: dice "${texto}"`);
+    const h1 = lineas.findIndex((l) => l.trim() === 'h1');
+    if (h1 >= 0) assert.ok(i < h1, `${nombre}: el volver va antes del título`);
+    assert.ok(!lineas.some((l) => l.trim().startsWith(String.fromCharCode(34) + "Volver")), `${nombre}: ningún "Volver…" suelto`);
+  }
+  const pestanas = Object.keys(hoy).filter((n) => !(n in VUELTA_W71) && !n.startsWith('reto_en_curso'));
+  assert.deepEqual(pestanas.sort(), ['admin_grupos', 'admin_grupos_error', 'admin_grupos_vacio', 'asistencia', 'profe_retos', 'profe_retos_error', 'profe_retos_vacio', 'retos', 'retos_error', 'retos_vacio', 'revision'], 'las demás escenas son pestañas (o la revisión, que cuelga de la pestaña Retos)');
+  for (const nombre of pestanas.filter((n) => n !== 'revision')) assert.ok(!hoy[nombre].some((l) => l.includes('volver')), `${nombre}: una pestaña no lleva volver`);
+  for (const nombre of ['vivo', 'nivel']) {
+    const i = hoy[nombre].findIndex((l) => l.includes('data-testid="salida-sales"'));
+    assert.ok(hoy[nombre][i].includes('class="nota-salida"') && !hoy[nombre][i].includes('texto-apoyo'), `${nombre}: la nota de salida ya no va en mayúsculas grises`);
+    assert.ok(hoy[nombre][i + 1].includes('aria-hidden="true"') && hoy[nombre][i + 2].trim() === '"↗ "', `${nombre}: con "↗" delante, que no se lee`);
+    assert.equal(hoy[nombre][i + 3].trim(), JSON.stringify('Vas a salir de ENGRAMA con tu cuenta; se abre en esta misma pestaña. Para volver, usa el botón atrás del navegador.'));
+  }
+});
+
 test('R9: lo que W68 declara cambió de verdad: cada escena del estudiante trae UNA barra con "Perfil"; el reto en curso, ninguna; y fuera de la barra nada cambió', async () => {
   const hoy = await tomarFotosNav();
   const barras = (lineas) => lineas.filter((l) => l.trimStart().startsWith('nav ') && l.includes('class="nav-inferior"'));
@@ -99,7 +164,7 @@ test('R9: lo que W68 declara cambió de verdad: cada escena del estudiante trae 
 
 test('R9: lo que W63 declaró sigue ahí: la asistencia abierta trae la vuelta al grupo (un nodo y su texto); los retos del profe ya no son un callejón por la barra (W70)', async () => {
   const hoy = await tomarFotosNav({ solo: ['profe_asistencia_abierta', 'profe_retos', 'profe_retos_vacio', 'profe_retos_error'] });
-  assert.ok(hoy.profe_asistencia_abierta.some((l) => l.includes('data-testid="volver-al-grupo"') && l.includes('href="#/profe/grupo/g1"')));
+  assert.ok(hoy.profe_asistencia_abierta.some((l) => l.includes('data-testid="volver"') && l.includes('href="#/profe/grupo/g1"')), 'W71: es el volver del encabezado');
   assert.ok(!BASE.vistas.profe_asistencia_abierta.some((l) => l.includes('volver')), 'la línea base era un callejón');
   assert.equal(sinSubarboles(hoy.profe_asistencia_abierta, [BARRA]).length, BASE.vistas.profe_asistencia_abierta.length + 2, 'fuera de la barra, un nodo de más y su texto');
   for (const nombre of ['profe_retos', 'profe_retos_vacio', 'profe_retos_error']) {
@@ -124,7 +189,6 @@ test('R9: lo que W70 declara cambió de verdad: cada escena del profe y del admi
     assert.ok(!hoy[nombre].some((l) => l.includes('class="barra-rol"') || l.includes('boton-cerrar-sesion"') && !nombre.startsWith('profe_asistencia')), `${nombre}: sin barra de arriba ni "Cerrar sesión" de la cuenta`);
   }
   for (const nombre of ['admin_grupos', 'admin_grupos_vacio', 'admin_grupos_error']) assert.ok(CRUDA.vistas[nombre].some((l) => l.includes('class="barra-rol"')), `${nombre}: la línea base traía la barra de arriba`);
-  for (const nombre of ESCENAS_CON_BARRA_W70) assert.equal(sinSubarboles(hoy[nombre], [BARRA]).length, BASE.vistas[nombre].length, `${nombre}: fuera de la barra, los mismos nodos`);
 });
 
 /** Las escenas que la espec nombra (§9.1), cada una con los estados que tiene. */

@@ -10,6 +10,7 @@ import { crearDrako } from '../ui/drako.js';
 import { textos } from '../textos.js';
 import { accionUnica } from '../api/cliente.js';
 import { crearNavInferior } from '../ui/nav_inferior.js';
+import { crearEncabezado } from '../ui/encabezado.js';
 
 const T = textos.aviso;
 
@@ -98,15 +99,22 @@ function botonSolicitudes(alTocar) {
 
 /**
  * @param {HTMLElement} raiz
- * @param {{aviso: import('../aviso.js').Aviso, alVolver: () => void, solicitudes?: string, rol?: string}} ctx
+ * @param {{aviso: import('../aviso.js').Aviso, alVolver?: () => void, solicitudes?: string, rol?: string}} ctx
  *   `solicitudes` (W33): la ruta de "Mis solicitudes sobre mis datos"; solo cuando hay sesión (antes de entrar no se puede pedir nada).
  *   `rol` (W68): el de la sesión; con él, el aviso lleva la barra de abajo (Perfil activa). Sin sesión (abierto desde la entrada) NO hay barra.
+ *   W71 (§5.7): con sesión es la ruta `#/datos` y lleva el encabezado de toda la app ("‹ Perfil" arriba); sin sesión el router está apagado y
+ *   conserva su botón "Volver" (`alVolver`), al final.
  */
 export function renderLeerAviso(raiz, ctx) {
-  const volver = h('button', { type: 'button', class: 'boton-secundario', 'data-testid': 'aviso-volver' }, T.volver);
-  volver.addEventListener('click', ctx.alVolver);
   const solicitudes = ctx.solicitudes ? h('a', { href: ctx.solicitudes, 'data-testid': 'aviso-ver-solicitudes' }, textos.solicitudes.enlace) : null;
-  montar(raiz, h('div', { 'data-testid': 'vista-aviso-datos' }, h('h1', {}, T.titulo), crearTextoAviso(ctx.aviso), solicitudes, volver, crearNavInferior('/datos', ctx.rol))); // TRAMPOSO: la barra sale siempre, tambien sin sesion
+  if (ctx.rol) {
+    const enc = crearEncabezado('/datos');
+    montar(raiz, h('div', { 'data-testid': 'vista-aviso-datos' }, enc.volver, enc.titulo, crearTextoAviso(ctx.aviso), solicitudes, crearNavInferior('/datos', ctx.rol)));
+  } else {
+    const volver = h('button', { type: 'button', class: 'boton-secundario', 'data-testid': 'aviso-volver' }, T.volver);
+    volver.addEventListener('click', () => ctx.alVolver?.());
+    montar(raiz, h('div', { 'data-testid': 'vista-aviso-datos' }, h('h1', {}, T.titulo), crearTextoAviso(ctx.aviso), solicitudes, volver, crearNavInferior('/datos'))); // TRAMPOSO: la barra sale también sin sesión
+  }
   document.body.dataset.listo = '1';
 }
 

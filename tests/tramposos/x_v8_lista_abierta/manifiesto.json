@@ -1,0 +1,16 @@
+{
+  "descripcion": "verificar_v8.mjs agrega perfil.js a la lista cerrada: una pestana podria volver a tener su propio volver sin que nada lo marque (V8)",
+  "archivos": {
+    "herramientas/verificar_v8.mjs": "verificar_v8.mjs"
+  },
+  "comando": [
+    "node",
+    "--test",
+    "--test-reporter=tap",
+    "tests/unit/verificar_v8.test.mjs"
+  ],
+  "espera_codigo_no_cero": true,
+  "espera_fallan_tests": [
+    "V8: la lista cerrada (pantallas sin router y el cierre de la celebración) puede tener su \"volver\"; el mismo código en otra vista se marca"
+  ]
+}

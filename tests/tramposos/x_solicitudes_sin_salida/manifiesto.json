@@ -1,0 +1,16 @@
+{
+  "descripcion": "vistas/datos_solicitudes.js sin su volver por la ruta: \"Mis datos: solicitudes\" vuelve a no decir como se regresa a Perfil (H7; U62)",
+  "archivos": {
+    "src/vistas/datos_solicitudes.js": "datos_solicitudes.js"
+  },
+  "comando": [
+    "node",
+    "--test",
+    "--test-reporter=tap",
+    "tests/unit/nav_encabezado.test.mjs"
+  ],
+  "espera_codigo_no_cero": true,
+  "espera_fallan_tests": [
+    "U62: cada pantalla trae la barra y, si la tabla dice que vuelve, EXACTAMENTE UN volver (el de ui/encabezado.js) antes del título, con su destino, su texto y su nombre accesible; las pestañas, cero (contenido, vacío, error y carga)"
+  ]
+}

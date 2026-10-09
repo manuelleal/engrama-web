@@ -13,6 +13,8 @@ import { crearDrako } from '../../ui/drako.js';
 import { ligarEscrituraARed } from '../../ui/red.js';
 import { registrarCelebracion } from '../../ui/celebraciones.js';
 import { crearNavInferior } from '../../ui/nav_inferior.js';
+import { crearEncabezado } from '../../ui/encabezado.js';
+import { crearNotaDeSalida } from '../../ui/nota_salida.js';
 import { textos } from '../../textos.js';
 import { destinosDeLaSesion, crearSalida, alVolverDeOtroOrigen } from '../../anillo/abrir.js';
 import { armarEnlaceAnillo } from '../../anillo/enlace.js';
@@ -20,7 +22,8 @@ import { armarEnlaceAnillo } from '../../anillo/enlace.js';
 const T = textos.anillo;
 // W68 (docs/ESPEC_navegacion.md §5.6): las dos pantallas llevan la barra de abajo, con Inicio activa. La ruta de cada destino es la de navegacion.js.
 const RUTA_DE = { eva_celular: '/vivo', set_examen: '/nivel' };
-const barraDe = (cfg, ctx) => crearNavInferior(/** @type {Record<string, string>} */ (RUTA_DE)[cfg.destino], ctx?.sesion?.rol);
+const rutaDe = (cfg) => /** @type {Record<string, string>} */ (RUTA_DE)[cfg.destino];
+const barraDe = (cfg, ctx) => crearNavInferior(rutaDe(cfg), ctx?.sesion?.rol);
 
 /**
  * @typedef {object} Configuracion
@@ -41,11 +44,12 @@ const barraDe = (cfg, ctx) => crearNavInferior(/** @type {Record<string, string>
  */
 
 function pantallaNoDisponible(raiz, cfg, ctx) {
+  const enc = crearEncabezado(rutaDe(cfg)); // W71: "‹ Inicio" arriba, antes del título; el mismo volver de toda la app
   montar(raiz, h(
     'div', { 'data-testid': cfg.testid },
-    h('h1', {}, cfg.titulo),
+    enc.volver,
+    enc.titulo,
     h('p', { role: 'status', 'data-testid': 'salida-no-disponible' }, T.noDisponible),
-    h('a', { href: '#/inicio', class: 'boton-chico', 'data-testid': 'salida-volver' }, T.volverInicio),
     barraDe(cfg, ctx),
   ));
   document.body.dataset.listo = '1';
@@ -100,15 +104,16 @@ export async function renderSalidaConCodigo(raiz, query, ctx, cfg) {
   const boton = /** @type {HTMLButtonElement} */ (h('button', { type: 'submit', 'data-testid': 'salida-entrar' }, cfg.entrar));
   const form = h('form', { 'data-testid': 'form-salida', novalidate: true }, h('label', { for: 'salida-codigo' }, cfg.campo), campo, boton, error, avisoRed);
   form.addEventListener('submit', alEnviar(cfg, salida, { campo, boton, error }));
+  const enc = crearEncabezado(rutaDe(cfg)); // W71: "‹ Inicio" arriba, antes del título
   montar(raiz, h(
     'div', { 'data-testid': cfg.testid },
+    enc.volver,
     crearDrako('presenta', cfg.drako, { desde: 'reposo' }),
-    h('h1', {}, cfg.titulo),
+    enc.titulo,
     h('p', { id: 'salida-ayuda', 'data-testid': 'salida-ayuda' }, cfg.ayuda),
     form,
-    h('p', { class: 'texto-apoyo', role: 'note', 'data-testid': 'salida-sales' }, T.sales),
+    crearNotaDeSalida('salida-sales'),
     h('a', { href: directo, 'data-testid': 'salida-enlace-directo' }, cfg.entrar), // el error: el pase en el href
-    h('a', { href: '#/inicio', class: 'boton-chico', 'data-testid': 'salida-volver' }, T.volverInicio),
     barraDe(cfg, ctx),
   ));
   // Sin red, salir a otro origen queda deshabilitado con su texto. Tras salir, el botón no se reactiva solo (otraCondicionOk).

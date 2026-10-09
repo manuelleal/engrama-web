@@ -1,0 +1,16 @@
+{
+  "descripcion": "profe/logro.js titula \"Logro por eje\" a secas: con dos grupos, el profe no sabe de cual es la tabla (H8; U68)",
+  "archivos": {
+    "src/vistas/profe/logro.js": "logro.js"
+  },
+  "comando": [
+    "node",
+    "--test",
+    "--test-reporter=tap",
+    "tests/unit/nav_encabezado.test.mjs"
+  ],
+  "espera_codigo_no_cero": true,
+  "espera_fallan_tests": [
+    "U68: el título de cada pantalla de un grupo dice de qué grupo es (\"<título> · <código>\"), su volver también, y la pestaña del navegador dice \"<título> · ENGRAMA\""
+  ]
+}

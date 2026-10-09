@@ -15,14 +15,19 @@ import { crearControlDeRed } from './inscripcion_red.js';
 import { crearSeccionCodigo } from './inscripcion_codigo.js';
 import { crearSeccionPendientes } from './inscripcion_pendientes.js';
 import { crearNavInferior } from '../../ui/nav_inferior.js';
+import { crearEncabezado } from '../../ui/encabezado.js';
 
 const T = textos.inscripcion;
 /** W70: la barra de abajo del rol, con Mis grupos activa. */
-const barra = (ctx) => crearNavInferior('/profe/grupo/:gid/inscripcion', ctx?.sesion?.rol);
+const RUTA = '/profe/grupo/:gid/inscripcion';
+const barra = (ctx) => crearNavInferior(RUTA, ctx?.sesion?.rol);
+/** W71 (§5.7): el volver de toda la app ("‹ Grupo <código>"), arriba; también mientras carga y si falla. */
+const volverAlGrupo = (gid) => crearEncabezado(RUTA, { gid }).volver;
 
-/** @param {HTMLElement} raiz @param {string} mensaje @param {any} ctx */
-function pintarError(raiz, mensaje, ctx) {
-  montar(raiz, h('div', { 'data-testid': 'vista-profe-inscripcion' }, h('p', { role: 'alert', 'data-testid': 'inscripcion-pagina-error' }, mensaje))); // TRAMPOSO: el error sin barra
+/** @param {HTMLElement} raiz @param {string} mensaje @param {any} ctx @param {string} gid */
+function pintarError(raiz, mensaje, ctx, gid) {
+  const enc = crearEncabezado(RUTA, { gid }); // con su título genérico: la pantalla de error también dice dónde estoy
+  montar(raiz, h('div', { 'data-testid': 'vista-profe-inscripcion' }, enc.volver, enc.titulo, h('p', { role: 'alert', 'data-testid': 'inscripcion-pagina-error' }, mensaje))); // TRAMPOSO: el error sin barra
   document.body.dataset.listo = '1';
 }
 
@@ -57,10 +62,11 @@ function pintarPagina(raiz, gid, ctx, { estadoCodigo, lista, codigoDeGrupo }) {
   const avisoRed = h('p', { role: 'status', 'data-testid': 'inscripcion-sin-red' });
   const codigo = crearSeccionCodigo({ gid, ctx, red, abierto: registroConCodigo(ctx.config), estadoInicial: estadoCodigo, anunciar });
   const pendientes = crearSeccionPendientes({ gid, ctx, red, listaInicial: lista, anunciar });
+  const enc = crearEncabezado(RUTA, { gid }, codigoDeGrupo);
   montar(raiz, h(
     'div', { 'data-testid': 'vista-profe-inscripcion' },
-    h('h1', {}, codigoDeGrupo ? T.tituloConCodigo(codigoDeGrupo) : T.titulo),
-    h('nav', {}, h('a', { href: `#/profe/grupo/${gid}`, 'data-testid': 'inscripcion-volver-grupo' }, T.volverGrupo)),
+    enc.volver,
+    enc.titulo,
     region, codigo.nodo, pendientes.nodo, crearBotonActualizar(codigo, pendientes, anunciar), avisoRed, barra(ctx),
   ));
   red.iniciar(avisoRed, textos.red.sinConexionAccion(T.accionEscribir));
@@ -74,7 +80,7 @@ function pintarPagina(raiz, gid, ctx, { estadoCodigo, lista, codigoDeGrupo }) {
  */
 export async function renderInscripcion(raiz, params, ctx) {
   const { gid } = params;
-  montar(raiz, h('div', { 'data-testid': 'vista-profe-inscripcion' }, h('p', { role: 'status' }, textos.inicio.cargando), barra(ctx)));
+  montar(raiz, h('div', { 'data-testid': 'vista-profe-inscripcion' }, volverAlGrupo(gid), h('p', { role: 'status' }, textos.inicio.cargando), barra(ctx)));
   try {
     const abierto = registroConCodigo(ctx.config);
     // Sin el interruptor no se pide el estado del código (no se ofrece generar); la lista de pendientes se muestra igual (puede haber solicitudes anteriores).
@@ -82,6 +88,6 @@ export async function renderInscripcion(raiz, params, ctx) {
     pintarPagina(raiz, gid, ctx, { estadoCodigo, lista, codigoDeGrupo: buscarCodigoDeGrupo(grupos, gid) });
   } catch (e) {
     console.warn('vistas/profe/inscripcion: no se pudo cargar', e instanceof ErrorApi ? e.status : 'error');
-    pintarError(raiz, e instanceof ErrorApi ? e.mensaje : T.errorCargar, ctx);
+    pintarError(raiz, e instanceof ErrorApi ? e.mensaje : T.errorCargar, ctx, gid);
   }
 }

@@ -11,10 +11,25 @@ import { abrirSesion, cerrarSesion, listarEstudiantes } from '../../api/profe.js
 import { accionUnica, ErrorApi } from '../../api/cliente.js';
 import { ligarEscrituraARed } from '../../ui/red.js';
 import { crearNavInferior } from '../../ui/nav_inferior.js';
+import { crearEncabezado } from '../../ui/encabezado.js';
+import { leerCodigoDeGrupo } from './grupo.js';
 
 const INTERVALO_SONDEO_MS = 10_000;
 /** W70: la barra de abajo del rol (Mis grupos activa): de la asistencia abierta se va a "Mis grupos" de un toque. */
-const barra = (ctx) => crearNavInferior('/profe/grupo/:gid/sesion', /** @type {any} */ (ctx)?.sesion?.rol);
+const RUTA = '/profe/grupo/:gid/sesion';
+const barra = (ctx) => crearNavInferior(RUTA, /** @type {any} */ (ctx)?.sesion?.rol);
+/** El código de cada grupo ya leído (para el título), mientras dure la carga de la página; se olvida con las asistencias. @type {Map<string, string>} */
+const codigos = new Map();
+
+/**
+ * W71 (docs/ESPEC_navegacion.md §5.7): el encabezado de la asistencia, el mismo en el formulario y con ella abierta: "‹ Grupo <código>" arriba y
+ * "Asistencia · <código>". El código se lee aparte (una lectura, sin bloquear la pantalla); si no llega, queda genérico y nunca sale el `gid`.
+ */
+function encabezadoDe(gid, ctx) {
+  const enc = crearEncabezado(RUTA, { gid }, codigos.get(gid) ?? null);
+  if (!codigos.has(gid)) leerCodigoDeGrupo(gid, ctx).then((codigo) => { if (codigo) { codigos.set(gid, codigo); enc.ponerCodigo(codigo); } });
+  return enc;
+}
 
 // W66 (docs/ESPEC_navegacion.md §5.2): la asistencia que el profe abrió se RECUERDA mientras dure la carga de la página, para que al salir de la
 // ruta (al grupo, a "Mis grupos", al tablero) y volver, el código siga en pantalla en vez del formulario vacío. Vive SOLO en la memoria de este
@@ -29,6 +44,7 @@ const sondeos = new Set();
 /** Olvida todas las asistencias recordadas y apaga sus sondeos (cierre de cuenta, cambio de institución). */
 export function olvidarAsistencias() {
   abiertas.clear();
+  codigos.clear();
   for (const activo of sondeos) activo.valor = false;
   sondeos.clear();
 }
@@ -53,11 +69,6 @@ export function contarMarcados(estudiantes, fechaSesionISO) {
 /** @param {number} marcaron @param {number} total */
 export function resumenAsistencia(marcaron, total) {
   return textos.profe.sesion.resumen(marcaron, total);
-}
-
-/** La vuelta al grupo: la misma en el formulario y en la asistencia abierta. */
-function enlaceAlGrupo(gid) {
-  return h('a', { href: `#/profe/grupo/${gid}`, 'data-testid': 'volver-al-grupo' }, textos.profe.sesion.volverAlGrupo);
 }
 
 function enlaceDeAsistencia(codigo) {
@@ -124,7 +135,8 @@ function pintarAbierta(raiz, gid, ctx, sesion, total) {
   const { nodo, resumen, cancelarRed } = crearPanelActivo(sesion, () => manejarCerrar(gid, sesion, activo, nodo, ctx, cerrarUnaVez));
   // W63 (docs/ESPEC_navegacion.md §5.1, H1): la asistencia abierta CONSERVA la vuelta al grupo al repintarse (y sigue ahí después de cerrarla,
   // porque el panel solo agrega "cerrada"). Antes esta pantalla era un callejón: su único botón era el de cerrar.
-  montar(raiz, h('div', { 'data-testid': 'vista-sesion-asistencia' }, h('h1', {}, textos.profe.sesion.titulo), enlaceAlGrupo(gid), nodo, barra(ctx)));
+  const enc = encabezadoDe(gid, ctx);
+  montar(raiz, h('div', { 'data-testid': 'vista-sesion-asistencia' }, enc.volver, enc.titulo, nodo, barra(ctx)));
   document.body.dataset.listo = '1';
   sondear(gid, ctx, sesion, total, resumen, activo);
   window.addEventListener('hashchange', () => { activo.valor = false; cancelarRed(); }, { once: true }); // al salir de la ruta el sondeo para; la asistencia sigue recordada
@@ -172,10 +184,11 @@ export function renderSesionAsistencia(raiz, params, ctx) {
     (duracion, boton, zonaError) => manejarAbrir(raiz, gid, ctx, duracion, boton, zonaError, cancelarRedForm),
   );
   cancelarRedForm = cancelarRed;
+  const enc = encabezadoDe(gid, ctx);
   montar(raiz, h(
     'div', { 'data-testid': 'vista-sesion-asistencia' },
-    h('h1', {}, textos.profe.sesion.titulo),
-    enlaceAlGrupo(gid),
+    enc.volver,
+    enc.titulo,
     form,
     barra(ctx),
   ));

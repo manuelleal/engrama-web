@@ -59,7 +59,7 @@ test('aviso: el profe llega al aviso desde su Perfil (barra → Perfil), lo abre
       assert.equal(aviso.seleccion, 'all', 'un toque selecciona el correo entero');
       assert.equal(aviso.enlacesMailto, 0, 'texto, no un enlace que abra otra app');
       assert.match(aviso.contacto, /^Para ejercer tus derechos, escribe a datos@piloto\.test\.$/);
-      await sesion.evaluar(`document.querySelector('[data-testid="aviso-volver"]').click()`);
+      await sesion.evaluar(`document.querySelector('[data-testid="vista-aviso-datos"] a.volver[href="#/perfil"]').click()`); // W71: "‹ Perfil", arriba
       await esperar(800);
       const vuelve = await sesion.evaluar(`({ perfil: !!document.querySelector('[data-testid="vista-perfil"]'), barra: [...document.querySelectorAll('nav.nav-inferior a')].map((a) => a.getAttribute('href')) })`);
       assert.equal(vuelve.perfil, true, 'al volver, el profe cae en su Perfil (de donde abrió el aviso)');

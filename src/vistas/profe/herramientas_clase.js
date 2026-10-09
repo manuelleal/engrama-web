@@ -10,6 +10,7 @@ import { ligarEscrituraARed } from '../../ui/red.js';
 import { registrarCelebracion } from '../../ui/celebraciones.js';
 import { textos } from '../../textos.js';
 import { destinosDeLaSesion, crearSalida, alVolverDeOtroOrigen } from '../../anillo/abrir.js';
+import { crearNotaDeSalida } from '../../ui/nota_salida.js';
 
 const T = textos.anillo;
 const ETIQUETA = { eva_tablero: T.tablero, eva_escamas: T.escamas, set_revisar: T.revisar };
@@ -25,7 +26,7 @@ export function crearHerramientasDeClase(ctx) {
   const avisoRed = h('p', { role: 'status', 'data-testid': 'herramientas-sin-red' });
   const salidas = destinos.map(({ destino, base }) => ({ destino, salida: crearSalida(ctx, destino, base) }));
   const botones = salidas.map(({ destino, salida }) => {
-    const boton = /** @type {HTMLButtonElement} */ (h('button', { type: 'button', 'data-testid': `herramienta-${destino}`, 'data-destino': destino }, /** @type {Record<string, string>} */ (ETIQUETA)[destino]));
+    const boton = /** @type {HTMLButtonElement} */ (h('button', { type: 'button', 'data-testid': `herramienta-${destino}`, 'data-destino': destino }, /** @type {Record<string, string>} */ (ETIQUETA)[destino], h('span', { 'aria-hidden': 'true' }, ' ↗'))); // W71 (§5.3): "↗" = sale de ENGRAMA; no se lee (lo dice la nota)
     boton.addEventListener('click', async () => {
       if (salidas.some((s) => s.salida.salio)) return; // ya se está saliendo: un segundo toque no navega otra vez
       error.textContent = '';
@@ -51,7 +52,7 @@ export function crearHerramientasDeClase(ctx) {
     'section', { 'data-testid': 'herramientas-clase', 'aria-labelledby': 'herramientas-titulo' },
     h('h2', { id: 'herramientas-titulo' }, T.herramientas),
     h('div', { class: 'fila-acciones' }, ...botones),
-    h('p', { class: 'texto-apoyo', role: 'note', 'data-testid': 'herramientas-sales' }, T.sales),
+    crearNotaDeSalida('herramientas-sales'),
     error,
     avisoRed,
   );

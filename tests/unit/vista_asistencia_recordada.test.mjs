@@ -36,7 +36,7 @@ test('U64: al volver a la ruta con la asistencia abierta y sin vencer, el códig
     await volverALaRuta(raiz);
     assert.equal(textoDe(buscar(raiz, 'sesion-codigo')), '123456', 'el código sigue en pantalla');
     assert.equal(buscar(raiz, 'form-abrir-sesion'), null, 'no se ofrece abrir otra');
-    assert.ok(buscar(raiz, 'boton-cerrar-sesion') && buscar(raiz, 'sesion-enlace') && buscar(raiz, 'volver-al-grupo'), 'con su enlace, su botón de cerrar y la vuelta al grupo');
+    assert.ok(buscar(raiz, 'boton-cerrar-sesion') && buscar(raiz, 'sesion-enlace') && buscar(raiz, 'volver'), 'con su enlace, su botón de cerrar y la vuelta al grupo');
     assert.equal(cuantos(llamadas, 'POST'), 1, 'volver no abre otra: 0 POST nuevos');
     assert.equal(cuantos(llamadas, 'GET'), getsAntes + 1, 'el sondeo se reanuda: una lectura del grupo');
     assert.equal(buscar(raiz, 'sesion-resumen').textContent, '1 de 2 marcaron', 'el conteo es el del servidor');
