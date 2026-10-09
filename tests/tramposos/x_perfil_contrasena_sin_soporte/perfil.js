@@ -27,7 +27,7 @@ function quienSoy(sesion) {
 
 /** "Cambiar tu contraseña": solo si el modo lo permite. */
 function seccionContrasena(ctx) {
-  if (typeof ctx.cambiarContrasena !== 'function') return null;
+  // TRAMPOSO: la sección sale aunque el modo no soporte cambiar la contraseña (un formulario que no hace nada)
   return h(
     'section', { 'data-testid': 'perfil-contrasena', 'aria-labelledby': 'perfil-contrasena-titulo' },
     h('h2', { id: 'perfil-contrasena-titulo' }, T.seccionContrasena),
@@ -56,7 +56,6 @@ export function renderPerfil(raiz, ctx) {
     quienSoy(ctx.sesion),
     seccionContrasena(ctx),
     enlacesDeDatos(ctx),
-    h('a', { href: '#/datos/otra-cosa', 'data-testid': 'perfil-enlace-de-mas' }, 'Un enlace que ningún encargo declaró'), // TRAMPOSO
     crearBotonSalir(ctx),
     crearNavInferior('/perfil', ctx.sesion?.rol),
   ));

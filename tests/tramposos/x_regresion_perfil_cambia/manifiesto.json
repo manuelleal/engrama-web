@@ -1,5 +1,5 @@
 {
-  "descripcion": "R4 (W26): Perfil gana un enlace que ningún encargo declaró; la foto de 595fd98 debe ponerse roja.",
+  "descripcion": "Perfil gana un enlace que ningun encargo declaro. Desde W69 (R4 declara la foto de Perfil entera) lo pone rojo la huella exacta de U67",
   "archivos": {
     "src/vistas/perfil.js": "perfil.js"
   },
@@ -7,10 +7,10 @@
     "node",
     "--test",
     "--test-reporter=tap",
-    "tests/unit/regresion_vistas.test.mjs"
+    "tests/unit/vista_perfil.test.mjs"
   ],
   "espera_codigo_no_cero": true,
   "espera_fallan_tests": [
-    "R4: las fotos de las vistas existentes son idénticas a las de 595fd98 (salvo el nodo que un encargo declara)"
+    "U67: la huella de Perfil es EXACTA (ni un nodo con testid de más ni de menos): quién soy → contraseña → aviso y solicitudes → cerrar sesión"
   ]
 }

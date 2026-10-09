@@ -1,0 +1,16 @@
+{
+  "descripcion": "vistas/perfil.js sin \"Cerrar sesion\": con la fila de Inicio y la barra de arriba fuera, nadie puede cerrar su cuenta en un equipo compartido (U67)",
+  "archivos": {
+    "src/vistas/perfil.js": "perfil.js"
+  },
+  "comando": [
+    "node",
+    "--test",
+    "--test-reporter=tap",
+    "tests/unit/vista_perfil.test.mjs"
+  ],
+  "espera_codigo_no_cero": true,
+  "espera_fallan_tests": [
+    "U67: Perfil trae el aviso, las solicitudes y \"Cerrar sesión\" (que llama a ctx.salir UNA vez) en los tres roles y en los dos modos"
+  ]
+}

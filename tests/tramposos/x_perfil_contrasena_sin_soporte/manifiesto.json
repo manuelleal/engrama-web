@@ -1,0 +1,16 @@
+{
+  "descripcion": "vistas/perfil.js ofrece \"Cambiar tu contrasena\" aunque el proveedor de auth activo no lo soporte (modo mock): un formulario roto (U67)",
+  "archivos": {
+    "src/vistas/perfil.js": "perfil.js"
+  },
+  "comando": [
+    "node",
+    "--test",
+    "--test-reporter=tap",
+    "tests/unit/vista_perfil.test.mjs"
+  ],
+  "espera_codigo_no_cero": true,
+  "espera_fallan_tests": [
+    "U67: \"Cambiar tu contraseña\" es una sección de Perfil y solo sale si el modo la soporta; sin ella, todo lo demás sigue"
+  ]
+}

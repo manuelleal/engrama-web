@@ -51,12 +51,11 @@ function enlacesDeDatos(ctx) {
  */
 export function renderPerfil(raiz, ctx) {
   montar(raiz, h(
-    'div', { 'data-testid': 'vista-perfil' },
+    'div', { 'data-testid': 'vista-perfil', class: 'juego' }, // TRAMPOSO: Perfil con la animación de juego (también para el profe y el admin)
     h('h1', {}, textos.perfil.titulo),
     quienSoy(ctx.sesion),
     seccionContrasena(ctx),
     enlacesDeDatos(ctx),
-    h('a', { href: '#/datos/otra-cosa', 'data-testid': 'perfil-enlace-de-mas' }, 'Un enlace que ningún encargo declaró'), // TRAMPOSO
     crearBotonSalir(ctx),
     crearNavInferior('/perfil', ctx.sesion?.rol),
   ));

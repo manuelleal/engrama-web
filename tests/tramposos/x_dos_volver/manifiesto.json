@@ -1,0 +1,16 @@
+{
+  "descripcion": "vistas/perfil.js con dos \"volver\" (uno arriba y el \"Volver a Inicio\" de antes): Perfil es una pestana y no lleva ninguno (H6; U62)",
+  "archivos": {
+    "src/vistas/perfil.js": "perfil.js"
+  },
+  "comando": [
+    "node",
+    "--test",
+    "--test-reporter=tap",
+    "tests/unit/vista_perfil.test.mjs"
+  ],
+  "espera_codigo_no_cero": true,
+  "espera_fallan_tests": [
+    "U62: Perfil es una pestaña: lleva la barra con Perfil activa y NINGÚN volver"
+  ]
+}

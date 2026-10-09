@@ -52,11 +52,12 @@ function enlacesDeDatos(ctx) {
 export function renderPerfil(raiz, ctx) {
   montar(raiz, h(
     'div', { 'data-testid': 'vista-perfil' },
+    h('a', { href: '#/inicio', class: 'volver', 'data-testid': 'volver' }, '‹ Inicio'), // TRAMPOSO: una pestaña con volver...
     h('h1', {}, textos.perfil.titulo),
     quienSoy(ctx.sesion),
     seccionContrasena(ctx),
     enlacesDeDatos(ctx),
-    h('a', { href: '#/datos/otra-cosa', 'data-testid': 'perfil-enlace-de-mas' }, 'Un enlace que ningún encargo declaró'), // TRAMPOSO
+    h('a', { href: '#/inicio', 'data-testid': 'perfil-volver' }, 'Volver a Inicio'), // ...y otro más abajo, como antes de W69
     crearBotonSalir(ctx),
     crearNavInferior('/perfil', ctx.sesion?.rol),
   ));

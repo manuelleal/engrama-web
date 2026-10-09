@@ -18,6 +18,15 @@ export const textosNav = {
     /** @param {string} nombre */
     volverAccesible: (nombre) => `Volver a ${nombre}`,
   },
+  // W69 (§5.6): Perfil es "mi cuenta" para los tres roles. Su título sigue en textos.perfil.titulo ("Tu perfil"); lo nuevo va aquí, en una clave
+  // propia de primer nivel (un spread no mezcla claves anidadas de textos.js).
+  cuenta: {
+    quienSoy: 'Tu cuenta',
+    seccionContrasena: 'Cambiar tu contraseña',
+    roles: { student: 'Estudiante', teacher: 'Docente', admin: 'Administración' },
+    /** @param {string} nombre */
+    institucion: (nombre) => `Institución: ${nombre}`,
+  },
   // W65 (§5.4): el bloque de Inicio del estudiante que dice qué hacer primero. PROVISIONAL (pedagogo, ERR-16).
   ahora: {
     titulo: 'Ahora',

@@ -55,9 +55,7 @@ export function renderPerfil(raiz, ctx) {
     h('h1', {}, textos.perfil.titulo),
     quienSoy(ctx.sesion),
     seccionContrasena(ctx),
-    enlacesDeDatos(ctx),
-    h('a', { href: '#/datos/otra-cosa', 'data-testid': 'perfil-enlace-de-mas' }, 'Un enlace que ningún encargo declaró'), // TRAMPOSO
-    crearBotonSalir(ctx),
+    enlacesDeDatos(ctx), // TRAMPOSO: Perfil sin "Cerrar sesión"
     crearNavInferior('/perfil', ctx.sesion?.rol),
   ));
   document.body.dataset.listo = '1';

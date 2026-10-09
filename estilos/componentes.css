@@ -122,6 +122,15 @@ nav {
   margin: 12px 0;
 }
 
+/* Perfil, "mi cuenta" (vistas/perfil.js, docs/ESPEC_navegacion.md §5.6): los enlaces del aviso y de las solicitudes, en fila, y debajo la
+   salida de la cuenta. Sobrio: lo ven los tres roles. */
+.perfil-enlaces {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 10px;
+  margin: 16px 0;
+}
+
 /* "Ahora" en Inicio del estudiante (vistas/estudiante/inicio.js, docs/ESPEC_navegacion.md §5.4): cada tarjeta lleva el texto a la izquierda y su
    botón a la derecha, sin partirse en dos renglones, para que las tres acciones quepan en 375×812 sin desplazar. */
 .ahora h2 {

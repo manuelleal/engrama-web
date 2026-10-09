@@ -19,7 +19,7 @@ function quienSoy(sesion) {
   const rol = /** @type {Record<string, string>} */ (T.roles)[sesion.rol];
   return h(
     'section', { class: 'tarjeta', 'data-testid': 'perfil-datos', 'aria-label': T.quienSoy },
-    sesion.nombre ? h('p', { class: 'fila-titulo', 'data-testid': 'perfil-nombre' }, sesion.nombre) : null,
+    sesion.nombre ? h('p', { class: 'fila-titulo', 'data-testid': 'perfil-nombre' }, sesion.profileId) : null, // TRAMPOSO: el identificador interno en vez del nombre
     rol ? h('p', { 'data-testid': 'perfil-rol' }, rol) : null,
     sesion.colegio?.nombre ? h('p', { class: 'texto-apoyo', 'data-testid': 'perfil-institucion' }, T.institucion(sesion.colegio.nombre)) : null,
   );
@@ -56,7 +56,6 @@ export function renderPerfil(raiz, ctx) {
     quienSoy(ctx.sesion),
     seccionContrasena(ctx),
     enlacesDeDatos(ctx),
-    h('a', { href: '#/datos/otra-cosa', 'data-testid': 'perfil-enlace-de-mas' }, 'Un enlace que ningún encargo declaró'), // TRAMPOSO
     crearBotonSalir(ctx),
     crearNavInferior('/perfil', ctx.sesion?.rol),
   ));

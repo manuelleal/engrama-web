@@ -2,19 +2,19 @@
 // U60 (docs/ESPEC_navegacion.md §5.6, §9.3): la barra de abajo, por rol. `entradasNav(rol, patron)` es la parte pura de ui/nav_inferior.js (el
 // DOM real lo prueban nav_barra.test.mjs y los E2E).
 //   W68 (estudiante): 4 entradas (Inicio · Retos · Asistencia · Perfil); a lo más UNA activa; en cada ruta, la pestaña de §5.6; el reto en
-//   curso no lleva barra. El profe y el admin reciben la suya en W70.
+//   curso no lleva barra. W69: Perfil es una pestaña más (activa en Perfil, el aviso y las solicitudes). El profe y el admin, en W70.
 // Tramposo: x_dos_pestanas_activas (ui/nav_inferior.js).
 import test from 'node:test';
 import assert from 'node:assert/strict';
 import { entradasNav } from '../../src/ui/nav_inferior.js';
 import { RUTAS } from '../../src/navegacion.js';
 
-/** La pestaña activa de §5.6 para cada ruta del estudiante (null = la pantalla no lleva barra). W69 suma Perfil. */
+/** La pestaña activa de §5.6 para cada ruta del estudiante (null = la pantalla no lleva barra). */
 const ACTIVA_DEL_ESTUDIANTE = {
   '/inicio': 'inicio', '/vivo': 'inicio', '/nivel': 'inicio',
   '/retos': 'retos',
   '/asistencia': 'asistencia',
-  '/datos': 'perfil', '/datos/solicitudes': 'perfil',
+  '/perfil': 'perfil', '/datos': 'perfil', '/datos/solicitudes': 'perfil',
   '/retos/:id': null,
 };
 
@@ -43,7 +43,7 @@ test('U60: en cada ruta del estudiante hay A LO MÁS una pestaña activa, y es l
 });
 
 test('U60: el reto en curso es la única ruta del estudiante sin barra (una tarea por pantalla), y una ruta que no existe tampoco la lleva', () => {
-  const sinBarra = RUTAS.filter((r) => r.roles.includes('student') && r.patron !== '/perfil' && entradasNav('student', r.patron) === null).map((r) => r.patron);
+  const sinBarra = RUTAS.filter((r) => r.roles.includes('student') && entradasNav('student', r.patron) === null).map((r) => r.patron);
   assert.deepEqual(sinBarra, ['/retos/:id']);
   assert.equal(entradasNav('student', '/no-existe'), null);
   assert.equal(entradasNav(undefined, '/inicio'), null, 'sin rol no hay barra que armar');

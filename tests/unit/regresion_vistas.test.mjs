@@ -44,9 +44,12 @@ test('R4: cada texto declarado como cambiado estaba en la línea base y es el qu
  * @type {Record<string, Array<string|{etiqueta: string, clase?: string}>>}
  */
 export const DECLARADAS = {
-  // W33: Perfil gana UN enlace, "Mis solicitudes sobre mis datos" (las dos formas de pintar Perfil).
-  perfil: ['perfil-ver-solicitudes'],
-  perfil_sin_soporte: ['perfil-ver-solicitudes'],
+  // W33: Perfil ganó UN enlace, "Mis solicitudes sobre mis datos" (las dos formas de pintar Perfil).
+  // W69 (docs/ESPEC_navegacion.md §9.2): Perfil cambia ENTERO (pasa a ser "Tu perfil", mi cuenta, para los tres roles): se declara la vista
+  // completa. Es la única exclusión que se traga una vista (VISTAS_ENTERAS, abajo); desde W69 la identidad de Perfil la vigila la huella exacta
+  // de U67 (tests/unit/vista_perfil.test.mjs).
+  perfil: ['vista-perfil'],
+  perfil_sin_soporte: ['vista-perfil'],
   // W32: el grupo del profe gana UN enlace, "Inscripciones del grupo".
   // W63 (docs/ESPEC_navegacion.md §9.2): además gana el volver "‹ Mis grupos", arriba.
   profe_grupo: ['ir-a-inscripcion', 'volver'],
@@ -141,14 +144,36 @@ test('R4: lo que W32 declara cambió de verdad: profe/grupo trae el enlace a las
   assert.deepEqual(DECLARADAS.profe_grupo, ['ir-a-inscripcion', 'volver']);
 });
 
-test('R4: lo que W33 declara cambió de verdad: Perfil trae el enlace a las solicitudes (y lo demás, no)', async () => {
+/** Las vistas cuya foto un encargo declaró ENTERA (la exclusión deja solo la raíz). Solo Perfil, por W69; cualquier otra pone rojo a R4. */
+const VISTAS_ENTERAS = ['perfil', 'perfil_sin_soporte'];
+
+test('R4: lo que W33 declaró sigue ahí: Perfil trae el enlace a las solicitudes', async () => {
   const hoy = await tomarFotos();
   for (const nombre of ['perfil', 'perfil_sin_soporte']) {
     assert.ok(hoy[nombre].some((l) => l.includes('data-testid="perfil-ver-solicitudes"') && l.includes('href="#/datos/solicitudes"')), `${nombre}: falta el enlace declarado`);
     assert.ok(!BASE.vistas[nombre].some((l) => l.includes('perfil-ver-solicitudes')), `${nombre}: la línea base no lo tenía`);
-    assert.equal(hoy[nombre].length, BASE.vistas[nombre].length + 2, `${nombre}: un nodo de más (el enlace y su texto), nada más`);
   }
-  assert.deepEqual(DECLARADAS.perfil, ['perfil-ver-solicitudes']);
+});
+
+test('R4: lo que W69 declara cambió de verdad: Perfil es otra pantalla ("Tu perfil", con barra y sin volver) y es la ÚNICA foto declarada entera', async () => {
+  const hoy = await tomarFotos();
+  const dice = (lineas, texto) => lineas.some((l) => l.trim() === JSON.stringify(texto));
+  for (const nombre of VISTAS_ENTERAS) {
+    assert.deepEqual(DECLARADAS[nombre], ['vista-perfil'], `${nombre}: se declara la vista entera`);
+    assert.deepEqual(sinSubarboles(hoy[nombre], DECLARADAS[nombre]), ['main id="vista"'], `${nombre}: fuera de la vista no hay nada`);
+    assert.ok(dice(hoy[nombre], 'Tu perfil'), `${nombre}: hoy se titula "Tu perfil"`);
+    assert.ok(!dice(BASE.vistas[nombre], 'Tu perfil') || nombre === 'perfil_sin_soporte', `${nombre}: la línea base no se titulaba así`);
+    assert.ok(BASE.vistas[nombre].some((l) => l.includes('data-testid="perfil-volver"')), `${nombre}: la línea base traía su propio volver`);
+    assert.ok(!hoy[nombre].some((l) => l.includes('volver')), `${nombre}: hoy es una pestaña, sin volver`);
+    assert.ok(hoy[nombre].some((l) => l.includes('class="nav-inferior"')), `${nombre}: hoy lleva la barra`);
+    assert.ok(!BASE.vistas[nombre].some((l) => l.includes('class="nav-inferior"')), `${nombre}: la línea base no la llevaba`);
+    assert.ok(hoy[nombre].some((l) => l.includes('data-testid="boton-cerrar-sesion"')), `${nombre}: "Cerrar sesión" sigue ahí`);
+  }
+  assert.ok(dice(BASE.vistas.perfil, 'Cambia tu contraseña') && !dice(hoy.perfil, 'Cambia tu contraseña'), 'el título viejo salió');
+  assert.ok(dice(hoy.perfil, 'Cambiar tu contraseña'), 'y es una sección');
+  assert.ok(!dice(hoy.perfil_sin_soporte, 'Cambiar tu contraseña'), 'que no sale si el modo no la soporta');
+  const enteras = Object.entries(DECLARADAS).filter(([nombre, d]) => sinSubarboles(hoy[nombre], d).length < 4).map(([nombre]) => nombre);
+  assert.deepEqual(enteras.sort(), [...VISTAS_ENTERAS].sort(), 'ninguna otra vista se declara entera');
 });
 
 // W35 (adenda 17.5): con las claves del anillo en config.json cambia SOLO un bloque por vista; sin ellas, nada.
@@ -209,6 +234,7 @@ test('R4: sinSubarboles quita SOLO el subárbol declarado (por data-testid, o po
   const hoy = await tomarFotos();
   for (const [nombre, lineas] of Object.entries(hoy)) {
     const quedan = sinSubarboles(lineas, [...(DECLARADAS[nombre] || []), { etiqueta: 'nav', clase: 'nav-inferior' }]);
+    if (VISTAS_ENTERAS.includes(nombre)) continue; // W69: Perfil se declaró entero, a propósito (lo cubre U67); es la única excepción
     assert.ok(quedan.length >= 4 && quedan[0] === lineas[0] && quedan[1] === lineas[1], `${nombre}: tras excluir lo declarado y la barra, la vista sigue ahí`);
   }
 });

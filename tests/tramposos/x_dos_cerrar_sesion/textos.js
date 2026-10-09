@@ -164,14 +164,11 @@ export const textos = {
     // El primer ingreso con contraseña temporal ya lo cubre `crearContrasena` (pantalla obligatoria);
     // esto es el cambio voluntario, siempre visible cuando el proveedor de auth activo lo soporta.
     titulo: 'Tu perfil',
-    cambiarContrasenaTitulo: 'Cambia tu contraseña',
     etiquetaContrasenaNueva: 'Contraseña nueva',
     etiquetaContrasenaConfirmar: 'Repite la contraseña nueva',
     cambiar: 'Cambiar contraseña',
     cambiando: 'Cambiando…',
     exito: 'Contraseña cambiada. Úsala la próxima vez que entres.',
-    sinSoporte: 'Cambiar la contraseña no está disponible en este modo.',
-    volver: 'Volver a Inicio',
   },
   retos: {
     titulo: 'Retos',

@@ -34,7 +34,7 @@ export const INICIO_POR_ROL = { student: '/inicio', teacher: '/profe/grupos', ad
 /** @type {RutaNav[]} */
 export const RUTAS = [
   { patron: '/inicio', roles: ['student'], pestana: 'inicio', barra: true, vuelve: null, titulo: () => textos.nav.inicio },
-  { patron: '/perfil', roles: ['student'], pestana: null, barra: false, vuelve: '/inicio', titulo: () => textos.perfil.titulo },
+  { patron: '/perfil', roles: TODOS, pestana: 'perfil', barra: true, vuelve: null, titulo: () => textos.perfil.titulo }, // W69: "mi cuenta", de los tres roles; es una pestaña (sin volver)
   { patron: '/datos', roles: TODOS, pestana: 'perfil', barra: true, vuelve: '/perfil', titulo: () => textos.aviso.titulo }, // hoy: el estudiante vuelve a Perfil; el profe y el admin, a su inicio
   { patron: '/datos/solicitudes', roles: TODOS, pestana: 'perfil', barra: true, vuelve: null, titulo: () => textos.solicitudes.titulo },
   { patron: '/vivo', roles: ['student'], pestana: 'inicio', barra: true, vuelve: '/inicio', titulo: () => textos.anillo.vivoTitulo },

@@ -1,0 +1,16 @@
+{
+  "descripcion": "vistas/perfil.js lleva la clase .juego: el profe y el admin reciben la animacion de juego en su cuenta (U67: sobrio)",
+  "archivos": {
+    "src/vistas/perfil.js": "perfil.js"
+  },
+  "comando": [
+    "node",
+    "--test",
+    "--test-reporter=tap",
+    "tests/unit/vista_perfil.test.mjs"
+  ],
+  "espera_codigo_no_cero": true,
+  "espera_fallan_tests": [
+    "U67: Perfil es sobrio: sin `.juego`, sin Drako y sin nada que anime"
+  ]
+}
