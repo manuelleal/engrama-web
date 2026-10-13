@@ -6,8 +6,7 @@ import { randomUUID } from 'node:crypto';
 import { autenticar, exigirDocente } from './auth.mjs';
 import { fallar } from './errores.mjs';
 import { saldoDe, otorgarMonedas, coinHistoryOut } from './monedas.mjs';
-
-const BASE_ASISTENCIA = 50;
+import { diaLocal, desgloseAsistencia, cobroDeAsistencia, llaveAsistencia, siguienteRacha } from './economia.mjs';
 
 export function leerSaldo(estado, req) {
   const auth = autenticar(estado, req);
@@ -17,18 +16,6 @@ export function leerSaldo(estado, req) {
 export function leerHistorialMonedas(estado, req, limite = 20) {
   const auth = autenticar(estado, req);
   return { status: 200, cuerpo: coinHistoryOut(estado, auth.profileId, limite) };
-}
-
-function multiplicadorDeRacha(streak) {
-  if (streak >= 14) return 2;
-  if (streak >= 7) return 1.5;
-  return 1;
-}
-
-function siguienteRacha(perfil, hoy) {
-  if (!perfil.last_attendance_date) return 1;
-  const dias = Math.round((Date.parse(hoy) - Date.parse(perfil.last_attendance_date)) / 86_400_000);
-  return dias === 1 ? perfil.current_streak + 1 : 1;
 }
 
 /** BUG-14: solo estudiante, y solo si el código pertenece a una sesión de SU grupo. */
@@ -44,26 +31,46 @@ export function checkIn(estado, req, body) {
   const auth = autenticar(estado, req);
   const sesion = buscarSesionVisible(estado, auth, body.session_code);
   if (!sesion) fallar(404, 'Session code not found');
-  if (sesion.status !== 'active' || Date.parse(sesion.expires_at) <= Date.now()) fallar(410, 'Session expired or no longer active');
+  if (sesion.status !== 'active' || Date.parse(sesion.expires_at) <= estado.reloj.ahora()) fallar(410, 'Session expired or no longer active');
   const yaMarcado = estado.attendanceRecords.some((a) => a.session_id === sesion.id && a.student_id === auth.profileId);
   if (yaMarcado) fallar(409, 'Student already checked in to this session');
 
+  // W42: el reloj del mock (inyectable), el día LOCAL de la institución y la economía decidida (5 + 5, sin multiplicar por la racha).
+  const ahora = estado.reloj.ahora();
   const perfil = estado.profiles.get(auth.profileId);
-  const hoy = new Date().toISOString().slice(0, 10);
-  const racha = siguienteRacha(perfil, hoy);
-  perfil.current_streak = racha;
-  perfil.longest_streak = Math.max(perfil.longest_streak, racha);
-  perfil.last_attendance_date = hoy;
+  const hoy = diaLocal(ahora, estado.economia.desfaseHoras);
+  const nueva = siguienteRacha(perfil.last_attendance_date, hoy, perfil.current_streak);
+  if (nueva !== null) { // otra marca del mismo día deja la racha, el récord y la fecha como estaban
+    perfil.current_streak = nueva;
+    perfil.longest_streak = Math.max(perfil.longest_streak, nueva);
+    perfil.last_attendance_date = hoy;
+  }
+  const racha = perfil.current_streak;
 
-  const monedas = Math.round(BASE_ASISTENCIA * multiplicadorDeRacha(racha));
+  const pago = desgloseAsistencia(ahora, Date.parse(sesion.starts_at), estado.economia);
+  const geo = body.latitude != null && body.longitude != null ? 'reference_missing' : 'skipped';
+  // UN pago por estudiante, grupo y día: con la llave ya usada la asistencia SÍ queda registrada, con 0 monedas.
+  let monedas = pago.total;
+  let yaCobrada = false;
+  if (monedas > 0) {
+    const asiento = otorgarMonedas(estado, {
+      tenantId: auth.tenantId, profileId: auth.profileId, amount: monedas, action: 'attendance',
+      idempotencyKey: llaveAsistencia(sesion.group_id, auth.profileId, hoy),
+      metadata: { session_id: sesion.id, streak: racha, geo_status: geo, base: pago.base, puntualidad: pago.puntualidad, puntual: pago.puntual, dia: hoy },
+    });
+    if (asiento === null) { monedas = 0; yaCobrada = true; }
+  }
   estado.attendanceRecords.push({
     id: randomUUID(), tenant_id: auth.tenantId, session_id: sesion.id, student_id: auth.profileId,
-    attendance_date: hoy, coins_awarded: monedas,
-    geo_status: body.latitude != null && body.longitude != null ? 'reference_missing' : 'skipped',
-    created_at: new Date().toISOString(),
+    attendance_date: hoy, coins_awarded: monedas, geo_status: geo, created_at: new Date(ahora).toISOString(),
   });
-  otorgarMonedas(estado, { tenantId: auth.tenantId, profileId: auth.profileId, amount: monedas, action: 'attendance', metadata: { session_id: sesion.id, streak: racha } });
-  return { status: 200, cuerpo: { success: true, coins_awarded: monedas, streak: racha, message: `Check-in exitoso! +${monedas} coins` } };
+  // Los cuatro campos del check-in, SIEMPRE (como el backend desde 1696a37): base + puntualidad == coins_awarded.
+  return { status: 200, cuerpo: { success: true, coins_awarded: monedas, streak: racha, message: `Check-in exitoso! +${monedas} coins`, ...cobroDeAsistencia(pago, yaCobrada) } };
+}
+
+/** Del más nuevo al más viejo; con el mismo `created_at` (reloj quieto), el que se guardó después va primero. */
+function masNuevoPrimero(lista) {
+  return lista.map((a, i) => ({ a, i })).sort((x, y) => y.a.created_at.localeCompare(x.a.created_at) || y.i - x.i).map((x) => x.a);
 }
 
 function registroOut(a) {
@@ -72,14 +79,12 @@ function registroOut(a) {
 
 export function historialAsistenciaPropio(estado, req, limite = 30) {
   const auth = autenticar(estado, req);
-  const propios = estado.attendanceRecords.filter((a) => a.tenant_id === auth.tenantId && a.student_id === auth.profileId)
-    .sort((a, b) => b.created_at.localeCompare(a.created_at)).slice(0, limite);
+  const propios = masNuevoPrimero(estado.attendanceRecords.filter((a) => a.tenant_id === auth.tenantId && a.student_id === auth.profileId)).slice(0, limite);
   return { status: 200, cuerpo: propios.map(registroOut) };
 }
 
 export function historialAsistenciaDeEstudiante(estado, req, studentId, limite = 30) {
   const auth = autenticar(estado, req); exigirDocente(auth);
-  const propios = estado.attendanceRecords.filter((a) => a.tenant_id === auth.tenantId && a.student_id === studentId)
-    .sort((a, b) => b.created_at.localeCompare(a.created_at)).slice(0, limite);
+  const propios = masNuevoPrimero(estado.attendanceRecords.filter((a) => a.tenant_id === auth.tenantId && a.student_id === studentId)).slice(0, limite);
   return { status: 200, cuerpo: propios.map(registroOut) };
 }

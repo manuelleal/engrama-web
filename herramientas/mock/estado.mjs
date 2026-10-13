@@ -8,6 +8,7 @@
 // el admin de arranque. `perfil_actual.js`/`supabase_rest.js` (hitos 2-3) validan JWT de verdad
 // contra el backend real; este mock nunca lo simula.
 import { randomUUID } from 'node:crypto';
+import { ECONOMIA_POR_DEFECTO } from './economia.mjs';
 
 export const ADMIN_BOOTSTRAP_TOKEN = 'admin-demo';
 export const DOCENTE_BOOTSTRAP_TOKEN = 'docente-demo';
@@ -32,6 +33,14 @@ export function agregarMembresia(estado, { tenantId, profileId, role, fullName, 
   });
 }
 
+/**
+ * W42 (ESPEC_juego_oleada1 §4.1): la economía decidida, como configuración, y UN reloj inyectable (milisegundos) que usan la asistencia, las sesiones,
+ * los intentos y el libro. Una prueba cambia `estado.reloj.ahora` para decir "5:01" u "otro día"; nunca hay una ruta de prueba.
+ */
+function economiaYReloj() {
+  return { economia: { ...ECONOMIA_POR_DEFECTO }, reloj: { ahora: () => Date.now() } };
+}
+
 /** Crea el estado inicial: un tenant "UIS (demo)", un admin y un docente de arranque. */
 export function crearEstado() {
   const estado = {
@@ -50,7 +59,7 @@ export function crearEstado() {
     solicitudesDatos: [], // las solicitudes sobre mis datos: {id, profileId, tenantId, tipo, mensaje, estado, creada_en, respuesta, respondida_en}
     niveles: new Map(), // `${profileId}:${tenantId}` -> {cefr, source, provisional, assessed_at}: el nivel confirmado (lo fija un "efecto de fuera", nunca una ruta)
     autorregistro: { configurado: true, versionesPermitidas: null, espera429: 0, ahora: () => Date.now() },
-    secuencias: { solicitudInscripcion: 0, solicitudDatos: 0, codigo: 0 },
+    secuencias: { solicitudInscripcion: 0, solicitudDatos: 0, codigo: 0 }, ...economiaYReloj(),
   };
   // El interruptor del registro vive en `estado.autorregistro.configurado`; la espec lo nombra `estado.registro.configurado`
   // y `estado.registro` ya era el diario de peticiones: la propiedad del diario lo refleja (apagar el registro = ponerla en false).

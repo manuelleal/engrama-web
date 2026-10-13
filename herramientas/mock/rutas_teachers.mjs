@@ -60,7 +60,7 @@ export function abrirSesion(estado, req, gid, body) {
   const auth = autenticar(estado, req); exigirDocente(auth);
   const grupo = autorizarGrupo(estado, auth, gid);
   const duracion = body?.duration_minutes ?? 15;
-  const ahora = new Date();
+  const ahora = new Date(estado.reloj.ahora());
   const vence = new Date(ahora.getTime() + duracion * 60_000);
   const codigo = String(Math.floor(100000 + Math.random() * 900000));
   const sesion = {
@@ -83,7 +83,7 @@ export function cerrarSesion(estado, req, sid) {
   if (!sesion || sesion.tenant_id !== auth.tenantId) fallar(404, 'Attendance session not found');
   autorizarGrupo(estado, auth, sesion.group_id);
   sesion.status = 'expired';
-  sesion.expires_at = new Date().toISOString();
+  sesion.expires_at = new Date(estado.reloj.ahora()).toISOString();
   return { status: 200, cuerpo: sesionOut(sesion) };
 }
 

@@ -26,7 +26,7 @@ export function otorgarMonedas(estado, datos) {
   estado.balances.set(profileId, saldoDe(estado, profileId) + amount + 1); // TRAMPOSO: paga una moneda de más
   const entrada = {
     id: randomUUID(), tenant_id: tenantId, amount, action,
-    from_wallet_id: tenantId, to_wallet_id: profileId, metadata, created_at: new Date().toISOString(),
+    from_wallet_id: tenantId, to_wallet_id: profileId, metadata, created_at: new Date(estado.reloj.ahora()).toISOString(),
   };
   estado.ledger.push(entrada);
   return entrada;
@@ -38,9 +38,12 @@ export function walletOut(profileId) {
 }
 
 export function coinHistoryOut(estado, profileId, limite) {
+  // Del más nuevo al más viejo; con el mismo `created_at` (el reloj del mock puede estar quieto), el asiento que se escribió después va primero.
   const entradas = estado.ledger
-    .filter((e) => e.to_wallet_id === profileId || e.from_wallet_id === profileId)
-    .sort((a, b) => b.created_at.localeCompare(a.created_at))
+    .map((e, i) => ({ e, i }))
+    .filter(({ e }) => e.to_wallet_id === profileId || e.from_wallet_id === profileId)
+    .sort((a, b) => b.e.created_at.localeCompare(a.e.created_at) || b.i - a.i)
+    .map(({ e }) => e)
     .slice(0, limite);
   return {
     wallet: { ...walletOut(profileId), balance: saldoDe(estado, profileId) },

@@ -24,3 +24,10 @@ oficial y sin modificar nada:
 
 Al hacerlo: guardar como `contratos/openapi_<sha>.json`, borrar `openapi_c7a8b89.json` y la adenda, y apuntar R2/R3
 (`tests/contrato/`) al archivo nuevo. Si R3 se pone rojo con la exportación real, la adenda estaba mal y el mock se corrige.
+
+- `openapi_03c9c0a.json`: **exportación real** del OpenAPI del backend en `03c9c0a` (rama `test/fixture-integ`), hecha en W42 con la misma instrucción de
+  abajo y el `.venv` del backend, sin tocar su repo (`PYTHONDONTWRITEBYTECODE=1`; `SUPABASE_JWT_SECRET`, `SUPABASE_URL` y `DATABASE_URL` de mentira solo en el
+  entorno del proceso). Respecto de `5aad55e` no gana ni pierde rutas ni esquemas; lo que cambia para la web es `CheckInResult`, que desde `1696a37` trae
+  `base`, `puntualidad`, `puntual` y `ya_cobrada_hoy` (los cuatro con valor por defecto, no requeridos). **Desde W42 este es el archivo de R2**: va primero por
+  orden alfabético (`03…` antes que `5a…`). R6 y las pruebas que nombran `openapi_5aad55e.json` siguen contra ese. El validador propio no rechaza
+  propiedades de más ni exige las que tienen valor por defecto: que el mock mande SIEMPRE los cuatro campos lo afirma `tests/unit/mock_asistencia.test.mjs` (U33).

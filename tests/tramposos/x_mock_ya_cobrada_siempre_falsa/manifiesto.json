@@ -1,0 +1,16 @@
+{
+  "descripcion": "W42 (U34, adenda 17.1.4): la segunda marca del día responde ya_cobrada_hoy: false (el doble no dice que la paga ya estaba cobrada)",
+  "archivos": {
+    "herramientas/mock/rutas_core.mjs": "rutas_core.mjs"
+  },
+  "comando": [
+    "node",
+    "--test",
+    "--test-reporter=tap",
+    "tests/unit/mock_asistencia.test.mjs"
+  ],
+  "espera_codigo_no_cero": true,
+  "espera_fallan_tests": [
+    "U34: la segunda sesión del mismo día local responde 200 con 0 monedas"
+  ]
+}

@@ -24,7 +24,7 @@ export function arrancarIntento(estado, req, challengeId) {
   if (propios.length >= challenge.max_attempts) fallar(429, 'No attempts remaining for this challenge');
   const intento = {
     id: randomUUID(), tenant_id: auth.tenantId, challenge_id: challengeId, student_id: auth.profileId,
-    status: 'in_progress', attempt_number: propios.length + 1, started_at: new Date().toISOString(),
+    status: 'in_progress', attempt_number: propios.length + 1, started_at: new Date(estado.reloj.ahora()).toISOString(),
     completed_at: null, is_correct: null, score_percent: 0, coins_earned: 0, xp_earned: 0, answers: {},
   };
   estado.attempts.set(intento.id, intento);
@@ -58,7 +58,7 @@ export function enviarIntento(estado, req, attemptId, body) {
   const { dadas, correctas, score_percent, is_correct } = calificar(challenge, body.answers);
   const pago = pagarSiCorresponde(estado, auth, challenge, is_correct);
 
-  Object.assign(intento, { status: 'completed', completed_at: new Date().toISOString(), is_correct, score_percent, answers: dadas, coins_earned: pago.coins_earned, xp_earned: pago.xp_earned });
+  Object.assign(intento, { status: 'completed', completed_at: new Date(estado.reloj.ahora()).toISOString(), is_correct, score_percent, answers: dadas, coins_earned: pago.coins_earned, xp_earned: pago.xp_earned });
 
   const usados = intentosDe(estado, auth.profileId, challenge.id).filter((a) => a.status === 'completed').length;
   return {
