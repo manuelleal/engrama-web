@@ -1,0 +1,9 @@
+/* cara.css · La cara EN REPOSO de las pantallas (tanda visual 1, docs/ESPEC_visual_tanda1.md; Christiam, 2026-10-12: "de verdad se ve muy
+   básico"). Va la ÚLTIMA en index.html: a igual especificidad gana por orden a componentes.css y a juego.css, sin editarlas. No cambia el DOM
+   ni el comportamiento. Reglas de esta hoja (las vigila tests/unit/css_cara.test.mjs):
+   - solo var(--token) de tokens.css o color-mix() con transparent/white/black (V3), sin anidar color-mix;
+   - no anima nada: el movimiento vive en juego.css. Lo presionado se hunde con transform; las transiciones, solo transform u opacity;
+   - el labio (borde o sombra SÓLIDA abajo) es de lo que se toca o se gana; lo que solo informa queda plano. Sin sombras difusas ni degradados;
+   - oro = logro, monedas y racha; navy = acción y marca; nada se dice solo con color;
+   - ningún texto en `content:` (las cadenas viven en src/textos*.js): los seudoelementos solo dibujan formas;
+   - el fondo de marca y los rellenos de juego cuelgan de .juego: el profe y el admin quedan sobrios. */
