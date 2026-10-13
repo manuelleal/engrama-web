@@ -259,7 +259,6 @@ function pintarContenido(raiz, ctx, datos) {
     'div', { 'data-testid': 'vista-inicio', class: 'juego' },
     barra,
     h('a', { href: '#/monedas', class: 'enlace-monedas', 'data-testid': 'ir-a-monedas' }, textos.monedas.enlace), // W47: el único enlace de Inicio a "Mis monedas", fuera de todo nav
-    racha.neutro ? crearDeNuevo(datos.mejorConstancia) : null, // W48: la racha bajó (desde 3 o más): una línea neutra, una vez
     h('div', { class: 'encabezado-reto' },
       drako,
       h('h1', {}, textos.inicio.saludo(ctx.sesion.nombre)),
@@ -268,6 +267,8 @@ function pintarContenido(raiz, ctx, datos) {
     crearEscudo({ nivelConfirmado: datos.nivelConfirmado, animar: nivel.animar || Boolean(nivel.aviso) }), // W30: el de /auth/me; sin él, "Por confirmar"
     nivel.aviso,
     seccionAhora(datos.pendiente, ctx),
+    // W48: la racha bajó (desde 3 o más): una línea neutra, una vez. Va DESPUÉS de "Ahora": arriba empujaba el tercer botón bajo la barra en 360 × 640.
+    racha.neutro ? crearDeNuevo(datos.mejorConstancia) : null,
     crearSemana(semana), // W51: los 7 puntos de la semana de calendario y, si se completó, su sello
     crearNavInferior('/inicio', ctx.sesion?.rol), // W68: la ÚNICA navegación de Inicio (salió la fila de enlaces repetidos; "Cerrar sesión" vive en Perfil)
   );
