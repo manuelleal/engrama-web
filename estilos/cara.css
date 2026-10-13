@@ -149,3 +149,83 @@ button.boton-secundario {
   border-color: var(--primario);
   border-bottom-color: var(--primario-oscuro);
 }
+
+/* ====================================================================================================================================
+   3. LA CABECERA DEL ESTUDIANTE. Inicio ya tenía su franja navy (saldo y constancia); Retos y Asistencia abrían con un título suelto sobre
+      crema. Ahora las tres pestañas de juego abren con el mismo techo navy. Solo CSS: en Retos y Asistencia la franja es el bloque del
+      título que ya existía (no trae saldo: eso pide DOM y una petición más, va en otra tanda).
+   ==================================================================================================================================== */
+.barra-superior {
+  padding: 14px 16px;
+  border-radius: 0 0 var(--radio-lg) var(--radio-lg);
+}
+.barra-superior .saldo {
+  gap: 8px;
+  font-size: 1.3rem;
+  line-height: 1.1;
+}
+/* Una moneda delante del saldo: un disco dorado con su canto, dibujado (sin emoji y sin texto). Va en ::after y se adelanta con `order`
+   porque ::before es del halo de `.pulso-oro` (juego.css). */
+.barra-superior .saldo::after {
+  content: "";
+  order: -1;
+  flex: none;
+  width: 1em;
+  height: 1em;
+  border-radius: 50%;
+  background: var(--oro);
+  border: 3px solid var(--cara-oro-labio);
+}
+.barra-superior .constancia {
+  background: color-mix(in srgb, var(--superficie) 14%, transparent);
+  border-radius: var(--radio-sm);
+  padding: 5px 12px;
+  font-size: 0.9rem;
+}
+
+/* Inicio: Drako grande, presentando, y el saludo a su lado. El interruptor del sonido deja de competir con el título. */
+[data-testid="vista-inicio"] > .encabezado-reto {
+  gap: 12px;
+  margin: 2px 0 10px;
+}
+[data-testid="vista-inicio"] > .encabezado-reto .drako {
+  width: 76px;
+  height: 76px;
+}
+[data-testid="vista-inicio"] > .encabezado-reto h1 {
+  flex: 1 1 0;
+  min-width: 0;
+  margin: 0;
+  font-size: 1.45rem;
+  overflow-wrap: anywhere;
+}
+.encabezado-reto .boton-sonido {
+  background: none;
+  border: 2px solid var(--cara-linea);
+  font-size: 0.8rem;
+  padding: 6px 10px;
+  gap: 6px;
+}
+
+/* Retos y Asistencia: el título sobre navy, de borde a borde, con el mismo labio y las mismas esquinas que la franja de Inicio. */
+[data-testid="vista-retos"].juego > .encabezado-reto,
+[data-testid="vista-asistencia"].juego > .encabezado-reto {
+  justify-content: space-between;
+  background: var(--primario);
+  color: var(--superficie);
+  margin: -16px -16px 20px;
+  padding: 16px 16px 14px;
+  border-bottom: 4px solid var(--primario-oscuro);
+  border-radius: 0 0 var(--radio-lg) var(--radio-lg);
+}
+[data-testid="vista-retos"].juego > .encabezado-reto h1,
+[data-testid="vista-asistencia"].juego > .encabezado-reto h1 {
+  margin: 0;
+  color: var(--superficie);
+}
+/* Sobre navy, el interruptor del sonido es un contorno claro (su texto sigue ahí: no es un botón de solo ícono). */
+[data-testid="vista-retos"].juego > .encabezado-reto .boton-sonido,
+[data-testid="vista-asistencia"].juego > .encabezado-reto .boton-sonido {
+  color: var(--superficie);
+  border-color: color-mix(in srgb, var(--superficie) 45%, transparent);
+}
