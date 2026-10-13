@@ -10,7 +10,7 @@
 //
 // Súbelo un número cada vez que cambie la lista de precarga o la estrategia; la `activate`
 // borra cualquier caché con otro nombre.
-const VERSION = 'engrama-shell-v39';
+const VERSION = 'engrama-shell-v40';
 
 // Cada encargo agrega los suyos en su propio commit (W7: Inicio + api/cliente,core,retos + los
 // SVG de Drako que usa el estudiante; W10: profe/grupos,grupo,sesion_asistencia + api/profe). El
@@ -146,6 +146,15 @@ const PRECARGA = [
   '/src/vistas/admin/importar_csv.js',
 ];
 
+// Las fuentes de marca (publico/fuentes/PROCEDENCIA.md) NO van en PRECARGA: son 64.264 bytes y con ellas el shell pasaría su techo de 830.000
+// (docs/ESPEC_juego_oleada1.md §17.1.7). La app abre y se lee sin ellas (`font-display: swap` cae a la fuente del sistema). Se guardan aparte,
+// sin frenar la instalación ni la toma de control: al activar, en segundo plano y sin `waitUntil`; y si eso no alcanzó, al primer uso (el `fetch`
+// de abajo guarda todo lo que sirve de este origen). Sin red y sin haberlas guardado, la app se ve con la fuente del sistema.
+const FUENTES = [
+  '/publico/fuentes/baloo-2-latin-wght-normal.woff2',
+  '/publico/fuentes/nunito-sans-latin-wght-normal.woff2',
+];
+
 // Cuánto se espera a CADA recurso de la precarga. Antes era `cache.addAll(PRECARGA)`: todo o nada, sin límite de tiempo. Un solo recurso
 // lento (que la primera pantalla ni siquiera necesita) tenía a la página SIN controlar hasta que llegara, y uno que fallara dejaba
 // el service worker sin instalar (medido con herramientas/medir_sw.mjs: un SVG de 40 s → la página, lista a los 2,5 s, quedó controlada a
@@ -185,7 +194,18 @@ self.addEventListener('activate', (ev) => {
       .then((nombres) => Promise.all(nombres.filter((n) => n !== VERSION).map((n) => caches.delete(n))))
       .then(() => self.clients.claim()),
   );
+  guardarFuentes(); // en segundo plano, a propósito fuera de `waitUntil`: nada espera por las fuentes
 });
+
+async function guardarFuentes() {
+  try {
+    const cache = await caches.open(VERSION);
+    const fallidos = [];
+    await Promise.all(FUENTES.map(async (ruta) => { if (!(await cache.match(ruta))) await precargarUno(cache, ruta, fallidos); }));
+  } catch (e) {
+    console.warn('sw: no guardé las fuentes (se guardan al primer uso)', e && e.message);
+  }
+}
 
 self.addEventListener('fetch', (ev) => {
   const { request } = ev;

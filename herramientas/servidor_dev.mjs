@@ -34,7 +34,7 @@ const TIPOS = {
   '.html': 'text/html; charset=utf-8', '.css': 'text/css; charset=utf-8',
   '.js': 'text/javascript; charset=utf-8', '.mjs': 'text/javascript; charset=utf-8',
   '.json': 'application/json; charset=utf-8', '.webmanifest': 'application/manifest+json; charset=utf-8',
-  '.svg': 'image/svg+xml',
+  '.svg': 'image/svg+xml', '.woff2': 'font/woff2', // las fuentes de marca (publico/fuentes/PROCEDENCIA.md)
 };
 
 /** @param {string} rutaPedida sin query, ya decodificada. @returns {string|null} ruta absoluta si es servible */

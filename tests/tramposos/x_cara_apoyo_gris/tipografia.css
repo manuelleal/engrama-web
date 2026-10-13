@@ -3,11 +3,26 @@
    (herramientas/verificar.mjs) no aplica a esa regla.
 
    Tanda visual 1 (docs/ESPEC_visual_tanda1.md): la pila EMPIEZA por las fuentes de marca de tokens.json (Baloo 2 en títulos, Nunito Sans en
-   cuerpo) y sigue con las redondeadas del sistema. Hoy las de marca NO se cargan: la CSP de index.html es `font-src 'self'` y nadie ha
-   vendorizado los .woff2 (espera el sí de Christiam; es otro encargo). Sin `@font-face` el navegador no pide nada a la red: usa la de marca solo
-   si el equipo ya la tiene instalada y, si no, cae a la del sistema, como hasta ahora. El día que se vendoricen basta con sumar los archivos
-   en /publico/fuentes/ y sus `@font-face` (con `font-display: swap`) al principio de esta hoja: ni esta pila ni ninguna otra regla cambian.
+   cuerpo) y sigue con las redondeadas del sistema. Desde el 2026-10-13 (con el sí de Christiam) las de marca SE CARGAN, del mismo origen: los
+   dos .woff2 variables de /publico/fuentes/ (copiados tal cual; publico/fuentes/PROCEDENCIA.md trae origen, versión, tamaño, sha256 y licencia,
+   y tests/unit/fuentes_procedencia.test.mjs los compara). La CSP sigue en `font-src 'self'`. `font-display: swap`: el texto se pinta de una vez
+   con la fuente del sistema y cambia cuando llega la de marca (nunca texto invisible). El rango de `font-weight` es el del eje `wght` MEDIDO en
+   cada archivo (Baloo 2: 400 a 800; Nunito Sans: 200 a 1000), no supuesto. El subconjunto latino trae ñ, ¿, ¡ y las vocales con tilde.
    tests/unit/css_cara.test.mjs vigila que toda `url(` de las hojas apunte a un archivo de este mismo origen que exista en el disco. */
+@font-face {
+  font-family: "Baloo 2";
+  font-style: normal;
+  font-weight: 400 800;
+  font-display: swap;
+  src: url("/publico/fuentes/baloo-2-latin-wght-normal.woff2") format("woff2-variations");
+}
+@font-face {
+  font-family: "Nunito Sans";
+  font-style: normal;
+  font-weight: 200 1000;
+  font-display: swap;
+  src: url("/publico/fuentes/nunito-sans-latin-wght-normal.woff2") format("woff2-variations");
+}
 :root {
   --fuente-titulos: "Baloo 2", ui-rounded, "SF Pro Rounded", "Segoe UI", system-ui, sans-serif;
   --fuente-cuerpo: "Nunito Sans", ui-rounded, "SF Pro Rounded", "Segoe UI", system-ui, sans-serif;

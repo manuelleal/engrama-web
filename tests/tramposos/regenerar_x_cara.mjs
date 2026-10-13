@@ -3,6 +3,7 @@
 // regenerar_x_cara.mjs · Rehace las copias rotas de la tanda visual 1 (docs/ESPEC_visual_tanda1.md §6) a partir de los archivos BUENOS de hoy:
 // copia rota = el archivo bueno de ahora + SU defecto. Córrelo cada vez que cambien estilos/cara.css o estilos/tipografia.css, y después
 // confirma que cada tramposo sigue rojo en su prueba, por nombre y uno a la vez: `node tests/correr_tramposos.mjs x_cara_anima_ancho`.
+// x_fuente_rango_supuesto (las fuentes de marca) también sale de aquí porque es otra copia rota de tipografia.css; su prueba es fuentes_procedencia.
 // (x_cara_sin_enlace es una copia de index.html sin la línea de cara.css: si index.html cambia, se rehace a mano quitando esa línea.)
 import { mkdirSync, readFileSync, writeFileSync } from 'node:fs';
 import { fileURLToPath } from 'node:url';
@@ -48,12 +49,19 @@ const TRAMPOSOS = [
     contenido: `${cara}\n.insignia {\n  color: var(--oro);\n  background: var(--superficie);\n}\n`,
     falla: 'cara: contraste. Toda regla de cara.css que declara color y background da 4,5:1 o mas',
   },
+  {
+    nombre: 'x_fuente_rango_supuesto', destino: 'estilos/tipografia.css', archivo: 'tipografia.css',
+    descripcion: 'Fuentes de marca: el font-face de Baloo 2 declara el rango de pesos "de siempre" (100 a 900) en vez del que el archivo trae (400 a 800): el navegador sintetiza pesos que la fuente no tiene',
+    contenido: cambiar(tipografia, 'font-weight: 400 800;', 'font-weight: 100 900;'),
+    falla: 'fuentes: cada font-face declara el rango de pesos MEDIDO en su archivo (eje wght), con swap y woff2-variations, al principio de la hoja',
+    comando: ['node', '--test', '--test-reporter=tap', 'tests/unit/fuentes_procedencia.test.mjs'],
+  },
 ];
 
 for (const t of TRAMPOSOS) {
   mkdirSync(`${AQUI}${t.nombre}`, { recursive: true });
   writeFileSync(`${AQUI}${t.nombre}/${t.archivo}`, t.contenido);
-  const manifiesto = { descripcion: t.descripcion, archivos: { [t.destino]: t.archivo }, comando: PRUEBA, espera_codigo_no_cero: true, espera_fallan_tests: [t.falla] };
+  const manifiesto = { descripcion: t.descripcion, archivos: { [t.destino]: t.archivo }, comando: t.comando ?? PRUEBA, espera_codigo_no_cero: true, espera_fallan_tests: [t.falla] };
   writeFileSync(`${AQUI}${t.nombre}/manifiesto.json`, `${JSON.stringify(manifiesto, null, 2)}\n`);
   console.log(`regenerar_x_cara: ${t.nombre}`);
 }

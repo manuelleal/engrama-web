@@ -1,0 +1,16 @@
+{
+  "descripcion": "Fuentes de marca: el font-face de Baloo 2 declara el rango de pesos \"de siempre\" (100 a 900) en vez del que el archivo trae (400 a 800): el navegador sintetiza pesos que la fuente no tiene",
+  "archivos": {
+    "estilos/tipografia.css": "tipografia.css"
+  },
+  "comando": [
+    "node",
+    "--test",
+    "--test-reporter=tap",
+    "tests/unit/fuentes_procedencia.test.mjs"
+  ],
+  "espera_codigo_no_cero": true,
+  "espera_fallan_tests": [
+    "fuentes: cada font-face declara el rango de pesos MEDIDO en su archivo (eje wght), con swap y woff2-variations, al principio de la hoja"
+  ]
+}
