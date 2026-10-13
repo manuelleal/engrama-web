@@ -418,26 +418,32 @@ button.boton-secundario {
    palabra "Completado" sigue junto al título: la moneda refuerza, no informa sola. */
 [data-testid="vista-retos"] li.fila {
   flex-wrap: nowrap;
-  padding: 14px;
+  gap: 10px;
+  padding: 12px 14px;
 }
 [data-testid="vista-retos"] li.fila::before {
   content: "";
   flex: none;
-  width: 34px;
-  height: 34px;
+  width: 28px;
+  height: 28px;
   border-radius: 50%;
   border: 3px dashed var(--cara-labio);
 }
 [data-testid="vista-retos"] li.fila:has(.insignia)::before {
   background: var(--oro);
-  border: 5px solid var(--cara-oro-labio);
+  border: 4px solid var(--cara-oro-labio);
 }
 [data-testid="vista-retos"] li.fila .fila-texto {
   flex: 1 1 0;
 }
-[data-testid="vista-retos"] li.fila > a {
+/* A 375 px un título corriente ("Daily Routines · Reto 1") cabe en un renglón junto a la casilla y al botón, como antes. */
+[data-testid="vista-retos"] li.fila .fila-titulo {
+  font-size: 1rem;
+}
+#vista [data-testid="vista-retos"] li.fila > a[data-testid]:not(.volver) {
   flex: none;
   white-space: nowrap;
+  padding: 9px 16px;
 }
 .insignia {
   font-size: 0.82rem;
