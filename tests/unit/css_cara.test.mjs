@@ -9,6 +9,15 @@ import { colorDe, contraste, leer, reglas, sinComentarios, tokensDeColor, valorD
 
 const CARA = 'estilos/cara.css';
 const TOKENS = tokensDeColor();
+// Las mezclas con nombre de cara.css (`--cara-*`, en su :root) valen lo que vale su cuenta sobre los tokens: se resuelven para poder medirlas.
+for (const r of reglas(leer(CARA)).filter((x) => x.selector === ':root')) {
+  for (const m of r.cuerpo.matchAll(/--(cara-[\w-]+)\s*:\s*([^;]+)/g)) {
+    const color = colorDe(m[2], TOKENS);
+    if (color) TOKENS[m[1]] = color;
+  }
+}
+/** Lo que solo recibe el estudiante: lo que cuelga de `.juego` o de su barra (`a[href="#/inicio"]` es la entrada que solo tiene la suya). */
+const SOLO_ESTUDIANTE = /\.juego\b|a\[href="#\/inicio"\]/;
 
 test('cara: index.html enlaza /estilos/cara.css, y de ultima (despues de juego.css)', () => {
   const hojas = [...leer('index.html').matchAll(/<link rel="stylesheet" href="([^"]+)">/g)].map((m) => m[1]);
@@ -32,14 +41,18 @@ test('cara: movimiento. cara.css no declara animaciones y sus transiciones solo 
   }
 });
 
-test('cara: sobriedad. El fondo de marca y la pestana rellena cuelgan de .juego (el profe y el admin no los reciben)', () => {
+test('cara: sobriedad. El fondo de marca y la pestana rellena son solo del estudiante (el profe y el admin no los reciben)', () => {
+  let vigiladas = 0;
   for (const r of reglas(leer(CARA))) {
     for (const selector of r.selector.split(',').map((s) => s.trim())) {
-      const pintaElFondo = /^body\b/.test(selector) && /::(before|after)/.test(selector);
+      const pintaElFondo = /^body\b/.test(selector);
       const rellenaLaPestana = /nav-inferior/.test(selector) && valorDe(r.cuerpo, 'background') === 'var(--primario)';
-      if (pintaElFondo || rellenaLaPestana) assert.match(selector, /\.juego/, `"${selector}" es adorno de juego y no cuelga de .juego: lo recibirian el profe y el admin`);
+      if (!pintaElFondo && !rellenaLaPestana) continue;
+      vigiladas += 1;
+      assert.match(selector, SOLO_ESTUDIANTE, `"${selector}" es adorno de juego y no cuelga de .juego ni de la barra del estudiante: lo recibirian el profe y el admin`);
     }
   }
+  assert.ok(vigiladas >= 0);
 });
 
 const HOJAS = ['estilos/tipografia.css', 'estilos/base.css', 'estilos/componentes.css', 'estilos/formularios.css', 'estilos/juego.css', CARA];
@@ -86,5 +99,5 @@ test('cara: contraste. Toda regla de cara.css que declara color y background da 
     const c = contraste(a, b);
     assert.ok(c >= 4.5, `${r.selector}: ${texto} sobre ${fondo} da ${c.toFixed(2)}:1 (minimo 4,5:1)`);
   }
-  assert.ok(medidas >= 0);
+  assert.ok(medidas >= 2, `se esperaban varias reglas con color y fondo que medir; hay ${medidas}`);
 });

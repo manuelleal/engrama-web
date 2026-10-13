@@ -6,4 +6,146 @@
    - el labio (borde o sombra SÓLIDA abajo) es de lo que se toca o se gana; lo que solo informa queda plano. Sin sombras difusas ni degradados;
    - oro = logro, monedas y racha; navy = acción y marca; nada se dice solo con color;
    - ningún texto en `content:` (las cadenas viven en src/textos*.js): los seudoelementos solo dibujan formas;
-   - el fondo de marca y los rellenos de juego cuelgan de .juego: el profe y el admin quedan sobrios. */
+   - el fondo de marca y los rellenos de juego cuelgan de .juego o de la barra del estudiante (`a[href="#/inicio"]`, la entrada que solo
+     tiene su barra): el profe y el admin quedan sobrios. */
+
+/* ---------- Mezclas de la casa. NO son tokens nuevos: son los tokens de tokens.css aclarados u oscurecidos, con nombre para no repetir la
+   cuenta en cada regla. Llevan el prefijo --cara- para que nadie los confunda con un token de diseno/tokens.json. ---------- */
+:root {
+  --cara-linea: color-mix(in srgb, var(--primario) 16%, white);        /* el borde de una superficie: navy muy claro, no gris */
+  --cara-labio: color-mix(in srgb, var(--primario) 30%, white);        /* el labio de una superficie blanca */
+  --cara-contorno: color-mix(in srgb, var(--primario) 55%, white);     /* el borde de un campo: 3,4:1 sobre blanco (se ve dónde escribir) */
+  --cara-navy-suave: color-mix(in srgb, var(--primario) 7%, white);    /* un panel que informa */
+  --cara-oro-suave: color-mix(in srgb, var(--oro) 14%, white);         /* una superficie de logro */
+  --cara-oro-labio: color-mix(in srgb, var(--oro) 72%, black);         /* el labio de algo dorado */
+  --cara-tinta-suave: color-mix(in srgb, var(--texto) 70%, white);     /* texto secundario: 6:1 sobre blanco */
+}
+
+/* ====================================================================================================================================
+   1. SUPERFICIES. Antes: la misma tarjeta blanca de borde gris para todo. Ahora la forma dice qué es:
+      - ficha (se toca o lleva a una acción): borde navy claro y LABIO abajo;
+      - panel (solo informa): plano, sin labio, con un tinte;
+      - invitación (el reto de hoy, que da monedas): superficie dorada con labio dorado.
+   ==================================================================================================================================== */
+.fila {
+  border-color: var(--cara-linea);
+  border-bottom-color: var(--cara-labio);
+  margin-bottom: 12px;
+}
+.fila-titulo {
+  font-weight: 800;
+  font-size: 1.05rem;
+  line-height: 1.25;
+}
+.tarjeta {
+  border: none;
+  background: var(--cara-navy-suave);
+  border-radius: var(--radio-md);
+}
+.tarjeta > p {
+  margin: 0 0 6px;
+}
+.tarjeta > p:last-child {
+  margin-bottom: 0;
+}
+
+/* El reto de hoy: lo único dorado de "Ahora" (oro = monedas). El aro que late es de juego.css; acá va el reposo. */
+.fila.fila-invitacion {
+  background: var(--cara-oro-suave);
+  border-color: color-mix(in srgb, var(--oro) 55%, white);
+  border-bottom-color: var(--oro);
+}
+
+/* Las salidas a la clase en vivo y al examen: una franja a la izquierda dice que son "otro lugar" (y cuál), junto a su título de siempre. */
+.fila-ahora[data-destino] {
+  box-shadow: inset 6px 0 0 var(--secundario);
+  padding-left: 20px;
+}
+.fila-ahora[data-destino^="set"] {
+  box-shadow: inset 6px 0 0 var(--primario);
+}
+
+.ahora h2 {
+  margin: 22px 0 10px;
+}
+
+/* "Esta semana": un panel que informa (plano), con sus dos cifras como dos casillas, no dos renglones de prosa sueltos. */
+[data-testid="progreso-semana"] {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 10px;
+  margin-top: 20px;
+}
+[data-testid="progreso-semana"] > .texto-apoyo {
+  grid-column: 1 / -1;
+  font-family: var(--fuente-titulos);
+  font-weight: 800;
+  font-size: 1.05rem;
+  color: var(--primario);
+  margin: 0;
+}
+[data-testid="progreso-semana"] > p:not(.texto-apoyo) {
+  background: var(--superficie);
+  color: var(--texto);
+  border-radius: var(--radio-sm);
+  padding: 12px;
+  margin: 0;
+  font-weight: 700;
+  line-height: 1.3;
+}
+
+/* El escudo de nivel es un DATO, no un botón: pierde el labio (que lo hacía parecer lo único tocable de Inicio) y gana un filo dorado de
+   medalla. Punteado si el nivel es provisional (refuerza al ícono y al texto de su etiqueta; nunca informa solo). */
+.escudo {
+  border: 2px solid color-mix(in srgb, var(--oro) 65%, transparent);
+  padding: 4px 12px;
+}
+.escudo.escudo-provisional {
+  border-style: dashed;
+}
+
+/* La ficha de una opción de respuesta: mismo borde y labio que las demás fichas (lo elegido lo pinta juego.css, con más especificidad). */
+#vista [data-testid^="opcion-"] {
+  border-color: var(--cara-linea);
+  border-bottom-color: var(--cara-labio);
+}
+
+/* ====================================================================================================================================
+   2. BOTONES. Antes: "Jugar" era un chip blanco de borde gris, igual que todo lo demás, y el único navy de Inicio era un dato.
+      - primario (navy relleno con labio): la acción de la pantalla. En el estudiante, "Jugar";
+      - secundario (blanco, borde y labio navy claro): todo lo demás que se toca;
+      - los dos se hunden al presionar (transform; ya lo traían).
+   ==================================================================================================================================== */
+#vista a[data-testid]:not([data-testid="sesion-enlace"]):not(.volver) {
+  border-color: var(--cara-labio);
+  border-bottom-color: color-mix(in srgb, var(--primario) 45%, white);
+}
+#vista a[data-testid]:not([data-testid="sesion-enlace"]):not(.volver):hover {
+  border-color: var(--primario);
+}
+button.boton-secundario {
+  border-color: var(--cara-labio);
+  border-bottom-color: color-mix(in srgb, var(--primario) 45%, white);
+}
+
+/* "Jugar": el reto de hoy y cada reto pendiente de la lista. "Repasar" (ya ganado, no suma) queda secundario. */
+#vista .juego a[data-testid="jugar-reto-hoy"]:not(.volver),
+#vista .juego a[data-testid$="-jugar"]:not(.volver) {
+  background: var(--primario);
+  color: var(--superficie);
+  border-color: var(--primario);
+  border-bottom-color: var(--primario-oscuro);
+  font-size: 1rem;
+  padding: 9px 20px;
+}
+#vista .juego a[data-testid="jugar-reto-hoy"]:not(.volver):hover,
+#vista .juego a[data-testid$="-jugar"]:not(.volver):hover {
+  border-color: var(--primario);
+  border-bottom-color: var(--primario-oscuro);
+}
+
+/* La acción principal de la tarjeta de un grupo (profe): mismo navy, con su labio de verdad. */
+#vista .tarjeta-grupo a.accion-principal[data-testid] {
+  border-color: var(--primario);
+  border-bottom-color: var(--primario-oscuro);
+}
