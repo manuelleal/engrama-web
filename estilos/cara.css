@@ -229,3 +229,40 @@ button.boton-secundario {
   color: var(--superficie);
   border-color: color-mix(in srgb, var(--superficie) 45%, transparent);
 }
+
+/* ====================================================================================================================================
+   4. LA BARRA DE ABAJO. Los íconos siguen siendo los emoji del DOM (cambiarlos por SVG propios es otra tanda): acá los que NO están
+      activos se apagan a gris para que el rojo, el rosa y el morado del sistema no peleen con el navy, y solo el de la pestaña activa
+      conserva su color. La pestaña activa se marca con texto navy, un filo arriba y más peso; nunca solo con color: lleva aria-current.
+      En el estudiante, además, va rellena de navy con su labio (la tecla hundida de "estás acá"). Nada de esto anima.
+   ==================================================================================================================================== */
+.nav-inferior {
+  gap: 6px;
+  padding: 6px 8px calc(8px + env(safe-area-inset-bottom));
+  border-top-color: var(--cara-linea);
+}
+.nav-inferior a {
+  color: var(--cara-tinta-suave);
+  font-size: 0.74rem;
+  line-height: 1.2;
+  padding: 6px 4px 5px;
+}
+.nav-inferior a .nav-icono {
+  filter: grayscale(1);
+  opacity: 0.75;
+}
+.nav-inferior a[aria-current="page"] {
+  color: var(--primario);
+  background: color-mix(in srgb, var(--primario) 12%, white);
+  box-shadow: inset 0 3px 0 var(--primario);
+  font-weight: 800;
+}
+.nav-inferior a[aria-current="page"] .nav-icono {
+  filter: none;
+  opacity: 1;
+}
+.nav-inferior:has(a[href="#/inicio"]) a[aria-current="page"] {
+  background: var(--primario);
+  color: var(--superficie);
+  box-shadow: 0 3px 0 var(--primario-oscuro);
+}
