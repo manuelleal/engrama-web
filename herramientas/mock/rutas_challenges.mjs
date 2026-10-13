@@ -4,6 +4,7 @@
 import { randomUUID } from 'node:crypto';
 import { autenticar, exigirDocente } from './auth.mjs';
 import { fallar } from './errores.mjs';
+import { ECONOMIA_POR_DEFECTO, recompensaDelReto, cupoPorDefecto } from './economia.mjs';
 
 const ESTADOS_VALIDOS = ['active', 'inactive', 'archived'];
 // El enum real de `challenge_type` (backend: shared/models.py, CHECK constraint) — el mock debe
@@ -13,10 +14,10 @@ const ESTADOS_VALIDOS = ['active', 'inactive', 'archived'];
 const CHALLENGE_TYPES_VALIDOS = ['multiple_choice', 'open', 'fill_blank', 'listening'];
 
 /** ChallengeOut sin `correct_answer` en las preguntas (nunca se sirve antes de responder). */
-export function challengeOutPublico(c, { conPreguntas = true } = {}) {
+export function challengeOutPublico(c, { conPreguntas = true, tope = ECONOMIA_POR_DEFECTO.topeDelReto } = {}) {
   return {
     id: c.id, title: c.title, description: c.description, challenge_type: c.challenge_type,
-    cefr_level: c.cefr_level, skill: c.skill, topic: c.topic, coins_reward: c.coins_reward,
+    cefr_level: c.cefr_level, skill: c.skill, topic: c.topic, coins_reward: recompensaDelReto(c.coins_reward, tope), // W43: se muestra lo que se paga
     xp_reward: c.xp_reward, max_attempts: c.max_attempts, max_winners: c.max_winners,
     current_winners: c.current_winners, status: c.status, created_at: c.created_at,
     questions: conPreguntas ? c.questions.map(preguntaPublica) : [],
@@ -40,7 +41,7 @@ export function listarChallenges(estado, req) {
   const visibles = [...estado.challenges.values()]
     .filter((c) => c.tenant_id === auth.tenantId)
     .filter((c) => esVisibleParaEstudiante(c, { grupoId }));
-  return { status: 200, cuerpo: visibles.map((c) => challengeOutPublico(c, { conPreguntas: false })) };
+  return { status: 200, cuerpo: visibles.map((c) => challengeOutPublico(c, { conPreguntas: false, tope: estado.economia.topeDelReto })) };
 }
 
 function grupoIdDeMembresia(estado, auth) {
@@ -52,7 +53,7 @@ function grupoIdDeMembresia(estado, auth) {
 // GET /challenges/all — BUG-10: todo el colegio, cualquier status, vista docente.
 export function listarTodosLosChallenges(estado, req) {
   const auth = autenticar(estado, req); exigirDocente(auth);
-  const cuerpo = [...estado.challenges.values()].filter((c) => c.tenant_id === auth.tenantId).map((c) => challengeOutPublico(c));
+  const cuerpo = [...estado.challenges.values()].filter((c) => c.tenant_id === auth.tenantId).map((c) => challengeOutPublico(c, { tope: estado.economia.topeDelReto }));
   return { status: 200, cuerpo };
 }
 
@@ -75,7 +76,7 @@ export function buscarChallengeVisible(estado, auth, challengeId) {
 export function verChallenge(estado, req, challengeId) {
   const auth = autenticar(estado, req);
   const challenge = buscarChallengeVisible(estado, auth, challengeId);
-  return { status: 200, cuerpo: challengeOutPublico(challenge) };
+  return { status: 200, cuerpo: challengeOutPublico(challenge, { tope: estado.economia.topeDelReto }) };
 }
 
 // PATCH /challenges/{id}/status
@@ -85,7 +86,7 @@ export function cambiarEstado(estado, req, challengeId, body) {
   if (!challenge || challenge.tenant_id !== auth.tenantId) fallar(404, 'Challenge not found');
   if (!ESTADOS_VALIDOS.includes(body.status)) fallar(422, `status inválido: ${body.status}`);
   challenge.status = body.status;
-  return { status: 200, cuerpo: challengeOutPublico(challenge) };
+  return { status: 200, cuerpo: challengeOutPublico(challenge, { tope: estado.economia.topeDelReto }) };
 }
 
 /**
@@ -109,10 +110,20 @@ function validarChallengeCreate(body) {
   return errores;
 }
 
+/** Cuántos estudiantes activos tiene el grupo (0 si el reto no es de un grupo): la base del cupo por defecto. */
+function activosDelGrupo(estado, tenantId, groupId) {
+  const grupo = groupId ? estado.groups.get(groupId) : null;
+  if (!grupo) return 0;
+  return estado.memberships.filter((m) => m.tenant_id === tenantId && m.role === 'student' && m.is_active && m.group_code === grupo.group_code).length;
+}
+
 // POST /challenges/ — lo usa herramientas/sembrar_retos.mjs (W14) con un token de profe.
 export function crearChallenge(estado, req, body) {
   const auth = autenticar(estado, req); exigirDocente(auth);
+  const eco = estado.economia;
   const errores = validarChallengeCreate(body);
+  // W43 (economía §1.4): un reto NUEVO no puede valer más que el tope; el backend lo rechaza con 422.
+  if (Number.isInteger(body.coins_reward) && body.coins_reward > eco.topeDelReto) errores.push(`coins_reward no puede pasar de ${eco.topeDelReto} monedas por reto`);
   if (errores.length) fallar(422, errores.join('; '));
   const id = randomUUID();
   const correct_answers = {};
@@ -125,10 +136,10 @@ export function crearChallenge(estado, req, body) {
   const challenge = {
     id, tenant_id: auth.tenantId, group_id: body.group_id ?? null, title: body.title, description: body.description,
     challenge_type: body.challenge_type || 'multiple_choice', cefr_level: body.cefr_level ?? null, skill: body.skill ?? null,
-    topic: body.topic ?? null, coins_reward: body.coins_reward ?? 5, xp_reward: body.xp_reward ?? 0,
-    max_attempts: body.max_attempts ?? 2, max_winners: body.max_winners ?? 10, current_winners: 0,
-    status: 'active', created_at: new Date().toISOString(), questions, correct_answers,
+    topic: body.topic ?? null, coins_reward: body.coins_reward ?? eco.recompensaDelReto, xp_reward: body.xp_reward ?? 0,
+    max_attempts: body.max_attempts ?? 2, max_winners: body.max_winners ?? cupoPorDefecto(activosDelGrupo(estado, auth.tenantId, body.group_id), eco.pisoDeGanadores), current_winners: 0,
+    status: 'active', created_at: new Date(estado.reloj.ahora()).toISOString(), questions, correct_answers,
   };
   estado.challenges.set(id, challenge);
-  return { status: 201, cuerpo: challengeOutPublico(challenge) };
+  return { status: 201, cuerpo: challengeOutPublico(challenge, { tope: estado.economia.topeDelReto }) };
 }

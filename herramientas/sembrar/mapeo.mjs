@@ -8,7 +8,7 @@
 //     clave, explicacion, ...}]} (piensalo y tu_palabra viven aquí);
 //   - una entrada suelta de nivel-unidad: {id, formato: 'lo_dice'|'conecta'|'oido', ...}.
 
-export const COINS_REWARD = 5; // D2: la base de Lingo (§13).
+export const COINS_REWARD = 10; // W43 (ESPEC_juego_oleada1 §4.1): reto individual = 10 (era 5, la base de Lingo).
 export const MAX_ATTEMPTS = 2; // D4.
 const ORDEN_ROLES = ['original', 'gemela', 'repaso'];
 const ORDEN_DESTREZAS = ['grammar', 'vocabulary'];
@@ -144,11 +144,12 @@ function conPrefijoBorrador(titulo, borrador) {
  * que le cabe a este contenido: todo lo que siembra F8 (piensalo y lo_dice) son preguntas de
  * opción múltiple. 'practice' no es un valor válido — era el bug F8 (encargo B).
  */
-export function challengeCreate(unidad, { titulo, destreza, description = '', questions }, { groupId, maxWinners, borrador }) {
+export function challengeCreate(unidad, { titulo, destreza, description = '', questions }, { groupId, borrador }) {
   return {
     title: conPrefijoBorrador(titulo, borrador), description, challenge_type: 'multiple_choice',
     cefr_level: unidad.nivel, skill: destreza, topic: unidad.id,
-    coins_reward: COINS_REWARD, max_attempts: MAX_ATTEMPTS, max_winners: maxWinners,
+    // W43: el cuerpo NO lleva `max_winners`. Lo resuelve el servidor (el tamaño del grupo, con piso): mandarlo con un grupo vacío daba 0 y un 422.
+    coins_reward: COINS_REWARD, max_attempts: MAX_ATTEMPTS,
     group_id: groupId, questions,
   };
 }

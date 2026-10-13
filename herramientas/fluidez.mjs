@@ -73,7 +73,7 @@ function sembrarReto(estado) {
   const groupId = [...estado.groups.values()][0].id;
   const q = (texto, buena) => ({ question_text: texto, correct_answer: buena, options_json: [{ label: 'A', value: 'uno' }, { label: 'B', value: 'dos' }] });
   const { cuerpo } = crearChallenge(estado, { headers: { authorization: `Bearer ${DOCENTE_BOOTSTRAP_TOKEN}` } }, {
-    title: 'Reto de fluidez', description: 'd', group_id: groupId, coins_reward: 30, xp_reward: 3,
+    title: 'Reto de fluidez', description: 'd', group_id: groupId, coins_reward: 20, xp_reward: 3,
     questions: [q('Primera?', 'A'), q('Segunda?', 'B'), q('Tercera?', 'A')],
   });
   return cuerpo;

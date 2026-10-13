@@ -5,6 +5,7 @@ import { randomUUID } from 'node:crypto';
 import { autenticar } from './auth.mjs';
 import { fallar } from './errores.mjs';
 import { buscarChallengeVisible, challengeOutPublico } from './rutas_challenges.mjs';
+import { recompensaDelReto } from './economia.mjs';
 import { otorgarMonedas } from './monedas.mjs';
 
 function intentosDe(estado, studentId, challengeId) {
@@ -19,7 +20,7 @@ export function arrancarIntento(estado, req, challengeId) {
 
   const propios = intentosDe(estado, auth.profileId, challengeId);
   const enCurso = propios.find((a) => a.status === 'in_progress');
-  if (enCurso) return { status: 201, cuerpo: attemptStartOut(enCurso, challenge) };
+  if (enCurso) return { status: 201, cuerpo: attemptStartOut(estado, enCurso, challenge) };
 
   if (propios.length >= challenge.max_attempts) fallar(429, 'No attempts remaining for this challenge');
   const intento = {
@@ -28,11 +29,11 @@ export function arrancarIntento(estado, req, challengeId) {
     completed_at: null, is_correct: null, score_percent: 0, coins_earned: 0, xp_earned: 0, answers: {},
   };
   estado.attempts.set(intento.id, intento);
-  return { status: 201, cuerpo: attemptStartOut(intento, challenge) };
+  return { status: 201, cuerpo: attemptStartOut(estado, intento, challenge) };
 }
 
-function attemptStartOut(intento, challenge) {
-  return { attempt_id: intento.id, attempt_number: intento.attempt_number, challenge: challengeOutPublico(challenge) };
+function attemptStartOut(estado, intento, challenge) {
+  return { attempt_id: intento.id, attempt_number: intento.attempt_number, challenge: challengeOutPublico(challenge, { tope: estado.economia.topeDelReto }) };
 }
 
 function calificar(challenge, respuestas) {
@@ -76,15 +77,16 @@ export function enviarIntento(estado, req, attemptId, body) {
 function pagarSiCorresponde(estado, auth, challenge, esCorrecta) {
   if (!esCorrecta || challenge.current_winners >= challenge.max_winners) return { coins_earned: 0, xp_earned: 0 };
   const llave = `challenge:${challenge.id}:${auth.profileId}`;
+  const paga = recompensaDelReto(challenge.coins_reward, estado.economia.topeDelReto); // W43: un reto guardado por encima del tope paga el tope
   const entrada = otorgarMonedas(estado, {
-    tenantId: auth.tenantId, profileId: auth.profileId, amount: challenge.coins_reward,
+    tenantId: auth.tenantId, profileId: auth.profileId, amount: paga,
     action: 'challenge', metadata: { challenge_id: challenge.id }, idempotencyKey: llave,
   });
   if (!entrada) return { coins_earned: 0, xp_earned: 0 };
   challenge.current_winners += 1;
   const perfil = estado.profiles.get(auth.profileId);
   perfil.xp += challenge.xp_reward;
-  return { coins_earned: challenge.coins_reward, xp_earned: challenge.xp_reward };
+  return { coins_earned: paga, xp_earned: challenge.xp_reward };
 }
 
 // GET /challenges/attempts/history

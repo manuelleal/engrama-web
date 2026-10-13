@@ -1,0 +1,16 @@
+{
+  "descripcion": "W43 (U35): el doble acepta crear un reto de más de 20 monedas (sin el 422 del tope)",
+  "archivos": {
+    "herramientas/mock/rutas_challenges.mjs": "rutas_challenges.mjs"
+  },
+  "comando": [
+    "node",
+    "--test",
+    "--test-reporter=tap",
+    "tests/unit/mock_retos_economia.test.mjs"
+  ],
+  "espera_codigo_no_cero": true,
+  "espera_fallan_tests": [
+    "U35: crear un reto de 21 monedas es 422 y no crea nada"
+  ]
+}

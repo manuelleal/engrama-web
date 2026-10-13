@@ -104,7 +104,7 @@ export function asignarReto(estado, req, gid, cid) {
   if (!challenge || challenge.tenant_id !== auth.tenantId) fallar(404, 'Challenge not found');
   if (challenge.group_id) autorizarGrupo(estado, auth, challenge.group_id);
   challenge.group_id = grupo.id;
-  return { status: 200, cuerpo: challengeOutPublico(challenge) };
+  return { status: 200, cuerpo: challengeOutPublico(challenge, { tope: estado.economia.topeDelReto }) };
 }
 
 // T7 — GET /teachers/groups/{gid}/item-errors

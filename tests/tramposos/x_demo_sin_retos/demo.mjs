@@ -30,7 +30,7 @@ export function sembrarDemo(estado) {
   importarCsv(estado, reqAdmin(), grupo.id, 'documento_id,nombre_completo\nest-1,Ana Sintetica\nest-2,Beto Sintetico\n');
   for (const [titulo, preguntas] of []) {
     crearChallenge(estado, reqDocente(), {
-      title: titulo, description: 'Reto de demostración (datos sintéticos)', group_id: grupo.id, coins_reward: 30, xp_reward: 3,
+      title: titulo, description: 'Reto de demostración (datos sintéticos)', group_id: grupo.id, coins_reward: 20, xp_reward: 3,
       questions: preguntas.map(([texto, buena, opciones]) => ({
         question_text: texto, correct_answer: buena,
         options_json: opciones.map((value, i) => ({ label: 'AB'[i], value })),

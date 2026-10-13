@@ -69,7 +69,7 @@ export function crearEstado() {
 
   const tenantId = randomUUID();
   estado.tenants.set(tenantId, { id: tenantId, name: 'UIS (demo)', slug: 'uis-demo' });
-  estado.poolBalances.set(tenantId, 1_000_000); // fondo de monedas del colegio (§9.1)
+  estado.poolBalances.set(tenantId, estado.economia.bolsaInicial); // fondo de monedas del colegio (§9.1; 200.000 desde W43)
 
   const adminId = crearProfile(estado, { documentoId: 'ADMIN-DEMO', nombre: 'Admin Demo' });
   agregarMembresia(estado, { tenantId, profileId: adminId, role: 'admin', fullName: 'Admin Demo' });
@@ -87,7 +87,7 @@ export function crearEstado() {
 export function crearTenant(estado, { name, slug }) {
   const id = randomUUID();
   estado.tenants.set(id, { id, name, slug });
-  estado.poolBalances.set(id, 1_000_000);
+  estado.poolBalances.set(id, estado.economia.bolsaInicial);
   return id;
 }
 

@@ -1,0 +1,16 @@
+{
+  "descripcion": "W43 (U36): el sembrador vuelve a poner 5 monedas por reto (la base de Lingo), no las 10 decididas",
+  "archivos": {
+    "herramientas/sembrar/mapeo.mjs": "mapeo.mjs"
+  },
+  "comando": [
+    "node",
+    "--test",
+    "--test-reporter=tap",
+    "tests/unit/mock_retos_economia.test.mjs"
+  ],
+  "espera_codigo_no_cero": true,
+  "espera_fallan_tests": [
+    "U36: el sembrador usa 10 por reto"
+  ]
+}

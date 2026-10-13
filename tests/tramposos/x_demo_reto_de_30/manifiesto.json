@@ -1,0 +1,17 @@
+{
+  "descripcion": "W43 (U36): la demo vuelve a sembrar retos de 30 monedas, que el servidor rechaza con 422 (la demo no arranca)",
+  "archivos": {
+    "herramientas/demo.mjs": "demo.mjs"
+  },
+  "comando": [
+    "node",
+    "--test",
+    "--test-reporter=tap",
+    "tests/unit/mock_retos_economia.test.mjs"
+  ],
+  "espera_codigo_no_cero": true,
+  "espera_fallan_tests": [
+    "U36: el sembrador usa 10 por reto",
+    "U36: ninguna herramienta siembra un reto de más de 20 monedas"
+  ]
+}

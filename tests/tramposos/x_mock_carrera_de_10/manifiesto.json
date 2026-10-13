@@ -1,0 +1,17 @@
+{
+  "descripcion": "W43 (U35): sin max_winners el doble vuelve al cupo fijo de 10 (una carrera: en un grupo de 13 solo cobran los 10 primeros)",
+  "archivos": {
+    "herramientas/mock/rutas_challenges.mjs": "rutas_challenges.mjs"
+  },
+  "comando": [
+    "node",
+    "--test",
+    "--test-reporter=tap",
+    "tests/unit/mock_retos_economia.test.mjs"
+  ],
+  "espera_codigo_no_cero": true,
+  "espera_fallan_tests": [
+    "U35: sin max_winners el cupo es max(estudiantes activos del grupo, 40)",
+    "U35: en un grupo de 13 cobran los 13"
+  ]
+}

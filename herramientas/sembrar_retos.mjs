@@ -53,17 +53,15 @@ async function pedirApi(apiUrl, ruta, { metodo = 'GET', token, cuerpo } = {}) {
   return json;
 }
 
-/** D4: `max_winners` = tamaño del grupo. T1 (`/teachers/groups`) trae `student_count`. */
-async function tamanoDelGrupo(apiUrl, token, grupoId) {
+/** El grupo debe ser visible para el token (T1). El cupo (`max_winners`) ya no se manda: lo resuelve el servidor (W43). */
+async function exigirGrupoVisible(apiUrl, token, grupoId) {
   const grupos = await pedirApi(apiUrl, '/teachers/groups', { token });
-  const grupo = grupos.find((g) => g.id === grupoId);
-  if (!grupo) throw new Error(`el grupo "${grupoId}" no aparece en /teachers/groups de este token`);
-  return grupo.student_count;
+  if (!grupos.some((g) => g.id === grupoId)) throw new Error(`el grupo "${grupoId}" no aparece en /teachers/groups de este token`);
 }
 
 /** Arma los cuerpos ChallengeCreate de una unidad ya autorizada (firma verificada aparte). */
-export function armarCuerpos(unidad, { groupId, maxWinners, borrador }) {
-  const ctx = { groupId, maxWinners, borrador };
+export function armarCuerpos(unidad, { groupId, borrador }) {
+  const ctx = { groupId, borrador };
   const bloques = bloquesDePiensalo(unidad).map((b) => ({ tipo: 'accuracy', ...b, cuerpo: challengeCreate(unidad, b, ctx) }));
   const lecturas = retosDeLectura(unidad).map((r) => ({ tipo: 'reading', ...r, cuerpo: challengeCreate(unidad, { ...r, destreza: 'reading' }, ctx) }));
   return [...bloques, ...lecturas];
@@ -73,8 +71,8 @@ async function sembrar({ unidad, apiUrl, token, grupoId, borrador }) {
   const veredicto = verificarFirma(unidad, { borrador, apiEsLocal: esApiLocal(apiUrl) });
   if (!veredicto.ok) { console.error(`sembrar_retos: ${veredicto.motivo}`); return { codigo: 2 }; }
 
-  const maxWinners = await tamanoDelGrupo(apiUrl, token, grupoId);
-  const cuerpos = armarCuerpos(unidad, { groupId: grupoId, maxWinners, borrador: veredicto.borrador });
+  await exigirGrupoVisible(apiUrl, token, grupoId);
+  const cuerpos = armarCuerpos(unidad, { groupId: grupoId, borrador: veredicto.borrador });
 
   const creados = [];
   for (const item of cuerpos) {

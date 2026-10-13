@@ -11,6 +11,10 @@ export const ECONOMIA_POR_DEFECTO = Object.freeze({
   asistenciaPuntualidad: 5, // si llegó a tiempo
   minutosDePuntualidad: 5, // a cuántos minutos de abrir todavía es puntual (inclusivo)
   desfaseHoras: -5, // el día es el de la institución (Bogotá), no el UTC
+  recompensaDelReto: 10, // W43: lo que vale un reto creado sin `coins_reward` (reto individual = 10)
+  topeDelReto: 20, // más de esto al crear es 422; uno ya guardado por encima paga y muestra el tope
+  pisoDeGanadores: 40, // `max_winners` omitido = max(estudiantes activos del grupo, este piso)
+  bolsaInicial: 200_000, // el fondo de monedas con que nace cada institución del doble
 });
 
 /**
@@ -67,4 +71,14 @@ export function siguienteRacha(ultimaFecha, hoy, rachaActual) {
   const dias = Math.round((Date.parse(hoy) - Date.parse(ultimaFecha)) / 86_400_000);
   if (dias === 0) return null;
   return dias === 1 ? rachaActual + 1 : 1;
+}
+
+/** Lo que un reto paga Y muestra: el menor entre lo guardado y el tope (un reto sembrado antes del tope no se reescribe, pero no paga de más). Pura. */
+export function recompensaDelReto(coinsReward, tope) {
+  return Math.min(coinsReward, tope);
+}
+
+/** `max_winners` de un reto creado SIN indicarlo: el tamaño del grupo, con piso (la moneda premia el dominio, no llegar primero). Pura. */
+export function cupoPorDefecto(estudiantesActivos, piso) {
+  return Math.max(estudiantesActivos, piso);
 }

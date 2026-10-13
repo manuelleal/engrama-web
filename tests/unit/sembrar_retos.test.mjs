@@ -51,7 +51,7 @@ test('sembrar(): rechaza una unidad sin firma y sin --borrador (código 2), sin 
   });
 });
 
-test('sembrar(): con --borrador contra la API local, siembra los 7 retos (6 Accuracy + 1 lectura) con max_winners = tamaño del grupo', async () => {
+test('sembrar(): con --borrador contra la API local, siembra los 7 retos (6 Accuracy + 1 lectura) de 10 monedas, sin mandar max_winners (lo resuelve el servidor: 40)', async () => {
   await conMockYGrupo(async ({ estado, grupo, apiUrl }) => {
     const r = await sembrar({ unidad: unidadSintetica(null), apiUrl, token: DOCENTE_BOOTSTRAP_TOKEN, grupoId: grupo.id, borrador: true });
     assert.equal(r.codigo, 0);
@@ -62,7 +62,8 @@ test('sembrar(): con --borrador contra la API local, siembra los 7 retos (6 Accu
     assert.equal(estado.challenges.size, 7);
     for (const challenge of estado.challenges.values()) {
       assert.equal(challenge.group_id, grupo.id);
-      assert.equal(challenge.max_winners, 3, 'D4: max_winners = tamaño del grupo (3 estudiantes)');
+      assert.equal(challenge.max_winners, 40, 'U36 (W43): el sembrador ya no manda max_winners; el doble resuelve max(3 estudiantes, piso 40)');
+      assert.equal(challenge.coins_reward, 10, 'U36 (W43): reto individual = 10');
       assert.match(challenge.title, /^\[BORRADOR\] sint-u01/);
     }
   });

@@ -26,7 +26,7 @@ function retoNuevo(estado, titulo, correctas) {
   const groupId = [...estado.groups.values()][0].id;
   const pregunta = (texto, buena) => ({ question_text: texto, correct_answer: buena, options_json: [{ label: 'A', value: 'Uno' }, { label: 'B', value: 'Dos' }] });
   const { cuerpo } = crearChallenge(estado, reqDocente(), {
-    title: titulo, description: 'd', group_id: groupId, coins_reward: 40, xp_reward: 3,
+    title: titulo, description: 'd', group_id: groupId, coins_reward: 20, xp_reward: 3,
     questions: [pregunta('Which one is the first?', correctas[0]), pregunta('Which one is the second?', correctas[1])],
   });
   return cuerpo;

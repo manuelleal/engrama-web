@@ -95,8 +95,8 @@ test('challengeCreate: la lectura de la unidad nunca aparece en la pregunta (sol
   assert.equal(cuerpo.description, 'Un texto de lectura.');
   for (const q of cuerpo.questions) assert.notEqual(q.question_text, 'Un texto de lectura.');
   assert.equal(cuerpo.group_id, 'g1');
-  assert.equal(cuerpo.max_winners, 5);
-  assert.equal(cuerpo.coins_reward, 5); // D2
+  assert.ok(!('max_winners' in cuerpo), 'U36 (W43): el cuerpo NO trae max_winners aunque se lo pasen; lo resuelve el servidor');
+  assert.equal(cuerpo.coins_reward, 10); // U36 (W43): reto individual = 10 (era 5, D2)
   assert.equal(cuerpo.max_attempts, 2);
 });
 

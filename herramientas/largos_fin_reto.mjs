@@ -16,7 +16,7 @@ await conAppCompleta(async (url, estado) => {
   const groupId = [...estado.groups.values()][0].id;
   const q = (t, b) => ({ question_text: t, correct_answer: b, options_json: [{ label: 'A', value: 'uno' }, { label: 'B', value: 'dos' }] });
   const { cuerpo: reto } = crearChallenge(estado, { headers: { authorization: `Bearer ${DOCENTE_BOOTSTRAP_TOKEN}` } }, {
-    title: 'largos', description: 'd', group_id: groupId, coins_reward: 30, xp_reward: 3, questions: [q('1?', 'A'), q('2?', 'B'), q('3?', 'A')],
+    title: 'largos', description: 'd', group_id: groupId, coins_reward: 20, xp_reward: 3, questions: [q('1?', 'A'), q('2?', 'B'), q('3?', 'A')],
   });
   const sesion = await abrirSesion({ ancho: 375, alto: 812 });
   try {
