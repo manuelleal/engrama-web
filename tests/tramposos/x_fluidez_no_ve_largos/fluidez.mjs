@@ -18,6 +18,7 @@ import { conAppCompleta } from '../tests/e2e/ayudante_servidor.mjs';
 import { crearChallenge } from './mock/rutas_challenges.mjs';
 import { abrirSesion as abrirSesionAsistencia } from './mock/rutas_teachers.mjs';
 import { DOCENTE_BOOTSTRAP_TOKEN } from './mock/estado.mjs';
+import { otorgarMonedas } from './mock/monedas.mjs';
 
 const RAIZ = resolve(fileURLToPath(new URL('.', import.meta.url)), '..');
 const esperar = (ms) => new Promise((r) => setTimeout(r, ms));
@@ -101,6 +102,11 @@ async function momentos(sesion, url, estado) {
   await sesion.evaluar("localStorage.setItem('engrama_ultimo_saldo_est-1', '-30'); localStorage.setItem('engrama_ultimo_constancia_est-1', '0'); location.hash = '#/retos'; void 0");
   await esperar(1200);
   salida.push(await medir(sesion, 'Inicio: monedas al contador, llama que sube, aviso', "location.hash = '#/inicio'; void 0", 5500));
+  // W47 (ESPEC_juego_oleada1 6 y 17.1.4): "Mis monedas" con 50 filas (el tope de la pantalla). Las monedas son un efecto de fuera, sobre el estado.
+  for (let i = 0; i < 50; i++) otorgarMonedas(estado, { tenantId: estado.tenantDemoId, profileId: estado.tokens.get('est-1'), amount: 1 + (i % 9), action: ['attendance', 'challenge', 'live'][i % 3], metadata: {} });
+  await sesion.evaluar("location.hash = '#/retos'; void 0");
+  await esperar(1200);
+  salida.push(await medir(sesion, 'Mis monedas: 50 filas que entran escalonadas', "location.hash = '#/monedas'; void 0", 3500));
   return salida;
 }
 

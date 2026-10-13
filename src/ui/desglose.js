@@ -21,6 +21,17 @@ export function desgloseDeAsistencia(historial, coinsAwarded) {
   if (!Array.isArray(entradas) || !Number.isInteger(coinsAwarded) || /** @type {number} */ (coinsAwarded) <= 0) return null;
   const asiento = entradas.find((e) => e?.action === 'attendance'); // el servidor ordena del más nuevo al más viejo: solo vale el primero
   if (!asiento || asiento.amount !== coinsAwarded) return null;
+  return desgloseDeAsiento(asiento);
+}
+
+/**
+ * El desglose de UN asiento del libro (W47: lo usan las filas de "Mis monedas"), con la misma regla: es de asistencia y su `metadata` trae `base` y
+ * `puntualidad` enteros no negativos que SUMAN su `amount`. En cualquier otro caso `null`. Pura; nunca resta para sacar una parte.
+ * @param {any} asiento
+ * @returns {{base: number, puntualidad: number} | null}
+ */
+export function desgloseDeAsiento(asiento) {
+  if (!asiento || asiento.action !== 'attendance') return null;
   const { base, puntualidad } = asiento.metadata ?? {};
   if (!esEnteroNoNegativo(base) || !esEnteroNoNegativo(puntualidad) || base + puntualidad !== asiento.amount) return null;
   return { base, puntualidad };

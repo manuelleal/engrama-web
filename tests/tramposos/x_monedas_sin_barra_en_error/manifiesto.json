@@ -1,0 +1,16 @@
+{
+  "descripcion": "W47 (U74): cuando Mis monedas no carga, la pantalla de error no trae la barra de abajo ni el volver: un callejón",
+  "archivos": {
+    "src/vistas/estudiante/monedas.js": "monedas.js"
+  },
+  "comando": [
+    "node",
+    "--test",
+    "--test-reporter=tap",
+    "tests/unit/vista_monedas.test.mjs"
+  ],
+  "espera_codigo_no_cero": true,
+  "espera_fallan_tests": [
+    "U74: en cargando, contenido, vacío, error y sin red la pantalla trae la barra"
+  ]
+}

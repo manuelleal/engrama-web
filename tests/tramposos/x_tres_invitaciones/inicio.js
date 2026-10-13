@@ -236,6 +236,7 @@ function pintarContenido(raiz, ctx, datos) {
   const nodo = h(
     'div', { 'data-testid': 'vista-inicio', class: 'juego' },
     barra,
+    h('a', { href: '#/monedas', class: 'enlace-monedas', 'data-testid': 'ir-a-monedas' }, textos.monedas.enlace), // W47: el único enlace de Inicio a "Mis monedas", fuera de todo nav
     h('div', { class: 'encabezado-reto' },
       crearDrako('presenta', textos.inicio.drakoBienvenida, { saludar: true, desde: 'reposo' }),
       h('h1', {}, textos.inicio.saludo(ctx.sesion.nombre)),

@@ -26,6 +26,7 @@ import { renderLeerAviso, renderErrorAviso } from './vistas/aviso_datos.js';
 import { configurarAviso, leerAviso, debePedirConsentimiento } from './aviso.js';
 import { textos } from './textos.js';
 import { renderAsistencia } from './vistas/estudiante/asistencia.js';
+import { renderMonedas } from './vistas/estudiante/monedas.js';
 import { renderRetos } from './vistas/estudiante/retos.js';
 import { renderRetoFlujo } from './vistas/estudiante/reto_flujo.js';
 import { renderGrupos } from './vistas/profe/grupos.js';
@@ -318,6 +319,7 @@ function arrancarConSesion(desdeElPrincipio = false) {
   ruta('/datos/solicitudes', conCtx((raiz, params, query, ctx) => renderSolicitudesDatos(raiz, ctx))); // W33: todos los roles
   ruta('/vivo', conCtx((raiz, params, query, ctx) => renderVivo(raiz, query, ctx))); // W35: la sala de EVA
   ruta('/nivel', conCtx((raiz, params, query, ctx) => renderNivel(raiz, query, ctx))); // W35: el examen de SET
+  ruta('/monedas', conCtx((raiz, params, query, ctx) => renderMonedas(raiz, ctx))); // W47: "Mis monedas"
   ruta('/asistencia', conCtx((raiz, params, query, ctx) => renderAsistencia(raiz, query, ctx)));
   ruta('/retos', conCtx((raiz, params, query, ctx) => renderRetos(raiz, ctx)));
   ruta('/retos/:id', conCtx((raiz, params, query, ctx) => renderRetoFlujo(raiz, params, query, ctx)));

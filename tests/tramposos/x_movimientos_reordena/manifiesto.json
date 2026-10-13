@@ -1,0 +1,16 @@
+{
+  "descripcion": "W47 (U42): las filas de Mis monedas se reordenan por fecha en el cliente en vez de conservar el orden del servidor",
+  "archivos": {
+    "src/ui/movimientos.js": "movimientos.js"
+  },
+  "comando": [
+    "node",
+    "--test",
+    "--test-reporter=tap",
+    "tests/unit/ui_movimientos.test.mjs"
+  ],
+  "espera_codigo_no_cero": true,
+  "espera_fallan_tests": [
+    "U42: conserva el ORDEN del servidor"
+  ]
+}

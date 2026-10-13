@@ -1,0 +1,16 @@
+{
+  "descripcion": "W47 (U43): sin movimientos la pantalla queda muda: ni Drako, ni el título, ni los dos caminos para ganar las primeras monedas",
+  "archivos": {
+    "src/vistas/estudiante/monedas.js": "monedas.js"
+  },
+  "comando": [
+    "node",
+    "--test",
+    "--test-reporter=tap",
+    "tests/unit/vista_monedas.test.mjs"
+  ],
+  "espera_codigo_no_cero": true,
+  "espera_fallan_tests": [
+    "U43: cargando dice qué carga; vacío trae a Drako en espera"
+  ]
+}

@@ -1,0 +1,15 @@
+{
+  "descripcion": "W47 (V8, U74): Mis monedas arma su propio \"Volver a Inicio\" en vez de usar el encabezado único",
+  "archivos": {
+    "src/vistas/estudiante/monedas.js": "monedas.js"
+  },
+  "comando": [
+    "node",
+    "herramientas/verificar.mjs",
+    "--json"
+  ],
+  "espera_codigo_no_cero": true,
+  "espera_contiene_checks": [
+    "V8"
+  ]
+}

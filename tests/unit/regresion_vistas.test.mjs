@@ -66,8 +66,26 @@ export const DECLARADAS = {
   // "Esta semana". La tarjeta del reto, que en la línea base colgaba de la vista, ahora cuelga de "Ahora": por eso se declaran los dos.
   // W68 (docs/ESPEC_navegacion.md §9.2): sale la fila de enlaces del final (un `nav` sin testid) y la barra de abajo gana "Perfil". Los dos son
   // `nav` sin `data-testid`: se declaran por etiqueta.
-  inicio: ['ahora', 'tarjeta-reto-hoy', { etiqueta: 'nav' }],
+  // W47 (docs/ESPEC_juego_oleada1.md §17.1.4): Inicio gana UN enlace, "Ver mis movimientos" (`ir-a-monedas`), justo debajo de la barra del saldo.
+  inicio: ['ahora', 'tarjeta-reto-hoy', { etiqueta: 'nav' }, 'ir-a-monedas'],
 };
+
+test('R4: lo que W47 declara cambió de verdad: Inicio gana el enlace "Ver mis movimientos" justo debajo de la barra del saldo, y solo eso', async () => {
+  const hoy = (await tomarFotos()).inicio;
+  const base = BASE.vistas.inicio;
+  const enlaces = hoy.filter((l) => l.includes('data-testid="ir-a-monedas"'));
+  assert.equal(enlaces.length, 1, 'un solo enlace a Mis monedas');
+  assert.ok(enlaces[0].trimStart().startsWith('a ') && enlaces[0].includes('href="#/monedas"'), 'es un enlace a #/monedas');
+  assert.ok(!base.some((l) => l.includes('ir-a-monedas')), 'la línea base no lo traía');
+  const i = hoy.indexOf(enlaces[0]);
+  const sangria = (l) => l.length - l.trimStart().length;
+  const anteriorHermano = hoy.slice(0, i).reverse().find((l) => sangria(l) === sangria(enlaces[0]));
+  assert.ok(anteriorHermano?.includes('class="barra-superior"'), 'va inmediatamente debajo de la barra del saldo, hijo directo de la vista');
+  assert.equal(hoy.filter((l) => l.includes('href="#/monedas"')).length, 1, 'el único enlace de Inicio a ese destino');
+  assert.equal(hoy[i + 1]?.trim(), '"Ver mis movimientos"');
+  assert.deepEqual(sinSubarboles(hoy, ['ir-a-monedas']), sinSubarboles(hoy, []).filter((l, n) => n !== i && n !== i + 1), 'la exclusión quita el enlace y su texto, nada más');
+  assert.deepEqual(sinSubarboles(hoy, DECLARADAS.inicio), sinSubarboles(base, DECLARADAS.inicio), 'fuera de lo declarado, Inicio es idéntico');
+});
 
 test('R4: lo que W68 declara cambió de verdad: Inicio ya no trae la fila de enlaces repetidos y su barra gana "Perfil"; lo demás no cambió', async () => {
   const hoy = (await tomarFotos()).inicio;

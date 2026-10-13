@@ -1,0 +1,17 @@
+{
+  "descripcion": "W47 (U41): el saldo de Mis monedas es la suma de las filas, calculada en el cliente, y no wallet.balance del servidor",
+  "archivos": {
+    "src/vistas/estudiante/monedas.js": "monedas.js"
+  },
+  "comando": [
+    "node",
+    "--test",
+    "--test-reporter=tap",
+    "tests/unit/vista_monedas.test.mjs"
+  ],
+  "espera_codigo_no_cero": true,
+  "espera_fallan_tests": [
+    "U41: pide una vez el libro (limit=50) y una vez la lista de retos",
+    "U41: el saldo NUNCA es la suma de las filas"
+  ]
+}

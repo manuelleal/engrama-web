@@ -1,0 +1,17 @@
+{
+  "descripcion": "W47 (U42): una acción que la app no conoce revienta la lista entera (y la pantalla) en vez de salir como \"Movimiento\"",
+  "archivos": {
+    "src/ui/movimientos.js": "movimientos.js"
+  },
+  "comando": [
+    "node",
+    "--test",
+    "--test-reporter=tap",
+    "tests/unit/ui_movimientos.test.mjs"
+  ],
+  "espera_codigo_no_cero": true,
+  "espera_fallan_tests": [
+    "U42: las cuatro etiquetas",
+    "U42: una respuesta rota no revienta"
+  ]
+}

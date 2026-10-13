@@ -23,6 +23,7 @@ import { renderSolicitudesDatos } from '../../src/vistas/datos_solicitudes.js';
 import { renderVivo } from '../../src/vistas/estudiante/vivo.js';
 import { renderNivel } from '../../src/vistas/estudiante/nivel.js';
 import { renderAsistencia } from '../../src/vistas/estudiante/asistencia.js';
+import { renderMonedas } from '../../src/vistas/estudiante/monedas.js';
 import { renderRetos } from '../../src/vistas/estudiante/retos.js';
 import { renderGrupos } from '../../src/vistas/profe/grupos.js';
 import { renderGrupo } from '../../src/vistas/profe/grupo.js';
@@ -37,11 +38,12 @@ import { renderImportarCsv } from '../../src/vistas/admin/importar_csv.js';
 
 const CODIGO = 'SINT-B1-01';
 const P = { gid: GID };
-const SERVIDOR = { ...RUTAS_NAV, 'GET /core/coins/balance': { balance: 120, currency: 'COIN' }, 'GET /core/attendance/history': [], 'GET /teachers/groups/g2/solicitudes': [] };
+const LIBRO = { wallet: { id: 'w-1', balance: 120 }, entries: [{ id: 'a-1', amount: 10, action: 'attendance', to_wallet_id: 'w-1', metadata: { base: 5, puntualidad: 5 }, created_at: '2026-10-20T23:00:00Z' }], total: 1 }; // W47: lo que pide "Mis monedas"
+const SERVIDOR = { ...RUTAS_NAV, 'GET /core/coins/balance': { balance: 120, currency: 'COIN' }, 'GET /core/coins/history': LIBRO, 'GET /core/attendance/history': [], 'GET /teachers/groups/g2/solicitudes': [] };
 const todas = (valor) => Object.fromEntries(Object.keys(SERVIDOR).map((k) => [k, valor]));
 const ESTADOS = {
   contenido: SERVIDOR,
-  vacio: { ...SERVIDOR, 'GET /challenges/': [], 'GET /challenges/attempts/history': [], 'GET /auth/solicitudes-datos': [], [`GET /teachers/groups/${GID}/students`]: [], 'GET /challenges/all': [] },
+  vacio: { ...SERVIDOR, 'GET /core/coins/history': { ...LIBRO, entries: [], total: 0 }, 'GET /challenges/': [], 'GET /challenges/attempts/history': [], 'GET /auth/solicitudes-datos': [], [`GET /teachers/groups/${GID}/students`]: [], 'GET /challenges/all': [] },
   error: todas(error500),
   carga: todas(nuncaResponde),
 };
@@ -55,6 +57,7 @@ const PANTALLAS = /** @type {Record<string, (r: any) => unknown>} */ ({
   '/datos/solicitudes': (r) => renderSolicitudesDatos(r, est()),
   '/vivo': (r) => renderVivo(r, {}, est()),
   '/nivel': (r) => renderNivel(r, {}, est()),
+  '/monedas': (r) => renderMonedas(r, est()),
   '/asistencia': (r) => renderAsistencia(r, {}, est()),
   '/retos': (r) => renderRetos(r, est()),
   '/profe/grupos': (r) => renderGrupos(r, ctxProfe()),

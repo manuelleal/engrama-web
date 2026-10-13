@@ -544,7 +544,7 @@ body {
 }
 .hero-titulo {
   margin: 0;
-  font-size: 1.7rem;
+  font-size: 1.35rem;
   color: var(--primario);
   animation: titulo-pop 750ms cubic-bezier(0.2, 1.9, 0.4, 1) 250ms backwards;
 }
@@ -893,5 +893,126 @@ body {
 }
 @keyframes desglose-entra {
   from { opacity: 0; transform: scale(0.8); }
+}
+
+/* ---------- W47 · "Mis monedas" (`#/monedas`, vistas/estudiante/monedas.js) y su enlace desde Inicio. Aquí no se gana nada: el saldo no cuenta ni
+   vuelan monedas. Las filas entran escalonadas (A6: solo las 12 primeras; `--i` es su turno). Sin movimiento, están puestas. ---------- */
+/* El enlace de Inicio a "Mis monedas": un renglón de texto pegado bajo la barra del saldo, a la derecha, con 44 px para el dedo. No es un chip
+   (la especificidad le gana a la regla de los enlaces con data-testid de componentes.css), para no competir con "Jugar". */
+#vista a.enlace-monedas[data-testid]:not([data-testid="sesion-enlace"]) {
+  display: flex;
+  width: fit-content;
+  min-height: 44px;
+  margin: -12px 0 4px auto;
+  padding: 0 0 0 12px;
+  background: none;
+  border: none;
+  font-size: 0.95rem;
+}
+#vista a.enlace-monedas[data-testid]:not([data-testid="sesion-enlace"])::after {
+  content: "\203A";
+}
+#vista a.enlace-monedas[data-testid]:not([data-testid="sesion-enlace"]):active {
+  transform: none;
+}
+.saldo-tarjeta {
+  display: flex;
+  align-items: center;
+  gap: 16px;
+  margin: 12px 0 20px;
+  padding: 18px 20px;
+  background: var(--primario);
+  color: var(--superficie);
+  border-radius: var(--radio-lg);
+  border-bottom: 4px solid var(--primario-oscuro);
+}
+.saldo-moneda {
+  flex: none;
+  width: 52px;
+  height: 52px;
+  border-radius: 50%;
+  background: var(--oro);
+  border: 5px solid color-mix(in srgb, var(--oro) 70%, black);
+  outline: 3px solid color-mix(in srgb, var(--oro) 35%, transparent);
+}
+.saldo-texto {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+}
+.saldo-etiqueta {
+  font-weight: 700;
+  font-size: 0.85rem;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  color: color-mix(in srgb, var(--superficie) 80%, transparent);
+}
+.saldo-total {
+  margin: 0;
+  font-family: var(--fuente-titulos);
+  font-weight: 800;
+  font-size: 1.35rem;
+  line-height: 1.1;
+  color: var(--oro);
+}
+.movimientos-titulo {
+  margin: 0 0 8px;
+}
+.movimientos {
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+.fila.movimiento {
+  flex-wrap: nowrap;
+  align-items: center;
+  gap: 12px;
+}
+.movimiento-icono {
+  flex: none;
+  display: grid;
+  place-items: center;
+  width: 40px;
+  height: 40px;
+  border-radius: 50%;
+  background: color-mix(in srgb, var(--oro) 16%, white);
+  font-size: 1.2rem;
+}
+.movimiento .fila-texto {
+  flex: 1;
+  min-width: 0;
+}
+.movimiento-detalle,
+.movimiento-fecha {
+  display: block;
+  font-size: 0.9rem;
+  color: color-mix(in srgb, var(--texto) 70%, transparent);
+}
+.movimiento-monto {
+  flex: none;
+  font-family: var(--fuente-titulos);
+  font-weight: 800;
+  font-size: 1.3rem;
+  color: var(--texto);
+}
+.movimiento-entra-monto {
+  color: var(--primario);
+}
+.movimientos-tope {
+  text-align: center;
+  color: color-mix(in srgb, var(--texto) 70%, transparent);
+}
+.monedas-caminos {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: center;
+  gap: 12px;
+}
+.juego .movimiento-entra {
+  animation: movimiento-entra 320ms ease-out backwards;
+  animation-delay: calc(var(--i, 0) * 40ms);
+}
+@keyframes movimiento-entra {
+  from { opacity: 0; transform: translateY(10px); }
 }
 

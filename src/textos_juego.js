@@ -32,6 +32,8 @@ export const textosJuego = {
     monto: (n, entra) => (n === 0 ? '0' : `${entra ? '+' : '−'}${n}`),
     /** @param {number} n @param {boolean} entra */
     montoAccesible: (n, entra) => (n === 0 ? 'Sin monedas' : `${entra ? 'Ganaste' : 'Usaste'} ${n} ${plural(n, 'moneda', 'monedas')}`),
+    /** "20 oct": el día y el mes (0 a 11). @param {number} dia @param {number} mes */
+    fecha: (dia, mes) => `${dia} ${['ene', 'feb', 'mar', 'abr', 'may', 'jun', 'jul', 'ago', 'sep', 'oct', 'nov', 'dic'][mes] ?? ''}`.trim(),
     /** @param {number} n */
     tope: (n) => `Estos son tus últimos ${n} movimientos.`,
     vacioTitulo: 'Todavía no tienes movimientos',

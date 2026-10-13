@@ -1,0 +1,16 @@
+{
+  "descripcion": "W47 (U43): Mis monedas recuerda la última respuesta y, sin red, pinta el saldo y las filas viejas (en un equipo compartido, las de otra persona)",
+  "archivos": {
+    "src/vistas/estudiante/monedas.js": "monedas.js"
+  },
+  "comando": [
+    "node",
+    "--test",
+    "--test-reporter=tap",
+    "tests/unit/vista_monedas.test.mjs"
+  ],
+  "espera_codigo_no_cero": true,
+  "espera_fallan_tests": [
+    "U43: sin red dice \"Sin conexión.\" y NO muestra las filas de una visita anterior"
+  ]
+}

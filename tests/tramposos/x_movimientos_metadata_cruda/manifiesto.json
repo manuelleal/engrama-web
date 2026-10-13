@@ -1,0 +1,16 @@
+{
+  "descripcion": "W47 (U42): una fila pinta el metadata crudo del asiento (session_id, geo_status, event_id y los identificadores internos quedan a la vista)",
+  "archivos": {
+    "src/ui/movimientos.js": "movimientos.js"
+  },
+  "comando": [
+    "node",
+    "--test",
+    "--test-reporter=tap",
+    "tests/unit/ui_movimientos.test.mjs"
+  ],
+  "espera_codigo_no_cero": true,
+  "espera_fallan_tests": [
+    "U42: ninguna fila contiene session_id, geo_status, event_id, un UUID ni el nombre técnico de la acción"
+  ]
+}
