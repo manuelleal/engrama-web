@@ -1,0 +1,16 @@
+{
+  "descripcion": "Tanda visual 1: una transicion de cara.css mueve el ancho (width) en vez de transform: reflow en cada fotograma",
+  "archivos": {
+    "estilos/cara.css": "cara.css"
+  },
+  "comando": [
+    "node",
+    "--test",
+    "--test-reporter=tap",
+    "tests/unit/css_cara.test.mjs"
+  ],
+  "espera_codigo_no_cero": true,
+  "espera_fallan_tests": [
+    "cara: movimiento. cara.css no declara animaciones y sus transiciones solo mueven transform u opacity"
+  ]
+}

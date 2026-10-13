@@ -1,0 +1,16 @@
+{
+  "descripcion": "Tanda visual 1: una regla de cara.css pinta texto oro sobre blanco (alrededor de 2:1): el oro es relleno, nunca texto sobre claro",
+  "archivos": {
+    "estilos/cara.css": "cara.css"
+  },
+  "comando": [
+    "node",
+    "--test",
+    "--test-reporter=tap",
+    "tests/unit/css_cara.test.mjs"
+  ],
+  "espera_codigo_no_cero": true,
+  "espera_fallan_tests": [
+    "cara: contraste. Toda regla de cara.css que declara color y background da 4,5:1 o mas"
+  ]
+}

@@ -1,0 +1,546 @@
+/* cara.css · La cara EN REPOSO de las pantallas (tanda visual 1, docs/ESPEC_visual_tanda1.md; Christiam, 2026-10-12: "de verdad se ve muy
+   básico"). Va la ÚLTIMA en index.html: a igual especificidad gana por orden a componentes.css y a juego.css, sin editarlas. No cambia el DOM
+   ni el comportamiento. Reglas de esta hoja (las vigila tests/unit/css_cara.test.mjs):
+   - solo var(--token) de tokens.css o color-mix() con transparent/white/black (V3), sin anidar color-mix;
+   - no anima nada: el movimiento vive en juego.css. Lo presionado se hunde con transform; las transiciones, solo transform u opacity;
+   - el labio (borde o sombra SÓLIDA abajo) es de lo que se toca o se gana; lo que solo informa queda plano. Sin sombras difusas ni degradados;
+   - oro = logro, monedas y racha; navy = acción y marca; nada se dice solo con color;
+   - ningún texto en `content:` (las cadenas viven en src/textos*.js): los seudoelementos solo dibujan formas;
+   - el fondo de marca y los rellenos de juego cuelgan de .juego o de la barra del estudiante (`a[href="#/inicio"]`, la entrada que solo
+     tiene su barra): el profe y el admin quedan sobrios. */
+
+/* ---------- Mezclas de la casa. NO son tokens nuevos: son los tokens de tokens.css aclarados u oscurecidos, con nombre para no repetir la
+   cuenta en cada regla. Llevan el prefijo --cara- para que nadie los confunda con un token de diseno/tokens.json. ---------- */
+:root {
+  --cara-linea: color-mix(in srgb, var(--primario) 16%, white);        /* el borde de una superficie: navy muy claro, no gris */
+  --cara-labio: color-mix(in srgb, var(--primario) 30%, white);        /* el labio de una superficie blanca */
+  --cara-contorno: color-mix(in srgb, var(--primario) 55%, white);     /* el borde de un campo: 3,4:1 sobre blanco (se ve dónde escribir) */
+  --cara-navy-suave: color-mix(in srgb, var(--primario) 7%, white);    /* un panel que informa */
+  --cara-oro-suave: color-mix(in srgb, var(--oro) 14%, white);         /* una superficie de logro */
+  --cara-oro-labio: color-mix(in srgb, var(--oro) 72%, black);         /* el labio de algo dorado */
+  --cara-tinta-suave: color-mix(in srgb, var(--texto) 70%, white);     /* texto secundario: 6:1 sobre blanco */
+}
+
+/* ====================================================================================================================================
+   1. SUPERFICIES. Antes: la misma tarjeta blanca de borde gris para todo. Ahora la forma dice qué es:
+      - ficha (se toca o lleva a una acción): borde navy claro y LABIO abajo;
+      - panel (solo informa): plano, sin labio, con un tinte;
+      - invitación (el reto de hoy, que da monedas): superficie dorada con labio dorado.
+   ==================================================================================================================================== */
+.fila {
+  border-color: var(--cara-linea);
+  border-bottom-color: var(--cara-labio);
+  margin-bottom: 12px;
+}
+.fila-titulo {
+  font-weight: 800;
+  font-size: 1.05rem;
+  line-height: 1.25;
+}
+.tarjeta {
+  border: none;
+  background: var(--cara-navy-suave);
+  border-radius: var(--radio-md);
+}
+.tarjeta > p {
+  margin: 0 0 6px;
+}
+.tarjeta > p:last-child {
+  margin-bottom: 0;
+}
+
+/* El reto de hoy: lo único dorado de "Ahora" (oro = monedas). El aro que late es de juego.css; acá va el reposo. */
+.fila.fila-invitacion {
+  background: var(--cara-oro-suave);
+  border-color: color-mix(in srgb, var(--oro) 55%, white);
+  border-bottom-color: var(--oro);
+}
+
+/* Las salidas a la clase en vivo y al examen: una franja a la izquierda dice que son "otro lugar" (y cuál), junto a su título de siempre. */
+.fila-ahora[data-destino] {
+  box-shadow: inset 6px 0 0 var(--secundario);
+  padding-left: 20px;
+}
+.fila-ahora[data-destino^="set"] {
+  box-shadow: inset 6px 0 0 var(--primario);
+}
+
+.ahora h2 {
+  margin: 22px 0 10px;
+}
+
+/* "Esta semana": un panel que informa (plano), con sus dos cifras como dos casillas, no dos renglones de prosa sueltos. */
+[data-testid="progreso-semana"] {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 10px;
+  margin-top: 20px;
+}
+[data-testid="progreso-semana"] > .texto-apoyo {
+  grid-column: 1 / -1;
+  font-family: var(--fuente-titulos);
+  font-weight: 800;
+  font-size: 1.05rem;
+  color: var(--primario);
+  margin: 0;
+}
+[data-testid="progreso-semana"] > p:not(.texto-apoyo) {
+  background: var(--superficie);
+  color: var(--texto);
+  border-radius: var(--radio-sm);
+  padding: 12px;
+  margin: 0;
+  font-weight: 700;
+  line-height: 1.3;
+}
+
+/* El escudo de nivel es un DATO, no un botón: pierde el labio (que lo hacía parecer lo único tocable de Inicio) y gana un filo dorado de
+   medalla. Punteado si el nivel es provisional (refuerza al ícono y al texto de su etiqueta; nunca informa solo). */
+.escudo {
+  border: 2px solid color-mix(in srgb, var(--oro) 65%, transparent);
+  padding: 4px 12px;
+}
+.escudo.escudo-provisional {
+  border-style: dashed;
+}
+
+/* La ficha de una opción de respuesta: mismo borde y labio que las demás fichas (lo elegido lo pinta juego.css, con más especificidad). */
+#vista [data-testid^="opcion-"] {
+  border-color: var(--cara-linea);
+  border-bottom-color: var(--cara-labio);
+}
+
+/* ====================================================================================================================================
+   2. BOTONES. Antes: "Jugar" era un chip blanco de borde gris, igual que todo lo demás, y el único navy de Inicio era un dato.
+      - primario (navy relleno con labio): la acción de la pantalla. En el estudiante, "Jugar";
+      - secundario (blanco, borde y labio navy claro): todo lo demás que se toca;
+      - los dos se hunden al presionar (transform; ya lo traían).
+   ==================================================================================================================================== */
+#vista a[data-testid]:not([data-testid="sesion-enlace"]):not(.volver) {
+  border-color: var(--cara-labio);
+  border-bottom-color: color-mix(in srgb, var(--primario) 45%, white);
+}
+#vista a[data-testid]:not([data-testid="sesion-enlace"]):not(.volver):hover {
+  border-color: var(--primario);
+}
+button.boton-secundario {
+  border-color: var(--cara-labio);
+  border-bottom-color: color-mix(in srgb, var(--primario) 45%, white);
+}
+
+/* "Jugar": el reto de hoy y cada reto pendiente de la lista. "Repasar" (ya ganado, no suma) queda secundario. */
+#vista .juego a[data-testid="jugar-reto-hoy"]:not(.volver),
+#vista .juego a[data-testid$="-jugar"]:not(.volver) {
+  background: var(--primario);
+  color: var(--superficie);
+  border-color: var(--primario);
+  border-bottom-color: var(--primario-oscuro);
+  font-size: 1rem;
+  padding: 9px 20px;
+}
+#vista .juego a[data-testid="jugar-reto-hoy"]:not(.volver):hover,
+#vista .juego a[data-testid$="-jugar"]:not(.volver):hover {
+  border-color: var(--primario);
+  border-bottom-color: var(--primario-oscuro);
+}
+
+/* La acción principal de la tarjeta de un grupo (profe): mismo navy, con su labio de verdad. */
+#vista .tarjeta-grupo a.accion-principal[data-testid] {
+  border-color: var(--primario);
+  border-bottom-color: var(--primario-oscuro);
+}
+
+/* ====================================================================================================================================
+   3. LA CABECERA DEL ESTUDIANTE. Inicio ya tenía su franja navy (saldo y constancia); Retos y Asistencia abrían con un título suelto sobre
+      crema. Ahora las tres pestañas de juego abren con el mismo techo navy. Solo CSS: en Retos y Asistencia la franja es el bloque del
+      título que ya existía (no trae saldo: eso pide DOM y una petición más, va en otra tanda).
+   ==================================================================================================================================== */
+.barra-superior {
+  padding: 14px 16px;
+  border-radius: 0 0 var(--radio-lg) var(--radio-lg);
+}
+.barra-superior .saldo {
+  gap: 8px;
+  font-size: 1.3rem;
+  line-height: 1.1;
+}
+/* Una moneda delante del saldo: un disco dorado con su canto, dibujado (sin emoji y sin texto). Va en ::after y se adelanta con `order`
+   porque ::before es del halo de `.pulso-oro` (juego.css). */
+.barra-superior .saldo::after {
+  content: "";
+  order: -1;
+  flex: none;
+  width: 1em;
+  height: 1em;
+  border-radius: 50%;
+  background: var(--oro);
+  border: 3px solid var(--cara-oro-labio);
+}
+.barra-superior .constancia {
+  background: color-mix(in srgb, var(--superficie) 14%, transparent);
+  border-radius: var(--radio-sm);
+  padding: 5px 12px;
+  font-size: 0.9rem;
+}
+
+/* Inicio: Drako grande, presentando, y el saludo a su lado. El interruptor del sonido deja de competir con el título. */
+[data-testid="vista-inicio"] > .encabezado-reto {
+  gap: 12px;
+  margin: 2px 0 10px;
+}
+[data-testid="vista-inicio"] > .encabezado-reto .drako {
+  width: 76px;
+  height: 76px;
+}
+[data-testid="vista-inicio"] > .encabezado-reto h1 {
+  flex: 1 1 0;
+  min-width: 0;
+  margin: 0;
+  font-size: 1.45rem;
+  overflow-wrap: anywhere;
+}
+.encabezado-reto .boton-sonido {
+  background: none;
+  border: 2px solid var(--cara-linea);
+  font-size: 0.8rem;
+  padding: 6px 10px;
+  gap: 6px;
+}
+
+/* Retos y Asistencia: el título sobre navy, de borde a borde, con el mismo labio y las mismas esquinas que la franja de Inicio. */
+[data-testid="vista-retos"].juego > .encabezado-reto,
+[data-testid="vista-asistencia"].juego > .encabezado-reto {
+  justify-content: space-between;
+  background: var(--primario);
+  color: var(--superficie);
+  margin: -16px -16px 20px;
+  padding: 16px 16px 14px;
+  border-bottom: 4px solid var(--primario-oscuro);
+  border-radius: 0 0 var(--radio-lg) var(--radio-lg);
+}
+[data-testid="vista-retos"].juego > .encabezado-reto h1,
+[data-testid="vista-asistencia"].juego > .encabezado-reto h1 {
+  margin: 0;
+  color: var(--superficie);
+}
+/* Sobre navy, el interruptor del sonido es un contorno claro (su texto sigue ahí: no es un botón de solo ícono). */
+[data-testid="vista-retos"].juego > .encabezado-reto .boton-sonido,
+[data-testid="vista-asistencia"].juego > .encabezado-reto .boton-sonido {
+  color: var(--superficie);
+  border-color: color-mix(in srgb, var(--superficie) 45%, transparent);
+}
+
+/* ====================================================================================================================================
+   4. LA BARRA DE ABAJO. Los íconos siguen siendo los emoji del DOM (cambiarlos por SVG propios es otra tanda): acá los que NO están
+      activos se apagan a gris para que el rojo, el rosa y el morado del sistema no peleen con el navy, y solo el de la pestaña activa
+      conserva su color. La pestaña activa se marca con texto navy, un filo arriba y más peso; nunca solo con color: lleva aria-current.
+      En el estudiante, además, va rellena de navy con su labio (la tecla hundida de "estás acá"). Nada de esto anima.
+   ==================================================================================================================================== */
+.nav-inferior {
+  gap: 6px;
+  padding: 6px 8px calc(8px + env(safe-area-inset-bottom));
+  border-top-color: var(--cara-linea);
+}
+.nav-inferior a {
+  color: var(--cara-tinta-suave);
+  font-size: 0.74rem;
+  line-height: 1.2;
+  padding: 6px 4px 5px;
+}
+.nav-inferior a .nav-icono {
+  filter: grayscale(1);
+  opacity: 0.75;
+}
+.nav-inferior a[aria-current="page"] {
+  color: var(--primario);
+  background: color-mix(in srgb, var(--primario) 12%, white);
+  box-shadow: inset 0 3px 0 var(--primario);
+  font-weight: 800;
+}
+.nav-inferior a[aria-current="page"] .nav-icono {
+  filter: none;
+  opacity: 1;
+}
+.nav-inferior:has(a[href="#/inicio"]) a[aria-current="page"] {
+  background: var(--primario);
+  color: var(--superficie);
+  box-shadow: 0 3px 0 var(--primario-oscuro);
+}
+/* Sobre el relleno navy, el emoji de la pestaña activa va en un disco blanco: el busto morado de "Perfil" no se veía sobre navy. */
+.nav-inferior:has(a[href="#/inicio"]) a[aria-current="page"] .nav-icono {
+  display: inline-grid;
+  place-items: center;
+  width: 1.5em;
+  height: 1.5em;
+  font-size: 1.15rem;
+  background: var(--superficie);
+  border-radius: 50%;
+}
+
+/* ====================================================================================================================================
+   5. FONDO DE MARCA Y ESCRITORIO (solo el estudiante, desde 900 px). Antes: a 1280 la columna de 480 px quedaba perdida en un mar crema.
+      Ahora la app es una hoja crema más ancha, de arriba abajo, sobre un fondo navy muy claro con dos formas planas de afiche (un arco navy
+      y un triángulo del verde azulado de la marca; el oro no: oro = logro) en la diagonal. Las formas son seudoelementos fijos, detrás de
+      todo, sin texto y sin movimiento. El profe y el admin no reciben nada de esto: su panel ya ocupa 1100 px y queda sobrio.
+   ==================================================================================================================================== */
+@media (min-width: 900px) {
+  body:has(.juego),
+  body:has(.nav-inferior a[href="#/inicio"]) {
+    background: color-mix(in srgb, var(--primario) 11%, white);
+  }
+  body:has(.juego)::before,
+  body:has(.nav-inferior a[href="#/inicio"])::before {
+    content: "";
+    position: fixed;
+    z-index: -1;
+    left: -16vmin;
+    bottom: -22vmin;
+    width: 70vmin;
+    height: 70vmin;
+    border-radius: 50%;
+    border: 9vmin solid color-mix(in srgb, var(--primario) 10%, transparent);
+    pointer-events: none;
+  }
+  body:has(.juego)::after,
+  body:has(.nav-inferior a[href="#/inicio"])::after {
+    content: "";
+    position: fixed;
+    z-index: -1;
+    right: 7vw;
+    top: 9vh;
+    width: 24vmin;
+    height: 24vmin;
+    background: color-mix(in srgb, var(--secundario) 30%, transparent);
+    clip-path: polygon(50% 0, 100% 100%, 0 100%);
+    transform: rotate(16deg);
+    pointer-events: none;
+  }
+  #vista:has(.juego),
+  #vista:has(.nav-inferior a[href="#/inicio"]) {
+    max-width: 600px;
+    min-height: 100vh;
+    /* Lado por lado: el `padding-bottom` que reserva el lugar de la barra fija (componentes.css, juego.css) no se toca. */
+    padding-top: 20px;
+    padding-left: 28px;
+    padding-right: 28px;
+    background: var(--fondo);
+    box-shadow: 0 0 0 2px var(--cara-linea);
+  }
+  /* Con la hoja más ancha, lo que va de borde a borde y lo que va fijo abajo la acompañan. */
+  #vista:has(.nav-inferior a[href="#/inicio"]) .nav-inferior,
+  #vista:has(.juego) .barra-accion {
+    max-width: 600px;
+  }
+  .juego > .barra-superior {
+    margin: -20px -28px 20px;
+    padding: 16px 28px;
+  }
+  [data-testid="vista-retos"].juego > .encabezado-reto,
+  [data-testid="vista-asistencia"].juego > .encabezado-reto {
+    margin: -20px -28px 24px;
+    padding: 20px 28px 18px;
+  }
+}
+
+/* ====================================================================================================================================
+   6. ASISTENCIA, RETOS Y ESTADOS VACÍOS (estudiante). Antes: un campo y un botón arriba y 600 px de crema; veinte filas iguales; un vacío de
+      borde punteado gris.
+   ==================================================================================================================================== */
+/* Asistencia: el formulario es LA ficha de la pantalla. El código se escribe grande y espaciado, como el que el profe proyecta; el botón
+   ocupa el ancho; y debajo espera el sello, vacío, en el mismo lugar donde la celebración (ui/sello.js) estampa el de verdad. */
+#vista [data-testid="form-asistencia"] {
+  background: var(--superficie);
+  border: 2px solid var(--cara-linea);
+  border-bottom: 4px solid var(--cara-labio);
+  border-radius: var(--radio-lg);
+  padding: 20px 16px 18px;
+  gap: 10px;
+  margin: 0;
+}
+#vista [data-testid="form-asistencia"] label {
+  font-size: 1rem;
+  text-align: center;
+}
+#vista [data-testid="form-asistencia"] input[data-testid="campo-codigo"] {
+  min-height: 64px;
+  font-family: var(--fuente-titulos);
+  font-weight: 800;
+  font-size: 1.9rem;
+  letter-spacing: 0.3em;
+  text-indent: 0.3em; /* compensa el espacio de la última letra: el código queda centrado de verdad */
+  text-align: center;
+  color: var(--primario);
+  background: var(--cara-navy-suave);
+  border-color: var(--cara-contorno);
+  border-radius: var(--radio-md);
+}
+#vista [data-testid="form-asistencia"] button[type="submit"] {
+  align-self: stretch;
+  min-height: 52px;
+  font-size: 1.1rem;
+}
+#vista [data-testid="form-asistencia"] [data-testid="asistencia-sin-red"]:empty {
+  display: none;
+}
+#vista [data-testid="asistencia-resultado"]:empty {
+  width: 136px;
+  height: 136px;
+  margin: 14px auto 2px;
+  border: 5px dashed var(--cara-labio);
+  border-radius: 50%;
+  transform: rotate(-8deg);
+}
+
+/* Retos: cada fila abre con su casilla de medalla. Vacía (un aro punteado) si el reto está pendiente; una moneda dorada si ya se ganó. La
+   palabra "Completado" sigue junto al título: la moneda refuerza, no informa sola. */
+[data-testid="vista-retos"] li.fila {
+  flex-wrap: nowrap;
+  padding: 14px;
+}
+[data-testid="vista-retos"] li.fila::before {
+  content: "";
+  flex: none;
+  width: 34px;
+  height: 34px;
+  border-radius: 50%;
+  border: 3px dashed var(--cara-labio);
+}
+[data-testid="vista-retos"] li.fila:has(.insignia)::before {
+  background: var(--oro);
+  border: 5px solid var(--cara-oro-labio);
+}
+[data-testid="vista-retos"] li.fila .fila-texto {
+  flex: 1 1 0;
+}
+[data-testid="vista-retos"] li.fila > a {
+  flex: none;
+  white-space: nowrap;
+}
+.insignia {
+  font-size: 0.82rem;
+  padding: 3px 10px;
+}
+
+/* Vacío: un panel con Drako grande y el título con peso; sin el borde punteado gris de "aquí falta algo". */
+.estado-vacio {
+  gap: 6px;
+  padding: 28px 16px;
+  background: var(--cara-navy-suave);
+  border: none;
+  border-radius: var(--radio-lg);
+}
+.estado-vacio .drako {
+  width: 108px;
+  height: 108px;
+}
+.estado-titulo {
+  font-size: 1.3rem;
+  line-height: 1.2;
+}
+.estado-vacio .estado-texto {
+  font-family: var(--fuente-cuerpo);
+  font-weight: 600;
+  max-width: 32ch;
+}
+/* Carga: los esqueletos tienen la forma de las fichas que vienen (borde y labio), no barras sueltas. */
+.esqueleto {
+  height: 64px;
+  background: var(--superficie);
+  border: 2px solid var(--cara-linea);
+  border-bottom: 4px solid var(--cara-labio);
+}
+.esqueleto-1,
+.esqueleto-2 {
+  width: 100%;
+  height: 64px;
+}
+
+/* ====================================================================================================================================
+   7. PROFE, ADMIN Y FORMULARIOS: SOBRIOS. Orden y jerarquía, nada de juego: aire entre secciones, una sola acción principal por pantalla,
+      campos que se ven (el borde gris claro daba 1,3:1 sobre blanco) y tablas con renglones cómodos.
+   ==================================================================================================================================== */
+#vista section:not(.aviso-seccion) > h2,
+#vista [data-testid^="vista-profe-"] > h2,
+#vista [data-testid^="vista-admin-"] > h2 {
+  margin: 28px 0 12px;
+}
+#vista .ahora > h2 {
+  margin: 22px 0 10px;
+}
+
+/* Las herramientas de clase sacan de la app: son secundarias. La principal de la pantalla es "Abrir asistencia" de cada grupo. */
+#vista [data-testid="herramientas-clase"] button {
+  background: var(--superficie);
+  color: var(--primario);
+  border: 2px solid var(--cara-labio);
+  border-bottom: 4px solid color-mix(in srgb, var(--primario) 45%, white);
+  padding: 10px 18px;
+}
+.fila.tarjeta-grupo {
+  gap: 12px;
+  padding: 16px;
+}
+.tarjeta-grupo .fila-titulo {
+  font-size: 1.2rem;
+}
+
+/* Campos: borde que se ve y foco navy. El contorno de foco de base.css (:focus-visible) sigue ahí. */
+#vista form input,
+#vista form select,
+#vista textarea,
+.selector-colegio select,
+.campo-fila {
+  border-color: var(--cara-contorno);
+}
+#vista form input:focus-visible,
+#vista form select:focus-visible,
+#vista textarea:focus-visible {
+  border-color: var(--primario);
+}
+/* El área de texto (Mis datos: solicitudes) no tenía estilo: salía con el borde fino y las esquinas rectas del navegador. */
+#vista textarea {
+  font-family: var(--fuente-cuerpo);
+  font-size: 1rem;
+  color: var(--texto);
+  background: var(--superficie);
+  border-width: 2px;
+  border-style: solid;
+  border-radius: var(--radio-sm);
+  padding: 10px 12px;
+}
+.aviso-nivel {
+  border-color: var(--cara-linea);
+}
+#vista form label {
+  font-size: 0.95rem;
+}
+
+/* Tablas: renglones con aire, encabezado en frase (no en mayúsculas) y borde de la casa. */
+#vista table {
+  border-color: var(--cara-linea);
+}
+#vista th {
+  font-size: 0.85rem;
+  text-transform: none;
+  letter-spacing: 0;
+  padding: 10px 8px;
+}
+#vista td {
+  padding: 9px 8px;
+}
+
+/* Perfil: quién soy, primero y con peso. */
+[data-testid="perfil-datos"] {
+  padding: 18px 16px;
+}
+[data-testid="perfil-nombre"] {
+  font-size: 1.3rem;
+}
+.perfil-enlaces {
+  margin-top: 28px;
+}
+
+.insignia {
+  color: var(--oro);
+  background: var(--superficie);
+}
