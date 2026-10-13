@@ -266,12 +266,22 @@ button.boton-secundario {
   color: var(--superficie);
   box-shadow: 0 3px 0 var(--primario-oscuro);
 }
+/* Sobre el relleno navy, el emoji de la pestaña activa va en un disco blanco: el busto morado de "Perfil" no se veía sobre navy. */
+.nav-inferior:has(a[href="#/inicio"]) a[aria-current="page"] .nav-icono {
+  display: inline-grid;
+  place-items: center;
+  width: 1.5em;
+  height: 1.5em;
+  font-size: 1.15rem;
+  background: var(--superficie);
+  border-radius: 50%;
+}
 
 /* ====================================================================================================================================
    5. FONDO DE MARCA Y ESCRITORIO (solo el estudiante, desde 900 px). Antes: a 1280 la columna de 480 px quedaba perdida en un mar crema.
       Ahora la app es una hoja crema más ancha, de arriba abajo, sobre un fondo navy muy claro con dos formas planas de afiche (un arco navy
-      y un triángulo dorado) en la diagonal. Las formas son seudoelementos fijos, detrás de todo, sin texto y sin movimiento. El profe y el
-      admin no reciben nada de esto: su panel ya ocupa 1100 px y queda sobrio.
+      y un triángulo del verde azulado de la marca; el oro no: oro = logro) en la diagonal. Las formas son seudoelementos fijos, detrás de
+      todo, sin texto y sin movimiento. El profe y el admin no reciben nada de esto: su panel ya ocupa 1100 px y queda sobrio.
    ==================================================================================================================================== */
 @media (min-width: 900px) {
   body:has(.juego),
@@ -300,7 +310,7 @@ button.boton-secundario {
     top: 9vh;
     width: 24vmin;
     height: 24vmin;
-    background: color-mix(in srgb, var(--oro) 38%, transparent);
+    background: color-mix(in srgb, var(--secundario) 30%, transparent);
     clip-path: polygon(50% 0, 100% 100%, 0 100%);
     transform: rotate(16deg);
     pointer-events: none;
@@ -330,4 +340,117 @@ button.boton-secundario {
     margin: -20px -28px 24px;
     padding: 20px 28px 18px;
   }
+}
+
+/* ====================================================================================================================================
+   6. ASISTENCIA, RETOS Y ESTADOS VACÍOS (estudiante). Antes: un campo y un botón arriba y 600 px de crema; veinte filas iguales; un vacío de
+      borde punteado gris.
+   ==================================================================================================================================== */
+/* Asistencia: el formulario es LA ficha de la pantalla. El código se escribe grande y espaciado, como el que el profe proyecta; el botón
+   ocupa el ancho; y debajo espera el sello, vacío, en el mismo lugar donde la celebración (ui/sello.js) estampa el de verdad. */
+#vista [data-testid="form-asistencia"] {
+  background: var(--superficie);
+  border: 2px solid var(--cara-linea);
+  border-bottom: 4px solid var(--cara-labio);
+  border-radius: var(--radio-lg);
+  padding: 20px 16px 18px;
+  gap: 10px;
+  margin: 0;
+}
+#vista [data-testid="form-asistencia"] label {
+  font-size: 1rem;
+  text-align: center;
+}
+#vista [data-testid="form-asistencia"] input[data-testid="campo-codigo"] {
+  min-height: 64px;
+  font-family: var(--fuente-titulos);
+  font-weight: 800;
+  font-size: 1.9rem;
+  letter-spacing: 0.3em;
+  text-indent: 0.3em; /* compensa el espacio de la última letra: el código queda centrado de verdad */
+  text-align: center;
+  color: var(--primario);
+  background: var(--cara-navy-suave);
+  border-color: var(--cara-contorno);
+  border-radius: var(--radio-md);
+}
+#vista [data-testid="form-asistencia"] button[type="submit"] {
+  align-self: stretch;
+  min-height: 52px;
+  font-size: 1.1rem;
+}
+#vista [data-testid="form-asistencia"] [data-testid="asistencia-sin-red"]:empty {
+  display: none;
+}
+#vista [data-testid="asistencia-resultado"]:empty {
+  width: 136px;
+  height: 136px;
+  margin: 14px auto 2px;
+  border: 5px dashed var(--cara-labio);
+  border-radius: 50%;
+  transform: rotate(-8deg);
+}
+
+/* Retos: cada fila abre con su casilla de medalla. Vacía (un aro punteado) si el reto está pendiente; una moneda dorada si ya se ganó. La
+   palabra "Completado" sigue junto al título: la moneda refuerza, no informa sola. */
+[data-testid="vista-retos"] li.fila {
+  flex-wrap: nowrap;
+  padding: 14px;
+}
+[data-testid="vista-retos"] li.fila::before {
+  content: "";
+  flex: none;
+  width: 34px;
+  height: 34px;
+  border-radius: 50%;
+  border: 3px dashed var(--cara-labio);
+}
+[data-testid="vista-retos"] li.fila:has(.insignia)::before {
+  background: var(--oro);
+  border: 5px solid var(--cara-oro-labio);
+}
+[data-testid="vista-retos"] li.fila .fila-texto {
+  flex: 1 1 0;
+}
+[data-testid="vista-retos"] li.fila > a {
+  flex: none;
+  white-space: nowrap;
+}
+.insignia {
+  font-size: 0.82rem;
+  padding: 3px 10px;
+}
+
+/* Vacío: un panel con Drako grande y el título con peso; sin el borde punteado gris de "aquí falta algo". */
+.estado-vacio {
+  gap: 6px;
+  padding: 28px 16px;
+  background: var(--cara-navy-suave);
+  border: none;
+  border-radius: var(--radio-lg);
+}
+.estado-vacio .drako {
+  width: 108px;
+  height: 108px;
+}
+.estado-titulo {
+  font-size: 1.3rem;
+  line-height: 1.2;
+}
+.estado-vacio .estado-texto {
+  font-family: var(--fuente-cuerpo);
+  font-weight: 600;
+  max-width: 32ch;
+}
+/* Carga: los esqueletos tienen la forma de las fichas que vienen (borde y labio), no barras sueltas. */
+.esqueleto {
+  height: 64px;
+  background: var(--superficie);
+  border: 2px solid var(--cara-linea);
+  border-bottom: 4px solid var(--cara-labio);
+}
+.esqueleto-1,
+.esqueleto-2 {
+  width: 100%;
+  height: 64px;
 }
