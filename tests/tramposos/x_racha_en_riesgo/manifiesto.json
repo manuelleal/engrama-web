@@ -1,0 +1,17 @@
+{
+  "descripcion": "W44 (U46): el texto de la racha que baja amenaza (\"Tu racha está en riesgo: no la vayas a perder\") en vez del neutro",
+  "archivos": {
+    "src/textos_juego.js": "textos_juego.js"
+  },
+  "comando": [
+    "node",
+    "--test",
+    "--test-reporter=tap",
+    "tests/unit/textos_juego.test.mjs"
+  ],
+  "espera_codigo_no_cero": true,
+  "espera_fallan_tests": [
+    "U46: ningún valor de los textos del juego",
+    "U46: los textos de §4.9 están escritos tal cual"
+  ]
+}

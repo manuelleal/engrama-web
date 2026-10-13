@@ -1,0 +1,16 @@
+{
+  "descripcion": "W44: textos_juego.js trae una clave `asistencia`, que ya existe en textos.js: el spread la pisa entera sin avisar (un spread no mezcla claves anidadas)",
+  "archivos": {
+    "src/textos_juego.js": "textos_juego.js"
+  },
+  "comando": [
+    "node",
+    "--test",
+    "--test-reporter=tap",
+    "tests/unit/textos_juego.test.mjs"
+  ],
+  "espera_codigo_no_cero": true,
+  "espera_fallan_tests": [
+    "W44: textos.js esparce textos_juego.js y ninguna clave suya pisa una de textos.js"
+  ]
+}

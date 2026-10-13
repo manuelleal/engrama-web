@@ -3,6 +3,7 @@
 // aquí en vez de escribir texto suelto, para que un cambio de redacción sea un solo lugar.
 import { textosAnillo } from './textos_anillo.js'; // las pantallas del anillo (ESPEC_pantallas_anillo): textos nuevos, en su propio archivo
 import { textosNav } from './textos_nav.js'; // la navegación (ESPEC_navegacion): la barra, el "volver" y los nombres de las pantallas
+import { textosJuego } from './textos_juego.js'; // la capa de juego (ESPEC_juego_oleada1): monedas, llama, mérito, semana, insignias
 
 export const textos = {
   app: {
@@ -383,4 +384,5 @@ export const textos = {
   },
   ...textosAnillo,
   ...textosNav,
+  ...textosJuego,
 };
