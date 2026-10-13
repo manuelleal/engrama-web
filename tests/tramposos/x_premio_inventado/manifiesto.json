@@ -1,0 +1,17 @@
+{
+  "descripcion": "W52 (U52): cuando el servidor no manda coins_reward, la app pone un número fijo (\"Hasta 40 monedas\", la cifra falsa de Lingo) en vez de callar",
+  "archivos": {
+    "src/vistas/estudiante/retos.js": "retos.js"
+  },
+  "comando": [
+    "node",
+    "--test",
+    "--test-reporter=tap",
+    "tests/unit/vista_retos.test.mjs"
+  ],
+  "espera_codigo_no_cero": true,
+  "espera_fallan_tests": [
+    "U52: \"Hasta N monedas\" solo con coins_reward entero mayor que 0",
+    "U52: en la lista de retos la etiqueta sale en cada fila sin ganar"
+  ]
+}

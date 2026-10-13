@@ -1226,3 +1226,13 @@ body {
   100% { transform: scale(1) rotate(0deg); }
 }
 
+
+/* W52: "Tu reto de hoy" con su etiqueta "Hasta N monedas" (un tercer renglón de texto de apoyo). La tarjeta se aprieta un poco para que, aun con un
+   nombre de 60 caracteres en el saludo, los tres botones de "Ahora" sigan sobre la barra sin desplazar a 375 × 812 (E31). Sin oro ni animación. */
+.fila.fila-ahora.con-premio {
+  padding-top: 9px;
+  padding-bottom: 9px;
+}
+.fila-ahora.con-premio .fila-texto {
+  gap: 1px;
+}

@@ -28,13 +28,27 @@ export function enlaceParaReto(retoId, ganado) {
     : { href: `#/retos/${retoId}`, texto: textos.retos.jugar, testid: `reto-${retoId}-jugar` };
 }
 
+/**
+ * W52 (docs/ESPEC_juego_oleada1.md §4.5, efecto 26): "Hasta N monedas", el premio a la vista antes de jugar. N es `coins_reward` DEL SERVIDOR: solo
+ * si llega como entero mayor que 0 y el reto todavía no está ganado (un repaso no suma monedas). Sin el dato no se dice nada: nunca un número
+ * puesto por la app. Pura.
+ * @param {{coins_reward?: unknown}|null|undefined} reto @param {boolean} ganado
+ * @returns {string|null}
+ */
+export function premioDelReto(reto, ganado) {
+  const n = reto?.coins_reward;
+  return !ganado && Number.isInteger(n) && /** @type {number} */ (n) > 0 ? textos.premioDelReto.hasta(/** @type {number} */ (n)) : null;
+}
+
 function filaDeReto(reto, ganado) {
   const datos = enlaceParaReto(reto.id, ganado);
+  const premio = premioDelReto(reto, ganado);
   const enlace = h('a', { href: datos.href, class: 'boton-chico', 'data-testid': datos.testid }, datos.texto);
   return h(
     'li', { class: 'fila', 'data-testid': `reto-${reto.id}` },
     h('div', { class: 'fila-texto' },
       h('span', { class: 'fila-titulo' }, tituloLegible(reto.title)),
+      premio ? h('span', { class: 'texto-apoyo', 'data-testid': `reto-${reto.id}-premio` }, premio) : null, // discreto: sin oro ni animación
       ganado ? h('span', { class: 'insignia', 'data-testid': `reto-${reto.id}-estado` }, textos.retos.completado) : null),
     enlace,
   );

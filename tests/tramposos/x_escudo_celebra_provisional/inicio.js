@@ -16,6 +16,7 @@ import { lanzarConfeti } from '../../ui/confeti.js';
 import { controladorDe } from '../../ui/drako_animado.js';
 import { planDeSemana, crearSemana, leerSemanaCelebrada, guardarSemanaCelebrada } from '../../ui/semana.js';
 import { metasDeSemana } from '../../config.js';
+import { premioDelReto } from './retos.js';
 import { crearCargando, crearVacio } from '../../ui/estados.js';
 import { crearNavInferior } from '../../ui/nav_inferior.js';
 import { crearSelectorColegio } from '../../ui/selector_colegio.js';
@@ -173,11 +174,13 @@ function escucharVueltaDeOtroOrigen(raiz, ctx) {
 // desplazar, y SOLO la primera late en oro (`fila-invitacion`): una invitación, no tres. El reto de hoy, si hay uno pendiente, es siempre la primera.
 function tarjetaRetoDeHoy(pendiente) {
   if (!pendiente) return crearVacio({ texto: textos.inicio.sinRetoPendiente, testid: 'banner-retos' });
+  const premio = premioDelReto(pendiente, false); // el pendiente no está ganado
   return h(
-    'div', { class: 'fila fila-ahora fila-invitacion', 'data-testid': 'tarjeta-reto-hoy' },
+    'div', { class: `fila fila-ahora fila-invitacion${premio ? ' con-premio' : ''}`, 'data-testid': 'tarjeta-reto-hoy' },
     h('div', { class: 'fila-texto' },
       h('span', { class: 'texto-apoyo' }, textos.inicio.retoDeHoyTitulo),
-      h('span', { class: 'fila-titulo' }, tituloLegible(pendiente.title))),
+      h('span', { class: 'fila-titulo' }, tituloLegible(pendiente.title)),
+      premio ? h('span', { class: 'texto-apoyo', 'data-testid': 'reto-hoy-premio' }, premio) : null), // W52: "Hasta N monedas", el coins_reward del servidor
     h('a', { href: `#/retos/${pendiente.id}`, class: 'boton-chico', 'data-testid': 'jugar-reto-hoy' }, textos.retos.jugar),
   );
 }
