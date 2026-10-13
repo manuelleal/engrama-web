@@ -1,0 +1,11 @@
+{
+  "descripcion": "Tanda visual 1: index.html no enlaza estilos/cara.css (alguien fusiono la hoja y olvido la linea): la app se ve como antes y nadie se entera",
+  "archivos": {
+    "index.html": "index.html"
+  },
+  "comando": ["node", "--test", "--test-reporter=tap", "tests/unit/css_cara.test.mjs"],
+  "espera_codigo_no_cero": true,
+  "espera_fallan_tests": [
+    "cara: index.html enlaza /estilos/cara.css, y de ultima (despues de juego.css)"
+  ]
+}

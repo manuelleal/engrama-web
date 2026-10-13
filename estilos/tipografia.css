@@ -1,40 +1,45 @@
-/* tipografia.css · Pulido visual para el piloto UIS (encargo de Christiam, 2026-09-28): pila de
-   fuentes del SISTEMA con forma redondeada, sin fuentes externas (§6.3: sin npm, descargas ni
-   CDN) — el CSP de index.html ya prohibía cargar una fuente que no sea de este origen
-   (font-src 'self'), así que 'Nunito Sans'/'Baloo 2' de tokens.css nunca se cargaron de verdad;
-   esto solo hace explícita la intención y evita que el navegador las busque en vano.
-   NO toca publico/diseno/tokens.css (R1, byte a byte): redefine las DOS variables de fuente acá,
-   después de que tokens.css ya cargó, y dejar los colores y radios tal cual salen del token. Un
-   color no es una fuente, así que V3 (herramientas/verificar.mjs) no aplica a esta regla. */
+/* tipografia.css · La pila de fuentes y la escala de tipo. NO toca publico/diseno/tokens.css (R1, byte a byte): redefine acá las DOS variables
+   de fuente, después de que tokens.css ya cargó; los colores y los radios salen tal cual del token. Un color no es una fuente, así que V3
+   (herramientas/verificar.mjs) no aplica a esa regla.
+
+   Tanda visual 1 (docs/ESPEC_visual_tanda1.md): la pila EMPIEZA por las fuentes de marca de tokens.json (Baloo 2 en títulos, Nunito Sans en
+   cuerpo) y sigue con las redondeadas del sistema. Hoy las de marca NO se cargan: la CSP de index.html es `font-src 'self'` y nadie ha
+   vendorizado los .woff2 (espera el sí de Christiam; es otro encargo). Sin `@font-face` el navegador no pide nada a la red: usa la de marca solo
+   si el equipo ya la tiene instalada y, si no, cae a la del sistema, como hasta ahora. El día que se vendoricen basta con sumar los archivos
+   en /publico/fuentes/ y sus `@font-face` (con `font-display: swap`) al principio de esta hoja: ni esta pila ni ninguna otra regla cambian.
+   tests/unit/css_cara.test.mjs vigila que toda `url(` de las hojas apunte a un archivo de este mismo origen que exista en el disco. */
 :root {
-  --fuente-cuerpo: ui-rounded, "SF Pro Rounded", "Segoe UI", system-ui, sans-serif;
-  --fuente-titulos: ui-rounded, "SF Pro Rounded", "Segoe UI", system-ui, sans-serif;
+  --fuente-titulos: "Baloo 2", ui-rounded, "SF Pro Rounded", "Segoe UI", system-ui, sans-serif;
+  --fuente-cuerpo: "Nunito Sans", ui-rounded, "SF Pro Rounded", "Segoe UI", system-ui, sans-serif;
 }
 
-/* Escala tipográfica (§9.4: mínimo 16px de cuerpo; nada de encabezados pequeños que hoy se ven
-   "sin terminar" a 375px). Sobrescribe el h1 suelto de base.css con peso y tamaño consistentes. */
+/* Escala de tipo (§9.4 de la espec del MVP: mínimo 16 px de cuerpo). Tres escalones con carácter: el título de la pantalla, el de una sección
+   y el de un bloque. Sin `text-wrap: balance`: en "Errores por ítem · SINT-B1-01" mandaba el punto medio al principio del segundo renglón. */
 h1 {
-  font-size: 1.6rem;
+  font-size: 1.7rem;
   font-weight: 800;
-  line-height: 1.18;
-  letter-spacing: -0.01em;
+  line-height: 1.15;
+  letter-spacing: -0.015em;
 }
 h2 {
-  font-size: 1.15rem;
+  font-size: 1.2rem;
   font-weight: 800;
   line-height: 1.2;
+  letter-spacing: -0.005em;
 }
 h3 {
   font-size: 1rem;
   font-weight: 700;
+  line-height: 1.25;
 }
 
-/* Texto de apoyo (contadores, etiquetas de estado): más chico, mayúsculas discretas. */
+/* Texto de apoyo (lo que acompaña a un título: "2 estudiantes", "Pregunta 1 de 3", "Mide tu nivel con el examen de tu institución."). Antes
+   iba en MAYÚSCULAS grises al 55 % (3,8:1 sobre blanco: no pasaba el 4,5:1) y una frase entera en mayúsculas pesaba más que su título. Ahora es
+   una frase normal, más chica y más suave que el cuerpo, al 70 % (6:1 sobre blanco, 5,7:1 sobre el fondo crema). */
 .texto-apoyo {
-  font-size: 0.82rem;
-  font-weight: 700;
-  letter-spacing: 0.03em;
-  text-transform: uppercase;
-  color: color-mix(in srgb, var(--texto) 55%, white);
+  font-size: 0.9rem;
+  font-weight: 600;
+  line-height: 1.35;
+  color: color-mix(in srgb, var(--texto) 70%, white);
   margin: 0;
 }
