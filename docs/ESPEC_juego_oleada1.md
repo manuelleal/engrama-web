@@ -809,3 +809,35 @@ Continúan la serie de §14.
 - Quitar las dos peticiones de respaldo de la asistencia cuando ningún despliegue corra un backend anterior a `1696a37`.
 - Tipar el `metadata` del libro (§13 punto 1, la mitad que sigue abierta): Mis monedas depende de él para el detalle de cada fila.
 - `diseno/arte/aceptado/` no existe: sin ella la puerta de W53 no tiene origen.
+
+#### 17.1.13 Medido al cerrar (2026-10-12, Creador) — nota añadida al final; el cuerpo y la adenda no se tocaron
+Lo que sigue se MIDIÓ al implementar; nada de arriba se editó. Suite unit + contrato: de 531 a **622 de 622**; `verificar.mjs` sin violaciones.
+
+**Hecho, un commit por encargo:** W45a `4e68690` · W42 `ad3bc46` · W43 `28b7f08` · W44 `baf9b36` · W45b `4729da2` · W47 `2d7ec74` · W49 `753f607` · W48 `16ecfb7` · W51 `3c0a167` · W52 `b622c71` · W50 `6546c47`.
+**No hecho:** W41, W46, W53, W54, W55, W56 a W60. El siguiente es **W55** (insignias en SVG a código) y luego W46.
+
+**Predicciones cumplidas:** P1 (los dos sha de §9.2 salieron tal cual: `88a83bee…` tras W42 y `37625fa5…` tras W43) · PA1 (el chip viejo, rojo en U71 y en el E2E a 150 ms: "+24 monedas" contra "+50 monedas") · PA2 (W47 cambió del humo de navegación solo `rutas.student` 9 → 10 y el informativo `pestanas_del_navegador_distintas` 17 → 18) · PA4 (R2 verde con el contrato nuevo) · PA5 (ninguna foto de R9 cambió; de R4 solo `inicio`: `ir-a-monedas`, `constancia`, `progreso-semana`) · los cruces de `x_checkin_pide_de_mas` y `x_mock_ya_cobrada_siempre_falsa` con E21, de `x_monedas_muestra_viejo_sin_red` con E20 y de `x_racha_rota_asusta` con E22.
+
+**Predicciones refutadas:**
+- §17.1.4 W42: "si el sha empieza por `59…`". El HEAD del backend es `03c9c0a`: el archivo es `contratos/openapi_03c9c0a.json` y aun así pasa a ser el de R2 (va primero por orden alfabético).
+- §9.3 U51: "`x_premio_por_abrir` → U51 (y E22)". En E22 queda VERDE (allí el saldo es 0 en la primera visita); lo caza U51.
+- E31 con la etiqueta de W52: en la primera medición FALLÓ (el tercer botón de "Ahora" terminaba en y=748 y la barra empieza en y=741, con un nombre de 60 caracteres). Se apretó la tarjeta, no el criterio: ahora 506, 611 y 732.
+- Tramposos que salieron VERDES en su primera medición (se corrigió la prueba o la copia, nunca el criterio): `x_mock_segunda_reinicia_racha` (U34 partía de racha 1) y, tras regenerarlos por parche, `x_inicio_con_dos_navegaciones` (su línea quedó fuera del árbol de la vista), `x_racha_calculada_en_vista` y `x3b_ganado_ofrece_jugar`.
+
+**Provisionales tomados (el más conservador), para decidir:**
+- **U46** tal como lo escribe §17.1.4 ("con 0 las que reciben monedas") quedaría rojo con el código bueno: `textos.asistencia.exito(0, …)` y `textos.revision.gananciaMonedas(0)` dicen "+0 monedas" y solo se llaman con más de 0. La prueba llama con 0 a todo `textos_juego.js` y deja esas dos funciones fuera de la llamada con 0. Candidato a ERR (un criterio escrito sin ejecutar).
+- **U43** "1 petición por toque" de "Reintentar": se leyó como una petición al libro por toque (la lista de retos, que es un adorno, se vuelve a pedir con ella).
+- **W48:** Inicio pinta la constancia de `/auth/me` de ese pintado (ya lo pedía para el nivel), no la de la sesión en memoria: sin eso la llama no subía tras marcar asistencia hasta recargar. La racha "último visto" sigue por persona (el saldo, por persona e institución).
+- **W51:** una meta mal formada vale 2 por clave (no las dos a la vez); la semana celebrada se guarda en `localStorage` (`engrama_ultimo_semana_<persona>_<institución>`), como lo último visto.
+- **W50:** `PASOS` conserva los seis de siempre y `PASOS_CON_MERITO` trae los siete. No se escribió E23.
+- **W45b y W52** apretaron dos cajas (la celebración de la asistencia y la tarjeta del reto de hoy con etiqueta) para que nada quede bajo la barra a 375 × 812.
+
+**Peso del shell (método de §17.1.7):** 114 entradas, **800.143 bytes**; +55.649 sobre 744.494 (techo del crecimiento: +80.000; techo absoluto: 830.000). `VERSION`: `engrama-shell-v38`. U59 (la prueba de peso, de W41) NO existe todavía: el techo sigue sin vigilante.
+
+**Humos declarados:** R5 `37625fa5f48e4cdfb762600716514db3c9d8ce84273338539426699b0c020bee` · navegación `228421b9b731fbab261c1aa160944bf0c5d8f4d99009c8aa5a684fbc76a18f51` (desarrollo) y `56803a185ddadbc77c3b57b087f73bb6f76758675facac7d92782454bb34fb7d` (réplica) · pantallas: sin cambio.
+
+**Lo que pide al despliegue:** nada obligatorio. Opcionales: `SEMANA_META_CLASES` y `SEMANA_META_RETOS` (enteros de 0 a 7; por omisión 2 y 2). La clave de "lo último visto" del saldo cambió de `engrama_ultimo_saldo_<persona>` a `…_<persona>_<institución>`: un guion que la siembre a mano debe usar la nueva. El texto del aviso al cruzar 3, 7 o 14 es "¡Constancia N! Tu llama creció." (un guion que espere "¡Constancia 3!" exacto se rompe). "Esta semana" pasó a "Tu semana".
+
+**Para después (visto, no tocado):** la medalla del fin de reto sigue contando desde "+0" (el mismo defecto de W45a, ya anotado en §17.1.12; en la captura a mitad de la celebración se lee "+0 monedas") · en modo `mock` el Inicio muestra la constancia fija del actor (3) aunque la asistencia diga otra (el mock de sesión no lee `/auth/me`) · los textos `textos.inicio.progresoSemanaTitulo`, `retosEstaSemana` y `asistenciasEstaSemana` quedaron sin uso · la prueba de aritmética de `ui_racha` no ve una suma entre paréntesis (lo cubre U47) · tres copias rotas viejas (`x12_envia_value`, `x11_drako_califica`, `x_repaso_muestra_monedas`) no derivan del archivo de hoy.
+
+**No verificado:** nada contra el piloto ni contra el backend real · la fluidez (ningún `npm run fluidez`) · Chrome (todo con Edge sin ventana) · lectores de pantalla · E23, E24, E26 y E28 · la réplica H1 (W56).
