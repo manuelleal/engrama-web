@@ -14,20 +14,18 @@
 }
 
 /* Escala de tipo (§9.4 de la espec del MVP: mínimo 16 px de cuerpo). Tres escalones con carácter: el título de la pantalla, el de una sección
-   y el de un bloque. Los títulos reparten sus renglones parejos (`balance`) en vez de dejar una palabra sola abajo. */
+   y el de un bloque. Sin `text-wrap: balance`: en "Errores por ítem · SINT-B1-01" mandaba el punto medio al principio del segundo renglón. */
 h1 {
   font-size: 1.7rem;
   font-weight: 800;
   line-height: 1.15;
   letter-spacing: -0.015em;
-  text-wrap: balance;
 }
 h2 {
   font-size: 1.2rem;
   font-weight: 800;
   line-height: 1.2;
   letter-spacing: -0.005em;
-  text-wrap: balance;
 }
 h3 {
   font-size: 1rem;
