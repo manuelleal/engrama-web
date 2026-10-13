@@ -1,0 +1,16 @@
+{
+  "descripcion": "W45b (U72): dice \"ya la cobraste\" con cualquier 0, sin mirar el campo ya_cobrada_hoy (un 0 también puede ser una paga configurada en 0)",
+  "archivos": {
+    "src/ui/desglose.js": "desglose.js"
+  },
+  "comando": [
+    "node",
+    "--test",
+    "--test-reporter=tap",
+    "tests/unit/ui_desglose.test.mjs"
+  ],
+  "espera_codigo_no_cero": true,
+  "espera_fallan_tests": [
+    "U72: con 0 monedas manda ya_cobrada_hoy SOLO si vino y es booleano"
+  ]
+}

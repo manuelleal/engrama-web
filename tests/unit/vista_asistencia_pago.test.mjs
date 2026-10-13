@@ -120,3 +120,65 @@ test('U38: la segunda petición no sale muda si falla: queda una línea en la co
   assert.ok(v.consola.some((l) => l.includes('vistas/asistencia') && l.includes('500')), v.consola.join(' | '));
   assert.ok(!v.consola.join(' ').includes('secreto-del-servidor'));
 });
+
+// U73 (docs/ESPEC_juego_oleada1.md §17.1.6, W45b): con los cuatro campos del check-in la asistencia NO pide nada más (1 POST y 0 GET); sin ellos, o si no
+// cuadran, queda el camino de respaldo de arriba (U38 intacto). Tramposos: x_checkin_pide_de_mas (src/vistas/estudiante/asistencia.js) y
+// x_ya_cobrada_ausente_es_falsa (src/ui/desglose.js).
+const checkInConCampos = (monedas, campos, racha = 3) => () => json(200, { success: true, coins_awarded: monedas, streak: racha, message: `Check-in exitoso! +${monedas} coins`, ...campos });
+const SOLO_EL_POST = ['POST /core/attendance/check-in'];
+
+test('U73: con los campos del check-in (10 = 5 + 5) se ve "+10 monedas" y su desglose con 1 POST y 0 GET', async () => {
+  const v = await marcar({ 'POST /core/attendance/check-in': checkInConCampos(10, { base: 5, puntualidad: 5, puntual: true, ya_cobrada_hoy: false }) });
+  assert.match(textoDe(buscar(v.raiz, 'resultado')), /✓ Asistencia marcada · \+10 monedas · constancia 3/);
+  assert.equal(textoDe(buscar(v.raiz, 'asistencia-desglose')), '5 por asistir + 5 por llegar a tiempo');
+  assert.deepEqual(v.llamadas, SOLO_EL_POST, 'ni el libro ni el historial: la respuesta ya lo dijo');
+  assert.ok(buscar(v.raiz, 'sello') && buscar(v.raiz, 'chip-monedas'));
+});
+
+test('U73: con 5 = 5 + 0 se ve solo "5 por asistir" (nada sobre la hora de llegada), con 1 POST y 0 GET', async () => {
+  const v = await marcar({ 'POST /core/attendance/check-in': checkInConCampos(5, { base: 5, puntualidad: 0, puntual: false, ya_cobrada_hoy: false }) });
+  assert.equal(textoDe(buscar(v.raiz, 'asistencia-desglose')), '5 por asistir');
+  assert.doesNotMatch(textoDe(buscar(v.raiz, 'asistencia-resultado')), /tarde|a tiempo|puntual/i);
+  assert.deepEqual(v.llamadas, SOLO_EL_POST);
+});
+
+test('U73: con 0 monedas y ya_cobrada_hoy: true dice "La de hoy ya la cobraste" con 1 POST y 0 GET; con false, "Asistencia marcada. Constancia: R." y tampoco pide nada', async () => {
+  const cobrada = await marcar({ 'POST /core/attendance/check-in': checkInConCampos(0, { base: 0, puntualidad: 0, puntual: false, ya_cobrada_hoy: true }, 4) });
+  assert.equal(textoDe(buscar(cobrada.raiz, 'resultado')), '✓ Asistencia marcada. La de hoy ya la cobraste: las monedas de asistencia son una vez por día. Constancia: 4.');
+  assert.deepEqual(cobrada.llamadas, SOLO_EL_POST);
+  assert.ok(buscar(cobrada.raiz, 'sello'), 'asistió: el sello');
+  assert.equal(buscar(cobrada.raiz, 'chip-monedas'), null, '0 fichas');
+  assert.equal(buscar(cobrada.raiz, 'asistencia-desglose'), null);
+  assert.match(buscar(cobrada.raiz, 'resultado').className, /resultado-ok/);
+  assert.doesNotMatch(textoDe(cobrada.raiz), /\+0|✗|tarde/);
+
+  const sinPaga = await marcar({ 'POST /core/attendance/check-in': checkInConCampos(0, { base: 0, puntualidad: 0, puntual: true, ya_cobrada_hoy: false }, 4) });
+  assert.equal(textoDe(buscar(sinPaga.raiz, 'resultado')), '✓ Asistencia marcada. Constancia: 4.');
+  assert.deepEqual(sinPaga.llamadas, SOLO_EL_POST, 'el servidor ya dijo que NO era una segunda marca: no hay nada que averiguar');
+  assert.doesNotMatch(textoDe(sinPaga.raiz), /cobraste|\+0/);
+});
+
+test('U73: si los campos vienen pero no cuadran (10 con 5 + 0), no se usan: se pide el libro, como antes, y se dice lo que el libro diga', async () => {
+  const campos = { base: 5, puntualidad: 0, puntual: false, ya_cobrada_hoy: false };
+  const conLibro = await marcar({ 'POST /core/attendance/check-in': checkInConCampos(10, campos), 'GET /core/coins/history': libro(10, { base: 5, puntualidad: 5, puntual: true }) });
+  assert.deepEqual(conLibro.llamadas, ['POST /core/attendance/check-in', 'GET /core/coins/history']);
+  assert.equal(textoDe(buscar(conLibro.raiz, 'asistencia-desglose')), '5 por asistir + 5 por llegar a tiempo', 'lo del libro, que sí cuadra');
+  const sinLibro = await marcar({ 'POST /core/attendance/check-in': checkInConCampos(10, campos), 'GET /core/coins/history': libro(10, { multiplier: 2 }) });
+  assert.equal(buscar(sinLibro.raiz, 'asistencia-desglose'), null, 'ni los campos ni el libro cuadran: solo el total');
+  assert.match(sinLibro.texto(), /\+10 monedas/);
+});
+
+test('U73: un backend anterior (sin los campos) sigue por el camino de respaldo: la segunda marca del día pide el historial y dice "ya la cobraste"', async () => {
+  const v = await marcar({ 'POST /core/attendance/check-in': checkIn(0, 4), 'GET /core/attendance/history': [marca('2026-10-08', 0), marca('2026-10-08', 10)] });
+  assert.deepEqual(v.llamadas, ['POST /core/attendance/check-in', 'GET /core/attendance/history'], 'ausente no es false: hay que preguntar');
+  assert.match(textoDe(buscar(v.raiz, 'resultado')), /La de hoy ya la cobraste/);
+});
+
+test('U73: el renglón del desglose está reservado desde que hay monedas (y no existe con 0)', async () => {
+  const conMonedas = await marcar({ 'POST /core/attendance/check-in': checkIn(10), 'GET /core/coins/history': libro(10, { multiplier: 2 }) });
+  const cuerpo = buscar(conMonedas.raiz, 'asistencia-cuerpo');
+  assert.ok(cuerpo.children.some((n) => n.className === 'renglon-desglose'), 'el renglón está aunque el desglose no llegue');
+  const sinMonedas = await marcar({ 'POST /core/attendance/check-in': checkInConCampos(0, { ya_cobrada_hoy: true }) });
+  assert.ok(!buscar(sinMonedas.raiz, 'asistencia-cuerpo').children.some((n) => n.className === 'renglon-desglose'));
+});
+

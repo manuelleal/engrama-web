@@ -620,15 +620,16 @@ body {
 /* ---------- Asistencia marcada (ui/sello.js): el sello se estampa con rebote y una onda; las monedas del
    chip cuentan y la llama de la constancia late. Sin movimiento queda un sello quieto, igual de claro. ---------- */
 .sello-zona .drako {
-  width: 84px;
-  height: 84px;
+  width: 72px;
+  height: 72px;
 }
+/* W45b: la celebración es más compacta para que el resultado y su desglose queden a la vista, sobre la barra, en un celular de 375 × 812. */
 .sello-zona {
   display: flex;
   flex-direction: column;
   align-items: center;
-  gap: 10px;
-  margin: 18px 0 8px;
+  gap: 8px;
+  margin: 4px 0 8px;
 }
 .sello {
   position: relative;
@@ -876,3 +877,21 @@ body {
   border: 2px solid var(--borde);
   color: var(--texto);
 }
+
+/* W45b (A7, docs/ESPEC_juego_oleada1.md §17.1.4): la línea del desglose de la asistencia ("5 por asistir + 5 por llegar a tiempo") entra con opacidad
+   y escala, una sola vez. Su renglón está reservado desde que hay monedas: al llegar el dato nada salta. Sin movimiento, aparece. */
+.juego .renglon-desglose {
+  min-height: 1.6em;
+  margin-top: 8px;
+  text-align: center;
+}
+.juego .asistencia-desglose {
+  margin: 0;
+  font-weight: 700;
+  color: var(--primario);
+  animation: desglose-entra 260ms ease-out backwards;
+}
+@keyframes desglose-entra {
+  from { opacity: 0; transform: scale(0.8); }
+}
+

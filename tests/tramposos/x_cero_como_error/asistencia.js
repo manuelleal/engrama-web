@@ -11,7 +11,7 @@ import { crearBotonSonido } from '../../ui/boton_sonido.js';
 import { marcarCargando, destelloExito } from '../../ui/boton.js';
 import { textos } from '../../textos.js';
 import { marcarAsistencia, leerHistorialMonedas, leerHistorialAsistencia } from '../../api/core.js';
-import { desgloseDeAsistencia, haySegundaMarcaDelDia, textoDelDesglose } from '../../ui/desglose.js';
+import { desgloseDeAsistencia, haySegundaMarcaDelDia, pagoDelCheckIn, textoDelDesglose } from '../../ui/desglose.js';
 import { accionUnica, ErrorApi } from '../../api/cliente.js';
 
 /**
@@ -32,18 +32,24 @@ function crearAvisoInformativo(texto) {
   return h('p', { role: 'status', 'aria-live': 'polite', 'data-testid': 'resultado-info', class: 'resultado resultado-info' }, h('span', { 'aria-hidden': 'true' }, 'ℹ'), ` ${texto}`);
 }
 
+/** La línea del desglose ("5 por asistir + 5 por llegar a tiempo") en su renglón, que está reservado desde que hay monedas (A7: nada salta al llegar). */
+function pintarDesglose(renglon, desglose) {
+  renglon?.append(h('p', { 'data-testid': 'asistencia-desglose', class: 'asistencia-desglose' }, textoDelDesglose(desglose)));
+}
+
 /**
- * Lo que el servidor puede decir DESPUÉS del check-in, en una segunda petición (la respuesta del check-in no lo trae; adenda 17.8):
+ * EL CAMINO DE RESPALDO (W45b): solo corre si la respuesta del check-in no alcanzó (`pagoDelCheckIn` dio `null`: un backend anterior a `1696a37`, o campos
+ * que no cuadran). Lo que el servidor puede decir DESPUÉS del check-in, en una segunda petición (adenda 17.8):
  *  - con monedas: el desglose, si el asiento del libro lo trae y cuadra (`desgloseDeAsistencia`); si no, queda solo el total;
  *  - con 0: "la de hoy ya la cobraste", solo si el historial de asistencia trae OTRA marca de hoy que sí pagó; si no, queda "Asistencia marcada. Constancia: R.".
  * Si la petición falla no se inventa nada. Nunca lanza.
- * @param {{cuerpo: HTMLElement, r: {coins_awarded: number, streak: number}, token: string, tenantId?: string}} d
+ * @param {{cuerpo: HTMLElement, renglon: HTMLElement|null, r: {coins_awarded: number, streak: number}, token: string, tenantId?: string}} d
  */
-async function completarConLoDelServidor({ cuerpo, r, token, tenantId }) {
+async function completarConLoDelServidor({ cuerpo, renglon, r, token, tenantId }) {
   try {
     if (r.coins_awarded > 0) {
       const desglose = desgloseDeAsistencia(await leerHistorialMonedas({ token, tenantId, limite: 5 }), r.coins_awarded);
-      if (desglose) cuerpo.append(h('p', { 'data-testid': 'asistencia-desglose' }, textoDelDesglose(desglose)));
+      if (desglose) pintarDesglose(renglon, desglose);
     } else if (haySegundaMarcaDelDia(await leerHistorialAsistencia({ token, tenantId, limite: 10 }))) {
       montar(cuerpo, crearResultado({ ok: true, texto: textos.asistencia.yaCobrada(r.streak) }));
     }
@@ -79,15 +85,20 @@ function actualizarBotonPorRed(boton, avisoRed, enLinea) {
 
 /** Un check-in que salió bien: el resultado (con ícono y texto), la celebración y, sin esperar, lo que el servidor pueda decir de la paga. */
 function mostrarMarcada({ zonaResultado, boton, r, ctx }) {
+  // W45b: primero lo que la respuesta del check-in ya dice (los cuatro campos, si vienen y cuadran): cero peticiones de más.
+  const pago = pagoDelCheckIn(r);
   // Con 0 monedas (la segunda marca del día) nunca se dice "+0": la asistencia SÍ quedó marcada y el resultado es positivo.
-  const texto = r.coins_awarded > 0 ? textos.asistencia.exito(r.coins_awarded, r.streak) : textos.asistencia.sinMonedas(r.streak);
-  const cuerpo = h('div', { 'data-testid': 'asistencia-cuerpo' }, crearResultado({ ok: r.coins_awarded > 0, texto }));
+  const texto = r.coins_awarded > 0 ? textos.asistencia.exito(r.coins_awarded, r.streak)
+    : pago && 'yaCobrada' in pago && pago.yaCobrada ? textos.asistencia.yaCobrada(r.streak) : textos.asistencia.sinMonedas(r.streak);
+  const renglon = r.coins_awarded > 0 ? h('div', { class: 'renglon-desglose' }) : null;
+  const cuerpo = h('div', { 'data-testid': 'asistencia-cuerpo' }, crearResultado({ ok: r.coins_awarded > 0, texto }), renglon);
   montar(zonaResultado, cuerpo);
   // Game feel: el sello se estampa, las monedas vuelan a su contador, suena y vibra; la constancia
   // que llega del servidor se celebra solo si subió (ui/sello.js).
   celebrarAsistencia({ zona: zonaResultado, monedas: r.coins_awarded, racha: r.streak, quien: ctx.sesion?.profileId });
   destelloExito(boton);
-  completarConLoDelServidor({ cuerpo, r, token: ctx.token, tenantId: ctx.tenantId }); // sin esperar: el botón no se queda bloqueado por una segunda petición
+  if (pago && 'desglose' in pago) pintarDesglose(renglon, pago.desglose);
+  else if (!pago) completarConLoDelServidor({ cuerpo, renglon, r, token: ctx.token, tenantId: ctx.tenantId }); // respaldo, sin esperar: el botón no se queda bloqueado
 }
 
 /** Un check-in que falló: el 402 informa (ℹ), todo lo demás es un resultado con ✗ como siempre. */

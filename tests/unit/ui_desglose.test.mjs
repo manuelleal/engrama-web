@@ -4,7 +4,7 @@
 // Tramposo: x_desglose_inventado (saca la puntualidad restando) → src/ui/desglose.js.
 import test from 'node:test';
 import assert from 'node:assert/strict';
-import { desgloseDeAsistencia, haySegundaMarcaDelDia, textoDelDesglose } from '../../src/ui/desglose.js';
+import { desgloseDeAsistencia, haySegundaMarcaDelDia, pagoDelCheckIn, textoDelDesglose } from '../../src/ui/desglose.js';
 
 const asiento = (amount, metadata, action = 'attendance') => ({ id: 'a', amount, action, metadata, created_at: '2026-10-08T14:00:00Z' });
 const historial = (...entries) => ({ wallet: {}, entries, total: entries.length });
@@ -61,3 +61,50 @@ test('U38: "la de hoy ya la cobraste" solo con la prueba: el registro más nuevo
   assert.equal(haySegundaMarcaDelDia([r('2026-10-08', 10), r('2026-10-08', 10)]), false, 'la más nueva pagó: no es una segunda marca sin paga');
   for (const roto of [[], null, undefined, 'x', {}, [{}, {}], [{ coins_awarded: 0 }, { coins_awarded: 10 }], [r('2026-10-08', 0), { attendance_date: '2026-10-08', coins_awarded: '10' }]]) assert.equal(haySegundaMarcaDelDia(roto), false, JSON.stringify(roto));
 });
+
+// U72 (docs/ESPEC_juego_oleada1.md §17.1.6, W45b): `pagoDelCheckIn` lee los cuatro campos de la respuesta del check-in. "Ausente" no es "0".
+// Tramposos (src/ui/desglose.js): x_ya_cobrada_ausente_es_falsa, x_ya_cobrada_por_cero, x_desglose_de_campos_sin_cuadrar.
+const checkIn = (coins_awarded, extra = {}) => ({ success: true, coins_awarded, streak: 3, message: `Check-in exitoso! +${coins_awarded} coins`, ...extra });
+
+test('U72: con monedas, base y puntualidad presentes, enteras y que SUMAN lo pagado dan el desglose (y nada más que eso)', () => {
+  assert.deepEqual(pagoDelCheckIn(checkIn(10, { base: 5, puntualidad: 5, puntual: true, ya_cobrada_hoy: false })), { desglose: { base: 5, puntualidad: 5 } });
+  assert.deepEqual(pagoDelCheckIn(checkIn(5, { base: 5, puntualidad: 0, puntual: false, ya_cobrada_hoy: false })), { desglose: { base: 5, puntualidad: 0 } });
+  assert.deepEqual(pagoDelCheckIn(checkIn(7, { base: 4, puntualidad: 3 })), { desglose: { base: 4, puntualidad: 3 } }, 'sin ya_cobrada_hoy también: basta que no sea true');
+  assert.deepEqual(pagoDelCheckIn(checkIn(3, { base: 0, puntualidad: 3, puntual: true, ya_cobrada_hoy: false })), { desglose: { base: 0, puntualidad: 3 } }, '0 es una parte válida si vino');
+});
+
+test('U72: con monedas, si los campos no cuadran, no son enteros o se contradicen, es null (va el camino de respaldo); la suma se comprueba, no se deduce', () => {
+  const nulos = {
+    'no suman lo pagado (5 + 0 con 10)': checkIn(10, { base: 5, puntualidad: 0, puntual: false, ya_cobrada_hoy: false }),
+    'suman de más': checkIn(10, { base: 5, puntualidad: 10, ya_cobrada_hoy: false }),
+    'base como texto': checkIn(10, { base: '5', puntualidad: 5, ya_cobrada_hoy: false }),
+    'base negativa': checkIn(10, { base: -1, puntualidad: 11, ya_cobrada_hoy: false }),
+    'base con decimales': checkIn(10, { base: 5.5, puntualidad: 4.5, ya_cobrada_hoy: false }),
+    'puntualidad nula': checkIn(10, { base: 10, puntualidad: null, ya_cobrada_hoy: false }),
+    'pagó y dice que ya estaba cobrada': checkIn(10, { base: 5, puntualidad: 5, puntual: true, ya_cobrada_hoy: true }),
+    'falta puntualidad (se deduciría restando)': checkIn(10, { base: 5, ya_cobrada_hoy: false }),
+    'falta base (se deduciría restando)': checkIn(10, { puntualidad: 5, ya_cobrada_hoy: false }),
+    'backend anterior: ninguno de los cuatro': checkIn(10),
+  };
+  for (const [caso, r] of Object.entries(nulos)) assert.equal(pagoDelCheckIn(r), null, caso);
+});
+
+test('U72: con 0 monedas manda ya_cobrada_hoy SOLO si vino y es booleano: true = ya la cobraste, false = no era una segunda marca, ausente = no se sabe', () => {
+  assert.deepEqual(pagoDelCheckIn(checkIn(0, { base: 0, puntualidad: 0, puntual: false, ya_cobrada_hoy: true })), { yaCobrada: true });
+  assert.deepEqual(pagoDelCheckIn(checkIn(0, { ya_cobrada_hoy: true })), { yaCobrada: true }, 'base y puntualidad pueden no venir');
+  assert.deepEqual(pagoDelCheckIn(checkIn(0, { base: 0, puntualidad: 0, puntual: true, ya_cobrada_hoy: false })), { yaCobrada: false }, 'paga configurada en 0: el servidor dijo que NO era una segunda marca');
+  assert.equal(pagoDelCheckIn(checkIn(0)), null, 'ausente no es false: un backend anterior no manda la clave');
+  assert.equal(pagoDelCheckIn(checkIn(0, { base: 0, puntualidad: 0 })), null, 'los otros en 0 no dicen si estaba cobrada');
+  for (const raro of ['true', 'false', 1, 0, null, undefined]) assert.equal(pagoDelCheckIn(checkIn(0, { ya_cobrada_hoy: raro })), null, `ya_cobrada_hoy: ${JSON.stringify(raro)}`);
+  assert.equal(pagoDelCheckIn(checkIn(0, { base: 5, puntualidad: 0, ya_cobrada_hoy: true })), null, '0 monedas con una parte que no es 0: no cuadra');
+});
+
+test('U72: una respuesta rota o sin coins_awarded entero es null, y la función nunca lanza', () => {
+  for (const r of [null, undefined, 'x', 10, [], {}, { coins_awarded: '10', base: 5, puntualidad: 5 }, { coins_awarded: 2.5, base: 2, puntualidad: 0.5 }, { coins_awarded: -5, ya_cobrada_hoy: true }, { coins_awarded: null }]) {
+    assert.equal(pagoDelCheckIn(r), null, JSON.stringify(r));
+  }
+  const heredado = Object.create({ base: 5, puntualidad: 5 });
+  heredado.coins_awarded = 10;
+  assert.equal(pagoDelCheckIn(heredado), null, 'una clave heredada no es una clave que vino');
+});
+

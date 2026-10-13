@@ -1,0 +1,17 @@
+{
+  "descripcion": "W45b (U73, E21): la asistencia sigue pidiendo el libro (o el historial) aunque los campos del check-in vengan y cuadren: una petición de más por cada marca",
+  "archivos": {
+    "src/vistas/estudiante/asistencia.js": "asistencia.js"
+  },
+  "comando": [
+    "node",
+    "--test",
+    "--test-reporter=tap",
+    "tests/unit/vista_asistencia_pago.test.mjs"
+  ],
+  "espera_codigo_no_cero": true,
+  "espera_fallan_tests": [
+    "U73: con los campos del check-in (10 = 5 + 5) se ve",
+    "U73: con 0 monedas y ya_cobrada_hoy: true dice"
+  ]
+}

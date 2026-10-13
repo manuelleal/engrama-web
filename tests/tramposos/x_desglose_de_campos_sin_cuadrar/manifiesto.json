@@ -1,0 +1,16 @@
+{
+  "descripcion": "W45b (U72): usa base y puntualidad del check-in sin comprobar que sumen lo pagado",
+  "archivos": {
+    "src/ui/desglose.js": "desglose.js"
+  },
+  "comando": [
+    "node",
+    "--test",
+    "--test-reporter=tap",
+    "tests/unit/ui_desglose.test.mjs"
+  ],
+  "espera_codigo_no_cero": true,
+  "espera_fallan_tests": [
+    "U72: con monedas, si los campos no cuadran, no son enteros o se contradicen, es null"
+  ]
+}

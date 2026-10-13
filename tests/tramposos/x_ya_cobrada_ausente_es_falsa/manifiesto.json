@@ -1,0 +1,16 @@
+{
+  "descripcion": "W45b (U72, U73): trata la clave ya_cobrada_hoy AUSENTE como false. Con un backend anterior la segunda marca del día ya no pide el historial y nunca dice \"ya la cobraste\"",
+  "archivos": {
+    "src/ui/desglose.js": "desglose.js"
+  },
+  "comando": [
+    "node",
+    "--test",
+    "--test-reporter=tap",
+    "tests/unit/vista_asistencia_pago.test.mjs"
+  ],
+  "espera_codigo_no_cero": true,
+  "espera_fallan_tests": [
+    "U73: un backend anterior (sin los campos) sigue por el camino de respaldo"
+  ]
+}
