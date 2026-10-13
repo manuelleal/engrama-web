@@ -11,8 +11,7 @@ import { crearDrako } from './drako.js';
 import { controladorDe } from './drako_animado.js';
 import { registrarCelebracion } from './celebraciones.js';
 import { lanzarConfeti } from './confeti.js';
-import { celebrarMonedas, planDeMonedas, duracionTotal } from './monedas.js';
-import { animarConteo } from './conteo.js';
+import { celebrarMonedas } from './monedas.js';
 import { crearLlama, celebrarRacha } from './racha.js';
 import { leerUltimo, guardarUltimo, compararConUltimo } from './ultimo_visto.js';
 
@@ -39,16 +38,16 @@ export function celebrarAsistencia(d) {
 function pintarYDisparar({ zona, monedas, racha, quien }) {
   const plan = planDeAsistencia(monedas, racha);
   const sello = crearSello();
-  const num = h('span', { class: 'chip-num' }, '+0');
-  const chip = plan.monedas ? h('p', { class: 'chip-monedas', 'aria-hidden': 'true', 'data-testid': 'chip-monedas' }, num, ` ${textos.inicio.monedas}`) : null;
+  // W45a: el chip NACE con el número del servidor y no cambia nunca (antes contaba desde 0 y, durante más de un segundo, decía "+2" sobre el "+10" del resultado).
+  const num = plan.monedas ? h('span', { class: 'chip-num' }, `+${monedas}`) : null;
+  const chip = num ? h('p', { class: 'chip-monedas', 'aria-hidden': 'true', 'data-testid': 'chip-monedas' }, num, ` ${textos.inicio.monedas}`) : null;
   const llama = plan.llama ? h('p', { class: 'constancia-asistencia', 'aria-hidden': 'true' }, crearLlama(), `${textos.inicio.constanciaPrefijo}: ${racha}`) : null;
   // Drako presenta el momento (nunca califica) y salta; el sello, las monedas y la llama son lo que dijo el servidor.
   const drako = crearDrako('celebra', textos.asistencia.drako, { desde: 'reposo', sinCiclo: true });
   controladorDe(drako)?.celebrarSalto();
   senal('sello');
-  if (plan.monedas) {
+  if (num) {
     despues(380, () => celebrarMonedas({ desde: sello, hasta: num, cantidad: monedas }));
-    animarConteo(num, { desde: 0, hasta: monedas, formato: (n) => `+${n}`, golpe: false, duracionMs: 380 + Math.max(900, duracionTotal(planDeMonedas(monedas))) });
     lanzarConfeti('suave');
   }
   celebrarSiSube(quien, racha, llama);

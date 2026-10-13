@@ -211,11 +211,18 @@ test('game feel: marcar asistencia estampa el sello, cuenta las monedas del serv
       url: `${url}#/asistencia?codigo=${sesion.session_code}`, ancho: 375, alto: 812, espera_ms: 5000, pre: YA_ENTRO,
       eval: `(async () => {
         const esperar = (ms) => new Promise((r) => setTimeout(r, ms));
-        await esperar(500);
+        // W45a (U71): el chip se lee en cuanto nace y 150 ms despues: debe decir YA el numero del resultado (antes contaba desde 0).
+        const leerChip = () => document.querySelector('[data-testid="chip-monedas"]')?.textContent ?? null;
+        let alNacer = null;
+        for (let i = 0; i < 100 && !document.querySelector('[data-testid="asistencia-resultado"] [data-testid="resultado"]'); i++) await esperar(10);
+        alNacer = leerChip();
+        await esperar(150);
+        const alos150 = leerChip();
+        await esperar(350);
         const temprano = { sello: !!document.querySelector('[data-testid="sello"]'), sonido: !!document.querySelector('[data-testid="boton-sonido"]') };
         await esperar(3200);
         return {
-          temprano,
+          temprano, alNacer, alos150,
           resultado: document.querySelector('[data-testid="asistencia-resultado"] [data-testid="resultado"]').textContent,
           chip: document.querySelector('[data-testid="chip-monedas"]')?.textContent ?? null,
           fichasQuedan: document.querySelectorAll('.ficha-moneda').length,
@@ -230,6 +237,8 @@ test('game feel: marcar asistencia estampa el sello, cuenta las monedas del serv
     assert.ok(m, 'el resultado dice cuántas monedas dio el servidor');
     if (Number(m[1]) > 0) assert.equal(r.eval.chip, `+${m[1]} monedas`, 'el chip cuenta hasta lo que dio el servidor, ni una más');
     else assert.equal(r.eval.chip, null);
+    assert.equal(r.eval.alNacer, r.eval.chip, 'W45a: el chip nace con el número del servidor (no cuenta desde 0)');
+    assert.equal(r.eval.alos150, r.eval.chip, 'W45a: a los 150 ms el chip dice lo mismo que el resultado');
     assert.equal(r.eval.fichasQuedan, 0);
   });
 });
