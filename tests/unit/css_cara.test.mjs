@@ -52,7 +52,7 @@ test('cara: sobriedad. El fondo de marca y la pestana rellena son solo del estud
       assert.match(selector, SOLO_ESTUDIANTE, `"${selector}" es adorno de juego y no cuelga de .juego ni de la barra del estudiante: lo recibirian el profe y el admin`);
     }
   }
-  assert.ok(vigiladas >= 0);
+  assert.ok(vigiladas >= 2, `se esperaban el fondo de marca y la pestana rellena en cara.css; hay ${vigiladas} reglas vigiladas`);
 });
 
 const HOJAS = ['estilos/tipografia.css', 'estilos/base.css', 'estilos/componentes.css', 'estilos/formularios.css', 'estilos/juego.css', CARA];

@@ -266,3 +266,68 @@ button.boton-secundario {
   color: var(--superficie);
   box-shadow: 0 3px 0 var(--primario-oscuro);
 }
+
+/* ====================================================================================================================================
+   5. FONDO DE MARCA Y ESCRITORIO (solo el estudiante, desde 900 px). Antes: a 1280 la columna de 480 px quedaba perdida en un mar crema.
+      Ahora la app es una hoja crema más ancha, de arriba abajo, sobre un fondo navy muy claro con dos formas planas de afiche (un arco navy
+      y un triángulo dorado) en la diagonal. Las formas son seudoelementos fijos, detrás de todo, sin texto y sin movimiento. El profe y el
+      admin no reciben nada de esto: su panel ya ocupa 1100 px y queda sobrio.
+   ==================================================================================================================================== */
+@media (min-width: 900px) {
+  body:has(.juego),
+  body:has(.nav-inferior a[href="#/inicio"]) {
+    background: color-mix(in srgb, var(--primario) 11%, white);
+  }
+  body:has(.juego)::before,
+  body:has(.nav-inferior a[href="#/inicio"])::before {
+    content: "";
+    position: fixed;
+    z-index: -1;
+    left: -16vmin;
+    bottom: -22vmin;
+    width: 70vmin;
+    height: 70vmin;
+    border-radius: 50%;
+    border: 9vmin solid color-mix(in srgb, var(--primario) 10%, transparent);
+    pointer-events: none;
+  }
+  body:has(.juego)::after,
+  body:has(.nav-inferior a[href="#/inicio"])::after {
+    content: "";
+    position: fixed;
+    z-index: -1;
+    right: 7vw;
+    top: 9vh;
+    width: 24vmin;
+    height: 24vmin;
+    background: color-mix(in srgb, var(--oro) 38%, transparent);
+    clip-path: polygon(50% 0, 100% 100%, 0 100%);
+    transform: rotate(16deg);
+    pointer-events: none;
+  }
+  #vista:has(.juego),
+  #vista:has(.nav-inferior a[href="#/inicio"]) {
+    max-width: 600px;
+    min-height: 100vh;
+    /* Lado por lado: el `padding-bottom` que reserva el lugar de la barra fija (componentes.css, juego.css) no se toca. */
+    padding-top: 20px;
+    padding-left: 28px;
+    padding-right: 28px;
+    background: var(--fondo);
+    box-shadow: 0 0 0 2px var(--cara-linea);
+  }
+  /* Con la hoja más ancha, lo que va de borde a borde y lo que va fijo abajo la acompañan. */
+  #vista:has(.nav-inferior a[href="#/inicio"]) .nav-inferior,
+  #vista:has(.juego) .barra-accion {
+    max-width: 600px;
+  }
+  .juego > .barra-superior {
+    margin: -20px -28px 20px;
+    padding: 16px 28px;
+  }
+  [data-testid="vista-retos"].juego > .encabezado-reto,
+  [data-testid="vista-asistencia"].juego > .encabezado-reto {
+    margin: -20px -28px 24px;
+    padding: 20px 28px 18px;
+  }
+}
