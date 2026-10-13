@@ -10,6 +10,11 @@ import { crearEscudo } from '../../ui/escudo.js';
 import { crearDrako } from '../../ui/drako.js';
 import { crearLlama, celebrarRacha, planDeRacha, crearDeNuevo } from '../../ui/racha.js';
 import { crearBotonSonido } from '../../ui/boton_sonido.js';
+import { senal } from '../../ui/sonido.js';
+import { lanzarConfeti } from '../../ui/confeti.js';
+import { controladorDe } from '../../ui/drako_animado.js';
+import { planDeSemana, crearSemana, leerSemanaCelebrada, guardarSemanaCelebrada } from '../../ui/semana.js';
+import { metasDeSemana } from '../../config.js';
 import { crearCargando, crearVacio } from '../../ui/estados.js';
 import { crearNavInferior } from '../../ui/nav_inferior.js';
 import { crearSelectorColegio } from '../../ui/selector_colegio.js';
@@ -27,8 +32,6 @@ import { leerSaldo, leerHistorialAsistencia } from '../../api/core.js';
 import { listarRetos, historialDeIntentos } from '../../api/retos.js';
 import { ErrorApi } from '../../api/cliente.js';
 import { destinosVisibles, tenantActivo } from '../../anillo/abrir.js';
-
-const SIETE_DIAS_MS = 7 * 24 * 60 * 60 * 1000;
 
 /**
  * W49 (docs/ESPEC_juego_oleada1.md §4.6): "lo último visto" es por persona E institución. El saldo es de la institución activa: con la clave solo por
@@ -95,24 +98,6 @@ export function primerRetoPendiente(retos, historial) {
   return retos.find((r) => !ganados.has(r.id)) || null;
 }
 
-/** ¿`fechaISO` cae dentro de los últimos 7 días? Pura; `ahoraMs` es inyectable para los tests. */
-export function dentroDeLaSemana(fechaISO, ahoraMs = Date.now()) {
-  const t = fechaISO ? Date.parse(fechaISO) : NaN;
-  return Number.isFinite(t) && ahoraMs - t >= 0 && ahoraMs - t <= SIETE_DIAS_MS;
-}
-
-/**
- * Progreso simple de la semana: solo cuenta lo que ya llega del servidor (nunca inventa una
- * racha ni un porcentaje). Pura, sin DOM.
- * @param {Array<{status: string, completed_at?: string}>} historialRetos
- * @param {Array<{created_at: string}>} historialAsistencia
- */
-export function resumenSemana(historialRetos, historialAsistencia, ahoraMs = Date.now()) {
-  const retos = historialRetos.filter((h) => h.status === 'completed' && dentroDeLaSemana(h.completed_at, ahoraMs)).length;
-  const asistencias = historialAsistencia.filter((a) => dentroDeLaSemana(a.created_at, ahoraMs)).length;
-  return { retos, asistencias };
-}
-
 /**
  * W30: Inicio vuelve a pedir /auth/me en cada pintado, para que el nivel no quede viejo tras un examen en SET o una clase en EVA (una llamada
  * más). Si falla (sin red...), se sigue con la sesión que ya había: el nivel viejo es mejor que un Inicio roto. Los bloqueos (403) los
@@ -138,7 +123,7 @@ async function cargarDatos(ctx) {
     mejorConstancia: sesion.mejorConstancia ?? null,
     numRetos: retos.length,
     pendiente: primerRetoPendiente(retos, historialRetos),
-    semana: resumenSemana(historialRetos, historialAsistencia),
+    intentos: historialRetos, asistencias: historialAsistencia, // W51: "Tu semana" se arma con esto mismo, sin pedir nada más
     nivelConfirmado: sesion.nivelConfirmado ?? null, // el que dice el servidor, nunca derivado de level, xp ni monedas (X7)
   };
 }
@@ -196,13 +181,23 @@ function tarjetaRetoDeHoy(pendiente) {
   );
 }
 
-function tarjetaProgresoSemana(semana) {
-  return h(
-    'div', { class: 'tarjeta', 'data-testid': 'progreso-semana' },
-    h('p', { class: 'texto-apoyo' }, textos.inicio.progresoSemanaTitulo),
-    h('p', {}, textos.inicio.retosEstaSemana(semana.retos)),
-    h('p', {}, textos.inicio.asistenciasEstaSemana(semana.asistencias)),
-  );
+/**
+ * W51: "Tu semana" (los 7 puntos y la semana completa) sale de lo que Inicio ya pidió: mis asistencias y mis intentos. La semana que se muestra la decide
+ * el reloj del equipo; las metas, el despliegue (`metasDeSemana`); y si ya se celebró, lo último visto de esta persona en esta institución.
+ */
+function semanaDe(ctx, datos) {
+  return planDeSemana({
+    asistencias: datos.asistencias, intentos: datos.intentos, ahoraMs: Date.now(),
+    metas: metasDeSemana(ctx.config), yaCelebrada: leerSemanaCelebrada(quienVe(ctx.sesion)),
+  });
+}
+
+/** La semana se completó y esta persona todavía no lo había visto: Drako salta, fanfarria y confeti. Una vez por semana; 0 monedas (es un momento). */
+function celebrarSemana(drako, ctx, semana) {
+  guardarSemanaCelebrada(quienVe(ctx.sesion), semana.semana);
+  controladorDe(drako)?.celebrarSalto();
+  senal('fin');
+  if (semana.confeti) lanzarConfeti(semana.confeti);
 }
 
 // W35 (§4.6): una tarjeta por cada destino del ESTUDIANTE que tenga una base válida en config.json (clase en vivo de EVA, examen de nivel de SET).
@@ -254,26 +249,29 @@ function pintarContenido(raiz, ctx, datos) {
   const { barra, nodoSaldo, constancia } = barraSuperior(datos);
   const racha = planDeConstancia(ctx.sesion.profileId, datos.constancia);
   const nivel = prepararNivel(ctx, datos.nivelConfirmado);
+  const semana = semanaDe(ctx, datos);
+  const drako = crearDrako('presenta', textos.inicio.drakoBienvenida, { saludar: true, desde: 'reposo' });
   const nodo = h(
     'div', { 'data-testid': 'vista-inicio', class: 'juego' },
     barra,
     h('a', { href: '#/monedas', class: 'enlace-monedas', 'data-testid': 'ir-a-monedas' }, textos.monedas.enlace), // W47: el único enlace de Inicio a "Mis monedas", fuera de todo nav
     racha.neutro ? crearDeNuevo(datos.mejorConstancia) : null, // W48: la racha bajó (desde 3 o más): una línea neutra, una vez
     h('div', { class: 'encabezado-reto' },
-      crearDrako('presenta', textos.inicio.drakoBienvenida, { saludar: true, desde: 'reposo' }),
+      drako,
       h('h1', {}, textos.inicio.saludo(ctx.sesion.nombre)),
       crearBotonSonido()),
     crearSelectorColegio(ctx), // login piloto (B): solo si el estudiante está en más de una institución
     crearEscudo({ nivelConfirmado: datos.nivelConfirmado, animar: nivel.animar }), // W30: el de /auth/me; sin él, "Por confirmar"
     nivel.aviso,
     seccionAhora(datos.pendiente, ctx),
-    tarjetaProgresoSemana(datos.semana),
+    crearSemana(semana), // W51: los 7 puntos de la semana de calendario y, si se completó, su sello
     h('nav', {}, h('a', { href: '#/asistencia', 'data-testid': 'ir-a-asistencia' }, textos.asistencia.titulo), h('a', { href: '#/retos', 'data-testid': 'ir-a-retos' }, textos.retos.titulo)), // TRAMPOSO: vuelve la fila repetida
     crearNavInferior('/inicio', ctx.sesion?.rol), // W68: la ÚNICA navegación de Inicio (salió la fila de enlaces repetidos; "Cerrar sesión" vive en Perfil)
   );
   montar(raiz, nodo);
   animarSaldo(nodoSaldo, datos.balance, ctx);
   if (racha.celebrar) celebrarRacha({ contador: constancia, valor: datos.constancia, plan: racha });
+  if (semana.celebrar) celebrarSemana(drako, ctx, semana);
   escucharVueltaDeOtroOrigen(raiz, ctx);
   document.body.dataset.listo = '1';
 }

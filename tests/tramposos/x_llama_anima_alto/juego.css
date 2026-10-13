@@ -1113,3 +1113,116 @@ body {
 .llama-etapa-3 {
   transform-origin: 50% 62%;
 }
+
+/* ---------- W51 · "Tu semana" (ui/semana.js, docs/ESPEC_juego_oleada1.md §4.6 y §5 A5): 7 puntos de lunes a domingo. Lleno = hay asistencia ese día
+   (oro, con su marca); sin asistencia es NEUTRO (un punto gris, nunca rojo ni "ausente"). En cada pintado los llenos entran uno tras otro (220 ms,
+   cada 60 ms: la entrada normal del juego, no un premio). Si la semana se completó: el anillo cerrado y el sello. Sin movimiento, todo quieto. ---------- */
+.semana-dias {
+  position: relative;
+  display: flex;
+  justify-content: space-between;
+  gap: 4px;
+  margin: 16px 0 12px;
+  padding: 0;
+  list-style: none;
+}
+.semana-dia {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 4px;
+  flex: 1;
+}
+.semana-punto {
+  display: grid;
+  place-items: center;
+  width: 34px;
+  height: 34px;
+  border-radius: 50%;
+  border: 2px solid var(--borde);
+  background: var(--fondo);
+  font-weight: 800;
+  line-height: 1;
+  color: var(--oro-texto);
+}
+.semana-dia-lleno .semana-punto {
+  border-color: color-mix(in srgb, var(--oro) 75%, black);
+  background: var(--oro);
+}
+.semana-letra {
+  font-family: var(--fuente-titulos);
+  font-weight: 700;
+  font-size: 0.8rem;
+  color: color-mix(in srgb, var(--texto) 70%, transparent);
+}
+.semana-dia-lleno .semana-letra {
+  color: var(--texto);
+}
+.semana-resumen {
+  margin: 0;
+  font-weight: 700;
+}
+.juego .semana-dia-lleno .semana-punto {
+  animation: semana-punto-entra 220ms cubic-bezier(0.2, 1.6, 0.4, 1) backwards;
+  animation-delay: calc(var(--i, 0) * 60ms);
+}
+@keyframes semana-punto-entra {
+  from { opacity: 0; transform: scale(0.4); }
+}
+/* El anillo de la semana: se cierra (aparece) alrededor de los 7 puntos cuando se completó. */
+.semana-completa .semana-dias::after {
+  content: "";
+  position: absolute;
+  inset: -8px -8px -6px;
+  border: 3px solid var(--oro);
+  border-radius: var(--radio-md);
+  pointer-events: none;
+}
+.juego .semana-completa .semana-dias::after {
+  animation: semana-anillo 400ms ease-out backwards;
+}
+@keyframes semana-anillo {
+  from { opacity: 0; transform: scale(0.9); }
+}
+.semana-sello {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  margin-top: 14px;
+  padding: 10px 14px;
+  background: var(--primario);
+  color: var(--superficie);
+  border-radius: var(--radio-md);
+  border-bottom: 4px solid var(--primario-oscuro);
+}
+.semana-sello-icono {
+  flex: none;
+  display: grid;
+  place-items: center;
+  width: 40px;
+  height: 40px;
+  border-radius: 50%;
+  background: var(--oro);
+  color: var(--oro-texto);
+  font-size: 1.3rem;
+}
+.semana-sello-titulo {
+  margin: 0;
+  font-family: var(--fuente-titulos);
+  font-weight: 800;
+  font-size: 1.15rem;
+  color: var(--oro);
+}
+.semana-sello-detalle {
+  margin: 0;
+  font-size: 0.92rem;
+}
+.juego .semana-sello-entra {
+  animation: merito-estampa 520ms cubic-bezier(0.2, 1.5, 0.35, 1) 300ms backwards;
+}
+@keyframes merito-estampa {
+  0% { opacity: 0; transform: scale(1.8) rotate(-8deg); }
+  60% { opacity: 1; transform: scale(0.92) rotate(0deg); }
+  100% { transform: scale(1) rotate(0deg); }
+}
+

@@ -1,0 +1,16 @@
+{
+  "descripcion": "W51 (U50): un día sin asistencia se marca como \"ausente\" (la web no sabe si ese día hubo clase)",
+  "archivos": {
+    "src/ui/semana.js": "semana.js"
+  },
+  "comando": [
+    "node",
+    "--test",
+    "--test-reporter=tap",
+    "tests/unit/ui_semana.test.mjs"
+  ],
+  "espera_codigo_no_cero": true,
+  "espera_fallan_tests": [
+    "U50: 7 puntos por attendance_date"
+  ]
+}

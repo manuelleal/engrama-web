@@ -1,0 +1,16 @@
+{
+  "descripcion": "W51: las metas de la semana aceptan cadenas como números: la cadena \"0\" apaga la semana completa sin que nadie lo haya pedido de verdad",
+  "archivos": {
+    "src/config.js": "config.js"
+  },
+  "comando": [
+    "node",
+    "--test",
+    "--test-reporter=tap",
+    "tests/unit/ui_semana.test.mjs"
+  ],
+  "espera_codigo_no_cero": true,
+  "espera_fallan_tests": [
+    "U50 (W51): las metas salen de config.json"
+  ]
+}

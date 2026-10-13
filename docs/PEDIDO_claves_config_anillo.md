@@ -43,3 +43,10 @@ Ejemplo (valores de mentira):
 
 ## Qué NO va en `config.json`
 Ningún token, contraseña, clave de servicio ni el código de un grupo. Las bases no se toman nunca de la dirección de la página ni de un campo: solo de aquí.
+
+## "Tu semana" (W51 de `docs/ESPEC_juego_oleada1.md`, ya lo lee la app)
+- `SEMANA_META_CLASES` y `SEMANA_META_RETOS` (nombres PROVISIONALES, C17): las metas de la semana completa del estudiante. **Enteros de 0 a 7** (no cadenas):
+  cuántos días distintos con asistencia y cuántos retos distintos ganados, de lunes a domingo. Sin la clave, o con un valor mal formado (`"2"`, `2.5`, `9`),
+  vale **2**. Un **0** en cualquiera de las dos **apaga** la semana completa (los 7 puntos se siguen viendo). No da monedas: es un sello y una celebración,
+  una vez por semana. Con un grupo de una sola clase por semana conviene `SEMANA_META_CLASES: 1` (lo decide Christiam, C2).
+

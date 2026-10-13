@@ -28,6 +28,22 @@ export function registroConCodigo(config) {
   return Boolean(config) && typeof config === 'object' && /** @type {any} */ (config).REGISTRO_CON_CODIGO === true;
 }
 
+/** Las metas de "Tu semana" cuando el despliegue no dice otra cosa (C2 de la espec del juego, PROVISIONAL). */
+const META_DE_SEMANA = 2;
+
+/**
+ * Las metas de la semana completa (docs/ESPEC_juego_oleada1.md §4.6 y adenda §17.1.4, W51): cuántas clases (días distintos con asistencia) y cuántos
+ * retos distintos ganados. Las pone el despliegue con `SEMANA_META_CLASES` y `SEMANA_META_RETOS`: enteros de 0 a 7. Una clave ausente o mal formada
+ * (un texto, un decimal, un número fuera de rango) vale 2; un 0 en cualquiera APAGA la semana completa (lo decide quien lee las metas). Pura.
+ * @param {unknown} config
+ * @returns {{clases: number, retos: number}}
+ */
+export function metasDeSemana(config) {
+  const c = config && typeof config === 'object' ? /** @type {Record<string, unknown>} */ (config) : {};
+  const meta = (/** @type {unknown} */ v) => (Number.isInteger(v) && /** @type {number} */ (v) >= 0 && /** @type {number} */ (v) <= 7 ? /** @type {number} */ (v) : META_DE_SEMANA);
+  return { clases: meta(c.SEMANA_META_CLASES), retos: meta(c.SEMANA_META_RETOS) };
+}
+
 /**
  * Pide /config.json SIEMPRE a la red (sin caché del navegador ni del service worker). Lanza si no hay
  * red, si responde mal o si no es un JSON con un modo válido: quien llama muestra el error, no inventa.

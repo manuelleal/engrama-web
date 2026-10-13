@@ -68,8 +68,25 @@ export const DECLARADAS = {
   // `nav` sin `data-testid`: se declaran por etiqueta.
   // W47 (docs/ESPEC_juego_oleada1.md §17.1.4): Inicio gana UN enlace, "Ver mis movimientos" (`ir-a-monedas`), justo debajo de la barra del saldo.
   // W48 (docs/ESPEC_juego_oleada1.md §12): el nodo `constancia` cambia: la llama lleva su etapa (con constancia 3, la etapa 1, con su lengua lateral).
-  inicio: ['ahora', 'tarjeta-reto-hoy', { etiqueta: 'nav' }, 'ir-a-monedas', 'constancia'],
+  // W51 (docs/ESPEC_juego_oleada1.md §17.1.4): `progreso-semana` cambia por dentro ("Esta semana" con dos contadores → "Tu semana" con sus 7 puntos);
+  // conserva su `data-testid` y su sitio (después de "Ahora").
+  inicio: ['ahora', 'tarjeta-reto-hoy', { etiqueta: 'nav' }, 'ir-a-monedas', 'constancia', 'progreso-semana'],
 };
+
+test('R4: lo que W51 declara cambió de verdad: "Esta semana" pasa a "Tu semana" con sus 7 puntos de lunes a domingo, en el mismo sitio; lo demás no cambió', async () => {
+  const hoy = (await tomarFotos()).inicio;
+  const base = BASE.vistas.inicio;
+  const linea = (lineas, testid) => lineas.findIndex((l) => l.includes(`data-testid="${testid}"`));
+  assert.ok(base.some((l) => l.trim() === '"Esta semana"') && !hoy.some((l) => l.trim() === '"Esta semana"'), 'la línea base decía "Esta semana"; hoy ya no');
+  assert.ok(hoy.some((l) => l.trim() === '"Tu semana"'), 'hoy dice "Tu semana"');
+  assert.equal(hoy.filter((l) => l.includes('data-testid="progreso-semana"')).length, 1, 'el nodo conserva su data-testid, una sola vez');
+  assert.ok(linea(hoy, 'ahora') < linea(hoy, 'progreso-semana'), 'sigue después de "Ahora"');
+  assert.equal(hoy.filter((l) => /^li class="semana-dia/.test(l.trim())).length, 7, 'siete puntos');
+  assert.equal(hoy.filter((l) => l.includes('semana-dia-lleno')).length, 0, 'en la foto (asistencias de 2020) ninguno está lleno: son neutros');
+  assert.ok(!hoy.some((l) => /ausente|faltaste/i.test(l)), 'un día sin registro nunca dice "ausente"');
+  assert.ok(!hoy.some((l) => l.includes('data-testid="semana-completa"')), 'sin semana completa no hay sello');
+  assert.deepEqual(sinSubarboles(hoy, DECLARADAS.inicio), sinSubarboles(base, DECLARADAS.inicio), 'fuera de lo declarado, Inicio es idéntico');
+});
 
 test('R4: lo que W48 declara cambió de verdad: en Inicio la llama de la constancia lleva su etapa (3 → etapa 1) y el número sigue aparte, en texto; lo demás no cambió', async () => {
   const hoy = (await tomarFotos()).inicio;
@@ -128,7 +145,7 @@ test('R4: lo que W65 declara cambió de verdad: Inicio trae "Ahora" con el reto 
   assert.ok(base.findIndex((l) => l.includes('progreso-semana')) > base.findIndex((l) => l.includes('tarjeta-reto-hoy')), 'en la línea base ya iba el reto antes');
   assert.ok(!base.some((l) => l.includes('data-testid="ahora"')), 'la línea base no tenía la sección');
   assert.deepEqual(sinSubarboles(hoy, DECLARADAS.inicio), sinSubarboles(base, DECLARADAS.inicio), 'fuera de lo declarado, Inicio es idéntico');
-  assert.ok(sinSubarboles(hoy, DECLARADAS.inicio).some((l) => l.includes('data-testid="progreso-semana"')), '"Esta semana" sigue ahí, sin tocar');
+  assert.ok(hoy.some((l) => l.includes('data-testid="progreso-semana"')), 'el nodo `progreso-semana` existe y va después de "Ahora" (W51 declaró su interior: ya no se afirma "sin tocar")');
 });
 
 test('R4: lo que W64 declara cambió de verdad: profe/grupos trae una tarjeta por grupo con tres acciones, y lo demás (el título) no cambió', async () => {

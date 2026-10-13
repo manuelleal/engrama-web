@@ -1,0 +1,17 @@
+{
+  "descripcion": "W51 (U50): la semana completa se celebra en cada visita a Inicio (no mira si esa semana ya se celebró)",
+  "archivos": {
+    "src/ui/semana.js": "semana.js"
+  },
+  "comando": [
+    "node",
+    "--test",
+    "--test-reporter=tap",
+    "tests/unit/ui_semana.test.mjs"
+  ],
+  "espera_codigo_no_cero": true,
+  "espera_fallan_tests": [
+    "U50: se celebra UNA vez por semana",
+    "U50: en Inicio, \"Tu semana\" pinta sus 7 puntos"
+  ]
+}
