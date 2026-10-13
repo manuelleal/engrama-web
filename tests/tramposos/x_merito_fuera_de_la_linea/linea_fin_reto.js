@@ -1,0 +1,86 @@
+// @ts-check
+// ui/linea_fin_reto.js · La LÍNEA DE TIEMPO del fin de reto, con anime.js (vendor/animejs@4.5.0): una sola coreografía, en
+// este orden, en vez de efectos sueltos que arrancan a la vez:
+//   Drako salta → confeti → el puntaje cuenta → las monedas vuelan → las filas entran en cascada → el botón
+// (si el reto no fue bien: Drako baja la cabeza con suavidad → el puntaje cuenta → las filas → el botón; sin confeti ni monedas).
+// Nada de lo que se celebra depende del tiempo que tardó el estudiante ni del azar: solo del resultado que llegó
+// (ui/celebracion.js decide el nivel). Con prefers-reduced-motion no hay línea de tiempo: todo va directo al estado final,
+// legible y quieto. Toda la línea se registra en ui/celebraciones.js: si el estudiante navega, se pausa y se limpia.
+import { createTimeline } from '../../vendor/animejs@4.5.0/anime.esm.min.js';
+import { reducirMovimiento } from './movimiento.js';
+import { registrarCelebracion } from './celebraciones.js';
+
+/** Los pasos, en el orden en que ocurren. */
+export const PASOS = ['drako', 'confeti', 'puntaje', 'monedas', 'filas', 'boton'];
+/** W50: con un sello de mérito, su paso va entre las monedas y las filas. Sin mérito la línea es la de siempre. */
+export const PASOS_CON_MERITO = ['drako', 'confeti', 'puntaje', 'monedas', 'merito', 'filas', 'boton'];
+
+const CONFETI_MS = 560; // Drako llega arriba del salto (DURACION_SALTO_MS = 1290; el pico es a ~570)
+const PUNTAJE_MS = 900;
+const PUNTAJE_ANIMO_MS = 500;
+const MONEDAS_MS = 1500;
+const MONEDAS_ANIMO_MS = 1000;
+const VUELO_MONEDAS_MS = 1300;
+const ESCALON_FILAS_MS = 110;
+const ENTRADA_FILA_MS = 480;
+const MERITO_MS = 600; // W50 (A4): el sello de mérito se estampa entre las monedas y las filas, y corre las filas 600 ms
+
+/**
+ * Cuándo ocurre cada paso — pura, para probar el ORDEN sin navegador.
+ * @param {'perfecto'|'bien'|'animo'} nivel
+ * @param {{monedas?: number, filas?: number, merito?: boolean, reducido?: boolean}} [d] `merito`: hay un sello de mérito que estampar (W50); sin él, la línea es la de siempre
+ * @returns {{reducido: boolean, pasos: {paso: string, ms: number}[], totalMs: number}}
+ */
+export function planDeLinea(nivel, { monedas = 0, filas = 0, merito = false, reducido = reducirMovimiento() } = {}) {
+  if (reducido) return { reducido: true, pasos: [], totalMs: 0 };
+  const festeja = nivel !== 'animo';
+  const pasos = [{ paso: 'drako', ms: 0 }];
+  if (festeja) pasos.push({ paso: 'confeti', ms: CONFETI_MS });
+  pasos.push({ paso: 'puntaje', ms: festeja ? PUNTAJE_MS : PUNTAJE_ANIMO_MS });
+  let t = festeja ? MONEDAS_MS : MONEDAS_ANIMO_MS;
+  if (monedas > 0) { pasos.push({ paso: 'monedas', ms: t }); t += VUELO_MONEDAS_MS; }
+  pasos.push({ paso: 'filas', ms: t });
+  const finFilas = t + Math.max(0, filas - 1) * ESCALON_FILAS_MS + ENTRADA_FILA_MS;
+  if (merito) pasos.push({ paso: 'merito', ms: finFilas - 200 });
+  pasos.push({ paso: 'boton', ms: finFilas - 120 });
+  return { reducido: false, pasos, totalMs: finFilas + 400 };
+}
+
+/** Las filas y el botón que la línea revela; sin movimiento, o si se cancela, se quedan visibles y listos. */
+function dejarVisibles(filas, boton) {
+  for (const f of filas) { f.style.opacity = ''; f.style.transform = ''; f.classList.add('fila-lista'); }
+  if (boton) { boton.style.opacity = ''; boton.style.transform = ''; }
+}
+
+/**
+ * Corre la línea de tiempo. `acciones` trae lo que ya sabe hacer cada pieza (drako, confeti, puntaje, monedas); las filas y el
+ * botón los revela esta línea con anime.js.
+ * @param {{nivel: 'perfecto'|'bien'|'animo', monedas: number, filas: HTMLElement[], boton: HTMLElement|null,
+ *   merito?: boolean, acciones: Partial<Record<'drako'|'confeti'|'puntaje'|'monedas'|'merito', () => void>>}} d
+ * @returns {{linea: any, cancelar: () => void}|null} null si no hay línea (movimiento reducido)
+ */
+export function correrLinea({ nivel, monedas, filas, boton, merito = false, acciones }) {
+  const plan = planDeLinea(nivel, { monedas, filas: filas.length, merito });
+  if (plan.reducido) {
+    for (const paso of ['drako', 'confeti', 'puntaje', 'monedas', 'merito']) acciones[paso]?.(); // sin línea: el sello ya queda puesto
+    dejarVisibles(filas, boton);
+    return null;
+  }
+  for (const el of [...filas, boton]) if (el) el.style.opacity = '0';
+  const linea = createTimeline({ autoplay: true });
+  let cancelada = false;
+  const terminar = registrarCelebracion(() => { cancelada = true; linea.pause(); dejarVisibles(filas, boton); });
+  const cuando = (paso) => /** @type {{ms: number}} */ (plan.pasos.find((p) => p.paso === paso)).ms;
+  for (const { paso, ms } of plan.pasos) {
+    if (paso === 'filas' || paso === 'boton') continue;
+    linea.call(() => { if (!cancelada) acciones[paso]?.(); }, ms);
+  }
+  filas.forEach((fila, i) => {
+    const inicio = cuando('filas') + i * ESCALON_FILAS_MS;
+    linea.add(fila, { opacity: [0, 1], translateX: [-36, 0], duration: ENTRADA_FILA_MS, ease: 'outBack(1.3)' }, inicio);
+    linea.call(() => { if (!cancelada) fila.classList.add('fila-lista'); }, inicio + 220);
+  });
+  if (boton) linea.add(boton, { opacity: [0, 1], scale: [0.85, 1], duration: 420, ease: 'outBack(1.6)' }, cuando('boton'));
+  linea.call(() => terminar(), plan.totalMs);
+  return { linea, cancelar: () => { terminar(); cancelada = true; linea.pause(); dejarVisibles(filas, boton); } };
+}

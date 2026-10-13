@@ -17,6 +17,8 @@ import { animarConteo } from './conteo.js';
 import { senal } from './sonido.js';
 import { correrLinea } from './linea_fin_reto.js';
 import { registrarCelebracion } from './celebraciones.js';
+import { crearSelloDeMerito, estamparMerito } from './merito.js';
+import { reducirMovimiento } from './movimiento.js';
 
 /** @typedef {'perfecto'|'bien'|'animo'} NivelCelebracion */
 
@@ -39,7 +41,8 @@ export function planDeCelebracion(nivel) {
 
 /**
  * La cabecera de la pantalla de resultado.
- * @param {{nivel: NivelCelebracion, aciertos: number, total: number, monedas: number}} d
+ * @param {{nivel: NivelCelebracion, aciertos: number, total: number, monedas: number, merito?: import('./merito.js').Merito|null}} d `merito` (W50): el
+ *   sello de mérito de este fin de reto, o null. Va después de la medalla; Drako presenta desde arriba y NUNCA va dentro del sello
  */
 export function crearHeroResultado(d) {
   const textosNivel = textos.celebracion[d.nivel];
@@ -48,6 +51,7 @@ export function crearHeroResultado(d) {
   const drako = crearDrako(plan.drako, textosNivel.drako, { desde: d.nivel === 'animo' ? 'presenta' : 'reposo', sinCiclo: true });
   const puntaje = h('span', { class: 'hero-puntaje-num', 'aria-hidden': 'true' }, `0 / ${d.total}`);
   const medallaNum = d.monedas > 0 ? h('span', { class: 'medalla-num' }, '+0') : null;
+  const sello = d.merito ? crearSelloDeMerito(d.merito, { enEspera: !reducirMovimiento() }) : null;
   const nodo = h(
     'section', { class: `hero-resultado hero-${d.nivel}`, 'data-testid': 'hero-resultado' },
     h('div', { class: 'hero-drako' }, drako),
@@ -56,8 +60,9 @@ export function crearHeroResultado(d) {
     h('p', { class: 'hero-puntaje', 'data-testid': 'puntaje' },
       puntaje, h('span', { class: 'solo-lectores' }, textos.celebracion.puntaje(d.aciertos, d.total))),
     medallaNum ? h('div', { class: 'medalla-monedas', 'aria-hidden': 'true' }, medallaNum, h('span', {}, textos.inicio.monedas)) : null,
+    sello,
   );
-  return { nodo, drako, puntaje, medallaNum };
+  return { nodo, drako, puntaje, medallaNum, sello };
 }
 
 /**
@@ -66,7 +71,7 @@ export function crearHeroResultado(d) {
  * (nivel, monedas del servidor, número de filas), nunca del tiempo que tardó el estudiante ni de ningún azar. Con prefers-reduced-motion
  * no hay línea: todo va directo al estado final.
  * @param {{nivel: NivelCelebracion, aciertos: number, total: number, monedas: number, hero: ReturnType<typeof crearHeroResultado>,
- *   filas?: HTMLElement[], boton?: HTMLElement|null}} d
+ *   filas?: HTMLElement[], boton?: HTMLElement|null, merito?: import('./merito.js').Merito|null}} d
  */
 export function celebrarFinDeReto(d) {
   const plan = planDeCelebracion(d.nivel);
@@ -84,8 +89,11 @@ export function celebrarFinDeReto(d) {
     },
     puntaje: () => animarConteo(d.hero.puntaje, { desde: 0, hasta: d.aciertos, formato: (n) => `${n} / ${d.total}`, golpe: d.nivel !== 'animo' }),
     monedas: () => contarMonedas(d),
+    merito: () => { if (d.merito) estamparMerito(d.hero.sello, d.merito); },
   };
-  correrLinea({ nivel: d.nivel, monedas: d.monedas, filas: d.filas || [], boton: d.boton || null, acciones });
+  // Si el estudiante cambia de pantalla antes del paso del sello, el sello no se queda escondido.
+  if (d.merito && d.hero.sello) registrarCelebracion(() => d.hero.sello?.classList.remove('merito-espera'));
+  correrLinea({ nivel: d.nivel, monedas: d.monedas, filas: d.filas || [], boton: d.boton || null, merito: Boolean(d.merito && d.hero.sello), acciones });
 }
 
 // El segundo estallido del perfecto: se cancela con el cambio de pantalla, como todo lo demás.

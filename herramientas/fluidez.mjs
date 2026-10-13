@@ -95,7 +95,7 @@ async function momentos(sesion, url, estado) {
   await sesion.evaluar("location.hash = '#/retos'");
   await esperar(1200);
   salida.push(await medir(sesion, 'Pregunta: elegir, avanzar (3 preguntas con transición)', `location.hash = '#/retos/${reto.id}'; void 0`, 3500).then(async (r) => r));
-  salida.push(await medir(sesion, 'Fin de reto perfecto: confeti fuerte, monedas, conteo', JUGAR_Y_TERMINAR, 6500));
+  salida.push(await medir(sesion, 'Fin de reto perfecto: confeti fuerte, monedas, conteo y sello de mérito (W50)', JUGAR_Y_TERMINAR, 6500));
   await sesion.evaluar("location.hash = '#/retos'");
   await esperar(1200);
   salida.push(await medir(sesion, 'Asistencia: sello, monedas, llama', `location.hash = '#/asistencia?codigo=${sesionAsistencia.session_code}'; void 0`, 5500));

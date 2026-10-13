@@ -1,0 +1,17 @@
+{
+  "descripcion": "W50 (U48): \"Primer reto perfecto\" se celebra en cada reto perfecto, aunque ya hubiera uno en el historial, y aunque el historial venga lleno o ilegible",
+  "archivos": {
+    "src/ui/merito.js": "merito.js"
+  },
+  "comando": [
+    "node",
+    "--test",
+    "--test-reporter=tap",
+    "tests/unit/ui_merito.test.mjs"
+  ],
+  "espera_codigo_no_cero": true,
+  "espera_fallan_tests": [
+    "U48: reto superado",
+    "U48: ante la duda no se celebra"
+  ]
+}

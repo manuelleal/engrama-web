@@ -1,0 +1,16 @@
+{
+  "descripcion": "W50 (U49): el sello de mérito se estampa al final, después de las filas, en vez de entre las monedas y las filas",
+  "archivos": {
+    "src/ui/linea_fin_reto.js": "linea_fin_reto.js"
+  },
+  "comando": [
+    "node",
+    "--test",
+    "--test-reporter=tap",
+    "tests/unit/ui_merito.test.mjs"
+  ],
+  "espera_codigo_no_cero": true,
+  "espera_fallan_tests": [
+    "U49: con mérito, el paso `merito` va después de `monedas` y antes de `filas`"
+  ]
+}

@@ -12,6 +12,8 @@ import { registrarCelebracion } from './celebraciones.js';
 
 /** Los pasos, en el orden en que ocurren. */
 export const PASOS = ['drako', 'confeti', 'puntaje', 'monedas', 'filas', 'boton'];
+/** W50: con un sello de mérito, su paso va entre las monedas y las filas. Sin mérito la línea es la de siempre. */
+export const PASOS_CON_MERITO = ['drako', 'confeti', 'puntaje', 'monedas', 'merito', 'filas', 'boton'];
 
 const CONFETI_MS = 560; // Drako llega arriba del salto (DURACION_SALTO_MS = 1290; el pico es a ~570)
 const PUNTAJE_MS = 900;
@@ -21,14 +23,15 @@ const MONEDAS_ANIMO_MS = 1000;
 const VUELO_MONEDAS_MS = 1300;
 const ESCALON_FILAS_MS = 110;
 const ENTRADA_FILA_MS = 480;
+const MERITO_MS = 600; // W50 (A4): el sello de mérito se estampa entre las monedas y las filas, y corre las filas 600 ms
 
 /**
  * Cuándo ocurre cada paso — pura, para probar el ORDEN sin navegador.
  * @param {'perfecto'|'bien'|'animo'} nivel
- * @param {{monedas?: number, filas?: number, reducido?: boolean}} [d]
+ * @param {{monedas?: number, filas?: number, merito?: boolean, reducido?: boolean}} [d] `merito`: hay un sello de mérito que estampar (W50); sin él, la línea es la de siempre
  * @returns {{reducido: boolean, pasos: {paso: string, ms: number}[], totalMs: number}}
  */
-export function planDeLinea(nivel, { monedas = 0, filas = 0, reducido = reducirMovimiento() } = {}) {
+export function planDeLinea(nivel, { monedas = 0, filas = 0, merito = false, reducido = reducirMovimiento() } = {}) {
   if (reducido) return { reducido: true, pasos: [], totalMs: 0 };
   const festeja = nivel !== 'animo';
   const pasos = [{ paso: 'drako', ms: 0 }];
@@ -36,6 +39,7 @@ export function planDeLinea(nivel, { monedas = 0, filas = 0, reducido = reducirM
   pasos.push({ paso: 'puntaje', ms: festeja ? PUNTAJE_MS : PUNTAJE_ANIMO_MS });
   let t = festeja ? MONEDAS_MS : MONEDAS_ANIMO_MS;
   if (monedas > 0) { pasos.push({ paso: 'monedas', ms: t }); t += VUELO_MONEDAS_MS; }
+  if (merito) { pasos.push({ paso: 'merito', ms: t }); t += MERITO_MS; }
   pasos.push({ paso: 'filas', ms: t });
   const finFilas = t + Math.max(0, filas - 1) * ESCALON_FILAS_MS + ENTRADA_FILA_MS;
   pasos.push({ paso: 'boton', ms: finFilas - 120 });
@@ -52,13 +56,13 @@ function dejarVisibles(filas, boton) {
  * Corre la línea de tiempo. `acciones` trae lo que ya sabe hacer cada pieza (drako, confeti, puntaje, monedas); las filas y el
  * botón los revela esta línea con anime.js.
  * @param {{nivel: 'perfecto'|'bien'|'animo', monedas: number, filas: HTMLElement[], boton: HTMLElement|null,
- *   acciones: Partial<Record<'drako'|'confeti'|'puntaje'|'monedas', () => void>>}} d
+ *   merito?: boolean, acciones: Partial<Record<'drako'|'confeti'|'puntaje'|'monedas'|'merito', () => void>>}} d
  * @returns {{linea: any, cancelar: () => void}|null} null si no hay línea (movimiento reducido)
  */
-export function correrLinea({ nivel, monedas, filas, boton, acciones }) {
-  const plan = planDeLinea(nivel, { monedas, filas: filas.length });
+export function correrLinea({ nivel, monedas, filas, boton, merito = false, acciones }) {
+  const plan = planDeLinea(nivel, { monedas, filas: filas.length, merito });
   if (plan.reducido) {
-    for (const paso of ['drako', 'confeti', 'puntaje', 'monedas']) acciones[paso]?.();
+    for (const paso of ['drako', 'confeti', 'puntaje', 'monedas', 'merito']) acciones[paso]?.(); // sin línea: el sello ya queda puesto
     dejarVisibles(filas, boton);
     return null;
   }

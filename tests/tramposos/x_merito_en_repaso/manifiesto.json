@@ -1,0 +1,16 @@
+{
+  "descripcion": "W50 (U48): un repaso de un reto ya ganado se lleva un sello de mérito (se premia repetir lo fácil)",
+  "archivos": {
+    "src/ui/merito.js": "merito.js"
+  },
+  "comando": [
+    "node",
+    "--test",
+    "--test-reporter=tap",
+    "tests/unit/ui_merito.test.mjs"
+  ],
+  "espera_codigo_no_cero": true,
+  "espera_fallan_tests": [
+    "U48: un repaso no lleva sello"
+  ]
+}

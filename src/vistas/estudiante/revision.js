@@ -8,6 +8,7 @@ import { crearResultado } from '../../ui/retro.js';
 import { crearBotonSonido } from '../../ui/boton_sonido.js';
 import { nivelDeCelebracion, crearHeroResultado, celebrarFinDeReto } from '../../ui/celebracion.js';
 import { crearNavInferior } from '../../ui/nav_inferior.js';
+import { meritoDelReto } from '../../ui/merito.js';
 import { textos } from '../../textos.js';
 
 /** Texto legible de una opción por su label ("A" -> su `value`); si no hay opciones, la label tal cual. */
@@ -39,7 +40,8 @@ function filaDeRevision(pregunta, respuestasDadas, correctAnswers, i) {
 
 /**
  * @param {HTMLElement} raiz
- * @param {{challenge: object, resultado: object, respuestasDadas: Record<string,string>, rol?: string}} datos `rol`: el de la sesión, para la barra
+ * @param {{challenge: object, resultado: object, respuestasDadas: Record<string,string>, rol?: string, esRepaso?: boolean, historialPrevio?: unknown}} datos
+ *   `rol`: el de la sesión, para la barra; `esRepaso` e `historialPrevio` (W50): lo que se sabía ANTES de jugar, para el sello de mérito
  */
 export function renderRevision(raiz, datos) {
   const { challenge, resultado, respuestasDadas } = datos;
@@ -48,7 +50,9 @@ export function renderRevision(raiz, datos) {
   const total = challenge.questions.length;
   const monedas = resultado.coins_earned;
   const nivel = nivelDeCelebracion(aciertos, total);
-  const hero = crearHeroResultado({ nivel, aciertos, total, monedas });
+  // W50: el sello de mérito sale de lo que dice el servidor (`is_correct`, `score_percent`) y del historial leído antes de jugar; sin historial, ninguno.
+  const merito = meritoDelReto({ resultado, challengeId: /** @type {any} */ (challenge).id, historialPrevio: datos.historialPrevio, esRepaso: datos.esRepaso === true });
+  const hero = crearHeroResultado({ nivel, aciertos, total, monedas, merito });
   // El texto de las monedas es el del servidor, tal cual (un repaso NUNCA muestra "+N"). Con monedas, la
   // medalla animada del hero es lo que se ve; este aviso queda para lectores de pantalla.
   const banner = h(
@@ -68,6 +72,6 @@ export function renderRevision(raiz, datos) {
   );
   montar(raiz, nodo);
   // La línea de tiempo del fin de reto revela las filas y el botón en su momento (ui/linea_fin_reto.js).
-  celebrarFinDeReto({ nivel, aciertos, total, monedas, hero, filas, boton: volver });
+  celebrarFinDeReto({ nivel, aciertos, total, monedas, hero, filas, boton: volver, merito });
   document.body.dataset.listo = '1';
 }

@@ -10,7 +10,7 @@
 //
 // Súbelo un número cada vez que cambie la lista de precarga o la estrategia; la `activate`
 // borra cualquier caché con otro nombre.
-const VERSION = 'engrama-shell-v37';
+const VERSION = 'engrama-shell-v38';
 
 // Cada encargo agrega los suyos en su propio commit (W7: Inicio + api/cliente,core,retos + los
 // SVG de Drako que usa el estudiante; W10: profe/grupos,grupo,sesion_asistencia + api/profe). El
@@ -75,6 +75,7 @@ const PRECARGA = [
   '/src/ui/desglose.js', // adenda 17.8: el desglose de la asistencia, solo si el servidor lo trae y cuadra
   '/src/ui/movimientos.js', // W47: las filas de "Mis monedas" (puro)
   '/src/ui/semana.js', // W51: "Tu semana" (los 7 puntos y la semana completa)
+  '/src/ui/merito.js', // W50: los sellos de mérito del fin de reto
   '/src/vistas/estudiante/monedas.js', // W47: `#/monedas`
   '/src/ui/estados.js',
   '/src/ui/titulo.js',

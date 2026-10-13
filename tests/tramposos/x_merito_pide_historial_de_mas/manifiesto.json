@@ -1,0 +1,16 @@
+{
+  "descripcion": "W50 (U48): para decidir el sello se pide el historial de intentos también en un repaso (una petición de más por cada reto)",
+  "archivos": {
+    "src/vistas/estudiante/reto_flujo.js": "reto_flujo.js"
+  },
+  "comando": [
+    "node",
+    "--test",
+    "--test-reporter=tap",
+    "tests/unit/ui_merito.test.mjs"
+  ],
+  "espera_codigo_no_cero": true,
+  "espera_fallan_tests": [
+    "U48: jugar un reto pide el historial las mismas veces que antes"
+  ]
+}

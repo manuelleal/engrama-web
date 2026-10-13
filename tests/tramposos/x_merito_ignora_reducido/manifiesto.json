@@ -1,0 +1,16 @@
+{
+  "descripcion": "W50 (U58): el sello de mérito ignora \"reducir movimiento\": mismos destellos y misma duración",
+  "archivos": {
+    "src/ui/merito.js": "merito.js"
+  },
+  "comando": [
+    "node",
+    "--test",
+    "--test-reporter=tap",
+    "tests/unit/ui_merito.test.mjs"
+  ],
+  "espera_codigo_no_cero": true,
+  "espera_fallan_tests": [
+    "U58 (mérito): reducido"
+  ]
+}

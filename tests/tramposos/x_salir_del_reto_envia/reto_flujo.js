@@ -29,10 +29,13 @@ function crearSalir() {
   return h('a', { href: '#/retos', class: 'salir-reto', 'data-testid': 'reto-salir', 'aria-label': textos.salirDelReto.nombre }, textos.salirDelReto.texto);
 }
 
-/** ¿Alguna vez se ganó este reto? (para el "Repaso" cuando no llega por la URL, p. ej. F5). */
+/**
+ * ¿Alguna vez se ganó este reto? (para el "Repaso" cuando no llega por la URL, p. ej. F5). W50: devuelve además el historial que leyó, ANTES de
+ * jugar, para saber al final si hay un mérito que celebrar ("primer reto perfecto", "reto superado"). Es la MISMA petición de siempre: ni una más.
+ */
 async function yaGanado(challengeId, ctx) {
   const historial = await historialDeIntentos(ctx);
-  return historial.some((h) => h.challenge_id === challengeId && h.is_correct);
+  return { ganado: historial.some((h) => h.challenge_id === challengeId && h.is_correct), historial };
 }
 
 function primeraSinResponder(preguntas, respuestas) {
@@ -145,7 +148,7 @@ async function manejarTerminar(raiz, estado, enviarUnaVez) {
   try {
     const resultado = await enviarUnaVez();
     borrarRespuestasGuardadas(estado.attemptId);
-    renderRevision(raiz, { challenge: estado.challenge, resultado, respuestasDadas: estado.respuestas, rol: estado.rol });
+    renderRevision(raiz, { challenge: estado.challenge, resultado, respuestasDadas: estado.respuestas, rol: estado.rol, esRepaso: estado.esRepaso, historialPrevio: estado.historialPrevio });
   } catch (e) {
     // 409 = "Attempt already completed or abandoned": un doble toque real ya lo manejó
     // accionUnica (una sola petición); si aun así llega, es que el servidor ya lo cerró por otra
@@ -166,10 +169,12 @@ export async function renderRetoFlujo(raiz, params, query, ctx) {
   montar(raiz, h('div', { 'data-testid': 'vista-reto-flujo', class: 'juego' }, crearSalir(), crearCargando(textos.inicio.cargando)));
   const challengeId = params.id;
   try {
-    const esRepaso = query.repaso === '1' || (await yaGanado(challengeId, ctx));
+    // Con `?repaso=1` no se pide el historial (como siempre): es un repaso y un repaso nunca lleva sello.
+    const previo = query.repaso === '1' ? { ganado: true, historial: null } : await yaGanado(challengeId, ctx);
+    const esRepaso = previo.ganado;
     const { attempt_id: attemptId, challenge } = await arrancarIntento(challengeId, ctx);
     const respuestas = leerRespuestasGuardadas(attemptId);
-    const estado = { attemptId, challenge, respuestas, esRepaso, rol: /** @type {any} */ (ctx).sesion?.rol, indice: primeraSinResponder(challenge.questions, respuestas) };
+    const estado = { attemptId, challenge, respuestas, esRepaso, historialPrevio: previo.historial, rol: /** @type {any} */ (ctx).sesion?.rol, indice: primeraSinResponder(challenge.questions, respuestas) };
     const enviarUnaVez = accionUnica(() => enviarIntento(attemptId, respuestas, ctx));
     const callbacks = {
       siguiente: () => { estado.indice++; pintarPregunta(raiz, estado, callbacks); },

@@ -1,0 +1,16 @@
+{
+  "descripcion": "W50 (U49): Drako aparece DENTRO del sello de mérito (la mascota calificando), en vez de presentar desde la cabecera",
+  "archivos": {
+    "src/ui/celebracion.js": "celebracion.js"
+  },
+  "comando": [
+    "node",
+    "--test",
+    "--test-reporter=tap",
+    "tests/unit/ui_merito.test.mjs"
+  ],
+  "espera_codigo_no_cero": true,
+  "espera_fallan_tests": [
+    "U49: en la revisión el sello va después de la medalla"
+  ]
+}
