@@ -94,7 +94,7 @@ async function faseAsistenciaEInicio(sesion, urlBase, carpeta, registro, estado)
     'El sello se estampa, el chip de monedas cuenta hasta lo que dio el servidor, la llama de la constancia late; el resultado con ícono y texto sigue debajo.', 2800);
   // Inicio como est-1 (la constancia del actor de prueba es 3): se simula una visita anterior con menos de todo.
   await cambiarA(sesion, urlBase, 'est-1', '/retos');
-  await sesion.evaluar("localStorage.setItem('engrama_ultimo_saldo_est-1', '-60'); localStorage.setItem('engrama_ultimo_constancia_est-1', '0')");
+  await sesion.evaluar("localStorage.setItem('engrama_ultimo_saldo_est-1_demo', '-60'); localStorage.setItem('engrama_ultimo_constancia_est-1', '0')");
   await sesion.navegar(`${urlBase}#/inicio`);
   await foto(sesion, carpeta, registro, '36-juego-inicio-celebra-375.png', 'Inicio: monedas, constancia que sube',
     'Las monedas vuelan al contador, que late en oro; la constancia sube con su llama y aparece "¡Constancia N!".', 700);
@@ -109,7 +109,7 @@ async function faseSecuencias(sesion, urlBase, carpeta, registro, estado) {
   await sesion.navegar(`${urlBase}#/retos`);
   await secuencia(sesion, carpeta, registro, 'asistencia-sello', 'Secuencia: asistencia con sello', `location.hash = '#/asistencia?codigo=${s2.session_code}'`, 16, 100);
   await cambiarA(sesion, urlBase, 'est-1', '/retos');
-  await sesion.evaluar("localStorage.setItem('engrama_ultimo_saldo_est-1', '-60'); localStorage.setItem('engrama_ultimo_constancia_est-1', '0')");
+  await sesion.evaluar("localStorage.setItem('engrama_ultimo_saldo_est-1_demo', '-60'); localStorage.setItem('engrama_ultimo_constancia_est-1', '0')");
   await esperar(900);
   await secuencia(sesion, carpeta, registro, 'inicio-monedas-y-constancia', 'Secuencia: Inicio con monedas y constancia', "location.hash = '#/inicio'", 16, 100);
 }

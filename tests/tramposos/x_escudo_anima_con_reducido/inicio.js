@@ -14,7 +14,6 @@ import { crearBotonSonido } from '../../ui/boton_sonido.js';
 import { crearCargando, crearVacio } from '../../ui/estados.js';
 import { crearNavInferior } from '../../ui/nav_inferior.js';
 import { crearSelectorColegio } from '../../ui/selector_colegio.js';
-import { senal } from '../../ui/sonido.js';
 import { animarConteo } from '../../ui/conteo.js';
 import { celebrarMonedas, planDeMonedas, duracionTotal } from '../../ui/monedas.js';
 import {
@@ -33,19 +32,39 @@ import { destinosVisibles, tenantActivo } from '../../anillo/abrir.js';
 const SIETE_DIAS_MS = 7 * 24 * 60 * 60 * 1000;
 
 /**
+ * W49 (docs/ESPEC_juego_oleada1.md §4.6): "lo último visto" es por persona E institución. El saldo es de la institución activa: con la clave solo por
+ * persona, cambiar de una institución con 10 monedas a otra con 100 hacía "volar" 90 monedas que nadie ganó. Pura.
+ * @param {{profileId: string, colegio?: {id?: string}|null}} sesion
+ */
+export function quienVe(sesion) {
+  return `${sesion.profileId}_${sesion.colegio?.id ?? 'sin-institucion'}`;
+}
+
+/**
+ * Qué hace el saldo en esta visita: hay PREMIO (monedas que vuelan, golpe de oro y sonido) solo si el saldo del servidor SUBIÓ respecto de lo último
+ * que esta persona vio en esta institución. La primera visita en un equipo no es un mérito: cuenta suave desde 0 y en silencio (W49: antes sonaba
+ * la moneda por abrir la app). Si no cambió o bajó, se muestra tal cual. Pura.
+ * @param {number|null} previo lo último visto @param {number} balance lo que dijo el servidor
+ */
+export function planDeSaldo(previo, balance) {
+  const que = compararConUltimo(previo, balance);
+  if (que === 'sube') return { premio: true, desde: /** @type {number} */ (previo) };
+  return { premio: false, desde: que === 'primera' ? 0 : balance };
+}
+
+/**
  * El saldo llega del servidor y SOLO se anima: si subió desde lo último que vio este estudiante, las
  * monedas vuelan al contador, cuenta, late en oro y suena (Lingo: setCoins, student.html:2022-2040);
- * si es la primera vez o no cambió, cuenta suave hasta el valor. Nunca calcula nada.
+ * si es la primera vez o no cambió, cuenta suave hasta el valor, sin premio. Nunca calcula nada.
  */
 async function animarSaldo(nodoSaldo, balance, ctx) {
-  const quien = ctx.sesion.profileId;
+  const quien = quienVe(ctx.sesion);
   const previo = leerUltimo('saldo', quien);
-  const que = compararConUltimo(previo, balance);
+  const plan = planDeSaldo(previo, balance);
   guardarUltimo('saldo', quien, balance);
   const formato = (n) => `${n} ${textos.inicio.monedas}`;
-  if (que !== 'sube') {
-    await animarConteo(nodoSaldo, { desde: que === 'primera' ? 0 : balance, hasta: balance, formato });
-    if (que === 'primera' && balance > 0) senal('moneda');
+  if (!plan.premio) {
+    await animarConteo(nodoSaldo, { desde: plan.desde, hasta: balance, formato }); // sin sonido ni fichas: abrir la app no es un logro
     return;
   }
   const ganado = balance - /** @type {number} */ (previo);
@@ -143,7 +162,7 @@ function avisoDeBaja(definitivo, provisional) {
  */
 function prepararNivel(ctx, nivel) {
   if (!nivel) return { animar: false, aviso: null };
-  const quien = `${ctx.sesion.profileId}_${ctx.sesion.colegio?.id ?? 'sin-institucion'}`;
+  const quien = quienVe(ctx.sesion);
   const previo = leerNivelVisto(quien);
   const plan = decidirNivel(previo, nivel, false);
   guardarNivelVisto(quien, { valor: valorDeNivel(nivel.cefr), provisional: nivel.provisional });

@@ -1,0 +1,17 @@
+{
+  "descripcion": "W49 (U51): la primera visita en un equipo con saldo mayor que 0 se premia (monedas que vuelan y sonido de moneda): se celebra por abrir la app",
+  "archivos": {
+    "src/vistas/estudiante/inicio.js": "inicio.js"
+  },
+  "comando": [
+    "node",
+    "--test",
+    "--test-reporter=tap",
+    "tests/unit/vista_inicio_premios.test.mjs"
+  ],
+  "espera_codigo_no_cero": true,
+  "espera_fallan_tests": [
+    "U51: el plan del saldo solo pide premio cuando el saldo del servidor SUBE",
+    "U51: primera visita con saldo 120 y luego abrir Inicio sin cambios"
+  ]
+}

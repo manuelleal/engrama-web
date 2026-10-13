@@ -99,7 +99,7 @@ async function momentos(sesion, url, estado) {
   await sesion.evaluar("location.hash = '#/retos'");
   await esperar(1200);
   salida.push(await medir(sesion, 'Asistencia: sello, monedas, llama', `location.hash = '#/asistencia?codigo=${sesionAsistencia.session_code}'; void 0`, 5500));
-  await sesion.evaluar("localStorage.setItem('engrama_ultimo_saldo_est-1', '-30'); localStorage.setItem('engrama_ultimo_constancia_est-1', '0'); location.hash = '#/retos'; void 0");
+  await sesion.evaluar("localStorage.setItem('engrama_ultimo_saldo_est-1_demo', '-30'); localStorage.setItem('engrama_ultimo_constancia_est-1', '0'); location.hash = '#/retos'; void 0");
   await esperar(1200);
   salida.push(await medir(sesion, 'Inicio: monedas al contador, llama que sube, aviso', "location.hash = '#/inicio'; void 0", 5500));
   // W47 (ESPEC_juego_oleada1 6 y 17.1.4): "Mis monedas" con 50 filas (el tope de la pantalla). Las monedas son un efecto de fuera, sobre el estado.

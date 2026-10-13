@@ -1,0 +1,17 @@
+{
+  "descripcion": "W49 (U51): lo último visto del saldo se guarda solo por persona: al cambiar de una institución con 10 monedas a otra con 100, vuelan 90 monedas que nadie ganó",
+  "archivos": {
+    "src/vistas/estudiante/inicio.js": "inicio.js"
+  },
+  "comando": [
+    "node",
+    "--test",
+    "--test-reporter=tap",
+    "tests/unit/vista_inicio_premios.test.mjs"
+  ],
+  "espera_codigo_no_cero": true,
+  "espera_fallan_tests": [
+    "U51: lo último visto del saldo se guarda por persona E institución",
+    "U51: cambiar de una institución con 10 monedas a otra con 100 no cuenta"
+  ]
+}

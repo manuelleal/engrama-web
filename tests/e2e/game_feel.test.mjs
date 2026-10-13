@@ -22,7 +22,7 @@ const SKIP = !HAY_NAVEGADOR && 'no hay Edge ni Chrome instalado en esta máquina
 
 const YA_ENTRO = "localStorage.setItem('engrama_actor_sintetico', 'est-1')";
 // Se simula una visita anterior con MENOS saldo que el del servidor (0): el valor que llega "sube".
-const VISITA_ANTERIOR_MENOR = "localStorage.setItem('engrama_ultimo_saldo_est-1', '-3')";
+const VISITA_ANTERIOR_MENOR = "localStorage.setItem('engrama_ultimo_saldo_est-1_demo', '-3')";
 
 test('game feel: en Inicio, si el saldo del servidor subió, las monedas vuelan y el contador termina en el valor real', { skip: SKIP }, async () => {
   await conAppCompleta(async (url) => {
@@ -36,7 +36,7 @@ test('game feel: en Inicio, si el saldo del servidor subió, las monedas vuelan 
           enVuelo,
           quedan: document.querySelectorAll('.ficha-moneda').length,
           saldo: document.querySelector('[data-testid="saldo"]').textContent,
-          guardado: localStorage.getItem('engrama_ultimo_saldo_est-1'),
+          guardado: localStorage.getItem('engrama_ultimo_saldo_est-1_demo'),
         };
       })()`,
     });

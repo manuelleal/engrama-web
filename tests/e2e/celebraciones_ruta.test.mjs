@@ -31,7 +31,7 @@ test('celebraciones: al navegar desde Inicio, el aviso de constancia y el confet
   await conAppCompleta(async (url) => {
     const r = await revisarPagina({
       url, ancho: 375, alto: 812, espera_ms: 5000,
-      pre: `${YA_ENTRO}; localStorage.setItem('engrama_ultimo_constancia_est-1', '1'); localStorage.setItem('engrama_ultimo_saldo_est-1', '-30')`,
+      pre: `${YA_ENTRO}; localStorage.setItem('engrama_ultimo_constancia_est-1', '1'); localStorage.setItem('engrama_ultimo_saldo_est-1_demo', '-30')`,
       eval: `(async () => {
         const esperar = (ms) => new Promise((r) => setTimeout(r, ms));
         const { celebracionesActivas } = await import('/src/ui/celebraciones.js');
