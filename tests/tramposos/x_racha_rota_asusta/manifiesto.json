@@ -1,0 +1,16 @@
+{
+  "descripcion": "W48 (U45, E22): cuando la racha baja suena el fallo y salta un aviso de pérdida (\"se rompió tu racha\") en vez de la línea neutra",
+  "archivos": {
+    "src/ui/racha.js": "racha.js"
+  },
+  "comando": [
+    "node",
+    "--test",
+    "--test-reporter=tap",
+    "tests/unit/ui_racha_viva.test.mjs"
+  ],
+  "espera_codigo_no_cero": true,
+  "espera_fallan_tests": [
+    "U45: 5 → 1 es neutro"
+  ]
+}

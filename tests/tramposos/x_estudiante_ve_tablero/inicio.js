@@ -9,7 +9,7 @@
 import { h, montar } from '../../ui/dom.js';
 import { crearEscudo } from '../../ui/escudo.js';
 import { crearDrako } from '../../ui/drako.js';
-import { crearLlama, celebrarRacha } from '../../ui/racha.js';
+import { crearLlama, celebrarRacha, planDeRacha, crearDeNuevo } from '../../ui/racha.js';
 import { crearBotonSonido } from '../../ui/boton_sonido.js';
 import { crearCargando, crearVacio } from '../../ui/estados.js';
 import { crearNavInferior } from '../../ui/nav_inferior.js';
@@ -76,15 +76,14 @@ async function animarSaldo(nodoSaldo, balance, ctx) {
 }
 
 /**
- * La constancia llega del servidor (`ctx.sesion.constancia`) y NUNCA se recalcula aquí: solo se compara
- * con lo último que vio este estudiante para saber si hay que celebrar que subió.
+ * La constancia llega del servidor y NUNCA se recalcula aquí: solo se compara con lo último que vio este estudiante para saber qué hacer en esta
+ * visita (W48, `planDeRacha`): celebrar que subió (y, si cruzó 3, 7 o 14, que la llama creció) o decir, una vez, "Empezamos de nuevo".
+ * @param {string} quien @param {number} valor el del servidor
  */
-function celebrarConstancia(nodoConstancia, ctx) {
-  const quien = ctx.sesion.profileId;
-  const valor = ctx.sesion.constancia;
+function planDeConstancia(quien, valor) {
   const previo = leerUltimo('constancia', quien);
   guardarUltimo('constancia', quien, valor);
-  if (compararConUltimo(previo, valor) === 'sube') celebrarRacha({ contador: nodoConstancia, valor });
+  return planDeRacha(previo, valor);
 }
 
 /**
@@ -136,6 +135,8 @@ async function cargarDatos(ctx) {
   ]);
   return {
     balance: saldo.balance,
+    constancia: sesion.constancia ?? ctx.sesion.constancia, // W48: la de /auth/me de ESTE pintado (tras marcar asistencia ya subió); nunca calculada
+    mejorConstancia: sesion.mejorConstancia ?? null,
     numRetos: retos.length,
     pendiente: primerRetoPendiente(retos, historialRetos),
     semana: resumenSemana(historialRetos, historialAsistencia),
@@ -243,23 +244,25 @@ function seccionAhora(pendiente, ctx) {
   );
 }
 
-function barraSuperior(datos, ctx) {
+function barraSuperior(datos) {
   const nodoSaldo = h('p', { class: 'saldo', 'data-testid': 'saldo' }, `0 ${textos.inicio.monedas}`);
   const constancia = h(
     'p', { class: 'constancia', 'data-testid': 'constancia' },
-    crearLlama(),
-    `${textos.inicio.constanciaPrefijo}: ${ctx.sesion.constancia}`,
+    crearLlama(datos.constancia), // W48: la etapa de la llama sale del número del servidor; el número va aparte, en texto
+    `${textos.inicio.constanciaPrefijo}: ${datos.constancia}`,
   );
   return { barra: h('div', { class: 'barra-superior' }, nodoSaldo, constancia), nodoSaldo, constancia };
 }
 
 function pintarContenido(raiz, ctx, datos) {
-  const { barra, nodoSaldo, constancia } = barraSuperior(datos, ctx);
+  const { barra, nodoSaldo, constancia } = barraSuperior(datos);
+  const racha = planDeConstancia(ctx.sesion.profileId, datos.constancia);
   const nivel = prepararNivel(ctx, datos.nivelConfirmado);
   const nodo = h(
     'div', { 'data-testid': 'vista-inicio', class: 'juego' },
     barra,
     h('a', { href: '#/monedas', class: 'enlace-monedas', 'data-testid': 'ir-a-monedas' }, textos.monedas.enlace), // W47: el único enlace de Inicio a "Mis monedas", fuera de todo nav
+    racha.neutro ? crearDeNuevo(datos.mejorConstancia) : null, // W48: la racha bajó (desde 3 o más): una línea neutra, una vez
     h('div', { class: 'encabezado-reto' },
       crearDrako('presenta', textos.inicio.drakoBienvenida, { saludar: true, desde: 'reposo' }),
       h('h1', {}, textos.inicio.saludo(ctx.sesion.nombre)),
@@ -273,7 +276,7 @@ function pintarContenido(raiz, ctx, datos) {
   );
   montar(raiz, nodo);
   animarSaldo(nodoSaldo, datos.balance, ctx);
-  celebrarConstancia(constancia, ctx);
+  if (racha.celebrar) celebrarRacha({ contador: constancia, valor: datos.constancia, plan: racha });
   escucharVueltaDeOtroOrigen(raiz, ctx);
   document.body.dataset.listo = '1';
 }

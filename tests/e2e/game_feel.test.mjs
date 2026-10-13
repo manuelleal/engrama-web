@@ -74,7 +74,8 @@ test('game feel: si la constancia del servidor subió, Inicio la celebra (llama,
       })()`,
     });
     assert.deepEqual(r.errores, []);
-    assert.equal(r.eval.aviso, '¡Constancia 3!', 'est-1 llega con constancia 3 del servidor: se celebra ese número, no otro');
+    // W48 (ESPEC_juego_oleada1 4.4): de 1 a 3 la racha CRUZA el umbral de 3, asi que el aviso dice ademas que la llama crecio (antes: '¡Constancia 3!').
+    assert.equal(r.eval.aviso, '¡Constancia 3! Tu llama creció.', 'est-1 llega con constancia 3 del servidor: se celebra ese número, no otro');
     assert.equal(r.eval.llamas, 1, 'la constancia lleva su llama dibujada');
     assert.ok(r.eval.confeti > 0, 'la racha que sube suelta confeti suave (un <canvas> con sus piezas)');
     assert.match(r.eval.constancia, /Constancia: 3$/);

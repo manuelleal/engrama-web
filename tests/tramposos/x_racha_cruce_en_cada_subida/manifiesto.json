@@ -1,0 +1,16 @@
+{
+  "descripcion": "W48 (U45): toda subida de la racha se anuncia como si la llama hubiera crecido (cruce y confeti normal en cada subida), no solo al cruzar 3, 7 o 14",
+  "archivos": {
+    "src/ui/racha.js": "racha.js"
+  },
+  "comando": [
+    "node",
+    "--test",
+    "--test-reporter=tap",
+    "tests/unit/ui_racha_viva.test.mjs"
+  ],
+  "espera_codigo_no_cero": true,
+  "espera_fallan_tests": [
+    "U45: la primera vez y un valor igual, nada; sube sin cruzar un umbral"
+  ]
+}

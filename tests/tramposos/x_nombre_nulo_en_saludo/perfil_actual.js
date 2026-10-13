@@ -17,8 +17,24 @@
 import { textos } from '../textos.js';
 import { cambiarContrasenaConToken } from './cambio_contrasena.js';
 import { registrarConsentimientoConToken } from './consentimiento.js';
+import { nivelValido } from './interfaz.js';
 
 let jwtEnMemoria = null;
+
+/**
+ * `confirmed_level` de /auth/me → `nivelConfirmado` de la Sesion, o null. Un cefr que no sea A1-C2 es null (el servidor manda, pero el
+ * cliente no pinta un "Nivel 7"). Si el servidor no dice que es definitivo (`provisional: false`), no se afirma que lo es. Nunca lee level ni xp.
+ * @param {any} crudo
+ * @returns {import('./interfaz.js').Sesion['nivelConfirmado']}
+ */
+export function nivelConfirmadoDe(crudo) {
+  if (!crudo || typeof crudo !== 'object' || !nivelValido(crudo.cefr)) return null;
+  return {
+    cefr: crudo.cefr, provisional: crudo.provisional !== false,
+    fuente: typeof crudo.source === 'string' ? crudo.source : null,
+    evaluadoEn: typeof crudo.assessed_at === 'string' ? crudo.assessed_at : null,
+  };
+}
 
 /**
  * @param {object} profileOut la forma de ProfileOut
@@ -37,10 +53,12 @@ export function perfilAJson(profileOut, tenantIdActivo) {
     grupo: membresia.group_code ?? null, modulos: ['engrama'],
     colegios: membresias.map((m) => ({ id: m.tenant_id, nombre: m.tenant_name, rol: m.role })),
     constancia: profileOut.current_streak, // el servidor manda; nunca se recalcula aquí
+    mejorConstancia: Number.isInteger(profileOut.longest_streak) ? profileOut.longest_streak : null, // W48: `longest_streak` tal cual, o null si no vino
     // Login piloto: la bandera viene del servidor (`profiles.force_password_reset`); el cliente nunca la deduce.
     debeCambiarContrasena: profileOut.must_change_password === true,
     // Lo que el servidor dice que aceptó del aviso de datos (null si nunca, o si el backend aún no lo informa: cierra).
     consentimiento: profileOut.consent_version ?? null,
+    nivelConfirmado: nivelConfirmadoDe(profileOut.confirmed_level), // W30: el de la institución activa; null = "Por confirmar"
   };
 }
 

@@ -23,6 +23,7 @@
  * @property {string|null} grupo
  * @property {string[]} modulos
  * @property {number} constancia
+ * @property {number|null} [mejorConstancia] la mejor racha que dice el SERVIDOR (`longest_streak` de /auth/me), o null si no la mandó. Nunca se calcula un máximo en el cliente (W48)
  * @property {{id: string, nombre: string, rol: string}[]} [colegios] las instituciones del usuario (sus membresías); sin ellas (modo mock) no se manda X-Tenant-ID
  * @property {string|null} [consentimiento] la versión del aviso de datos que el SERVIDOR dice que aceptó (`consent_version` de /auth/me), o null; sin la propiedad (modo mock) no se pide
  * @property {boolean} [debeCambiarContrasena] la contraseña es temporal (`must_change_password` de /auth/me): hay que crear la propia antes de seguir
@@ -68,6 +69,7 @@ export function validarSesion(sesion) {
   if (s.grupo !== null && typeof s.grupo !== 'string') errores.push('grupo debe ser string o null');
   if (!Array.isArray(s.modulos)) errores.push('falta modulos (array)');
   if (typeof s.constancia !== 'number') errores.push('falta constancia (number)');
+  if (s.mejorConstancia !== undefined && s.mejorConstancia !== null && typeof s.mejorConstancia !== 'number') errores.push('mejorConstancia debe ser number o null');
   if ('level' in s || 'xp' in s) errores.push('la Sesion no debe traer level ni xp (regla de la casa)');
   const nivel = /** @type {any} */ (s.nivelConfirmado);
   if (nivel !== undefined && nivel !== null && (typeof nivel !== 'object' || !nivelValido(nivel.cefr) || typeof nivel.provisional !== 'boolean')) {

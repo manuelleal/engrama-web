@@ -1,0 +1,17 @@
+{
+  "descripcion": "W48 (U47): la asistencia calcula la \"mejor constancia\" en el cliente (el máximo entre lo que tenía y lo que llega) en vez de mostrar longest_streak del servidor",
+  "archivos": {
+    "src/vistas/estudiante/asistencia.js": "asistencia.js"
+  },
+  "comando": [
+    "node",
+    "--test",
+    "--test-reporter=tap",
+    "tests/unit/ui_racha_viva.test.mjs"
+  ],
+  "espera_codigo_no_cero": true,
+  "espera_fallan_tests": [
+    "U47: en la asistencia, la racha que baja pide /auth/me SOLO en ese caso",
+    "U47: ninguna vista ni componente de la racha calcula un máximo"
+  ]
+}

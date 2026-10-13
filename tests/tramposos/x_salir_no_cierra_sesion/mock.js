@@ -17,7 +17,7 @@ const CLAVE_LOCALSTORAGE = 'engrama_actor_sintetico';
 export const ACTORES_SINTETICOS = [
   { token: 'admin-demo', nombre: 'Admin Demo', rol: 'admin', colegio: 'UIS (demo)', grupo: null, constancia: 0 },
   { token: 'docente-demo', nombre: 'Docente Demo', rol: 'teacher', colegio: 'UIS (demo)', grupo: null, constancia: 0 },
-  { token: 'est-1', nombre: 'Ana Sintética', rol: 'student', colegio: 'UIS (demo)', grupo: 'SINT-B1-01', constancia: 3 },
+  { token: 'est-1', nombre: 'Ana Sintética', rol: 'student', colegio: 'UIS (demo)', grupo: 'SINT-B1-01', constancia: 3, mejorConstancia: 5 },
   { token: 'est-2', nombre: 'Beto Sintético', rol: 'student', colegio: 'UIS (demo)', grupo: 'SINT-B1-01', constancia: 0 },
 ];
 
@@ -25,7 +25,7 @@ function actorASesion(actor) {
   return {
     profileId: actor.token, nombre: actor.nombre, rol: actor.rol,
     colegio: { id: 'demo', nombre: actor.colegio, tipo: 'school' },
-    grupo: actor.grupo, modulos: ['engrama'], constancia: actor.constancia,
+    grupo: actor.grupo, modulos: ['engrama'], constancia: actor.constancia, mejorConstancia: actor.mejorConstancia ?? null, nivelConfirmado: null,
   };
 }
 

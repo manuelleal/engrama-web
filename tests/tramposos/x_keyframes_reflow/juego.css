@@ -1016,3 +1016,100 @@ body {
   from { opacity: 0; transform: translateY(10px); }
 }
 
+
+/* ---------- W48 · La llama con vida (ui/racha.js, docs/ESPEC_juego_oleada1.md §4.4 y §5 A1 a A3). La etapa (0 a 3) sale del número del servidor;
+   aquí solo se dibuja. La caja de la llama mide siempre lo mismo (la escala es `scale`, que no mueve lo de al lado) y reserva a los lados el
+   sitio de la etapa mayor. Sin movimiento: la llama quieta a su escala, las chispas ocultas y el halo fijo. ---------- */
+.llama {
+  margin-left: 0.3em;
+  margin-right: 0.5em;
+}
+.llama-etapa-1 { scale: 1.15; }
+.llama-etapa-2 { scale: 1.3; }
+.llama-etapa-3 { scale: 1.5; }
+.llama-lengua {
+  position: absolute;
+  left: -22%;
+  bottom: 0;
+  width: 58%;
+  height: 58%;
+  clip-path: polygon(50% 0%, 66% 24%, 90% 50%, 94% 76%, 74% 98%, 26% 98%, 6% 76%, 10% 50%, 34% 26%, 40% 12%);
+  background: linear-gradient(to top, var(--oro), color-mix(in srgb, var(--oro) 45%, white));
+  transform-origin: 50% 100%;
+  animation: llama-lengua 1.3s ease-in-out infinite;
+}
+@keyframes llama-lengua {
+  0%, 100% { transform: scale(0.72) rotate(-16deg); opacity: 0.6; }
+  50% { transform: scale(1) rotate(-6deg); opacity: 1; }
+}
+.llama-chispa {
+  position: absolute;
+  bottom: 78%;
+  width: 0.17em;
+  height: 0.17em;
+  border-radius: 50%;
+  background: var(--oro);
+  opacity: 0;
+  animation: llama-chispa 1.6s ease-out infinite;
+}
+.llama-chispa-0 { left: 4%; }
+.llama-chispa-1 { left: 80%; animation-delay: 0.8s; }
+.llama-chispa-2 { left: 34%; animation-delay: 0.4s; }
+.llama-chispa-3 { left: 60%; animation-delay: 1.2s; }
+@keyframes llama-chispa {
+  0% { transform: translateY(0) scale(1); opacity: 0; }
+  15% { opacity: 1; }
+  100% { transform: translateY(-14px) scale(0.4); opacity: 0; }
+}
+.llama-halo {
+  position: absolute;
+  inset: -14% -42% -12%;
+  border-radius: 50%;
+  background: radial-gradient(circle, color-mix(in srgb, var(--oro) 75%, transparent), transparent 70%);
+  opacity: 0.25;
+  animation: llama-halo 2s ease-in-out infinite;
+}
+@keyframes llama-halo {
+  0%, 100% { transform: scale(1); opacity: 0.25; }
+  50% { transform: scale(1.12); opacity: 0.6; }
+}
+/* A2: al cruzar 3, 7 o 14 la llama crece (900 ms, con rebote) y el aviso lo dice. El aviso del cruce es más largo: puede partir en dos renglones. */
+.constancia-crece .llama {
+  animation: llama-crece 900ms cubic-bezier(0.2, 1.6, 0.4, 1) 1;
+}
+@keyframes llama-crece {
+  0% { transform: scale(0.78); }
+  55% { transform: scale(1.25); }
+  100% { transform: scale(1); }
+}
+.celebra-racha-cruce {
+  white-space: normal;
+  width: max-content;
+  max-width: calc(100vw - 24px);
+  font-size: 1.1rem;
+  line-height: 1.2;
+}
+/* A3: la racha bajó. Una línea neutra, en el sitio: entra con opacidad y nada más (ni rojo, ni temblor, ni sonido). */
+.racha-de-nuevo {
+  width: fit-content;
+  max-width: 100%;
+  margin: 0 0 12px auto;
+  padding: 8px 14px;
+  background: var(--superficie);
+  border: 2px solid var(--borde);
+  border-radius: var(--radio-sm);
+  font-weight: 700;
+  color: var(--texto);
+  animation: aparece-suave 200ms ease-out backwards;
+}
+.sello-zona .racha-de-nuevo {
+  margin: 0 auto;
+}
+@keyframes aparece-suave {
+  from { opacity: 0; }
+}
+/* Las etapas altas crecen desde el centro de la llama (no solo hacia arriba): caben en la barra del saldo sin salirse por el borde de la pantalla. */
+.llama-etapa-2,
+.llama-etapa-3 {
+  transform-origin: 50% 62%;
+}

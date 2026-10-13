@@ -57,6 +57,20 @@ async function completarConLoDelServidor({ cuerpo, renglon, r, token, tenantId }
   }
 }
 
+/**
+ * W48: la mejor constancia es `longest_streak` DEL SERVIDOR (llega en /auth/me como `mejorConstancia`). Se pregunta solo cuando la racha bajó; si no
+ * se puede leer, null (la línea sale sin número). Aquí nunca se calcula un máximo. Nunca lanza.
+ */
+async function mejorConstanciaDelServidor(ctx) {
+  try {
+    const sesion = typeof ctx.recargarSesion === 'function' ? await ctx.recargarSesion() : ctx.sesion;
+    return sesion?.mejorConstancia ?? null;
+  } catch (e) {
+    console.warn('vistas/asistencia: no se pudo leer la mejor constancia', e instanceof ErrorApi ? e.status : 'error');
+    return null;
+  }
+}
+
 function crearFormulario(estado) {
   const campo = h('input', {
     type: 'text', id: 'codigo-sesion', 'data-testid': 'campo-codigo', value: estado.codigoInicial || '',
@@ -94,7 +108,7 @@ function mostrarMarcada({ zonaResultado, boton, r, ctx }) {
   montar(zonaResultado, cuerpo);
   // Game feel: el sello se estampa, las monedas vuelan a su contador, suena y vibra; la constancia
   // que llega del servidor se celebra solo si subió (ui/sello.js).
-  celebrarAsistencia({ zona: zonaResultado, monedas: r.coins_awarded, racha: r.streak, quien: ctx.sesion?.profileId });
+  celebrarAsistencia({ zona: zonaResultado, monedas: r.coins_awarded, racha: r.streak, quien: ctx.sesion?.profileId, mejorConstancia: () => mejorConstanciaDelServidor(ctx) });
   destelloExito(boton);
   if (pago && 'desglose' in pago) pintarDesglose(renglon, pago.desglose);
   else if (!pago) completarConLoDelServidor({ cuerpo, renglon, r, token: ctx.token, tenantId: ctx.tenantId }); // respaldo, sin esperar: el botón no se queda bloqueado

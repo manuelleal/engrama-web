@@ -51,6 +51,7 @@ export function perfilAJson(profileOut, tenantIdActivo) {
     grupo: membresia.group_code ?? null, modulos: ['engrama'],
     colegios: membresias.map((m) => ({ id: m.tenant_id, nombre: m.tenant_name, rol: m.role })),
     constancia: profileOut.current_streak, // el servidor manda; nunca se recalcula aquí
+    mejorConstancia: Number.isInteger(profileOut.longest_streak) ? profileOut.longest_streak : null, // W48: `longest_streak` tal cual, o null si no vino
     // Login piloto: la bandera viene del servidor (`profiles.force_password_reset`); el cliente nunca la deduce.
     debeCambiarContrasena: profileOut.must_change_password === true,
     // Lo que el servidor dice que aceptó del aviso de datos (null si nunca, o si el backend aún no lo informa: cierra).

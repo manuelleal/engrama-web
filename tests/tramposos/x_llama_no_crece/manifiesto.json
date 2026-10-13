@@ -1,0 +1,17 @@
+{
+  "descripcion": "W48 (U44): la llama no tiene etapas: con cualquier constancia es la misma llama de siempre",
+  "archivos": {
+    "src/ui/racha.js": "racha.js"
+  },
+  "comando": [
+    "node",
+    "--test",
+    "--test-reporter=tap",
+    "tests/unit/ui_racha_viva.test.mjs"
+  ],
+  "espera_codigo_no_cero": true,
+  "espera_fallan_tests": [
+    "U44: la etapa de la llama sale del número del servidor",
+    "U44: la llama lleva su etapa"
+  ]
+}

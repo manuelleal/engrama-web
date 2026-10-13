@@ -67,8 +67,22 @@ export const DECLARADAS = {
   // W68 (docs/ESPEC_navegacion.md §9.2): sale la fila de enlaces del final (un `nav` sin testid) y la barra de abajo gana "Perfil". Los dos son
   // `nav` sin `data-testid`: se declaran por etiqueta.
   // W47 (docs/ESPEC_juego_oleada1.md §17.1.4): Inicio gana UN enlace, "Ver mis movimientos" (`ir-a-monedas`), justo debajo de la barra del saldo.
-  inicio: ['ahora', 'tarjeta-reto-hoy', { etiqueta: 'nav' }, 'ir-a-monedas'],
+  // W48 (docs/ESPEC_juego_oleada1.md §12): el nodo `constancia` cambia: la llama lleva su etapa (con constancia 3, la etapa 1, con su lengua lateral).
+  inicio: ['ahora', 'tarjeta-reto-hoy', { etiqueta: 'nav' }, 'ir-a-monedas', 'constancia'],
 };
+
+test('R4: lo que W48 declara cambió de verdad: en Inicio la llama de la constancia lleva su etapa (3 → etapa 1) y el número sigue aparte, en texto; lo demás no cambió', async () => {
+  const hoy = (await tomarFotos()).inicio;
+  const base = BASE.vistas.inicio;
+  const nodo = (lineas) => { const i = lineas.findIndex((l) => l.includes('data-testid="constancia"')); const s = lineas[i].length - lineas[i].trimStart().length; const fin = lineas.findIndex((l, n) => n > i && l.length - l.trimStart().length <= s); return lineas.slice(i, fin).map((l) => l.trim()); };
+  assert.deepEqual(nodo(base), ['p class="constancia" data-testid="constancia"', 'span class="llama" aria-hidden="true"', 'span class="llama-cuerpo"', 'span class="llama-nucleo"', '"Constancia: 3"'], 'la línea base: una sola llama');
+  assert.deepEqual(nodo(hoy), [
+    'p class="constancia" data-testid="constancia"', 'span class="llama llama-etapa-1" aria-hidden="true" data-etapa="1"',
+    'span class="llama-cuerpo"', 'span class="llama-nucleo"', 'span class="llama-lengua"', '"Constancia: 3"',
+  ], 'hoy: la llama en su etapa, decorativa, y el número del servidor tal cual, en texto');
+  assert.equal(hoy.filter((l) => l.includes('racha-de-nuevo') || l.includes('celebra-racha')).length, 0, 'en la primera visita no hay ni aviso ni línea neutra');
+  assert.deepEqual(sinSubarboles(hoy, DECLARADAS.inicio), sinSubarboles(base, DECLARADAS.inicio), 'fuera de lo declarado, Inicio es idéntico');
+});
 
 test('R4: lo que W47 declara cambió de verdad: Inicio gana el enlace "Ver mis movimientos" justo debajo de la barra del saldo, y solo eso', async () => {
   const hoy = (await tomarFotos()).inicio;
