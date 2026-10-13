@@ -1,0 +1,11 @@
+{
+  "descripcion": "Tanda visual 1: el texto de apoyo vuelve al gris de antes (55 % de --texto sobre blanco: 3,8:1), que no pasa el 4,5:1",
+  "archivos": {
+    "estilos/tipografia.css": "tipografia.css"
+  },
+  "comando": ["node", "--test", "--test-reporter=tap", "tests/unit/css_cara.test.mjs"],
+  "espera_codigo_no_cero": true,
+  "espera_fallan_tests": [
+    "cara: el texto de apoyo no va en mayusculas y se lee: 4,5:1 o mas sobre la superficie y sobre el fondo"
+  ]
+}

@@ -27,7 +27,7 @@ regenerar, y otro agente trabaja a la vez en el repo. `cara.css` va después de 
 | M5 | Movimiento | En `cara.css` y `tipografia.css`: ningún `@keyframes` ni `transition` sobre algo que no sea `transform` u `opacity` (`css_cara`) |
 | M6 | Sobriedad | En `cara.css` nada anima la barra de abajo; el fondo de marca y la pestaña rellena cuelgan de `.juego` (`css_cara`) |
 | M7 | Contraste | Toda regla de `cara.css` que declara `color` y `background` da 4,5:1 o más; `.texto-apoyo` da 4,5:1 o más sobre `--superficie` y sobre `--fondo` (`css_cara`, calculado desde `publico/diseno/tokens.css`) |
-| M8 | Tipografía | `--fuente-titulos` empieza por `"Baloo 2"` y `--fuente-cuerpo` por `"Nunito Sans"`; ninguna hoja trae `@font-face` ni `url(` (no se descarga nada; la CSP sigue igual) (`css_cara`) |
+| M8 | Tipografía | `--fuente-titulos` empieza por `"Baloo 2"` y `--fuente-cuerpo` por `"Nunito Sans"`; toda `url(` de las hojas apunta a `/publico/` y existe en el disco: hoy no hay ninguna, no se descarga nada y la CSP sigue igual (`css_cara`). *Ajuste del 12-oct, antes de escribir CSS y de ver ningún resultado: la primera redacción decía "ninguna hoja trae `@font-face` ni `url(`", y eso obligaba a tocar la prueba el día que se vendoricen las fuentes; el encargo pide que ese día no haya que tocar nada más* |
 | M9 | `.texto-apoyo` ya no va en mayúsculas | `css_cara` |
 | M10 | La hoja se carga, y de última | `index.html` enlaza `/estilos/cara.css` después de `/estilos/juego.css` (`css_cara`) |
 | M11 | Medidas en el navegador | `tests/e2e/nav_medidas.test.mjs` (E31), `inicio_ahora`, `pantallas_anillo` (E17), `shell`, `nav_sobria` (E33) y `game_feel`, uno por uno, en verde |

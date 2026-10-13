@@ -4,6 +4,7 @@
 // admin, y todo texto que pinta se puede leer. Cada prueba tiene su tramposo en tests/tramposos/x_cara_*.
 import test from 'node:test';
 import assert from 'node:assert/strict';
+import { existsSync } from 'node:fs';
 import { colorDe, contraste, leer, reglas, sinComentarios, tokensDeColor, valorDe } from './css_apoyo.mjs';
 
 const CARA = 'estilos/cara.css';
@@ -37,6 +38,38 @@ test('cara: sobriedad. El fondo de marca y la pestana rellena cuelgan de .juego 
       const pintaElFondo = /^body\b/.test(selector) && /::(before|after)/.test(selector);
       const rellenaLaPestana = /nav-inferior/.test(selector) && valorDe(r.cuerpo, 'background') === 'var(--primario)';
       if (pintaElFondo || rellenaLaPestana) assert.match(selector, /\.juego/, `"${selector}" es adorno de juego y no cuelga de .juego: lo recibirian el profe y el admin`);
+    }
+  }
+});
+
+const HOJAS = ['estilos/tipografia.css', 'estilos/base.css', 'estilos/componentes.css', 'estilos/formularios.css', 'estilos/juego.css', CARA];
+
+test('cara: tipografia. La pila empieza por las fuentes de marca y ninguna hoja pide un archivo que no sea de este origen y exista', () => {
+  const raiz = reglas(leer('estilos/tipografia.css')).find((r) => r.selector === ':root');
+  assert.ok(raiz, 'tipografia.css define las dos variables de fuente en :root');
+  assert.match(valorDe(raiz.cuerpo, '--fuente-titulos') || '', /^"Baloo 2",/, 'los titulos empiezan por la fuente de marca de tokens.json');
+  assert.match(valorDe(raiz.cuerpo, '--fuente-cuerpo') || '', /^"Nunito Sans",/, 'el cuerpo empieza por la fuente de marca de tokens.json');
+  for (const hoja of HOJAS) {
+    for (const m of sinComentarios(leer(hoja)).matchAll(/url\(\s*['"]?([^'")]+)['"]?\s*\)/g)) {
+      assert.match(m[1], /^\/publico\//, `${hoja}: url(${m[1]}) no es de este origen (la CSP es font-src 'self'; nada de CDN)`);
+      assert.ok(existsSync(new URL(`../..${m[1]}`, import.meta.url)), `${hoja}: url(${m[1]}) no existe en el disco (un 404 en cada carga)`);
+    }
+  }
+});
+
+test('cara: el texto de apoyo no va en mayusculas y se lee: 4,5:1 o mas sobre la superficie y sobre el fondo', () => {
+  const todas = HOJAS.flatMap((hoja) => reglas(leer(hoja)).map((r) => ({ ...r, hoja })));
+  const deApoyo = todas.filter((r) => r.selector.split(',').some((s) => /\.texto-apoyo$/.test(s.trim())));
+  assert.ok(deApoyo.length >= 1, 'la regla de .texto-apoyo sigue existiendo');
+  for (const r of deApoyo) {
+    assert.ok(!/text-transform\s*:\s*uppercase/.test(r.cuerpo), `${r.hoja} "${r.selector}": el texto de apoyo es una frase, no un rotulo en mayusculas`);
+    const texto = valorDe(r.cuerpo, 'color');
+    if (!texto || valorDe(r.cuerpo, 'background')) continue; // con fondo propio lo mide la prueba de contraste de las reglas
+    const color = colorDe(texto, TOKENS);
+    assert.ok(color, `${r.hoja} "${r.selector}": color ${texto} que no sale de tokens`);
+    for (const fondo of ['superficie', 'fondo']) {
+      const c = contraste(color, TOKENS[fondo]);
+      assert.ok(c >= 4.5, `${r.hoja} "${r.selector}": ${texto} sobre --${fondo} da ${c.toFixed(2)}:1 (minimo 4,5:1)`);
     }
   }
 });
