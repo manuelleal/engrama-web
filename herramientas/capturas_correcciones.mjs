@@ -39,7 +39,9 @@ async function faseRedYBanda({ sesion, estado, g1, foto }) {
   await sesion.evaluar(`location.hash = '#/retos/${g1.id}'`);
   await foto('c1-red-reintentar', 'reto-reintentar');
   await tocar(sesion, 'reto-reintentar');
-  await tocar(sesion, 'opcion-A'); await esperar(150); await tocar(sesion, 'boton-comprobar');
+  await tocar(sesion, 'opcion-A'); await esperar(150);
+  await foto('c1b-comprobar', 'boton-comprobar'); // H-A (auditoría 06): "Comprobar" con una opción elegida, en el navy del sistema (no en oro)
+  await tocar(sesion, 'boton-comprobar');
   await foto('c2-fallo', 'explicacion');
   await tocar(sesion, 'boton-siguiente'); await esperar(500);
   await tocar(sesion, 'opcion-B'); await esperar(150); await tocar(sesion, 'boton-comprobar');
