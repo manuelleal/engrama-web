@@ -1,0 +1,16 @@
+{
+  "descripcion": "SR9: el defecto de x_sembrador_gemela_en_feed (solo el repaso va solo_refuerzo), medido por el humo sobre el contenido real A1/A2",
+  "archivos": {
+    "herramientas/sembrar/mapeo.mjs": "mapeo.mjs"
+  },
+  "comando": [
+    "node",
+    "--test",
+    "--test-reporter=tap",
+    "tests/unit/sembrar_humo.test.mjs"
+  ],
+  "espera_codigo_no_cero": true,
+  "espera_fallan_tests": [
+    "SR9: el humo de A1 y A2 sale bien"
+  ]
+}

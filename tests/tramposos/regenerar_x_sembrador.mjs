@@ -67,6 +67,11 @@ export const TRAMPOSOS = {
     descripcion: 'SR8: la explicación viaja como `explicacion` (el nombre del banco) y no como `explanation`: el backend (extra="forbid") responde 422',
     cambios: [['  if (item.explicacion) marcas.explanation = item.explicacion;', '  if (item.explicacion) marcas.explicacion = item.explicacion;']],
   },
+  x_sembrador_humo_ve_gemela: {
+    archivo: MAPEO, comando: tap('tests/unit/sembrar_humo.test.mjs'), tests: ['SR9: el humo de A1 y A2 sale bien'],
+    descripcion: 'SR9: el defecto de x_sembrador_gemela_en_feed (solo el repaso va solo_refuerzo), medido por el humo sobre el contenido real A1/A2',
+    cambios: [[SOLO_REFUERZO_BUENO, "export const ROLES_SOLO_REFUERZO = ['repaso'];"]],
+  },
   x_sembrador_revision_ciega: {
     archivo: 'herramientas/sembrar/revision.mjs', comando: tap(REVISION), tests: ['SR6: revisarCuerpo encuentra cada error de la espec'],
     descripcion: 'SR6: la revisión no mira el catálogo: un nodo que el backend no conoce pasa, y la siembra se corta a la mitad con 422 nodo_desconocido',
