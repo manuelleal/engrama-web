@@ -1,0 +1,747 @@
+{
+  "id": "a1-u01",
+  "nivel": "A1",
+  "titulo": "This Is My Family",
+  "situacion": "Yurany, new at a school in Floridablanca, introduces herself and her family on the class profile wall.",
+  "puedo_hacer": [
+    "I can introduce myself and say my age.",
+    "I can name the people in my family and say who they are.",
+    "I can understand a short profile or message about someone's family.",
+    "I can write a short profile about my own family."
+  ],
+  "contenido": {
+    "lectura": {
+      "genero": "profile (class profile page)",
+      "texto": "Hi! My name is Yurany and I'm thirteen years old. I'm new at this school in Floridablanca. This is my family. My mother is Yesenia and my father is Esteban. My sister, Liliana, is sixteen years old. She has her own room full of books. My little brother, Nicolás, is ten. He loves his bike. My grandparents live in Piedecuesta. My aunt Nayibe and my uncle Ismael live near them, too. Nayibe's son is my cousin, and we are good friends. On Sundays we visit our grandparents' house. My family is small, but we are very happy together.",
+      "palabras": 98
+    },
+    "escucha": {
+      "hablantes": [
+        "Yurany",
+        "Kendry"
+      ],
+      "guion": "Kendry: Hi, Yurany! Welcome to our school. Tell me about your family.\nYurany: Hi, Kendry! I live with my mom, my dad, my sister and my brother. My sister is Liliana. She's sixteen.\nKendry: And your brother? How old is he?\nYurany: He's ten. His name is Nicolás, and he's really funny.\nKendry: Is your family from Floridablanca?\nYurany: My parents are, but my grandparents are in Piedecuesta. We visit them every Sunday.",
+      "segundos_estimados": 40
+    },
+    "vocabulario": [
+      {
+        "en": "mother",
+        "def_en": "a female parent",
+        "es": "madre",
+        "ejemplo": "My mother is Yesenia and my father is Esteban."
+      },
+      {
+        "en": "father",
+        "def_en": "a male parent",
+        "es": "padre",
+        "ejemplo": "My mother is Yesenia and my father is Esteban."
+      },
+      {
+        "en": "parents",
+        "def_en": "your mother and your father",
+        "es": "padres",
+        "ejemplo": "My parents are, but my grandparents are in Piedecuesta."
+      },
+      {
+        "en": "brother",
+        "def_en": "a boy or man with the same parents as you",
+        "es": "hermano",
+        "ejemplo": "My little brother, Nicolás, is ten."
+      },
+      {
+        "en": "sister",
+        "def_en": "a girl or woman with the same parents as you",
+        "es": "hermana",
+        "ejemplo": "My sister, Liliana, is sixteen years old."
+      },
+      {
+        "en": "grandparents",
+        "def_en": "the parents of your mother or father",
+        "es": "abuelos",
+        "ejemplo": "My grandparents live in Piedecuesta."
+      },
+      {
+        "en": "aunt",
+        "def_en": "the sister of your mother or father",
+        "es": "tía",
+        "ejemplo": "My aunt Nayibe and my uncle Ismael live near them, too."
+      },
+      {
+        "en": "uncle",
+        "def_en": "the brother of your mother or father",
+        "es": "tío",
+        "ejemplo": "My aunt Nayibe and my uncle Ismael live near them, too."
+      },
+      {
+        "en": "cousin",
+        "def_en": "the child of your aunt or uncle",
+        "es": "primo, prima",
+        "ejemplo": "Nayibe's son is my cousin, and we are good friends."
+      },
+      {
+        "en": "years old",
+        "def_en": "used to say someone's age",
+        "es": "años (de edad)",
+        "ejemplo": "I'm thirteen years old."
+      },
+      {
+        "en": "family",
+        "def_en": "the people you live with and are related to",
+        "es": "familia",
+        "ejemplo": "This is my family."
+      },
+      {
+        "en": "happy",
+        "def_en": "feeling good, glad",
+        "es": "feliz, felices",
+        "ejemplo": "we are very happy together."
+      },
+      {
+        "en": "welcome",
+        "def_en": "a friendly word for someone new",
+        "es": "bienvenido, bienvenida",
+        "ejemplo": "Welcome to our school."
+      },
+      {
+        "en": "own",
+        "def_en": "belonging only to you, not shared",
+        "es": "propio, propia",
+        "ejemplo": "She has her own room full of books."
+      },
+      {
+        "en": "daughter",
+        "def_en": "a girl or woman who is somebody's child",
+        "es": "hija",
+        "ejemplo": "Liliana and Yurany are Yesenia's daughters."
+      },
+      {
+        "en": "grandmother",
+        "def_en": "the mother of your mother or father",
+        "es": "abuela",
+        "ejemplo": "Her grandmother tells funny stories about the town."
+      },
+      {
+        "en": "grandfather",
+        "def_en": "the father of your mother or father",
+        "es": "abuelo",
+        "ejemplo": "Yurany's grandfather cooks empanadas for everyone."
+      }
+    ],
+    "gramatica": [
+      {
+        "estructura": "be: am/is/are (afirmativo, negativo, pregunta); edad con be",
+        "regla": "Be = ser/estar. I am, he/she/it is, we/you/they are. La edad se dice con be, no con have.",
+        "ejemplos": [
+          "I'm thirteen years old.",
+          "My sister is sixteen.",
+          "Is your family from Floridablanca?"
+        ],
+        "errores_tipicos": [
+          "*I have thirteen years* (calco de 'tengo... años') -> I'm thirteen.",
+          "*My brother ten years old* (falta el verbo be) -> My brother is ten years old.",
+          "*She fourteen* (falta is) -> She is fourteen."
+        ]
+      },
+      {
+        "estructura": "posesivos my/your/his/her/our/their + 's",
+        "regla": "My/your/his/her/our/their + sustantivo dice de quién es algo. His/her según el dueño, no según la cosa. + 's = posesión de una persona.",
+        "ejemplos": [
+          "My brother loves his bike.",
+          "My sister has her own room.",
+          "We visit our grandparents' house."
+        ],
+        "errores_tipicos": [
+          "*Liliana and his brother* (debería ser 'her brother': his/her según el dueño, no según la cosa).",
+          "*the pet of my sister* (calco de 'de') -> 'my sister's pet'.",
+          "*My grandparents house* (falta el apóstrofo) -> 'my grandparents' house'."
+        ]
+      }
+    ],
+    "produccion": {
+      "speaking": {
+        "tarea": "Graba un mensaje de voz de 30 segundos presentando a 3 miembros de tu familia: nombre, edad y un dato de cada uno.",
+        "criterios": [
+          "Dice el nombre y la edad de 3 personas.",
+          "Usa am/is/are correctamente.",
+          "Usa his o her según el dueño, no según la cosa."
+        ]
+      },
+      "writing": {
+        "tarea": "Escribe tu perfil para el muro de la clase (5-6 oraciones): preséntate y presenta a tu familia.",
+        "criterios": [
+          "Presenta a 3 o más miembros de tu familia.",
+          "Usa is/are y las edades con be.",
+          "Usa al menos un posesivo (my, his, her, our) o un 's.",
+          "Termina con una oración sobre cómo es tu familia."
+        ]
+      }
+    }
+  },
+  "practicas": [
+    {
+      "familia": "a1-u01-f01",
+      "estructura": "be: am/is/are (afirmativo, negativo, pregunta); edad con be — eje: la forma de be según el sujeto (am / aren't / Is she); atractor fijo: el calco de 'tener ... años' con have (un solo calco por ítem); la clave rota y la forma básica 'is' es clave en 1 de 3",
+      "items": [
+        {
+          "id": "a1-u01-f01-1",
+          "rol": "original",
+          "formato": "piensalo",
+          "enunciado": "Kendry: 'Yurany, I ___ thirteen, like you!'",
+          "opciones": {
+            "A": "is",
+            "B": "are",
+            "C": "am",
+            "D": "have"
+          },
+          "clave": "C",
+          "calco": "D",
+          "explicacion": {
+            "regla": "La edad va con be: I am, he/she is, we/you/they are.",
+            "por_opcion": {
+              "A": "Is es para he, she o it. Con I se usa am.",
+              "B": "Are es para we, you o they. Con I se usa am.",
+              "D": "Tienta por el calco de 'tengo trece'. En inglés la edad no va con have: I am thirteen."
+            },
+            "ejemplo": "Yurany and Kendry are thirteen years old.",
+            "idioma": "es"
+          },
+          "pool": "practice",
+          "segundos": 25,
+          "generado_por": "creador-opus@F8-a1-u01-o6",
+          "revisado_por": null
+        },
+        {
+          "id": "a1-u01-f01-2",
+          "rol": "gemela",
+          "formato": "piensalo",
+          "enunciado": "Yurany's grandparents ___ sixty. They're seventy.",
+          "opciones": {
+            "A": "aren't",
+            "B": "haven't",
+            "C": "isn't",
+            "D": "am not"
+          },
+          "clave": "A",
+          "calco": "B",
+          "explicacion": {
+            "regla": "Negativa de be con la edad: I am not, he/she isn't, we/you/they aren't.",
+            "por_opcion": {
+              "B": "Tienta por el calco de 'no tienen sesenta'. La edad va con be, no con have: aren't.",
+              "C": "Isn't es para he, she o it. Los abuelos son they: aren't.",
+              "D": "Am not solo va con I. Los abuelos son they: aren't."
+            },
+            "ejemplo": "My cousins aren't twelve. They're nine.",
+            "idioma": "es"
+          },
+          "pool": "practice",
+          "segundos": 25,
+          "generado_por": "creador-opus@F8-a1-u01-o6",
+          "revisado_por": null
+        },
+        {
+          "id": "a1-u01-f01-3",
+          "rol": "repaso",
+          "formato": "piensalo",
+          "enunciado": "Kendry: 'Yurany, you're thirteen. And your sister Liliana, ___ sixteen?'",
+          "opciones": {
+            "A": "Are they",
+            "B": "Has she",
+            "C": "Are you",
+            "D": "Is she"
+          },
+          "clave": "D",
+          "calco": "B",
+          "explicacion": {
+            "regla": "Pregunta de edad con be: Am I…?, Is he/she…?, Are we/you/they…?",
+            "por_opcion": {
+              "A": "Are they es para dos o más personas. Liliana es una sola (she): Is she.",
+              "B": "Tienta por el calco de '¿tiene dieciséis?'. La edad se pregunta con be: Is she.",
+              "C": "Are you pregunta por Yurany, y ya sabemos que tiene trece. La pregunta es por Liliana: Is she."
+            },
+            "ejemplo": "Are your grandparents seventy? Yes, they are.",
+            "idioma": "es"
+          },
+          "pool": "practice",
+          "segundos": 25,
+          "generado_por": "creador-opus@F8-a1-u01-o6",
+          "revisado_por": null
+        }
+      ]
+    },
+    {
+      "familia": "a1-u01-f02",
+      "estructura": "posesivos my/your/his/her/our/their + 's — eje: el posesivo según el DUEÑO (el dueño va en español entre paréntesis); atractor fijo: her, elegido por la persona o cosa poseída (abuela, bolsa, tía) y no por el dueño; la clave rota (their, your, his) y nunca es her",
+      "items": [
+        {
+          "id": "a1-u01-f02-1",
+          "rol": "original",
+          "formato": "piensalo",
+          "enunciado": "Liliana and Nicolás are with ___ today. (la abuela de ellos)",
+          "opciones": {
+            "A": "his grandmother",
+            "B": "their grandmother",
+            "C": "our grandmother",
+            "D": "her grandmother"
+          },
+          "clave": "B",
+          "explicacion": {
+            "regla": "El posesivo va según el dueño, no según la persona poseída. Dueños: ellos = their.",
+            "por_opcion": {
+              "A": "His es para un dueño hombre. Los dueños son dos: their.",
+              "C": "Our es 'nuestra' (we). La abuela es de ellos: their.",
+              "D": "Tienta porque la abuela es mujer. Pero los dueños son dos, Liliana y Nicolás: their."
+            },
+            "ejemplo": "My cousins are with their dad today.",
+            "idioma": "es"
+          },
+          "pool": "practice",
+          "segundos": 25,
+          "generado_por": "creador-opus@F8-a1-u01-o6",
+          "revisado_por": null
+        },
+        {
+          "id": "a1-u01-f02-2",
+          "rol": "gemela",
+          "formato": "piensalo",
+          "enunciado": "Mrs. Pinzón, is this ___? (la bolsa de usted)",
+          "opciones": {
+            "A": "her bag",
+            "B": "my bag",
+            "C": "his bag",
+            "D": "your bag"
+          },
+          "clave": "D",
+          "explicacion": {
+            "regla": "Cuando le hablas a la persona (usted o tú), su cosa es your.",
+            "por_opcion": {
+              "A": "Tienta porque Mrs. Pinzón es mujer y 'su bolsa' suena a her. Pero le hablas a ella: your.",
+              "B": "My es 'mi'. La bolsa es de usted: your.",
+              "C": "His es para un dueño hombre del que hablas. Aquí le hablas a Mrs. Pinzón: your."
+            },
+            "ejemplo": "Excuse me, sir, is this your pen?",
+            "idioma": "es"
+          },
+          "pool": "practice",
+          "segundos": 25,
+          "generado_por": "creador-opus@F8-a1-u01-o6",
+          "revisado_por": null
+        },
+        {
+          "id": "a1-u01-f02-3",
+          "rol": "repaso",
+          "formato": "piensalo",
+          "enunciado": "Look, this is Nicolás, and this is ___ Nayibe. (la tía de él)",
+          "opciones": {
+            "A": "their aunt",
+            "B": "her aunt",
+            "C": "his aunt",
+            "D": "your aunt"
+          },
+          "clave": "C",
+          "explicacion": {
+            "regla": "El posesivo va según el dueño: Nicolás (he) = his, aunque la tía sea mujer.",
+            "por_opcion": {
+              "A": "Their es para dos o más dueños. El dueño es uno, Nicolás: his.",
+              "B": "Tienta porque la tía es mujer. Pero el dueño es Nicolás, un hombre: his.",
+              "D": "Your es para la persona a la que le hablas. La tía es de Nicolás: his."
+            },
+            "ejemplo": "Kendry is at the park with his mom.",
+            "idioma": "es"
+          },
+          "pool": "practice",
+          "segundos": 25,
+          "generado_por": "creador-opus@F8-a1-u01-o6",
+          "revisado_por": null
+        }
+      ]
+    },
+    {
+      "familia": "a1-u01-f03",
+      "estructura": "vocab: family words (grupo 1: hijo, hermana, abuelo) — eje: la palabra según DESDE QUIÉN se mira la relación; atractor fijo: la palabra correcta para otra persona del enunciado (brother, daughter, father); la clave nunca es la más común del grupo (mother/father)",
+      "items": [
+        {
+          "id": "a1-u01-f03-1",
+          "rol": "original",
+          "formato": "piensalo",
+          "enunciado": "Yesenia is Nicolás's mom, and Yurany is his big sister. Nicolás is Yesenia's ___.",
+          "opciones": {
+            "A": "mother",
+            "B": "grandmother",
+            "C": "son",
+            "D": "brother"
+          },
+          "clave": "C",
+          "explicacion": {
+            "regla": "Son = hijo: un niño o un hombre, visto desde su mamá o su papá.",
+            "por_opcion": {
+              "A": "Mother es madre. La mamá es Yesenia, no Nicolás.",
+              "B": "Grandmother es abuela, una mujer mayor. Nicolás es un niño de diez años.",
+              "D": "Tienta porque Nicolás es el hermano de Yurany. Pero aquí lo miras desde Yesenia, su mamá: son."
+            },
+            "ejemplo": "Nayibe's son is Yurany's cousin.",
+            "idioma": "es"
+          },
+          "pool": "practice",
+          "segundos": 20,
+          "generado_por": "creador-opus@F8-a1-u01-o6",
+          "revisado_por": null
+        },
+        {
+          "id": "a1-u01-f03-2",
+          "rol": "gemela",
+          "formato": "piensalo",
+          "enunciado": "Liliana and Yurany have the same mom and dad. Liliana is sixteen and Yurany is thirteen. Liliana is Yurany's big ___.",
+          "opciones": {
+            "A": "uncle",
+            "B": "sister",
+            "C": "daughter",
+            "D": "father"
+          },
+          "clave": "B",
+          "explicacion": {
+            "regla": "Sister = hermana: una niña o mujer con tu misma mamá y tu mismo papá.",
+            "por_opcion": {
+              "A": "Uncle es tío, un hombre. Liliana es mujer.",
+              "C": "Tienta porque Liliana es hija de Yesenia y Esteban. Pero aquí la miras desde Yurany: sister.",
+              "D": "Father es padre, un hombre. Liliana es una joven de dieciséis años."
+            },
+            "ejemplo": "Kendry has a big sister. She's fourteen.",
+            "idioma": "es"
+          },
+          "pool": "practice",
+          "segundos": 20,
+          "generado_por": "creador-opus@F8-a1-u01-o6",
+          "revisado_por": null
+        },
+        {
+          "id": "a1-u01-f03-3",
+          "rol": "repaso",
+          "formato": "piensalo",
+          "enunciado": "Esteban is Liliana's dad. Esteban's father is Liliana's ___.",
+          "opciones": {
+            "A": "grandfather",
+            "B": "cousin",
+            "C": "aunt",
+            "D": "father"
+          },
+          "clave": "A",
+          "explicacion": {
+            "regla": "Grandfather = abuelo: el papá de tu mamá o de tu papá.",
+            "por_opcion": {
+              "B": "Cousin es primo o prima, el hijo o la hija de tu tío. No es el papá de tu papá.",
+              "C": "Aunt es tía, una mujer. El papá de Esteban es un hombre.",
+              "D": "Tienta porque es el father de Esteban. Pero aquí lo miras desde Liliana: grandfather."
+            },
+            "ejemplo": "Yesenia's mother is Liliana's grandmother.",
+            "idioma": "es"
+          },
+          "pool": "practice",
+          "segundos": 20,
+          "generado_por": "creador-opus@F8-a1-u01-o6",
+          "revisado_por": null
+        }
+      ]
+    },
+    {
+      "familia": "a1-u01-f04",
+      "estructura": "vocab: family words (grupo 2: tía, prima, tío) — eje: la familia extendida vista desde quien habla; atractor fijo: la palabra correcta desde el papá o la mamá (sister, daughter, brother); la clave nunca es la más común del grupo",
+      "items": [
+        {
+          "id": "a1-u01-f04-1",
+          "rol": "original",
+          "formato": "piensalo",
+          "enunciado": "Yurany's mom and Nayibe have the same parents. Nayibe is Yurany's ___.",
+          "opciones": {
+            "A": "aunt",
+            "B": "sister",
+            "C": "grandmother",
+            "D": "cousin"
+          },
+          "clave": "A",
+          "explicacion": {
+            "regla": "Aunt = tía: la hermana de tu mamá o tu papá.",
+            "por_opcion": {
+              "B": "Tienta porque Nayibe es hermana de la mamá de Yurany. Pero aquí la miras desde Yurany: aunt.",
+              "C": "Grandmother es abuela, la mamá de tu mamá o tu papá.",
+              "D": "Cousin es primo o prima: el hijo o la hija de tu tío o tu tía."
+            },
+            "ejemplo": "Kendry's aunt is a doctor.",
+            "idioma": "es"
+          },
+          "pool": "practice",
+          "segundos": 20,
+          "generado_por": "creador-opus@F8-a1-u01-o6",
+          "revisado_por": null
+        },
+        {
+          "id": "a1-u01-f04-2",
+          "rol": "gemela",
+          "formato": "piensalo",
+          "enunciado": "Ismael is Esteban's brother, and Esteban is Yurany's dad. Ismael's little girl, Dayana, is Yurany's ___.",
+          "opciones": {
+            "A": "daughter",
+            "B": "mother",
+            "C": "brother",
+            "D": "cousin"
+          },
+          "clave": "D",
+          "explicacion": {
+            "regla": "Cousin = primo o prima: el hijo o la hija de tu tío o tu tía.",
+            "por_opcion": {
+              "A": "Tienta porque Dayana es hija de Ismael. Pero aquí la miras desde Yurany: cousin.",
+              "B": "Mother es madre. Dayana es una niña pequeña.",
+              "C": "Brother es hermano, y es un niño. Dayana es una niña."
+            },
+            "ejemplo": "Nayibe's son is Nicolás's cousin too.",
+            "idioma": "es"
+          },
+          "pool": "practice",
+          "segundos": 20,
+          "generado_por": "creador-opus@F8-a1-u01-o6",
+          "revisado_por": null
+        },
+        {
+          "id": "a1-u01-f04-3",
+          "rol": "repaso",
+          "formato": "piensalo",
+          "enunciado": "Kendry's mom has a brother, Ramiro. Ramiro is Kendry's ___.",
+          "opciones": {
+            "A": "brother",
+            "B": "uncle",
+            "C": "sister",
+            "D": "grandfather"
+          },
+          "clave": "B",
+          "explicacion": {
+            "regla": "Uncle = tío: el hermano de tu mamá o de tu papá.",
+            "por_opcion": {
+              "A": "Tienta porque Ramiro es hermano de la mamá de Kendry. Pero aquí lo miras desde Kendry: uncle.",
+              "C": "Sister es hermana, una mujer. Ramiro es un hombre.",
+              "D": "Grandfather es abuelo, el papá de tu mamá o tu papá. Ramiro es su hermano."
+            },
+            "ejemplo": "Ismael is Liliana's uncle too.",
+            "idioma": "es"
+          },
+          "pool": "practice",
+          "segundos": 20,
+          "generado_por": "creador-opus@F8-a1-u01-o6",
+          "revisado_por": null
+        }
+      ]
+    },
+    {
+      "familia": "a1-u01-f05",
+      "estructura": "posesivos my/your/his/her/our/their + 's",
+      "items": [
+        {
+          "id": "a1-u01-f05-1",
+          "rol": "original",
+          "formato": "tu_palabra",
+          "enunciado": "Liliana has a new bike. This is ___ bike. (de ella)",
+          "aceptadas": [
+            "her"
+          ],
+          "tolerancia": "exacta",
+          "explicacion": {
+            "regla": "Her es de una dueña mujer (she).",
+            "ejemplo": "Yurany likes her new backpack too.",
+            "idioma": "es"
+          },
+          "pool": "practice",
+          "segundos": 40
+        },
+        {
+          "id": "a1-u01-f05-2",
+          "rol": "gemela",
+          "formato": "tu_palabra",
+          "enunciado": "The green backpack is not Liliana's. It belongs to her brother Nicolás: it is ___ backpack. (de Nicolás)",
+          "aceptadas": [
+            "Nicolás's",
+            "Nicolas's",
+            "Nicolás’s",
+            "Nicolas’s"
+          ],
+          "tolerancia": "exacta",
+          "explicacion": {
+            "regla": "Nombre + 's dice de quién es algo. En inglés no se dice 'the backpack of Nicolás'.",
+            "ejemplo": "Yurany's room is small.",
+            "idioma": "es"
+          },
+          "pool": "practice",
+          "segundos": 40
+        },
+        {
+          "id": "a1-u01-f05-3",
+          "rol": "repaso",
+          "formato": "tu_palabra",
+          "enunciado": "Kendry and I are classmates. ___ school is in Floridablanca. (el colegio de nosotros)",
+          "aceptadas": [
+            "our",
+            "Our"
+          ],
+          "tolerancia": "exacta",
+          "explicacion": {
+            "regla": "Our es 'nuestro/nuestra', para we.",
+            "ejemplo": "Our neighbors are very friendly.",
+            "idioma": "es"
+          },
+          "pool": "practice",
+          "segundos": 40
+        }
+      ]
+    },
+    {
+      "familia": "a1-u01-f06",
+      "estructura": "vocab: family words (grupo 3)",
+      "items": [
+        {
+          "id": "a1-u01-f06-1",
+          "rol": "original",
+          "formato": "tu_palabra",
+          "enunciado": "Your mother, father, brothers and sisters are your f___ (familia).",
+          "aceptadas": [
+            "family"
+          ],
+          "tolerancia": "1_letra",
+          "explicacion": {
+            "regla": "Family = familia: las personas con las que vives y tienes lazos.",
+            "ejemplo": "Yurany has a small family.",
+            "idioma": "es"
+          },
+          "pool": "practice",
+          "segundos": 40
+        },
+        {
+          "id": "a1-u01-f06-2",
+          "rol": "gemela",
+          "formato": "tu_palabra",
+          "enunciado": "My family isn't big, but we are together on Sundays. We are very h___ (felices).",
+          "aceptadas": [
+            "happy"
+          ],
+          "tolerancia": "1_letra",
+          "explicacion": {
+            "regla": "Happy = feliz/felices: sentirse bien y contento/a.",
+            "ejemplo": "Kendry's family is very happy together.",
+            "idioma": "es"
+          },
+          "pool": "practice",
+          "segundos": 40
+        },
+        {
+          "id": "a1-u01-f06-3",
+          "rol": "repaso",
+          "formato": "tu_palabra",
+          "enunciado": "When a new student arrives, we say 'w___ (bienvenida) to our school!'",
+          "aceptadas": [
+            "welcome"
+          ],
+          "tolerancia": "1_letra",
+          "explicacion": {
+            "regla": "Welcome = bienvenido/a: un saludo para alguien nuevo.",
+            "ejemplo": "Everyone says 'Welcome!' on the first day of school.",
+            "idioma": "es"
+          },
+          "pool": "practice",
+          "segundos": 40
+        }
+      ]
+    },
+    {
+      "id": "a1-u01-c01",
+      "formato": "conecta",
+      "pool": "practice",
+      "segundos": 50,
+      "pares": [
+        [
+          "mother",
+          "madre"
+        ],
+        [
+          "father",
+          "padre"
+        ],
+        [
+          "uncle",
+          "tío"
+        ],
+        [
+          "aunt",
+          "tía"
+        ],
+        [
+          "grandparents",
+          "abuelos"
+        ]
+      ],
+      "sobrante": "primo"
+    },
+    {
+      "id": "a1-u01-l01",
+      "formato": "lo_dice",
+      "pool": "practice",
+      "segundos": 100,
+      "texto": "Hi, I'm Kendry. My best friend at school is Yurany. She's new, and she's very friendly. Her grandparents live in Piedecuesta, and she visits them on Sundays. Yurany has one sister and one brother. Her sister, Liliana, is sixteen, and her brother, Nicolás, is ten.",
+      "afirmaciones": [
+        {
+          "texto": "Yurany's grandparents live in Lebrija.",
+          "clave": "F",
+          "cita": "Her grandparents live in Piedecuesta",
+          "explicacion": "Falso. Viven en Piedecuesta, no en Lebrija: 'Her grandparents live in Piedecuesta'."
+        },
+        {
+          "texto": "Yurany's sister is sixteen years old.",
+          "clave": "V",
+          "cita": "Her sister, Liliana, is sixteen",
+          "explicacion": "Verdadero. Liliana, la hermana, tiene dieciséis años: 'Her sister, Liliana, is sixteen'."
+        }
+      ]
+    },
+    {
+      "id": "a1-u01-l02",
+      "formato": "lo_dice",
+      "pool": "practice",
+      "segundos": 120,
+      "texto": "On Sunday, Yurany's family visits her grandparents in Piedecuesta. Her aunt Nayibe comes at ten, and her uncle Ismael comes at twelve. Yurany's grandfather cooks empanadas for everyone, and her grandmother tells funny stories about the town.",
+      "afirmaciones": [
+        {
+          "texto": "Yurany's aunt comes at ten.",
+          "clave": "V",
+          "cita": "Her aunt Nayibe comes at ten",
+          "explicacion": "Verdadero. La tía llega a las diez: 'Her aunt Nayibe comes at ten'."
+        },
+        {
+          "texto": "Yurany's uncle Ismael comes at ten.",
+          "clave": "F",
+          "cita": "her uncle Ismael comes at twelve",
+          "explicacion": "Falso. Ismael llega a las doce, no a las diez: 'her uncle Ismael comes at twelve'."
+        },
+        {
+          "texto": "Yurany's uncle comes at eleven.",
+          "clave": "F",
+          "cita": "her uncle Ismael comes at twelve",
+          "explicacion": "Falso. No es a las once, sino a las doce: 'her uncle Ismael comes at twelve'."
+        }
+      ]
+    },
+    {
+      "id": "a1-u01-o01",
+      "formato": "oido",
+      "pool": "practice",
+      "segundos": 40,
+      "guion": "Hi, Yurany! It's Kendry. Today is my big sister's birthday. She's fourteen now! My mom is forty, and my cousin is thirty. Let's do the family project at the library after school. See you!",
+      "pregunta": "How old is Kendry's mom?",
+      "opciones": {
+        "A": "forty",
+        "B": "thirteen",
+        "C": "fourteen",
+        "D": "thirty"
+      },
+      "clave": "A",
+      "explicacion": "Hi, Yurany! It's Kendry. Today is my big sister's birthday. She's fourteen now! **My mom is forty**, and my cousin is thirty. Let's do the family project at the library after school. See you!"
+    }
+  ],
+  "fuente": null,
+  "generado_por": "creador-opus@F8-t0r4",
+  "revisado_por": null
+}

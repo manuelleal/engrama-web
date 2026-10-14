@@ -1,0 +1,3053 @@
+{
+ "_nota": "Foto de los cuerpos que armaba el sembrador de 3c81fe3 (antes de ESPEC_sembrador_refuerzo), sobre tests/fixtures/sembrar/. No se regenera: SR5.",
+ "a1-u01-my-family": {
+  "borrador": [
+   {
+    "cefr_level": "A1",
+    "challenge_type": "multiple_choice",
+    "coins_reward": 10,
+    "description": "",
+    "group_id": "00000000-0000-4000-8000-000000000001",
+    "max_attempts": 2,
+    "questions": [
+     {
+      "correct_answer": "C",
+      "options_json": [
+       {
+        "label": "A",
+        "value": "is"
+       },
+       {
+        "label": "B",
+        "value": "are"
+       },
+       {
+        "label": "C",
+        "value": "am"
+       },
+       {
+        "label": "D",
+        "value": "have"
+       }
+      ],
+      "order_index": 1,
+      "question_text": "Kendry: 'Yurany, I ___ thirteen, like you!'",
+      "question_type": "multiple_choice"
+     },
+     {
+      "correct_answer": "B",
+      "options_json": [
+       {
+        "label": "A",
+        "value": "his grandmother"
+       },
+       {
+        "label": "B",
+        "value": "their grandmother"
+       },
+       {
+        "label": "C",
+        "value": "our grandmother"
+       },
+       {
+        "label": "D",
+        "value": "her grandmother"
+       }
+      ],
+      "order_index": 2,
+      "question_text": "Liliana and Nicolás are with ___ today. (la abuela de ellos)",
+      "question_type": "multiple_choice"
+     }
+    ],
+    "skill": "grammar",
+    "title": "[BORRADOR] a1-u01 · This Is My Family · Gramática 1 · original",
+    "topic": "a1-u01"
+   },
+   {
+    "cefr_level": "A1",
+    "challenge_type": "multiple_choice",
+    "coins_reward": 10,
+    "description": "",
+    "group_id": "00000000-0000-4000-8000-000000000001",
+    "max_attempts": 2,
+    "questions": [
+     {
+      "correct_answer": "A",
+      "options_json": [
+       {
+        "label": "A",
+        "value": "aren't"
+       },
+       {
+        "label": "B",
+        "value": "haven't"
+       },
+       {
+        "label": "C",
+        "value": "isn't"
+       },
+       {
+        "label": "D",
+        "value": "am not"
+       }
+      ],
+      "order_index": 1,
+      "question_text": "Yurany's grandparents ___ sixty. They're seventy.",
+      "question_type": "multiple_choice"
+     },
+     {
+      "correct_answer": "D",
+      "options_json": [
+       {
+        "label": "A",
+        "value": "her bag"
+       },
+       {
+        "label": "B",
+        "value": "my bag"
+       },
+       {
+        "label": "C",
+        "value": "his bag"
+       },
+       {
+        "label": "D",
+        "value": "your bag"
+       }
+      ],
+      "order_index": 2,
+      "question_text": "Mrs. Pinzón, is this ___? (la bolsa de usted)",
+      "question_type": "multiple_choice"
+     }
+    ],
+    "skill": "grammar",
+    "title": "[BORRADOR] a1-u01 · This Is My Family · Gramática 2 · gemela",
+    "topic": "a1-u01"
+   },
+   {
+    "cefr_level": "A1",
+    "challenge_type": "multiple_choice",
+    "coins_reward": 10,
+    "description": "",
+    "group_id": "00000000-0000-4000-8000-000000000001",
+    "max_attempts": 2,
+    "questions": [
+     {
+      "correct_answer": "D",
+      "options_json": [
+       {
+        "label": "A",
+        "value": "Are they"
+       },
+       {
+        "label": "B",
+        "value": "Has she"
+       },
+       {
+        "label": "C",
+        "value": "Are you"
+       },
+       {
+        "label": "D",
+        "value": "Is she"
+       }
+      ],
+      "order_index": 1,
+      "question_text": "Kendry: 'Yurany, you're thirteen. And your sister Liliana, ___ sixteen?'",
+      "question_type": "multiple_choice"
+     },
+     {
+      "correct_answer": "C",
+      "options_json": [
+       {
+        "label": "A",
+        "value": "their aunt"
+       },
+       {
+        "label": "B",
+        "value": "her aunt"
+       },
+       {
+        "label": "C",
+        "value": "his aunt"
+       },
+       {
+        "label": "D",
+        "value": "your aunt"
+       }
+      ],
+      "order_index": 2,
+      "question_text": "Look, this is Nicolás, and this is ___ Nayibe. (la tía de él)",
+      "question_type": "multiple_choice"
+     }
+    ],
+    "skill": "grammar",
+    "title": "[BORRADOR] a1-u01 · This Is My Family · Gramática 3 · repaso",
+    "topic": "a1-u01"
+   },
+   {
+    "cefr_level": "A1",
+    "challenge_type": "multiple_choice",
+    "coins_reward": 10,
+    "description": "",
+    "group_id": "00000000-0000-4000-8000-000000000001",
+    "max_attempts": 2,
+    "questions": [
+     {
+      "correct_answer": "C",
+      "options_json": [
+       {
+        "label": "A",
+        "value": "mother"
+       },
+       {
+        "label": "B",
+        "value": "grandmother"
+       },
+       {
+        "label": "C",
+        "value": "son"
+       },
+       {
+        "label": "D",
+        "value": "brother"
+       }
+      ],
+      "order_index": 1,
+      "question_text": "Yesenia is Nicolás's mom, and Yurany is his big sister. Nicolás is Yesenia's ___.",
+      "question_type": "multiple_choice"
+     },
+     {
+      "correct_answer": "A",
+      "options_json": [
+       {
+        "label": "A",
+        "value": "aunt"
+       },
+       {
+        "label": "B",
+        "value": "sister"
+       },
+       {
+        "label": "C",
+        "value": "grandmother"
+       },
+       {
+        "label": "D",
+        "value": "cousin"
+       }
+      ],
+      "order_index": 2,
+      "question_text": "Yurany's mom and Nayibe have the same parents. Nayibe is Yurany's ___.",
+      "question_type": "multiple_choice"
+     }
+    ],
+    "skill": "vocabulary",
+    "title": "[BORRADOR] a1-u01 · This Is My Family · Vocabulario 1 · original",
+    "topic": "a1-u01"
+   },
+   {
+    "cefr_level": "A1",
+    "challenge_type": "multiple_choice",
+    "coins_reward": 10,
+    "description": "",
+    "group_id": "00000000-0000-4000-8000-000000000001",
+    "max_attempts": 2,
+    "questions": [
+     {
+      "correct_answer": "B",
+      "options_json": [
+       {
+        "label": "A",
+        "value": "uncle"
+       },
+       {
+        "label": "B",
+        "value": "sister"
+       },
+       {
+        "label": "C",
+        "value": "daughter"
+       },
+       {
+        "label": "D",
+        "value": "father"
+       }
+      ],
+      "order_index": 1,
+      "question_text": "Liliana and Yurany have the same mom and dad. Liliana is sixteen and Yurany is thirteen. Liliana is Yurany's big ___.",
+      "question_type": "multiple_choice"
+     },
+     {
+      "correct_answer": "D",
+      "options_json": [
+       {
+        "label": "A",
+        "value": "daughter"
+       },
+       {
+        "label": "B",
+        "value": "mother"
+       },
+       {
+        "label": "C",
+        "value": "brother"
+       },
+       {
+        "label": "D",
+        "value": "cousin"
+       }
+      ],
+      "order_index": 2,
+      "question_text": "Ismael is Esteban's brother, and Esteban is Yurany's dad. Ismael's little girl, Dayana, is Yurany's ___.",
+      "question_type": "multiple_choice"
+     }
+    ],
+    "skill": "vocabulary",
+    "title": "[BORRADOR] a1-u01 · This Is My Family · Vocabulario 2 · gemela",
+    "topic": "a1-u01"
+   },
+   {
+    "cefr_level": "A1",
+    "challenge_type": "multiple_choice",
+    "coins_reward": 10,
+    "description": "",
+    "group_id": "00000000-0000-4000-8000-000000000001",
+    "max_attempts": 2,
+    "questions": [
+     {
+      "correct_answer": "A",
+      "options_json": [
+       {
+        "label": "A",
+        "value": "grandfather"
+       },
+       {
+        "label": "B",
+        "value": "cousin"
+       },
+       {
+        "label": "C",
+        "value": "aunt"
+       },
+       {
+        "label": "D",
+        "value": "father"
+       }
+      ],
+      "order_index": 1,
+      "question_text": "Esteban is Liliana's dad. Esteban's father is Liliana's ___.",
+      "question_type": "multiple_choice"
+     },
+     {
+      "correct_answer": "B",
+      "options_json": [
+       {
+        "label": "A",
+        "value": "brother"
+       },
+       {
+        "label": "B",
+        "value": "uncle"
+       },
+       {
+        "label": "C",
+        "value": "sister"
+       },
+       {
+        "label": "D",
+        "value": "grandfather"
+       }
+      ],
+      "order_index": 2,
+      "question_text": "Kendry's mom has a brother, Ramiro. Ramiro is Kendry's ___.",
+      "question_type": "multiple_choice"
+     }
+    ],
+    "skill": "vocabulary",
+    "title": "[BORRADOR] a1-u01 · This Is My Family · Vocabulario 3 · repaso",
+    "topic": "a1-u01"
+   },
+   {
+    "cefr_level": "A1",
+    "challenge_type": "multiple_choice",
+    "coins_reward": 10,
+    "description": "Hi, I'm Kendry. My best friend at school is Yurany. She's new, and she's very friendly. Her grandparents live in Piedecuesta, and she visits them on Sundays. Yurany has one sister and one brother. Her sister, Liliana, is sixteen, and her brother, Nicolás, is ten.",
+    "group_id": "00000000-0000-4000-8000-000000000001",
+    "max_attempts": 2,
+    "questions": [
+     {
+      "correct_answer": "F",
+      "options_json": [
+       {
+        "label": "V",
+        "value": "True"
+       },
+       {
+        "label": "F",
+        "value": "False"
+       },
+       {
+        "label": "ND",
+        "value": "Not given"
+       }
+      ],
+      "order_index": 1,
+      "question_text": "Yurany's grandparents live in Lebrija.",
+      "question_type": "multiple_choice"
+     },
+     {
+      "correct_answer": "V",
+      "options_json": [
+       {
+        "label": "V",
+        "value": "True"
+       },
+       {
+        "label": "F",
+        "value": "False"
+       },
+       {
+        "label": "ND",
+        "value": "Not given"
+       }
+      ],
+      "order_index": 2,
+      "question_text": "Yurany's sister is sixteen years old.",
+      "question_type": "multiple_choice"
+     }
+    ],
+    "skill": "reading",
+    "title": "[BORRADOR] a1-u01 · This Is My Family · Lectura 1",
+    "topic": "a1-u01"
+   },
+   {
+    "cefr_level": "A1",
+    "challenge_type": "multiple_choice",
+    "coins_reward": 10,
+    "description": "On Sunday, Yurany's family visits her grandparents in Piedecuesta. Her aunt Nayibe comes at ten, and her uncle Ismael comes at twelve. Yurany's grandfather cooks empanadas for everyone, and her grandmother tells funny stories about the town.",
+    "group_id": "00000000-0000-4000-8000-000000000001",
+    "max_attempts": 2,
+    "questions": [
+     {
+      "correct_answer": "V",
+      "options_json": [
+       {
+        "label": "V",
+        "value": "True"
+       },
+       {
+        "label": "F",
+        "value": "False"
+       },
+       {
+        "label": "ND",
+        "value": "Not given"
+       }
+      ],
+      "order_index": 1,
+      "question_text": "Yurany's aunt comes at ten.",
+      "question_type": "multiple_choice"
+     },
+     {
+      "correct_answer": "F",
+      "options_json": [
+       {
+        "label": "V",
+        "value": "True"
+       },
+       {
+        "label": "F",
+        "value": "False"
+       },
+       {
+        "label": "ND",
+        "value": "Not given"
+       }
+      ],
+      "order_index": 2,
+      "question_text": "Yurany's uncle Ismael comes at ten.",
+      "question_type": "multiple_choice"
+     },
+     {
+      "correct_answer": "F",
+      "options_json": [
+       {
+        "label": "V",
+        "value": "True"
+       },
+       {
+        "label": "F",
+        "value": "False"
+       },
+       {
+        "label": "ND",
+        "value": "Not given"
+       }
+      ],
+      "order_index": 3,
+      "question_text": "Yurany's uncle comes at eleven.",
+      "question_type": "multiple_choice"
+     }
+    ],
+    "skill": "reading",
+    "title": "[BORRADOR] a1-u01 · This Is My Family · Lectura 2",
+    "topic": "a1-u01"
+   }
+  ],
+  "firmada": [
+   {
+    "cefr_level": "A1",
+    "challenge_type": "multiple_choice",
+    "coins_reward": 10,
+    "description": "",
+    "group_id": "00000000-0000-4000-8000-000000000001",
+    "max_attempts": 2,
+    "questions": [
+     {
+      "correct_answer": "C",
+      "options_json": [
+       {
+        "label": "A",
+        "value": "is"
+       },
+       {
+        "label": "B",
+        "value": "are"
+       },
+       {
+        "label": "C",
+        "value": "am"
+       },
+       {
+        "label": "D",
+        "value": "have"
+       }
+      ],
+      "order_index": 1,
+      "question_text": "Kendry: 'Yurany, I ___ thirteen, like you!'",
+      "question_type": "multiple_choice"
+     },
+     {
+      "correct_answer": "B",
+      "options_json": [
+       {
+        "label": "A",
+        "value": "his grandmother"
+       },
+       {
+        "label": "B",
+        "value": "their grandmother"
+       },
+       {
+        "label": "C",
+        "value": "our grandmother"
+       },
+       {
+        "label": "D",
+        "value": "her grandmother"
+       }
+      ],
+      "order_index": 2,
+      "question_text": "Liliana and Nicolás are with ___ today. (la abuela de ellos)",
+      "question_type": "multiple_choice"
+     }
+    ],
+    "skill": "grammar",
+    "title": "a1-u01 · This Is My Family · Gramática 1 · original",
+    "topic": "a1-u01"
+   },
+   {
+    "cefr_level": "A1",
+    "challenge_type": "multiple_choice",
+    "coins_reward": 10,
+    "description": "",
+    "group_id": "00000000-0000-4000-8000-000000000001",
+    "max_attempts": 2,
+    "questions": [
+     {
+      "correct_answer": "A",
+      "options_json": [
+       {
+        "label": "A",
+        "value": "aren't"
+       },
+       {
+        "label": "B",
+        "value": "haven't"
+       },
+       {
+        "label": "C",
+        "value": "isn't"
+       },
+       {
+        "label": "D",
+        "value": "am not"
+       }
+      ],
+      "order_index": 1,
+      "question_text": "Yurany's grandparents ___ sixty. They're seventy.",
+      "question_type": "multiple_choice"
+     },
+     {
+      "correct_answer": "D",
+      "options_json": [
+       {
+        "label": "A",
+        "value": "her bag"
+       },
+       {
+        "label": "B",
+        "value": "my bag"
+       },
+       {
+        "label": "C",
+        "value": "his bag"
+       },
+       {
+        "label": "D",
+        "value": "your bag"
+       }
+      ],
+      "order_index": 2,
+      "question_text": "Mrs. Pinzón, is this ___? (la bolsa de usted)",
+      "question_type": "multiple_choice"
+     }
+    ],
+    "skill": "grammar",
+    "title": "a1-u01 · This Is My Family · Gramática 2 · gemela",
+    "topic": "a1-u01"
+   },
+   {
+    "cefr_level": "A1",
+    "challenge_type": "multiple_choice",
+    "coins_reward": 10,
+    "description": "",
+    "group_id": "00000000-0000-4000-8000-000000000001",
+    "max_attempts": 2,
+    "questions": [
+     {
+      "correct_answer": "D",
+      "options_json": [
+       {
+        "label": "A",
+        "value": "Are they"
+       },
+       {
+        "label": "B",
+        "value": "Has she"
+       },
+       {
+        "label": "C",
+        "value": "Are you"
+       },
+       {
+        "label": "D",
+        "value": "Is she"
+       }
+      ],
+      "order_index": 1,
+      "question_text": "Kendry: 'Yurany, you're thirteen. And your sister Liliana, ___ sixteen?'",
+      "question_type": "multiple_choice"
+     },
+     {
+      "correct_answer": "C",
+      "options_json": [
+       {
+        "label": "A",
+        "value": "their aunt"
+       },
+       {
+        "label": "B",
+        "value": "her aunt"
+       },
+       {
+        "label": "C",
+        "value": "his aunt"
+       },
+       {
+        "label": "D",
+        "value": "your aunt"
+       }
+      ],
+      "order_index": 2,
+      "question_text": "Look, this is Nicolás, and this is ___ Nayibe. (la tía de él)",
+      "question_type": "multiple_choice"
+     }
+    ],
+    "skill": "grammar",
+    "title": "a1-u01 · This Is My Family · Gramática 3 · repaso",
+    "topic": "a1-u01"
+   },
+   {
+    "cefr_level": "A1",
+    "challenge_type": "multiple_choice",
+    "coins_reward": 10,
+    "description": "",
+    "group_id": "00000000-0000-4000-8000-000000000001",
+    "max_attempts": 2,
+    "questions": [
+     {
+      "correct_answer": "C",
+      "options_json": [
+       {
+        "label": "A",
+        "value": "mother"
+       },
+       {
+        "label": "B",
+        "value": "grandmother"
+       },
+       {
+        "label": "C",
+        "value": "son"
+       },
+       {
+        "label": "D",
+        "value": "brother"
+       }
+      ],
+      "order_index": 1,
+      "question_text": "Yesenia is Nicolás's mom, and Yurany is his big sister. Nicolás is Yesenia's ___.",
+      "question_type": "multiple_choice"
+     },
+     {
+      "correct_answer": "A",
+      "options_json": [
+       {
+        "label": "A",
+        "value": "aunt"
+       },
+       {
+        "label": "B",
+        "value": "sister"
+       },
+       {
+        "label": "C",
+        "value": "grandmother"
+       },
+       {
+        "label": "D",
+        "value": "cousin"
+       }
+      ],
+      "order_index": 2,
+      "question_text": "Yurany's mom and Nayibe have the same parents. Nayibe is Yurany's ___.",
+      "question_type": "multiple_choice"
+     }
+    ],
+    "skill": "vocabulary",
+    "title": "a1-u01 · This Is My Family · Vocabulario 1 · original",
+    "topic": "a1-u01"
+   },
+   {
+    "cefr_level": "A1",
+    "challenge_type": "multiple_choice",
+    "coins_reward": 10,
+    "description": "",
+    "group_id": "00000000-0000-4000-8000-000000000001",
+    "max_attempts": 2,
+    "questions": [
+     {
+      "correct_answer": "B",
+      "options_json": [
+       {
+        "label": "A",
+        "value": "uncle"
+       },
+       {
+        "label": "B",
+        "value": "sister"
+       },
+       {
+        "label": "C",
+        "value": "daughter"
+       },
+       {
+        "label": "D",
+        "value": "father"
+       }
+      ],
+      "order_index": 1,
+      "question_text": "Liliana and Yurany have the same mom and dad. Liliana is sixteen and Yurany is thirteen. Liliana is Yurany's big ___.",
+      "question_type": "multiple_choice"
+     },
+     {
+      "correct_answer": "D",
+      "options_json": [
+       {
+        "label": "A",
+        "value": "daughter"
+       },
+       {
+        "label": "B",
+        "value": "mother"
+       },
+       {
+        "label": "C",
+        "value": "brother"
+       },
+       {
+        "label": "D",
+        "value": "cousin"
+       }
+      ],
+      "order_index": 2,
+      "question_text": "Ismael is Esteban's brother, and Esteban is Yurany's dad. Ismael's little girl, Dayana, is Yurany's ___.",
+      "question_type": "multiple_choice"
+     }
+    ],
+    "skill": "vocabulary",
+    "title": "a1-u01 · This Is My Family · Vocabulario 2 · gemela",
+    "topic": "a1-u01"
+   },
+   {
+    "cefr_level": "A1",
+    "challenge_type": "multiple_choice",
+    "coins_reward": 10,
+    "description": "",
+    "group_id": "00000000-0000-4000-8000-000000000001",
+    "max_attempts": 2,
+    "questions": [
+     {
+      "correct_answer": "A",
+      "options_json": [
+       {
+        "label": "A",
+        "value": "grandfather"
+       },
+       {
+        "label": "B",
+        "value": "cousin"
+       },
+       {
+        "label": "C",
+        "value": "aunt"
+       },
+       {
+        "label": "D",
+        "value": "father"
+       }
+      ],
+      "order_index": 1,
+      "question_text": "Esteban is Liliana's dad. Esteban's father is Liliana's ___.",
+      "question_type": "multiple_choice"
+     },
+     {
+      "correct_answer": "B",
+      "options_json": [
+       {
+        "label": "A",
+        "value": "brother"
+       },
+       {
+        "label": "B",
+        "value": "uncle"
+       },
+       {
+        "label": "C",
+        "value": "sister"
+       },
+       {
+        "label": "D",
+        "value": "grandfather"
+       }
+      ],
+      "order_index": 2,
+      "question_text": "Kendry's mom has a brother, Ramiro. Ramiro is Kendry's ___.",
+      "question_type": "multiple_choice"
+     }
+    ],
+    "skill": "vocabulary",
+    "title": "a1-u01 · This Is My Family · Vocabulario 3 · repaso",
+    "topic": "a1-u01"
+   },
+   {
+    "cefr_level": "A1",
+    "challenge_type": "multiple_choice",
+    "coins_reward": 10,
+    "description": "Hi, I'm Kendry. My best friend at school is Yurany. She's new, and she's very friendly. Her grandparents live in Piedecuesta, and she visits them on Sundays. Yurany has one sister and one brother. Her sister, Liliana, is sixteen, and her brother, Nicolás, is ten.",
+    "group_id": "00000000-0000-4000-8000-000000000001",
+    "max_attempts": 2,
+    "questions": [
+     {
+      "correct_answer": "F",
+      "options_json": [
+       {
+        "label": "V",
+        "value": "True"
+       },
+       {
+        "label": "F",
+        "value": "False"
+       },
+       {
+        "label": "ND",
+        "value": "Not given"
+       }
+      ],
+      "order_index": 1,
+      "question_text": "Yurany's grandparents live in Lebrija.",
+      "question_type": "multiple_choice"
+     },
+     {
+      "correct_answer": "V",
+      "options_json": [
+       {
+        "label": "V",
+        "value": "True"
+       },
+       {
+        "label": "F",
+        "value": "False"
+       },
+       {
+        "label": "ND",
+        "value": "Not given"
+       }
+      ],
+      "order_index": 2,
+      "question_text": "Yurany's sister is sixteen years old.",
+      "question_type": "multiple_choice"
+     }
+    ],
+    "skill": "reading",
+    "title": "a1-u01 · This Is My Family · Lectura 1",
+    "topic": "a1-u01"
+   },
+   {
+    "cefr_level": "A1",
+    "challenge_type": "multiple_choice",
+    "coins_reward": 10,
+    "description": "On Sunday, Yurany's family visits her grandparents in Piedecuesta. Her aunt Nayibe comes at ten, and her uncle Ismael comes at twelve. Yurany's grandfather cooks empanadas for everyone, and her grandmother tells funny stories about the town.",
+    "group_id": "00000000-0000-4000-8000-000000000001",
+    "max_attempts": 2,
+    "questions": [
+     {
+      "correct_answer": "V",
+      "options_json": [
+       {
+        "label": "V",
+        "value": "True"
+       },
+       {
+        "label": "F",
+        "value": "False"
+       },
+       {
+        "label": "ND",
+        "value": "Not given"
+       }
+      ],
+      "order_index": 1,
+      "question_text": "Yurany's aunt comes at ten.",
+      "question_type": "multiple_choice"
+     },
+     {
+      "correct_answer": "F",
+      "options_json": [
+       {
+        "label": "V",
+        "value": "True"
+       },
+       {
+        "label": "F",
+        "value": "False"
+       },
+       {
+        "label": "ND",
+        "value": "Not given"
+       }
+      ],
+      "order_index": 2,
+      "question_text": "Yurany's uncle Ismael comes at ten.",
+      "question_type": "multiple_choice"
+     },
+     {
+      "correct_answer": "F",
+      "options_json": [
+       {
+        "label": "V",
+        "value": "True"
+       },
+       {
+        "label": "F",
+        "value": "False"
+       },
+       {
+        "label": "ND",
+        "value": "Not given"
+       }
+      ],
+      "order_index": 3,
+      "question_text": "Yurany's uncle comes at eleven.",
+      "question_type": "multiple_choice"
+     }
+    ],
+    "skill": "reading",
+    "title": "a1-u01 · This Is My Family · Lectura 2",
+    "topic": "a1-u01"
+   }
+  ]
+ },
+ "a2-u01-travelling-by-bus": {
+  "borrador": [
+   {
+    "cefr_level": "A2",
+    "challenge_type": "multiple_choice",
+    "coins_reward": 10,
+    "description": "",
+    "group_id": "00000000-0000-4000-8000-000000000001",
+    "max_attempts": 2,
+    "questions": [
+     {
+      "correct_answer": "C",
+      "options_json": [
+       {
+        "label": "A",
+        "value": "faster"
+       },
+       {
+        "label": "B",
+        "value": "more fast"
+       },
+       {
+        "label": "C",
+        "value": "cheaper"
+       },
+       {
+        "label": "D",
+        "value": "more expensive"
+       }
+      ],
+      "order_index": 1,
+      "question_text": "A Metrolínea trip to the UIS costs 3,000 pesos, and a taxi costs 12,000. Both take 20 minutes. Metrolínea is ___ than a taxi.",
+      "question_type": "multiple_choice"
+     },
+     {
+      "correct_answer": "B",
+      "options_json": [
+       {
+        "label": "A",
+        "value": "doesn't have to buy"
+       },
+       {
+        "label": "B",
+        "value": "have to buy"
+       },
+       {
+        "label": "C",
+        "value": "don't have to buy"
+       },
+       {
+        "label": "D",
+        "value": "has to buy"
+       }
+      ],
+      "order_index": 2,
+      "question_text": "Drivers on the buses to San Gil don't sell tickets. So at the terminal, passengers ___ one at the window before they get on.",
+      "question_type": "multiple_choice"
+     }
+    ],
+    "skill": "grammar",
+    "title": "[BORRADOR] a2-u01 · Taking the Bus · Gramática 1 · original",
+    "topic": "a2-u01"
+   },
+   {
+    "cefr_level": "A2",
+    "challenge_type": "multiple_choice",
+    "coins_reward": 10,
+    "description": "",
+    "group_id": "00000000-0000-4000-8000-000000000001",
+    "max_attempts": 2,
+    "questions": [
+     {
+      "correct_answer": "A",
+      "options_json": [
+       {
+        "label": "A",
+        "value": "slower"
+       },
+       {
+        "label": "B",
+        "value": "earlier"
+       },
+       {
+        "label": "C",
+        "value": "more early"
+       },
+       {
+        "label": "D",
+        "value": "faster"
+       }
+      ],
+      "order_index": 1,
+      "question_text": "The 6:30 bus gets to the UIS in 25 minutes on Saturdays, but in 45 minutes on Mondays, at rush hour. On Mondays it is ___ than on Saturdays.",
+      "question_type": "multiple_choice"
+     },
+     {
+      "correct_answer": "D",
+      "options_json": [
+       {
+        "label": "A",
+        "value": "have to go"
+       },
+       {
+        "label": "B",
+        "value": "don't have to go"
+       },
+       {
+        "label": "C",
+        "value": "has to go"
+       },
+       {
+        "label": "D",
+        "value": "doesn't have to go"
+       }
+      ],
+      "order_index": 2,
+      "question_text": "Fabián already has his ticket in his hand, so he ___ to the window again.",
+      "question_type": "multiple_choice"
+     }
+    ],
+    "skill": "grammar",
+    "title": "[BORRADOR] a2-u01 · Taking the Bus · Gramática 2 · gemela",
+    "topic": "a2-u01"
+   },
+   {
+    "cefr_level": "A2",
+    "challenge_type": "multiple_choice",
+    "coins_reward": 10,
+    "description": "",
+    "group_id": "00000000-0000-4000-8000-000000000001",
+    "max_attempts": 2,
+    "questions": [
+     {
+      "correct_answer": "D",
+      "options_json": [
+       {
+        "label": "A",
+        "value": "more busy"
+       },
+       {
+        "label": "B",
+        "value": "busier"
+       },
+       {
+        "label": "C",
+        "value": "longer"
+       },
+       {
+        "label": "D",
+        "value": "shorter"
+       }
+      ],
+      "order_index": 1,
+      "question_text": "At the terminal, there are four people in line at window two and twelve at window five. The line at window two is ___ than the line at window five.",
+      "question_type": "multiple_choice"
+     },
+     {
+      "correct_answer": "A",
+      "options_json": [
+       {
+        "label": "A",
+        "value": "don't have to wait"
+       },
+       {
+        "label": "B",
+        "value": "has to wait"
+       },
+       {
+        "label": "C",
+        "value": "doesn't have to wait"
+       },
+       {
+        "label": "D",
+        "value": "have to wait"
+       }
+      ],
+      "order_index": 2,
+      "question_text": "Ramiro and Dayana have 30,000 pesos on their Metrolínea cards, so they ___ in line to recharge them today.",
+      "question_type": "multiple_choice"
+     }
+    ],
+    "skill": "grammar",
+    "title": "[BORRADOR] a2-u01 · Taking the Bus · Gramática 3 · repaso",
+    "topic": "a2-u01"
+   },
+   {
+    "cefr_level": "A2",
+    "challenge_type": "multiple_choice",
+    "coins_reward": 10,
+    "description": "",
+    "group_id": "00000000-0000-4000-8000-000000000001",
+    "max_attempts": 2,
+    "questions": [
+     {
+      "correct_answer": "B",
+      "options_json": [
+       {
+        "label": "A",
+        "value": "seat"
+       },
+       {
+        "label": "B",
+        "value": "fare"
+       },
+       {
+        "label": "C",
+        "value": "terminal"
+       },
+       {
+        "label": "D",
+        "value": "platform"
+       }
+      ],
+      "order_index": 1,
+      "question_text": "At the window, passengers pay the ___: 22,000 pesos for the bus with stops to San Gil.",
+      "question_type": "multiple_choice"
+     },
+     {
+      "correct_answer": "C",
+      "options_json": [
+       {
+        "label": "A",
+        "value": "get on"
+       },
+       {
+        "label": "B",
+        "value": "wait for"
+       },
+       {
+        "label": "C",
+        "value": "get off"
+       },
+       {
+        "label": "D",
+        "value": "miss"
+       }
+      ],
+      "order_index": 2,
+      "question_text": "Dayana's aunt lives in a small town before San Gil. On the bus with stops, Dayana tells the driver, 'I'd like to ___ there, please.'",
+      "question_type": "multiple_choice"
+     }
+    ],
+    "skill": "vocabulary",
+    "title": "[BORRADOR] a2-u01 · Taking the Bus · Vocabulario 1 · original",
+    "topic": "a2-u01"
+   },
+   {
+    "cefr_level": "A2",
+    "challenge_type": "multiple_choice",
+    "coins_reward": 10,
+    "description": "",
+    "group_id": "00000000-0000-4000-8000-000000000001",
+    "max_attempts": 2,
+    "questions": [
+     {
+      "correct_answer": "C",
+      "options_json": [
+       {
+        "label": "A",
+        "value": "drivers"
+       },
+       {
+        "label": "B",
+        "value": "platforms"
+       },
+       {
+        "label": "C",
+        "value": "passengers"
+       },
+       {
+        "label": "D",
+        "value": "stations"
+       }
+      ],
+      "order_index": 1,
+      "question_text": "Mr. Pinzón drives the 9:30 bus to San Gil. Today 30 ___ get on, and each one shows him a ticket.",
+      "question_type": "multiple_choice"
+     },
+     {
+      "correct_answer": "B",
+      "options_json": [
+       {
+        "label": "A",
+        "value": "gets on"
+       },
+       {
+        "label": "B",
+        "value": "misses"
+       },
+       {
+        "label": "C",
+        "value": "waits for"
+       },
+       {
+        "label": "D",
+        "value": "gets off"
+       }
+      ],
+      "order_index": 2,
+      "question_text": "The 9:30 bus to San Gil leaves on time, but Ramiro gets to the terminal at 9:40. He ___ it, so he takes the 10:00 bus.",
+      "question_type": "multiple_choice"
+     }
+    ],
+    "skill": "vocabulary",
+    "title": "[BORRADOR] a2-u01 · Taking the Bus · Vocabulario 2 · gemela",
+    "topic": "a2-u01"
+   },
+   {
+    "cefr_level": "A2",
+    "challenge_type": "multiple_choice",
+    "coins_reward": 10,
+    "description": "",
+    "group_id": "00000000-0000-4000-8000-000000000001",
+    "max_attempts": 2,
+    "questions": [
+     {
+      "correct_answer": "A",
+      "options_json": [
+       {
+        "label": "A",
+        "value": "route"
+       },
+       {
+        "label": "B",
+        "value": "ticket"
+       },
+       {
+        "label": "C",
+        "value": "card"
+       },
+       {
+        "label": "D",
+        "value": "driver"
+       }
+      ],
+      "order_index": 1,
+      "question_text": "The direct bus and the bus with stops leave from different platforms, but they use the same ___: the same roads to San Gil.",
+      "question_type": "multiple_choice"
+     },
+     {
+      "correct_answer": "D",
+      "options_json": [
+       {
+        "label": "A",
+        "value": "waiting for"
+       },
+       {
+        "label": "B",
+        "value": "missing"
+       },
+       {
+        "label": "C",
+        "value": "getting off"
+       },
+       {
+        "label": "D",
+        "value": "getting on"
+       }
+      ],
+      "order_index": 2,
+      "question_text": "Look! Ramiro is ___ the bus through the front door. Now he's showing his ticket to the driver and looking for a seat.",
+      "question_type": "multiple_choice"
+     }
+    ],
+    "skill": "vocabulary",
+    "title": "[BORRADOR] a2-u01 · Taking the Bus · Vocabulario 3 · repaso",
+    "topic": "a2-u01"
+   },
+   {
+    "cefr_level": "A2",
+    "challenge_type": "multiple_choice",
+    "coins_reward": 10,
+    "description": "Every Monday, Fabián takes Metrolínea to the UIS. He always recharges his card on Fridays, so he doesn't have to wait in line. The 6:30 a.m. bus is usually crowded, so he takes the 5:45 one. On weekends, Fabián sometimes visits his cousin in San Gil by intercity bus.",
+    "group_id": "00000000-0000-4000-8000-000000000001",
+    "max_attempts": 2,
+    "questions": [
+     {
+      "correct_answer": "V",
+      "options_json": [
+       {
+        "label": "V",
+        "value": "True"
+       },
+       {
+        "label": "F",
+        "value": "False"
+       },
+       {
+        "label": "ND",
+        "value": "Not given"
+       }
+      ],
+      "order_index": 1,
+      "question_text": "Fabián recharges his card on Fridays.",
+      "question_type": "multiple_choice"
+     },
+     {
+      "correct_answer": "F",
+      "options_json": [
+       {
+        "label": "V",
+        "value": "True"
+       },
+       {
+        "label": "F",
+        "value": "False"
+       },
+       {
+        "label": "ND",
+        "value": "Not given"
+       }
+      ],
+      "order_index": 2,
+      "question_text": "Fabián takes the 6:15 bus on Mondays.",
+      "question_type": "multiple_choice"
+     },
+     {
+      "correct_answer": "ND",
+      "options_json": [
+       {
+        "label": "V",
+        "value": "True"
+       },
+       {
+        "label": "F",
+        "value": "False"
+       },
+       {
+        "label": "ND",
+        "value": "Not given"
+       }
+      ],
+      "order_index": 3,
+      "question_text": "Fabián's cousin is nineteen years old.",
+      "question_type": "multiple_choice"
+     }
+    ],
+    "skill": "reading",
+    "title": "[BORRADOR] a2-u01 · Taking the Bus · Lectura 1",
+    "topic": "a2-u01"
+   },
+   {
+    "cefr_level": "A2",
+    "challenge_type": "multiple_choice",
+    "coins_reward": 10,
+    "description": "The first bus to San Gil leaves the Bucaramanga terminal at 4:30 a.m. Direct buses are more expensive than buses with stops, but they are faster. Rosa sells tickets at window three. She says the line at her window is longer on Fridays than on Mondays.",
+    "group_id": "00000000-0000-4000-8000-000000000001",
+    "max_attempts": 2,
+    "questions": [
+     {
+      "correct_answer": "F",
+      "options_json": [
+       {
+        "label": "V",
+        "value": "True"
+       },
+       {
+        "label": "F",
+        "value": "False"
+       },
+       {
+        "label": "ND",
+        "value": "Not given"
+       }
+      ],
+      "order_index": 1,
+      "question_text": "Rosa sells tickets at window five.",
+      "question_type": "multiple_choice"
+     },
+     {
+      "correct_answer": "V",
+      "options_json": [
+       {
+        "label": "V",
+        "value": "True"
+       },
+       {
+        "label": "F",
+        "value": "False"
+       },
+       {
+        "label": "ND",
+        "value": "Not given"
+       }
+      ],
+      "order_index": 2,
+      "question_text": "The first bus to San Gil leaves at 4:30 a.m.",
+      "question_type": "multiple_choice"
+     },
+     {
+      "correct_answer": "ND",
+      "options_json": [
+       {
+        "label": "V",
+        "value": "True"
+       },
+       {
+        "label": "F",
+        "value": "False"
+       },
+       {
+        "label": "ND",
+        "value": "Not given"
+       }
+      ],
+      "order_index": 3,
+      "question_text": "Rosa lives in San Gil.",
+      "question_type": "multiple_choice"
+     }
+    ],
+    "skill": "reading",
+    "title": "[BORRADOR] a2-u01 · Taking the Bus · Lectura 2",
+    "topic": "a2-u01"
+   }
+  ],
+  "firmada": [
+   {
+    "cefr_level": "A2",
+    "challenge_type": "multiple_choice",
+    "coins_reward": 10,
+    "description": "",
+    "group_id": "00000000-0000-4000-8000-000000000001",
+    "max_attempts": 2,
+    "questions": [
+     {
+      "correct_answer": "C",
+      "options_json": [
+       {
+        "label": "A",
+        "value": "faster"
+       },
+       {
+        "label": "B",
+        "value": "more fast"
+       },
+       {
+        "label": "C",
+        "value": "cheaper"
+       },
+       {
+        "label": "D",
+        "value": "more expensive"
+       }
+      ],
+      "order_index": 1,
+      "question_text": "A Metrolínea trip to the UIS costs 3,000 pesos, and a taxi costs 12,000. Both take 20 minutes. Metrolínea is ___ than a taxi.",
+      "question_type": "multiple_choice"
+     },
+     {
+      "correct_answer": "B",
+      "options_json": [
+       {
+        "label": "A",
+        "value": "doesn't have to buy"
+       },
+       {
+        "label": "B",
+        "value": "have to buy"
+       },
+       {
+        "label": "C",
+        "value": "don't have to buy"
+       },
+       {
+        "label": "D",
+        "value": "has to buy"
+       }
+      ],
+      "order_index": 2,
+      "question_text": "Drivers on the buses to San Gil don't sell tickets. So at the terminal, passengers ___ one at the window before they get on.",
+      "question_type": "multiple_choice"
+     }
+    ],
+    "skill": "grammar",
+    "title": "a2-u01 · Taking the Bus · Gramática 1 · original",
+    "topic": "a2-u01"
+   },
+   {
+    "cefr_level": "A2",
+    "challenge_type": "multiple_choice",
+    "coins_reward": 10,
+    "description": "",
+    "group_id": "00000000-0000-4000-8000-000000000001",
+    "max_attempts": 2,
+    "questions": [
+     {
+      "correct_answer": "A",
+      "options_json": [
+       {
+        "label": "A",
+        "value": "slower"
+       },
+       {
+        "label": "B",
+        "value": "earlier"
+       },
+       {
+        "label": "C",
+        "value": "more early"
+       },
+       {
+        "label": "D",
+        "value": "faster"
+       }
+      ],
+      "order_index": 1,
+      "question_text": "The 6:30 bus gets to the UIS in 25 minutes on Saturdays, but in 45 minutes on Mondays, at rush hour. On Mondays it is ___ than on Saturdays.",
+      "question_type": "multiple_choice"
+     },
+     {
+      "correct_answer": "D",
+      "options_json": [
+       {
+        "label": "A",
+        "value": "have to go"
+       },
+       {
+        "label": "B",
+        "value": "don't have to go"
+       },
+       {
+        "label": "C",
+        "value": "has to go"
+       },
+       {
+        "label": "D",
+        "value": "doesn't have to go"
+       }
+      ],
+      "order_index": 2,
+      "question_text": "Fabián already has his ticket in his hand, so he ___ to the window again.",
+      "question_type": "multiple_choice"
+     }
+    ],
+    "skill": "grammar",
+    "title": "a2-u01 · Taking the Bus · Gramática 2 · gemela",
+    "topic": "a2-u01"
+   },
+   {
+    "cefr_level": "A2",
+    "challenge_type": "multiple_choice",
+    "coins_reward": 10,
+    "description": "",
+    "group_id": "00000000-0000-4000-8000-000000000001",
+    "max_attempts": 2,
+    "questions": [
+     {
+      "correct_answer": "D",
+      "options_json": [
+       {
+        "label": "A",
+        "value": "more busy"
+       },
+       {
+        "label": "B",
+        "value": "busier"
+       },
+       {
+        "label": "C",
+        "value": "longer"
+       },
+       {
+        "label": "D",
+        "value": "shorter"
+       }
+      ],
+      "order_index": 1,
+      "question_text": "At the terminal, there are four people in line at window two and twelve at window five. The line at window two is ___ than the line at window five.",
+      "question_type": "multiple_choice"
+     },
+     {
+      "correct_answer": "A",
+      "options_json": [
+       {
+        "label": "A",
+        "value": "don't have to wait"
+       },
+       {
+        "label": "B",
+        "value": "has to wait"
+       },
+       {
+        "label": "C",
+        "value": "doesn't have to wait"
+       },
+       {
+        "label": "D",
+        "value": "have to wait"
+       }
+      ],
+      "order_index": 2,
+      "question_text": "Ramiro and Dayana have 30,000 pesos on their Metrolínea cards, so they ___ in line to recharge them today.",
+      "question_type": "multiple_choice"
+     }
+    ],
+    "skill": "grammar",
+    "title": "a2-u01 · Taking the Bus · Gramática 3 · repaso",
+    "topic": "a2-u01"
+   },
+   {
+    "cefr_level": "A2",
+    "challenge_type": "multiple_choice",
+    "coins_reward": 10,
+    "description": "",
+    "group_id": "00000000-0000-4000-8000-000000000001",
+    "max_attempts": 2,
+    "questions": [
+     {
+      "correct_answer": "B",
+      "options_json": [
+       {
+        "label": "A",
+        "value": "seat"
+       },
+       {
+        "label": "B",
+        "value": "fare"
+       },
+       {
+        "label": "C",
+        "value": "terminal"
+       },
+       {
+        "label": "D",
+        "value": "platform"
+       }
+      ],
+      "order_index": 1,
+      "question_text": "At the window, passengers pay the ___: 22,000 pesos for the bus with stops to San Gil.",
+      "question_type": "multiple_choice"
+     },
+     {
+      "correct_answer": "C",
+      "options_json": [
+       {
+        "label": "A",
+        "value": "get on"
+       },
+       {
+        "label": "B",
+        "value": "wait for"
+       },
+       {
+        "label": "C",
+        "value": "get off"
+       },
+       {
+        "label": "D",
+        "value": "miss"
+       }
+      ],
+      "order_index": 2,
+      "question_text": "Dayana's aunt lives in a small town before San Gil. On the bus with stops, Dayana tells the driver, 'I'd like to ___ there, please.'",
+      "question_type": "multiple_choice"
+     }
+    ],
+    "skill": "vocabulary",
+    "title": "a2-u01 · Taking the Bus · Vocabulario 1 · original",
+    "topic": "a2-u01"
+   },
+   {
+    "cefr_level": "A2",
+    "challenge_type": "multiple_choice",
+    "coins_reward": 10,
+    "description": "",
+    "group_id": "00000000-0000-4000-8000-000000000001",
+    "max_attempts": 2,
+    "questions": [
+     {
+      "correct_answer": "C",
+      "options_json": [
+       {
+        "label": "A",
+        "value": "drivers"
+       },
+       {
+        "label": "B",
+        "value": "platforms"
+       },
+       {
+        "label": "C",
+        "value": "passengers"
+       },
+       {
+        "label": "D",
+        "value": "stations"
+       }
+      ],
+      "order_index": 1,
+      "question_text": "Mr. Pinzón drives the 9:30 bus to San Gil. Today 30 ___ get on, and each one shows him a ticket.",
+      "question_type": "multiple_choice"
+     },
+     {
+      "correct_answer": "B",
+      "options_json": [
+       {
+        "label": "A",
+        "value": "gets on"
+       },
+       {
+        "label": "B",
+        "value": "misses"
+       },
+       {
+        "label": "C",
+        "value": "waits for"
+       },
+       {
+        "label": "D",
+        "value": "gets off"
+       }
+      ],
+      "order_index": 2,
+      "question_text": "The 9:30 bus to San Gil leaves on time, but Ramiro gets to the terminal at 9:40. He ___ it, so he takes the 10:00 bus.",
+      "question_type": "multiple_choice"
+     }
+    ],
+    "skill": "vocabulary",
+    "title": "a2-u01 · Taking the Bus · Vocabulario 2 · gemela",
+    "topic": "a2-u01"
+   },
+   {
+    "cefr_level": "A2",
+    "challenge_type": "multiple_choice",
+    "coins_reward": 10,
+    "description": "",
+    "group_id": "00000000-0000-4000-8000-000000000001",
+    "max_attempts": 2,
+    "questions": [
+     {
+      "correct_answer": "A",
+      "options_json": [
+       {
+        "label": "A",
+        "value": "route"
+       },
+       {
+        "label": "B",
+        "value": "ticket"
+       },
+       {
+        "label": "C",
+        "value": "card"
+       },
+       {
+        "label": "D",
+        "value": "driver"
+       }
+      ],
+      "order_index": 1,
+      "question_text": "The direct bus and the bus with stops leave from different platforms, but they use the same ___: the same roads to San Gil.",
+      "question_type": "multiple_choice"
+     },
+     {
+      "correct_answer": "D",
+      "options_json": [
+       {
+        "label": "A",
+        "value": "waiting for"
+       },
+       {
+        "label": "B",
+        "value": "missing"
+       },
+       {
+        "label": "C",
+        "value": "getting off"
+       },
+       {
+        "label": "D",
+        "value": "getting on"
+       }
+      ],
+      "order_index": 2,
+      "question_text": "Look! Ramiro is ___ the bus through the front door. Now he's showing his ticket to the driver and looking for a seat.",
+      "question_type": "multiple_choice"
+     }
+    ],
+    "skill": "vocabulary",
+    "title": "a2-u01 · Taking the Bus · Vocabulario 3 · repaso",
+    "topic": "a2-u01"
+   },
+   {
+    "cefr_level": "A2",
+    "challenge_type": "multiple_choice",
+    "coins_reward": 10,
+    "description": "Every Monday, Fabián takes Metrolínea to the UIS. He always recharges his card on Fridays, so he doesn't have to wait in line. The 6:30 a.m. bus is usually crowded, so he takes the 5:45 one. On weekends, Fabián sometimes visits his cousin in San Gil by intercity bus.",
+    "group_id": "00000000-0000-4000-8000-000000000001",
+    "max_attempts": 2,
+    "questions": [
+     {
+      "correct_answer": "V",
+      "options_json": [
+       {
+        "label": "V",
+        "value": "True"
+       },
+       {
+        "label": "F",
+        "value": "False"
+       },
+       {
+        "label": "ND",
+        "value": "Not given"
+       }
+      ],
+      "order_index": 1,
+      "question_text": "Fabián recharges his card on Fridays.",
+      "question_type": "multiple_choice"
+     },
+     {
+      "correct_answer": "F",
+      "options_json": [
+       {
+        "label": "V",
+        "value": "True"
+       },
+       {
+        "label": "F",
+        "value": "False"
+       },
+       {
+        "label": "ND",
+        "value": "Not given"
+       }
+      ],
+      "order_index": 2,
+      "question_text": "Fabián takes the 6:15 bus on Mondays.",
+      "question_type": "multiple_choice"
+     },
+     {
+      "correct_answer": "ND",
+      "options_json": [
+       {
+        "label": "V",
+        "value": "True"
+       },
+       {
+        "label": "F",
+        "value": "False"
+       },
+       {
+        "label": "ND",
+        "value": "Not given"
+       }
+      ],
+      "order_index": 3,
+      "question_text": "Fabián's cousin is nineteen years old.",
+      "question_type": "multiple_choice"
+     }
+    ],
+    "skill": "reading",
+    "title": "a2-u01 · Taking the Bus · Lectura 1",
+    "topic": "a2-u01"
+   },
+   {
+    "cefr_level": "A2",
+    "challenge_type": "multiple_choice",
+    "coins_reward": 10,
+    "description": "The first bus to San Gil leaves the Bucaramanga terminal at 4:30 a.m. Direct buses are more expensive than buses with stops, but they are faster. Rosa sells tickets at window three. She says the line at her window is longer on Fridays than on Mondays.",
+    "group_id": "00000000-0000-4000-8000-000000000001",
+    "max_attempts": 2,
+    "questions": [
+     {
+      "correct_answer": "F",
+      "options_json": [
+       {
+        "label": "V",
+        "value": "True"
+       },
+       {
+        "label": "F",
+        "value": "False"
+       },
+       {
+        "label": "ND",
+        "value": "Not given"
+       }
+      ],
+      "order_index": 1,
+      "question_text": "Rosa sells tickets at window five.",
+      "question_type": "multiple_choice"
+     },
+     {
+      "correct_answer": "V",
+      "options_json": [
+       {
+        "label": "V",
+        "value": "True"
+       },
+       {
+        "label": "F",
+        "value": "False"
+       },
+       {
+        "label": "ND",
+        "value": "Not given"
+       }
+      ],
+      "order_index": 2,
+      "question_text": "The first bus to San Gil leaves at 4:30 a.m.",
+      "question_type": "multiple_choice"
+     },
+     {
+      "correct_answer": "ND",
+      "options_json": [
+       {
+        "label": "V",
+        "value": "True"
+       },
+       {
+        "label": "F",
+        "value": "False"
+       },
+       {
+        "label": "ND",
+        "value": "Not given"
+       }
+      ],
+      "order_index": 3,
+      "question_text": "Rosa lives in San Gil.",
+      "question_type": "multiple_choice"
+     }
+    ],
+    "skill": "reading",
+    "title": "a2-u01 · Taking the Bus · Lectura 2",
+    "topic": "a2-u01"
+   }
+  ]
+ },
+ "b1-u01-job-interview": {
+  "borrador": [
+   {
+    "cefr_level": "B1",
+    "challenge_type": "multiple_choice",
+    "coins_reward": 10,
+    "description": "",
+    "group_id": "00000000-0000-4000-8000-000000000001",
+    "max_attempts": 2,
+    "questions": [
+     {
+      "correct_answer": "C",
+      "options_json": [
+       {
+        "label": "A",
+        "value": "is working"
+       },
+       {
+        "label": "B",
+        "value": "works"
+       },
+       {
+        "label": "C",
+        "value": "has worked"
+       },
+       {
+        "label": "D",
+        "value": "worked"
+       }
+      ],
+      "order_index": 1,
+      "question_text": "Mrs. Cadena, Leidy's mentor, ___ at Café del Oriente since 2020.",
+      "question_type": "multiple_choice"
+     },
+     {
+      "correct_answer": "B",
+      "options_json": [
+       {
+        "label": "A",
+        "value": "the interns are having"
+       },
+       {
+        "label": "B",
+        "value": "the interns have"
+       },
+       {
+        "label": "C",
+        "value": "the interns had"
+       },
+       {
+        "label": "D",
+        "value": "the interns have had"
+       }
+      ],
+      "order_index": 2,
+      "question_text": "Leidy asks Mrs. Cadena: 'Could you tell me where ___ lunch every day? I'd like to join them tomorrow.'",
+      "question_type": "multiple_choice"
+     }
+    ],
+    "skill": "grammar",
+    "title": "[BORRADOR] b1-u01 · Your First Job Interview · Gramática 1 · original",
+    "topic": "b1-u01"
+   },
+   {
+    "cefr_level": "B1",
+    "challenge_type": "multiple_choice",
+    "coins_reward": 10,
+    "description": "",
+    "group_id": "00000000-0000-4000-8000-000000000001",
+    "max_attempts": 2,
+    "questions": [
+     {
+      "correct_answer": "A",
+      "options_json": [
+       {
+        "label": "A",
+        "value": "interviews"
+       },
+       {
+        "label": "B",
+        "value": "has interviewed"
+       },
+       {
+        "label": "C",
+        "value": "is interviewing"
+       },
+       {
+        "label": "D",
+        "value": "interviewed"
+       }
+      ],
+      "order_index": 1,
+      "question_text": "Leidy's little brother asks what a human resources manager does. Leidy answers: 'In any company, he or she ___ the candidates and chooses the new workers.'",
+      "question_type": "multiple_choice"
+     },
+     {
+      "correct_answer": "D",
+      "options_json": [
+       {
+        "label": "A",
+        "value": "you are working"
+       },
+       {
+        "label": "B",
+        "value": "you have worked"
+       },
+       {
+        "label": "C",
+        "value": "you work"
+       },
+       {
+        "label": "D",
+        "value": "you worked"
+       }
+      ],
+      "order_index": 2,
+      "question_text": "Mrs. Cadena had a job at a bank before she came to Café del Oriente in 2020. Leidy asks her: 'Could you tell me how long ___ at the bank?'",
+      "question_type": "multiple_choice"
+     }
+    ],
+    "skill": "grammar",
+    "title": "[BORRADOR] b1-u01 · Your First Job Interview · Gramática 2 · gemela",
+    "topic": "b1-u01"
+   },
+   {
+    "cefr_level": "B1",
+    "challenge_type": "multiple_choice",
+    "coins_reward": 10,
+    "description": "",
+    "group_id": "00000000-0000-4000-8000-000000000001",
+    "max_attempts": 2,
+    "questions": [
+     {
+      "correct_answer": "D",
+      "options_json": [
+       {
+        "label": "A",
+        "value": "has talked"
+       },
+       {
+        "label": "B",
+        "value": "talked"
+       },
+       {
+        "label": "C",
+        "value": "talks"
+       },
+       {
+        "label": "D",
+        "value": "is talking"
+       }
+      ],
+      "order_index": 1,
+      "question_text": "Mr. Rangel can't come to the phone right now: he ___ with a candidate in his office.",
+      "question_type": "multiple_choice"
+     },
+     {
+      "correct_answer": "A",
+      "options_json": [
+       {
+        "label": "A",
+        "value": "she is doing"
+       },
+       {
+        "label": "B",
+        "value": "she does"
+       },
+       {
+        "label": "C",
+        "value": "she did"
+       },
+       {
+        "label": "D",
+        "value": "she has done"
+       }
+      ],
+      "order_index": 2,
+      "question_text": "Mrs. Cadena's door is closed. Josmar asks Mr. Rangel: 'Could you tell me what ___ at the moment? I need to ask her something.'",
+      "question_type": "multiple_choice"
+     }
+    ],
+    "skill": "grammar",
+    "title": "[BORRADOR] b1-u01 · Your First Job Interview · Gramática 3 · repaso",
+    "topic": "b1-u01"
+   },
+   {
+    "cefr_level": "B1",
+    "challenge_type": "multiple_choice",
+    "coins_reward": 10,
+    "description": "",
+    "group_id": "00000000-0000-4000-8000-000000000001",
+    "max_attempts": 2,
+    "questions": [
+     {
+      "correct_answer": "D",
+      "options_json": [
+       {
+        "label": "A",
+        "value": "mistake"
+       },
+       {
+        "label": "B",
+        "value": "fear"
+       },
+       {
+        "label": "C",
+        "value": "complaint"
+       },
+       {
+        "label": "D",
+        "value": "weakness"
+       }
+      ],
+      "order_index": 1,
+      "question_text": "Dayana often forgets dates and times. In her interview, she says honestly: 'Organization is my biggest ___, but now I use a calendar.'",
+      "question_type": "multiple_choice"
+     },
+     {
+      "correct_answer": "A",
+      "options_json": [
+       {
+        "label": "A",
+        "value": "internship"
+       },
+       {
+        "label": "B",
+        "value": "interview"
+       },
+       {
+        "label": "C",
+        "value": "employer"
+       },
+       {
+        "label": "D",
+        "value": "candidate"
+       }
+      ],
+      "order_index": 2,
+      "question_text": "Most SENA students do a six-month ___ in a company before finishing their technical program.",
+      "question_type": "multiple_choice"
+     }
+    ],
+    "skill": "vocabulary",
+    "title": "[BORRADOR] b1-u01 · Your First Job Interview · Vocabulario 1 · original",
+    "topic": "b1-u01"
+   },
+   {
+    "cefr_level": "B1",
+    "challenge_type": "multiple_choice",
+    "coins_reward": 10,
+    "description": "",
+    "group_id": "00000000-0000-4000-8000-000000000001",
+    "max_attempts": 2,
+    "questions": [
+     {
+      "correct_answer": "B",
+      "options_json": [
+       {
+        "label": "A",
+        "value": "strengths"
+       },
+       {
+        "label": "B",
+        "value": "candidates"
+       },
+       {
+        "label": "C",
+        "value": "experiences"
+       },
+       {
+        "label": "D",
+        "value": "internships"
+       }
+      ],
+      "order_index": 1,
+      "question_text": "Mr. Rangel is interviewing three ___ this week, and only one of them will get the internship.",
+      "question_type": "multiple_choice"
+     },
+     {
+      "correct_answer": "C",
+      "options_json": [
+       {
+        "label": "A",
+        "value": "teamwork"
+       },
+       {
+        "label": "B",
+        "value": "patience"
+       },
+       {
+        "label": "C",
+        "value": "experience"
+       },
+       {
+        "label": "D",
+        "value": "confidence"
+       }
+      ],
+      "order_index": 2,
+      "question_text": "Leidy works alone at the cash register and still gets nervous and impatient when the line is long. But after a year as a cashier, she has useful ___: she knows what customers usually ask for.",
+      "question_type": "multiple_choice"
+     }
+    ],
+    "skill": "vocabulary",
+    "title": "[BORRADOR] b1-u01 · Your First Job Interview · Vocabulario 2 · gemela",
+    "topic": "b1-u01"
+   },
+   {
+    "cefr_level": "B1",
+    "challenge_type": "multiple_choice",
+    "coins_reward": 10,
+    "description": "",
+    "group_id": "00000000-0000-4000-8000-000000000001",
+    "max_attempts": 2,
+    "questions": [
+     {
+      "correct_answer": "C",
+      "options_json": [
+       {
+        "label": "A",
+        "value": "intern"
+       },
+       {
+        "label": "B",
+        "value": "mentor"
+       },
+       {
+        "label": "C",
+        "value": "employer"
+       },
+       {
+        "label": "D",
+        "value": "candidate"
+       }
+      ],
+      "order_index": 1,
+      "question_text": "Mrs. Mantilla owns the pharmacy where Yohan works. She gave him the job and pays him every Friday, but an older worker trains him. Mrs. Mantilla is Yohan's ___.",
+      "question_type": "multiple_choice"
+     },
+     {
+      "correct_answer": "B",
+      "options_json": [
+       {
+        "label": "A",
+        "value": "available"
+       },
+       {
+        "label": "B",
+        "value": "reliable"
+       },
+       {
+        "label": "C",
+        "value": "calm"
+       },
+       {
+        "label": "D",
+        "value": "experienced"
+       }
+      ],
+      "order_index": 2,
+      "question_text": "Yohan is new at the pharmacy, gets nervous easily and has classes every morning. But when he promises something, he does it. His manager says he is very ___.",
+      "question_type": "multiple_choice"
+     }
+    ],
+    "skill": "vocabulary",
+    "title": "[BORRADOR] b1-u01 · Your First Job Interview · Vocabulario 3 · repaso",
+    "topic": "b1-u01"
+   },
+   {
+    "cefr_level": "B1",
+    "challenge_type": "multiple_choice",
+    "coins_reward": 10,
+    "description": "On the morning of her interview, Leidy arrived at Café del Oriente twenty minutes early. She has worked as a part-time cashier since last year, so she wasn't a complete beginner, but she still felt nervous. Mr. Rangel welcomed her warmly and offered her a cup of coffee. During the interview, he asked about her studies and her experience, and Leidy answered every question with confidence. She didn't ask about the salary, but she did ask an indirect question about the schedule. After thirty minutes, Mr. Rangel thanked her and said, 'We will call you this week.'",
+    "group_id": "00000000-0000-4000-8000-000000000001",
+    "max_attempts": 2,
+    "questions": [
+     {
+      "correct_answer": "F",
+      "options_json": [
+       {
+        "label": "V",
+        "value": "True"
+       },
+       {
+        "label": "F",
+        "value": "False"
+       },
+       {
+        "label": "ND",
+        "value": "Not given"
+       }
+      ],
+      "order_index": 1,
+      "question_text": "Leidy arrived ten minutes early for her interview.",
+      "question_type": "multiple_choice"
+     },
+     {
+      "correct_answer": "V",
+      "options_json": [
+       {
+        "label": "V",
+        "value": "True"
+       },
+       {
+        "label": "F",
+        "value": "False"
+       },
+       {
+        "label": "ND",
+        "value": "Not given"
+       }
+      ],
+      "order_index": 2,
+      "question_text": "Mr. Rangel offered Leidy a cup of coffee.",
+      "question_type": "multiple_choice"
+     },
+     {
+      "correct_answer": "ND",
+      "options_json": [
+       {
+        "label": "V",
+        "value": "True"
+       },
+       {
+        "label": "F",
+        "value": "False"
+       },
+       {
+        "label": "ND",
+        "value": "Not given"
+       }
+      ],
+      "order_index": 3,
+      "question_text": "Leidy went to the interview by bus.",
+      "question_type": "multiple_choice"
+     }
+    ],
+    "skill": "reading",
+    "title": "[BORRADOR] b1-u01 · Your First Job Interview · Lectura 1",
+    "topic": "b1-u01"
+   },
+   {
+    "cefr_level": "B1",
+    "challenge_type": "multiple_choice",
+    "coins_reward": 10,
+    "description": "Two days after the interview, Leidy was at her cashier job when her phone rang. It was Mr. Rangel from Café del Oriente. He said the team liked her answers about teamwork, and he offered her the internship. Leidy accepted at once and asked one last indirect question: 'I'd like to know if I could start the following Monday.' Mr. Rangel said yes. That evening, Leidy called her friend Dayana to tell her the good news.",
+    "group_id": "00000000-0000-4000-8000-000000000001",
+    "max_attempts": 2,
+    "questions": [
+     {
+      "correct_answer": "F",
+      "options_json": [
+       {
+        "label": "V",
+        "value": "True"
+       },
+       {
+        "label": "F",
+        "value": "False"
+       },
+       {
+        "label": "ND",
+        "value": "Not given"
+       }
+      ],
+      "order_index": 1,
+      "question_text": "Mr. Rangel called Leidy three days after the interview.",
+      "question_type": "multiple_choice"
+     },
+     {
+      "correct_answer": "V",
+      "options_json": [
+       {
+        "label": "V",
+        "value": "True"
+       },
+       {
+        "label": "F",
+        "value": "False"
+       },
+       {
+        "label": "ND",
+        "value": "Not given"
+       }
+      ],
+      "order_index": 2,
+      "question_text": "Leidy asked to start the following Monday.",
+      "question_type": "multiple_choice"
+     },
+     {
+      "correct_answer": "ND",
+      "options_json": [
+       {
+        "label": "V",
+        "value": "True"
+       },
+       {
+        "label": "F",
+        "value": "False"
+       },
+       {
+        "label": "ND",
+        "value": "Not given"
+       }
+      ],
+      "order_index": 3,
+      "question_text": "Leidy's friend Dayana lives in Floridablanca.",
+      "question_type": "multiple_choice"
+     }
+    ],
+    "skill": "reading",
+    "title": "[BORRADOR] b1-u01 · Your First Job Interview · Lectura 2",
+    "topic": "b1-u01"
+   }
+  ],
+  "firmada": [
+   {
+    "cefr_level": "B1",
+    "challenge_type": "multiple_choice",
+    "coins_reward": 10,
+    "description": "",
+    "group_id": "00000000-0000-4000-8000-000000000001",
+    "max_attempts": 2,
+    "questions": [
+     {
+      "correct_answer": "C",
+      "options_json": [
+       {
+        "label": "A",
+        "value": "is working"
+       },
+       {
+        "label": "B",
+        "value": "works"
+       },
+       {
+        "label": "C",
+        "value": "has worked"
+       },
+       {
+        "label": "D",
+        "value": "worked"
+       }
+      ],
+      "order_index": 1,
+      "question_text": "Mrs. Cadena, Leidy's mentor, ___ at Café del Oriente since 2020.",
+      "question_type": "multiple_choice"
+     },
+     {
+      "correct_answer": "B",
+      "options_json": [
+       {
+        "label": "A",
+        "value": "the interns are having"
+       },
+       {
+        "label": "B",
+        "value": "the interns have"
+       },
+       {
+        "label": "C",
+        "value": "the interns had"
+       },
+       {
+        "label": "D",
+        "value": "the interns have had"
+       }
+      ],
+      "order_index": 2,
+      "question_text": "Leidy asks Mrs. Cadena: 'Could you tell me where ___ lunch every day? I'd like to join them tomorrow.'",
+      "question_type": "multiple_choice"
+     }
+    ],
+    "skill": "grammar",
+    "title": "b1-u01 · Your First Job Interview · Gramática 1 · original",
+    "topic": "b1-u01"
+   },
+   {
+    "cefr_level": "B1",
+    "challenge_type": "multiple_choice",
+    "coins_reward": 10,
+    "description": "",
+    "group_id": "00000000-0000-4000-8000-000000000001",
+    "max_attempts": 2,
+    "questions": [
+     {
+      "correct_answer": "A",
+      "options_json": [
+       {
+        "label": "A",
+        "value": "interviews"
+       },
+       {
+        "label": "B",
+        "value": "has interviewed"
+       },
+       {
+        "label": "C",
+        "value": "is interviewing"
+       },
+       {
+        "label": "D",
+        "value": "interviewed"
+       }
+      ],
+      "order_index": 1,
+      "question_text": "Leidy's little brother asks what a human resources manager does. Leidy answers: 'In any company, he or she ___ the candidates and chooses the new workers.'",
+      "question_type": "multiple_choice"
+     },
+     {
+      "correct_answer": "D",
+      "options_json": [
+       {
+        "label": "A",
+        "value": "you are working"
+       },
+       {
+        "label": "B",
+        "value": "you have worked"
+       },
+       {
+        "label": "C",
+        "value": "you work"
+       },
+       {
+        "label": "D",
+        "value": "you worked"
+       }
+      ],
+      "order_index": 2,
+      "question_text": "Mrs. Cadena had a job at a bank before she came to Café del Oriente in 2020. Leidy asks her: 'Could you tell me how long ___ at the bank?'",
+      "question_type": "multiple_choice"
+     }
+    ],
+    "skill": "grammar",
+    "title": "b1-u01 · Your First Job Interview · Gramática 2 · gemela",
+    "topic": "b1-u01"
+   },
+   {
+    "cefr_level": "B1",
+    "challenge_type": "multiple_choice",
+    "coins_reward": 10,
+    "description": "",
+    "group_id": "00000000-0000-4000-8000-000000000001",
+    "max_attempts": 2,
+    "questions": [
+     {
+      "correct_answer": "D",
+      "options_json": [
+       {
+        "label": "A",
+        "value": "has talked"
+       },
+       {
+        "label": "B",
+        "value": "talked"
+       },
+       {
+        "label": "C",
+        "value": "talks"
+       },
+       {
+        "label": "D",
+        "value": "is talking"
+       }
+      ],
+      "order_index": 1,
+      "question_text": "Mr. Rangel can't come to the phone right now: he ___ with a candidate in his office.",
+      "question_type": "multiple_choice"
+     },
+     {
+      "correct_answer": "A",
+      "options_json": [
+       {
+        "label": "A",
+        "value": "she is doing"
+       },
+       {
+        "label": "B",
+        "value": "she does"
+       },
+       {
+        "label": "C",
+        "value": "she did"
+       },
+       {
+        "label": "D",
+        "value": "she has done"
+       }
+      ],
+      "order_index": 2,
+      "question_text": "Mrs. Cadena's door is closed. Josmar asks Mr. Rangel: 'Could you tell me what ___ at the moment? I need to ask her something.'",
+      "question_type": "multiple_choice"
+     }
+    ],
+    "skill": "grammar",
+    "title": "b1-u01 · Your First Job Interview · Gramática 3 · repaso",
+    "topic": "b1-u01"
+   },
+   {
+    "cefr_level": "B1",
+    "challenge_type": "multiple_choice",
+    "coins_reward": 10,
+    "description": "",
+    "group_id": "00000000-0000-4000-8000-000000000001",
+    "max_attempts": 2,
+    "questions": [
+     {
+      "correct_answer": "D",
+      "options_json": [
+       {
+        "label": "A",
+        "value": "mistake"
+       },
+       {
+        "label": "B",
+        "value": "fear"
+       },
+       {
+        "label": "C",
+        "value": "complaint"
+       },
+       {
+        "label": "D",
+        "value": "weakness"
+       }
+      ],
+      "order_index": 1,
+      "question_text": "Dayana often forgets dates and times. In her interview, she says honestly: 'Organization is my biggest ___, but now I use a calendar.'",
+      "question_type": "multiple_choice"
+     },
+     {
+      "correct_answer": "A",
+      "options_json": [
+       {
+        "label": "A",
+        "value": "internship"
+       },
+       {
+        "label": "B",
+        "value": "interview"
+       },
+       {
+        "label": "C",
+        "value": "employer"
+       },
+       {
+        "label": "D",
+        "value": "candidate"
+       }
+      ],
+      "order_index": 2,
+      "question_text": "Most SENA students do a six-month ___ in a company before finishing their technical program.",
+      "question_type": "multiple_choice"
+     }
+    ],
+    "skill": "vocabulary",
+    "title": "b1-u01 · Your First Job Interview · Vocabulario 1 · original",
+    "topic": "b1-u01"
+   },
+   {
+    "cefr_level": "B1",
+    "challenge_type": "multiple_choice",
+    "coins_reward": 10,
+    "description": "",
+    "group_id": "00000000-0000-4000-8000-000000000001",
+    "max_attempts": 2,
+    "questions": [
+     {
+      "correct_answer": "B",
+      "options_json": [
+       {
+        "label": "A",
+        "value": "strengths"
+       },
+       {
+        "label": "B",
+        "value": "candidates"
+       },
+       {
+        "label": "C",
+        "value": "experiences"
+       },
+       {
+        "label": "D",
+        "value": "internships"
+       }
+      ],
+      "order_index": 1,
+      "question_text": "Mr. Rangel is interviewing three ___ this week, and only one of them will get the internship.",
+      "question_type": "multiple_choice"
+     },
+     {
+      "correct_answer": "C",
+      "options_json": [
+       {
+        "label": "A",
+        "value": "teamwork"
+       },
+       {
+        "label": "B",
+        "value": "patience"
+       },
+       {
+        "label": "C",
+        "value": "experience"
+       },
+       {
+        "label": "D",
+        "value": "confidence"
+       }
+      ],
+      "order_index": 2,
+      "question_text": "Leidy works alone at the cash register and still gets nervous and impatient when the line is long. But after a year as a cashier, she has useful ___: she knows what customers usually ask for.",
+      "question_type": "multiple_choice"
+     }
+    ],
+    "skill": "vocabulary",
+    "title": "b1-u01 · Your First Job Interview · Vocabulario 2 · gemela",
+    "topic": "b1-u01"
+   },
+   {
+    "cefr_level": "B1",
+    "challenge_type": "multiple_choice",
+    "coins_reward": 10,
+    "description": "",
+    "group_id": "00000000-0000-4000-8000-000000000001",
+    "max_attempts": 2,
+    "questions": [
+     {
+      "correct_answer": "C",
+      "options_json": [
+       {
+        "label": "A",
+        "value": "intern"
+       },
+       {
+        "label": "B",
+        "value": "mentor"
+       },
+       {
+        "label": "C",
+        "value": "employer"
+       },
+       {
+        "label": "D",
+        "value": "candidate"
+       }
+      ],
+      "order_index": 1,
+      "question_text": "Mrs. Mantilla owns the pharmacy where Yohan works. She gave him the job and pays him every Friday, but an older worker trains him. Mrs. Mantilla is Yohan's ___.",
+      "question_type": "multiple_choice"
+     },
+     {
+      "correct_answer": "B",
+      "options_json": [
+       {
+        "label": "A",
+        "value": "available"
+       },
+       {
+        "label": "B",
+        "value": "reliable"
+       },
+       {
+        "label": "C",
+        "value": "calm"
+       },
+       {
+        "label": "D",
+        "value": "experienced"
+       }
+      ],
+      "order_index": 2,
+      "question_text": "Yohan is new at the pharmacy, gets nervous easily and has classes every morning. But when he promises something, he does it. His manager says he is very ___.",
+      "question_type": "multiple_choice"
+     }
+    ],
+    "skill": "vocabulary",
+    "title": "b1-u01 · Your First Job Interview · Vocabulario 3 · repaso",
+    "topic": "b1-u01"
+   },
+   {
+    "cefr_level": "B1",
+    "challenge_type": "multiple_choice",
+    "coins_reward": 10,
+    "description": "On the morning of her interview, Leidy arrived at Café del Oriente twenty minutes early. She has worked as a part-time cashier since last year, so she wasn't a complete beginner, but she still felt nervous. Mr. Rangel welcomed her warmly and offered her a cup of coffee. During the interview, he asked about her studies and her experience, and Leidy answered every question with confidence. She didn't ask about the salary, but she did ask an indirect question about the schedule. After thirty minutes, Mr. Rangel thanked her and said, 'We will call you this week.'",
+    "group_id": "00000000-0000-4000-8000-000000000001",
+    "max_attempts": 2,
+    "questions": [
+     {
+      "correct_answer": "F",
+      "options_json": [
+       {
+        "label": "V",
+        "value": "True"
+       },
+       {
+        "label": "F",
+        "value": "False"
+       },
+       {
+        "label": "ND",
+        "value": "Not given"
+       }
+      ],
+      "order_index": 1,
+      "question_text": "Leidy arrived ten minutes early for her interview.",
+      "question_type": "multiple_choice"
+     },
+     {
+      "correct_answer": "V",
+      "options_json": [
+       {
+        "label": "V",
+        "value": "True"
+       },
+       {
+        "label": "F",
+        "value": "False"
+       },
+       {
+        "label": "ND",
+        "value": "Not given"
+       }
+      ],
+      "order_index": 2,
+      "question_text": "Mr. Rangel offered Leidy a cup of coffee.",
+      "question_type": "multiple_choice"
+     },
+     {
+      "correct_answer": "ND",
+      "options_json": [
+       {
+        "label": "V",
+        "value": "True"
+       },
+       {
+        "label": "F",
+        "value": "False"
+       },
+       {
+        "label": "ND",
+        "value": "Not given"
+       }
+      ],
+      "order_index": 3,
+      "question_text": "Leidy went to the interview by bus.",
+      "question_type": "multiple_choice"
+     }
+    ],
+    "skill": "reading",
+    "title": "b1-u01 · Your First Job Interview · Lectura 1",
+    "topic": "b1-u01"
+   },
+   {
+    "cefr_level": "B1",
+    "challenge_type": "multiple_choice",
+    "coins_reward": 10,
+    "description": "Two days after the interview, Leidy was at her cashier job when her phone rang. It was Mr. Rangel from Café del Oriente. He said the team liked her answers about teamwork, and he offered her the internship. Leidy accepted at once and asked one last indirect question: 'I'd like to know if I could start the following Monday.' Mr. Rangel said yes. That evening, Leidy called her friend Dayana to tell her the good news.",
+    "group_id": "00000000-0000-4000-8000-000000000001",
+    "max_attempts": 2,
+    "questions": [
+     {
+      "correct_answer": "F",
+      "options_json": [
+       {
+        "label": "V",
+        "value": "True"
+       },
+       {
+        "label": "F",
+        "value": "False"
+       },
+       {
+        "label": "ND",
+        "value": "Not given"
+       }
+      ],
+      "order_index": 1,
+      "question_text": "Mr. Rangel called Leidy three days after the interview.",
+      "question_type": "multiple_choice"
+     },
+     {
+      "correct_answer": "V",
+      "options_json": [
+       {
+        "label": "V",
+        "value": "True"
+       },
+       {
+        "label": "F",
+        "value": "False"
+       },
+       {
+        "label": "ND",
+        "value": "Not given"
+       }
+      ],
+      "order_index": 2,
+      "question_text": "Leidy asked to start the following Monday.",
+      "question_type": "multiple_choice"
+     },
+     {
+      "correct_answer": "ND",
+      "options_json": [
+       {
+        "label": "V",
+        "value": "True"
+       },
+       {
+        "label": "F",
+        "value": "False"
+       },
+       {
+        "label": "ND",
+        "value": "Not given"
+       }
+      ],
+      "order_index": 3,
+      "question_text": "Leidy's friend Dayana lives in Floridablanca.",
+      "question_type": "multiple_choice"
+     }
+    ],
+    "skill": "reading",
+    "title": "b1-u01 · Your First Job Interview · Lectura 2",
+    "topic": "b1-u01"
+   }
+  ]
+ }
+}

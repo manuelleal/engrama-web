@@ -1,0 +1,762 @@
+{
+  "id": "b1-u01",
+  "nivel": "B1",
+  "titulo": "Your First Job Interview",
+  "situacion": "Leidy, a SENA student who has worked as a part-time cashier since last year, interviews with Mr. Rangel for the internship of her practical stage at a Bucaramanga company; Café del Oriente calls her two days later to offer it.",
+  "puedo_hacer": [
+    "I can talk about my studies and work experience using the present perfect with for and since.",
+    "I can ask polite indirect questions in a job interview.",
+    "I can understand an article with advice for a first job interview.",
+    "I can write a short email to apply for an internship."
+  ],
+  "contenido": {
+    "lectura": {
+      "genero": "artículo (columna de consejos para la primera entrevista)",
+      "texto": "Ready for Your First Job Interview?\nEvery semester, SENA students across Bucaramanga apply for their etapa productiva, the internship that closes their technical program. For many, it starts with a job interview, and that first interview can feel like the hardest exam of the whole course.\nLeidy, a systems student, knows the feeling well. Last week she had an interview with Mr. Rangel, the human resources manager at Café del Oriente, a coffee export company near the Parque Industrial. The company needed a candidate available from Monday to Friday. \"I've wanted to work in an office since I started SENA,\" Leidy says, \"so this internship is important for me.\"\nOur careers office asked local employers what makes a candidate stand out. Here is their advice.\nFirst, know your skills. Employers want short, clear answers about your strengths and your experience, not a long speech. If you have worked before, even in a small job, mention it: \"I have worked as a cashier for eight months\" sounds more confident than \"I worked once.\"\nSecond, be honest about your weaknesses too. Every candidate has one. Instead of saying \"I don't have any,\" try: \"My biggest weakness is public speaking, but I'm working on it in my English classes.\"\nThird, ask questions, but ask them the right way. A direct question like \"What does the company do?\" can sound too informal in an interview. Try an indirect question instead: \"Could you tell me what the company's main products are?\" or \"I'd like to know if the internship includes transport.\" These questions show respect and interest at the same time.\nFinally, ask about the team. \"How long have you offered internships to SENA students?\" is a smart question: the answer tells you if the employer is reliable and if teamwork really matters there.\nLeidy left her interview feeling calm. Mr. Rangel asked her, \"How long have you studied English?\" and she answered, \"I've studied English for three years, and I've also used it in customer service.\" Then she asked two indirect questions of her own: \"Could you tell me what a normal day at the office looks like?\" and \"I'd like to know if there's a mentor for new interns.\" Two days later, Café del Oriente called: she got the internship.",
+      "palabras": 377
+    },
+    "escucha": {
+      "hablantes": [
+        "Mr. Rangel",
+        "Leidy"
+      ],
+      "guion": "Mr. Rangel: Good morning, Leidy. Please, sit down. Thank you for coming.\nLeidy: Good morning, Mr. Rangel. Thank you for the opportunity.\nMr. Rangel: So, tell me about yourself. How long have you studied at SENA?\nLeidy: I've studied Systems Analysis for almost two years now. I finish my technical program in November.\nMr. Rangel: Good. And have you worked before?\nLeidy: Yes, I have. I've worked as a part-time cashier since last year, so I already know how to deal with customers.\nMr. Rangel: That's useful for us. Our office needs someone reliable and available every weekday morning.\nLeidy: I understand. I'm free from Monday to Friday, from seven to one.\nMr. Rangel: Perfect. What would you say is your biggest strength?\nLeidy: I think it's teamwork. I always help my classmates with our group projects.\nMr. Rangel: And your weakness?\nLeidy: Honestly, public speaking. But I'm improving it in my English class.\nLeidy: Could you tell me what the intern usually does here at Café del Oriente?\nMr. Rangel: Sure. Interns help with orders, emails and a little bit of everything.\nLeidy: And I'd like to know if there's someone who can help new interns at the start.\nMr. Rangel: Yes, every intern has a mentor for the first month.\nLeidy: That's great to hear. Thank you very much, Mr. Rangel.\nMr. Rangel: Thank you, Leidy. We'll call you this week.",
+      "segundos_estimados": 92
+    },
+    "vocabulario": [
+      {
+        "en": "apply (for)",
+        "def_en": "to formally ask for a job, a course or a document",
+        "es": "postularse, aplicar",
+        "ejemplo": "Every semester, SENA students across Bucaramanga apply for their etapa productiva, the internship that closes their technical program."
+      },
+      {
+        "en": "candidate",
+        "def_en": "a person who wants a job and is being considered for it",
+        "es": "candidato, candidata",
+        "ejemplo": "Our careers office asked local employers what makes a candidate stand out."
+      },
+      {
+        "en": "skills",
+        "def_en": "things a person knows how to do well",
+        "es": "habilidades",
+        "ejemplo": "First, know your skills."
+      },
+      {
+        "en": "strength",
+        "def_en": "something a person is good at",
+        "es": "fortaleza",
+        "ejemplo": "What would you say is your biggest strength?"
+      },
+      {
+        "en": "weakness",
+        "def_en": "something a person is not very good at",
+        "es": "debilidad",
+        "ejemplo": "Second, be honest about your weaknesses too."
+      },
+      {
+        "en": "internship",
+        "def_en": "a short period of supervised work, often for a student",
+        "es": "pasantía, práctica laboral",
+        "ejemplo": "Two days later, Café del Oriente called: she got the internship."
+      },
+      {
+        "en": "available",
+        "def_en": "free to work or do something at a certain time",
+        "es": "disponible",
+        "ejemplo": "The company needed a candidate available from Monday to Friday."
+      },
+      {
+        "en": "reliable",
+        "def_en": "someone you can trust to do things well",
+        "es": "confiable",
+        "ejemplo": "Our office needs someone reliable and available every weekday morning."
+      },
+      {
+        "en": "teamwork",
+        "def_en": "people working together toward the same goal",
+        "es": "trabajo en equipo",
+        "ejemplo": "I think it's teamwork."
+      },
+      {
+        "en": "experience",
+        "def_en": "knowledge or skill gained from doing something before",
+        "es": "experiencia",
+        "ejemplo": "Employers want short, clear answers about your strengths and your experience, not a long speech."
+      },
+      {
+        "en": "employer",
+        "def_en": "a person or company that gives people jobs",
+        "es": "empleador, empleadora",
+        "ejemplo": "the answer tells you if the employer is reliable and if teamwork really matters there."
+      },
+      {
+        "en": "human resources",
+        "def_en": "the department that hires and manages workers in a company",
+        "es": "recursos humanos",
+        "ejemplo": "Last week she had an interview with Mr. Rangel, the human resources manager at Café del Oriente, a coffee export company near the Parque Industrial."
+      },
+      {
+        "en": "mentor",
+        "def_en": "an experienced person who helps and guides someone new",
+        "es": "mentor, mentora",
+        "ejemplo": "Yes, every intern has a mentor for the first month."
+      },
+      {
+        "en": "confident",
+        "def_en": "sure of yourself and your abilities",
+        "es": "seguro de sí mismo, segura de sí misma",
+        "ejemplo": "\"I have worked as a cashier for eight months\" sounds more confident than \"I worked once.\""
+      }
+    ],
+    "gramatica": [
+      {
+        "estructura": "presente perfecto con for / since / How long ...?",
+        "regla": "Present perfect (have/has + past participle) shows something that began earlier and is still true now. Use for + a period of time, since + a starting point, and How long ...? to ask.",
+        "ejemplos": [
+          "I've studied English for three years.",
+          "I've wanted to work in an office since I started SENA.",
+          "How long have you studied at SENA?"
+        ],
+        "errores_tipicos": [
+          "*I study here since 2024* -> I have studied here since 2024.",
+          "*I have two years studying* -> I've studied for two years.",
+          "*How long you have worked here?* -> How long have you worked here?"
+        ]
+      },
+      {
+        "estructura": "preguntas indirectas (Could you tell me what ...? / I'd like to know if ...)",
+        "regla": "Indirect questions keep statement word order after the introducer: Could you tell me ...? or I'd like to know if ... No inversion and no do/does inside.",
+        "ejemplos": [
+          "Could you tell me what the company's main products are?",
+          "I'd like to know if the internship includes transport.",
+          "Could you tell me what a normal day at the office looks like?"
+        ],
+        "errores_tipicos": [
+          "*Could you tell me where is the office?* -> Could you tell me where the office is.",
+          "*I'd like to know if does the job include weekends?* -> I'd like to know if the job includes weekends.",
+          "*Could you tell me what time does the interview start?* -> Could you tell me what time the interview starts."
+        ]
+      }
+    ],
+    "produccion": {
+      "speaking": {
+        "tarea": "Simulación de entrevista de 2 minutos: responde 3 preguntas del entrevistador y haz 2 preguntas indirectas, por ejemplo Could you tell me...? y también I'd like to know if...?",
+        "criterios": [
+          "Usa el presente perfecto con for o since al menos una vez.",
+          "Hace 2 preguntas indirectas bien formadas.",
+          "Responde con oraciones completas, no solo yes o no.",
+          "Suena natural y seguro (confident)."
+        ]
+      },
+      "writing": {
+        "tarea": "Correo de presentación (150-180 palabras) para pedir una entrevista o una etapa productiva en una empresa.",
+        "criterios": [
+          "Cuenta su experiencia y sus habilidades usando el presente perfecto (for/since).",
+          "Incluye al menos una pregunta indirecta sobre el puesto.",
+          "Menciona su disponibilidad (available).",
+          "Usa un cierre formal (Best regards, ...)."
+        ]
+      }
+    }
+  },
+  "practicas": [
+    {
+      "familia": "b1-u01-f01",
+      "estructura": "presente perfecto con for / since / How long ...?",
+      "items": [
+        {
+          "id": "b1-u01-f01-1",
+          "rol": "original",
+          "formato": "piensalo",
+          "enunciado": "Mrs. Cadena, Leidy's mentor, ___ at Café del Oriente since 2020.",
+          "opciones": {
+            "A": "is working",
+            "B": "works",
+            "C": "has worked",
+            "D": "worked"
+          },
+          "clave": "C",
+          "explicacion": {
+            "regla": "Since + a starting point (desde) takes the present perfect.",
+            "por_opcion": {
+              "A": "Tempting: 'trabaja desde' feels like now, but since 2020 needs has worked.",
+              "B": "Tempting calco of 'trabaja desde 2020'; with since, English uses has worked.",
+              "D": "Worked closes the action in the past, but since 2020 runs until now."
+            },
+            "ejemplo": "Leidy has used English at work since last year.",
+            "idioma": "en"
+          },
+          "pool": "practice",
+          "segundos": 30,
+          "generado_por": "creador-opus@F8-b1-u01",
+          "revisado_por": null
+        },
+        {
+          "id": "b1-u01-f01-2",
+          "rol": "gemela",
+          "formato": "piensalo",
+          "enunciado": "Leidy's little brother asks what a human resources manager does. Leidy answers: 'In any company, he or she ___ the candidates and chooses the new workers.'",
+          "opciones": {
+            "A": "interviews",
+            "B": "has interviewed",
+            "C": "is interviewing",
+            "D": "interviewed"
+          },
+          "clave": "A",
+          "explicacion": {
+            "regla": "A general fact about a job takes the present simple.",
+            "por_opcion": {
+              "B": "Tempting after for/since, but this is a general fact about the job, with no period up to now.",
+              "C": "Is interviewing is for right now; a general fact about a job needs interviews.",
+              "D": "Interviewed is past, but Leidy describes the job in general, today."
+            },
+            "ejemplo": "Human resources managers usually interview candidates in person.",
+            "idioma": "en"
+          },
+          "pool": "practice",
+          "segundos": 30,
+          "generado_por": "creador-opus@F8-b1-u01",
+          "revisado_por": null
+        },
+        {
+          "id": "b1-u01-f01-3",
+          "rol": "repaso",
+          "formato": "piensalo",
+          "enunciado": "Mr. Rangel can't come to the phone right now: he ___ with a candidate in his office.",
+          "opciones": {
+            "A": "has talked",
+            "B": "talked",
+            "C": "talks",
+            "D": "is talking"
+          },
+          "clave": "D",
+          "explicacion": {
+            "regla": "Right now (ahora mismo): present continuous, is + -ing.",
+            "por_opcion": {
+              "A": "Has talked looks back from now; right now needs an action in progress.",
+              "B": "Talked is finished, but the conversation is happening right now.",
+              "C": "Talks is for habits; for this moment, use is talking."
+            },
+            "ejemplo": "Leidy is filling in a form right now.",
+            "idioma": "en"
+          },
+          "pool": "practice",
+          "segundos": 30,
+          "generado_por": "creador-opus@F8-b1-u01",
+          "revisado_por": null
+        }
+      ]
+    },
+    {
+      "familia": "b1-u01-f02",
+      "estructura": "preguntas indirectas (Could you tell me what ...? / I'd like to know if ...)",
+      "items": [
+        {
+          "id": "b1-u01-f02-1",
+          "rol": "original",
+          "formato": "piensalo",
+          "enunciado": "Leidy asks Mrs. Cadena: 'Could you tell me where ___ lunch every day? I'd like to join them tomorrow.'",
+          "opciones": {
+            "A": "the interns are having",
+            "B": "the interns have",
+            "C": "the interns had",
+            "D": "the interns have had"
+          },
+          "clave": "B",
+          "explicacion": {
+            "regla": "Indirect question keeps statement order; every day takes the present simple.",
+            "por_opcion": {
+              "A": "Are having is for one moment now, but every day is a routine.",
+              "C": "Had is past, but Leidy asks about a routine she will join.",
+              "D": "Tempting after this unit, but a routine takes the simple form: have."
+            },
+            "ejemplo": "Could you tell me where the interns have meetings?",
+            "idioma": "en"
+          },
+          "pool": "practice",
+          "segundos": 30,
+          "generado_por": "creador-opus@F8-b1-u01",
+          "revisado_por": null
+        },
+        {
+          "id": "b1-u01-f02-2",
+          "rol": "gemela",
+          "formato": "piensalo",
+          "enunciado": "Mrs. Cadena had a job at a bank before she came to Café del Oriente in 2020. Leidy asks her: 'Could you tell me how long ___ at the bank?'",
+          "opciones": {
+            "A": "you are working",
+            "B": "you have worked",
+            "C": "you work",
+            "D": "you worked"
+          },
+          "clave": "D",
+          "explicacion": {
+            "regla": "Statement order; a finished job (before 2020) takes the past simple.",
+            "por_opcion": {
+              "A": "Are working is for now, but she left the bank in 2020.",
+              "B": "Tempting after this unit, but have worked reaches now; the bank job ended in 2020.",
+              "C": "Work is for a job you still have; she left the bank."
+            },
+            "ejemplo": "Could you tell me how long Josmar worked at his uncle's store?",
+            "idioma": "en"
+          },
+          "pool": "practice",
+          "segundos": 30,
+          "generado_por": "creador-opus@F8-b1-u01",
+          "revisado_por": null
+        },
+        {
+          "id": "b1-u01-f02-3",
+          "rol": "repaso",
+          "formato": "piensalo",
+          "enunciado": "Mrs. Cadena's door is closed. Josmar asks Mr. Rangel: 'Could you tell me what ___ at the moment? I need to ask her something.'",
+          "opciones": {
+            "A": "she is doing",
+            "B": "she does",
+            "C": "she did",
+            "D": "she has done"
+          },
+          "clave": "A",
+          "explicacion": {
+            "regla": "Indirect question keeps statement order; at the moment takes is + -ing.",
+            "por_opcion": {
+              "B": "Tempting: the present simple is for routines; at the moment needs is doing.",
+              "C": "Did is for a finished action, but this is happening at the moment.",
+              "D": "Has done looks back at a result, not an action in progress."
+            },
+            "ejemplo": "Could you tell me what the interns are doing?",
+            "idioma": "en"
+          },
+          "pool": "practice",
+          "segundos": 30,
+          "generado_por": "creador-opus@F8-b1-u01",
+          "revisado_por": null
+        }
+      ]
+    },
+    {
+      "familia": "b1-u01-f03",
+      "estructura": "vocab: work and interviews (grupo 1)",
+      "items": [
+        {
+          "id": "b1-u01-f03-1",
+          "rol": "original",
+          "formato": "piensalo",
+          "enunciado": "Dayana often forgets dates and times. In her interview, she says honestly: 'Organization is my biggest ___, but now I use a calendar.'",
+          "opciones": {
+            "A": "mistake",
+            "B": "fear",
+            "C": "complaint",
+            "D": "weakness"
+          },
+          "clave": "D",
+          "explicacion": {
+            "regla": "Weakness = debilidad: something you don't do well yet.",
+            "por_opcion": {
+              "A": "A mistake is one wrong action, not an area she doesn't do well.",
+              "B": "A fear is something that scares you, and organization doesn't scare her.",
+              "C": "A complaint says you're unhappy with others; she is talking about herself."
+            },
+            "ejemplo": "Public speaking is Leidy's biggest weakness.",
+            "idioma": "en"
+          },
+          "pool": "practice",
+          "segundos": 20,
+          "generado_por": "creador-opus@F8-b1-u01",
+          "revisado_por": null
+        },
+        {
+          "id": "b1-u01-f03-2",
+          "rol": "gemela",
+          "formato": "piensalo",
+          "enunciado": "Mr. Rangel is interviewing three ___ this week, and only one of them will get the internship.",
+          "opciones": {
+            "A": "strengths",
+            "B": "candidates",
+            "C": "experiences",
+            "D": "internships"
+          },
+          "clave": "B",
+          "explicacion": {
+            "regla": "Candidate = candidato: a person who wants a job or a place.",
+            "por_opcion": {
+              "A": "Strengths are qualities, not people you can interview.",
+              "C": "Experiences are things that happen to you, not people you interview.",
+              "D": "Internships are work periods; here people compete to get one."
+            },
+            "ejemplo": "Each candidate answered five questions.",
+            "idioma": "en"
+          },
+          "pool": "practice",
+          "segundos": 20,
+          "generado_por": "creador-opus@F8-b1-u01",
+          "revisado_por": null
+        },
+        {
+          "id": "b1-u01-f03-3",
+          "rol": "repaso",
+          "formato": "piensalo",
+          "enunciado": "Mrs. Mantilla owns the pharmacy where Yohan works. She gave him the job and pays him every Friday, but an older worker trains him. Mrs. Mantilla is Yohan's ___.",
+          "opciones": {
+            "A": "intern",
+            "B": "mentor",
+            "C": "employer",
+            "D": "candidate"
+          },
+          "clave": "C",
+          "explicacion": {
+            "regla": "Employer (empleador) = the person or company that gives you a job.",
+            "por_opcion": {
+              "A": "An intern is a student who learns at work; Mrs. Mantilla owns the pharmacy.",
+              "B": "Tempting: a mentor guides you, but here an older worker trains Yohan, not her.",
+              "D": "A candidate wants a job; Mrs. Mantilla gives Yohan the job."
+            },
+            "ejemplo": "Café del Oriente is a good employer for SENA interns.",
+            "idioma": "en"
+          },
+          "pool": "practice",
+          "segundos": 20,
+          "generado_por": "creador-opus@F8-b1-u01",
+          "revisado_por": null
+        }
+      ]
+    },
+    {
+      "familia": "b1-u01-f04",
+      "estructura": "vocab: work and interviews (grupo 2)",
+      "items": [
+        {
+          "id": "b1-u01-f04-1",
+          "rol": "original",
+          "formato": "piensalo",
+          "enunciado": "Most SENA students do a six-month ___ in a company before finishing their technical program.",
+          "opciones": {
+            "A": "internship",
+            "B": "interview",
+            "C": "employer",
+            "D": "candidate"
+          },
+          "clave": "A",
+          "explicacion": {
+            "regla": "Internship = pasantía, práctica: supervised work for a student.",
+            "por_opcion": {
+              "B": "An interview lasts minutes, not six months.",
+              "C": "An employer is a person or company, not something you do.",
+              "D": "A candidate is a person who wants a job, not a work period."
+            },
+            "ejemplo": "Josmar's internship starts next week.",
+            "idioma": "en"
+          },
+          "pool": "practice",
+          "segundos": 20,
+          "generado_por": "creador-opus@F8-b1-u01",
+          "revisado_por": null
+        },
+        {
+          "id": "b1-u01-f04-2",
+          "rol": "gemela",
+          "formato": "piensalo",
+          "enunciado": "Leidy works alone at the cash register and still gets nervous and impatient when the line is long. But after a year as a cashier, she has useful ___: she knows what customers usually ask for.",
+          "opciones": {
+            "A": "teamwork",
+            "B": "patience",
+            "C": "experience",
+            "D": "confidence"
+          },
+          "clave": "C",
+          "explicacion": {
+            "regla": "Experience = experiencia: knowledge from doing something before.",
+            "por_opcion": {
+              "A": "Teamwork is working with others, but she works alone at the register.",
+              "B": "Patience means staying calm while you wait, but she gets impatient.",
+              "D": "Confidence means feeling sure of yourself, but she still gets nervous."
+            },
+            "ejemplo": "Every job, even a small one, gives you experience.",
+            "idioma": "en"
+          },
+          "pool": "practice",
+          "segundos": 20,
+          "generado_por": "creador-opus@F8-b1-u01",
+          "revisado_por": null
+        },
+        {
+          "id": "b1-u01-f04-3",
+          "rol": "repaso",
+          "formato": "piensalo",
+          "enunciado": "Yohan is new at the pharmacy, gets nervous easily and has classes every morning. But when he promises something, he does it. His manager says he is very ___.",
+          "opciones": {
+            "A": "available",
+            "B": "reliable",
+            "C": "calm",
+            "D": "experienced"
+          },
+          "clave": "B",
+          "explicacion": {
+            "regla": "Reliable = confiable: someone who does what they promise.",
+            "por_opcion": {
+              "A": "Available means free at a certain time, but he is busy every morning.",
+              "C": "Calm means relaxed, but he gets nervous easily.",
+              "D": "Experienced means with a lot of practice, but he is new."
+            },
+            "ejemplo": "Reliable interns finish their tasks on time.",
+            "idioma": "en"
+          },
+          "pool": "practice",
+          "segundos": 20,
+          "generado_por": "creador-opus@F8-b1-u01",
+          "revisado_por": null
+        }
+      ]
+    },
+    {
+      "familia": "b1-u01-f05",
+      "estructura": "presente perfecto con for / since / How long ...?",
+      "items": [
+        {
+          "id": "b1-u01-f05-1",
+          "rol": "original",
+          "formato": "tu_palabra",
+          "enunciado": "Leidy tells Mr. Rangel: 'I started guitar lessons three years ago, and I still take classes on Saturdays. I ___ (play) the guitar for three years.'",
+          "aceptadas": [
+            "have played",
+            "'ve played",
+            "have been playing",
+            "'ve been playing"
+          ],
+          "tolerancia": "exacta",
+          "explicacion": {
+            "regla": "For + a period up to now (desde hace): have + participle.",
+            "ejemplo": "I have lived in Piedecuesta for five years.",
+            "idioma": "en"
+          },
+          "pool": "practice",
+          "segundos": 35,
+          "generado_por": "creador-opus@F8-b1-u01",
+          "revisado_por": null
+        },
+        {
+          "id": "b1-u01-f05-2",
+          "rol": "gemela",
+          "formato": "tu_palabra",
+          "enunciado": "Mr. Rangel ___ (work) in human resources since 2016.",
+          "aceptadas": [
+            "has worked",
+            "'s worked",
+            "has been working",
+            "'s been working"
+          ],
+          "tolerancia": "exacta",
+          "explicacion": {
+            "regla": "Since + a starting point (desde): has + participle.",
+            "ejemplo": "Leidy has studied at SENA since 2024.",
+            "idioma": "en"
+          },
+          "pool": "practice",
+          "segundos": 35,
+          "generado_por": "creador-opus@F8-b1-u01",
+          "revisado_por": null
+        },
+        {
+          "id": "b1-u01-f05-3",
+          "rol": "repaso",
+          "formato": "tu_palabra",
+          "enunciado": "Mrs. Cadena ___ (know) Mr. Rangel since university.",
+          "aceptadas": [
+            "has known",
+            "'s known"
+          ],
+          "tolerancia": "exacta",
+          "explicacion": {
+            "regla": "Know is a stative verb (de estado): since takes has known.",
+            "ejemplo": "Josmar has known Leidy since their first day.",
+            "idioma": "en"
+          },
+          "pool": "practice",
+          "segundos": 35,
+          "generado_por": "creador-opus@F8-b1-u01",
+          "revisado_por": null
+        }
+      ]
+    },
+    {
+      "familia": "b1-u01-f06",
+      "estructura": "vocab: work and interviews (grupo 3)",
+      "items": [
+        {
+          "id": "b1-u01-f06-1",
+          "rol": "original",
+          "formato": "tu_palabra",
+          "enunciado": "Josmar has classes every afternoon, but he is a___ (free to work at a certain time) every morning for the internship.",
+          "aceptadas": [
+            "available"
+          ],
+          "tolerancia": "1_letra",
+          "explicacion": {
+            "regla": "Available = disponible: free to work at a certain time.",
+            "ejemplo": "Leidy is available from seven to one.",
+            "idioma": "en"
+          },
+          "pool": "practice",
+          "segundos": 35,
+          "generado_por": "creador-opus@F8-b1-u01",
+          "revisado_por": null
+        },
+        {
+          "id": "b1-u01-f06-2",
+          "rol": "gemela",
+          "formato": "tu_palabra",
+          "enunciado": "The interns finished a big order in one day because they shared the tasks and helped each other. Mrs. Cadena said: 'That was great t___ (the way people work together toward one goal)!'",
+          "aceptadas": [
+            "teamwork",
+            "team work",
+            "team-work"
+          ],
+          "tolerancia": "1_letra",
+          "explicacion": {
+            "regla": "Teamwork = trabajo en equipo: people working together toward one goal.",
+            "ejemplo": "Good teamwork makes long days easier.",
+            "idioma": "en"
+          },
+          "pool": "practice",
+          "segundos": 35,
+          "generado_por": "creador-opus@F8-b1-u01",
+          "revisado_por": null
+        },
+        {
+          "id": "b1-u01-f06-3",
+          "rol": "repaso",
+          "formato": "tu_palabra",
+          "enunciado": "Josmar sold shoes at his uncle's store for two years, so he has some e___ (knowledge from doing something before) in sales.",
+          "aceptadas": [
+            "experience",
+            "expertise"
+          ],
+          "tolerancia": "1_letra",
+          "explicacion": {
+            "regla": "Experience = experiencia: knowledge or skill from doing something before.",
+            "ejemplo": "Leidy got experience with customers as a cashier.",
+            "idioma": "en"
+          },
+          "pool": "practice",
+          "segundos": 35,
+          "generado_por": "creador-opus@F8-b1-u01",
+          "revisado_por": null
+        }
+      ]
+    },
+    {
+      "id": "b1-u01-c01",
+      "formato": "conecta",
+      "pares": [
+        [
+          "apply",
+          "postularse"
+        ],
+        [
+          "skills",
+          "habilidades"
+        ],
+        [
+          "weakness",
+          "debilidad"
+        ],
+        [
+          "strength",
+          "fortaleza"
+        ],
+        [
+          "confident",
+          "seguro de sí mismo"
+        ]
+      ],
+      "sobrante": "confianza",
+      "pool": "practice",
+      "segundos": 45,
+      "generado_por": "creador-opus@F8-b1-u01",
+      "revisado_por": null
+    },
+    {
+      "id": "b1-u01-l01",
+      "formato": "lo_dice",
+      "texto": "On the morning of her interview, Leidy arrived at Café del Oriente twenty minutes early. She has worked as a part-time cashier since last year, so she wasn't a complete beginner, but she still felt nervous. Mr. Rangel welcomed her warmly and offered her a cup of coffee. During the interview, he asked about her studies and her experience, and Leidy answered every question with confidence. She didn't ask about the salary, but she did ask an indirect question about the schedule. After thirty minutes, Mr. Rangel thanked her and said, 'We will call you this week.'",
+      "afirmaciones": [
+        {
+          "texto": "Leidy arrived ten minutes early for her interview.",
+          "clave": "F",
+          "cita": "Leidy arrived at Café del Oriente twenty minutes early",
+          "explicacion": "False. The text says she arrived 'twenty minutes early' (veinte minutos antes)."
+        },
+        {
+          "texto": "Mr. Rangel offered Leidy a cup of coffee.",
+          "clave": "V",
+          "cita": "offered her a cup of coffee",
+          "explicacion": "True. The text says Mr. Rangel 'offered her a cup of coffee'."
+        },
+        {
+          "texto": "Leidy went to the interview by bus.",
+          "clave": "ND",
+          "cita": "On the morning of her interview, Leidy arrived at Café del Oriente",
+          "explicacion": "Not stated. The text says she arrived at the café, but never says how she got there."
+        }
+      ],
+      "pool": "practice",
+      "segundos": 135,
+      "generado_por": "creador-opus@F8-b1-u01",
+      "revisado_por": null
+    },
+    {
+      "id": "b1-u01-l02",
+      "formato": "lo_dice",
+      "texto": "Two days after the interview, Leidy was at her cashier job when her phone rang. It was Mr. Rangel from Café del Oriente. He said the team liked her answers about teamwork, and he offered her the internship. Leidy accepted at once and asked one last indirect question: 'I'd like to know if I could start the following Monday.' Mr. Rangel said yes. That evening, Leidy called her friend Dayana to tell her the good news.",
+      "afirmaciones": [
+        {
+          "texto": "Mr. Rangel called Leidy three days after the interview.",
+          "clave": "F",
+          "cita": "Two days after the interview, Leidy was at her cashier job when her phone rang. It was Mr. Rangel",
+          "explicacion": "False. The text says 'Two days after the interview' (dos días después)."
+        },
+        {
+          "texto": "Leidy asked to start the following Monday.",
+          "clave": "V",
+          "cita": "I'd like to know if I could start the following Monday.",
+          "explicacion": "True. She asked: 'I'd like to know if I could start the following Monday.'"
+        },
+        {
+          "texto": "Leidy's friend Dayana lives in Floridablanca.",
+          "clave": "ND",
+          "cita": "Leidy called her friend Dayana to tell her the good news",
+          "explicacion": "Not stated. The text says Leidy called Dayana, but never says where Dayana lives."
+        }
+      ],
+      "pool": "practice",
+      "segundos": 135,
+      "generado_por": "creador-opus@F8-b1-u01",
+      "revisado_por": null
+    },
+    {
+      "id": "b1-u01-o01",
+      "formato": "oido",
+      "guion": "Hi Leidy, this is Mrs. Cadena, your mentor at Café del Oriente. Welcome to the team! Mr. Rangel told me you're free from seven. The office opens at seven thirty, and I usually get here at seven fifteen. But on Monday I have an early meeting, so please come at eight thirty, and I'll show you around then. See you on Monday!",
+      "segundos_estimados": 28,
+      "pregunta": "What time should Leidy arrive on Monday?",
+      "opciones": {
+        "A": "Seven thirty",
+        "B": "Eight thirty",
+        "C": "Seven fifteen",
+        "D": "Seven"
+      },
+      "clave": "B",
+      "explicacion": "Hi Leidy, this is Mrs. Cadena, your mentor at Café del Oriente. Welcome to the team! Mr. Rangel told me you're free from seven. The office opens at seven thirty, and I usually get here at seven fifteen. But on Monday I have an early meeting, **so please come at eight thirty**, and I'll show you around then. See you on Monday!",
+      "pool": "practice",
+      "segundos": 43,
+      "generado_por": "creador-opus@F8-b1-u01",
+      "revisado_por": null
+    }
+  ],
+  "fuente": null,
+  "generado_por": "creador-opus@F8-b1-u01-practicas (contenido: redactor-sonnet@F8-b1)",
+  "revisado_por": "Christiam",
+  "revisado_huella": "1747da2e8266a6a2168ad7ba66b95bfe",
+  "revisado_en": "2026-10-06"
+}

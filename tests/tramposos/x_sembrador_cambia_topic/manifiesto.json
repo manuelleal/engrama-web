@@ -1,0 +1,16 @@
+{
+  "descripcion": "SR5: el sembrador manda como topic el título de la unidad y no su id (la tanda ordena por topic: PEDIDO_sembrador §2 dice no cambiarlo)",
+  "archivos": {
+    "herramientas/sembrar/mapeo.mjs": "mapeo.mjs"
+  },
+  "comando": [
+    "node",
+    "--test",
+    "--test-reporter=tap",
+    "tests/unit/sembrar_identidad.test.mjs"
+  ],
+  "espera_codigo_no_cero": true,
+  "espera_fallan_tests": [
+    "SR5: los cuerpos de a1-u01-my-family sin los campos nuevos son la foto de antes del cambio"
+  ]
+}
