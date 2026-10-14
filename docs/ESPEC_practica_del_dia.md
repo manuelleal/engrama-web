@@ -175,6 +175,15 @@ Al leer los humos y E31 antes de tocar Inicio se vio que la protagonista, tal co
 - El botón del sistema dentro de la protagonista (`sx-btn sx-btn--claro`) perdía su color por la regla vieja de `cara.css` sobre
   `a[data-testid="jugar-reto-hoy"]`: esa regla deja fuera a `.sx-btn` (`:where(:not(.sx-btn))`), como manda el CLAUDE.md (la vieja deja fuera a la nueva).
 
+## 6c. Adenda 2 (2026-10-14, DESPUÉS de correr los E2E del bloque 2: se declara, no se esconde)
+Con la protagonista alta (título de 28 px, barra, botón a todo el ancho y el nivel adentro), **E31 se puso rojo** (con dos instituciones y un nombre
+de 60 caracteres el tercer botón de "Ahora" terminaba en y=762 con la barra en y=746) y **la réplica del humo de navegación también** (a 360 × 640,
+2 botones bajo la barra). El criterio no se movió: se cambió la tarjeta. Queda **compacta** (texto a la izquierda y "Jugar" a la derecha, como las
+demás filas de "Ahora"; título de tarjeta, 18 px; la barra de avance delgada) y **el nivel de práctica va después de las tarjetas de "Ahora"**
+(sigue fuera del escudo). Medido después: 365, 459 y 569 contra la barra en 746. Se aparta de la maqueta (botón blanco a todo el ancho): manda E31.
+- E30 (`nav_sin_callejones`) deja fuera `/repaso` de "toda ruta de la tabla se alcanza por toques", igual que el reto en curso: solo se enlaza cuando la
+  tanda trae repaso. Su barra y su volver los miden U62 y el humo de navegación (que lo visita por su dirección: rutas del estudiante 10 → 11).
+
 ## 7. Medido al cerrar
 (Se llena al cerrar: commits, cifras de `verificar.mjs` y de la suite, peso LF y `VERSION`, tabla de E2E, sha256 del humo y de la réplica, y lo que
 no se probó.)

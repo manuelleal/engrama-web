@@ -6,7 +6,8 @@
 //   - la tarjeta conserva lo que medían "Tu reto de hoy", los humos y E31 (`tarjeta-reto-hoy`, `jugar-reto-hoy`, `fila-ahora`, la única que late):
 //     "Jugar" es un ENLACE (al reto pendiente del feed) que, tocado, pide la tanda y va a su primer paso; sin tanda, sigue a ese reto;
 //   - un paso a la vez, en el orden del servidor: el repaso primero, después el primer reto pendiente;
-//   - el nivel de práctica va dentro de la tarjeta, nunca en el escudo; sin SET, "Todavía no es tu nivel" (dictamen 04 §1.3).
+//   - la tarjeta es compacta (texto a la izquierda, botón a la derecha) para que los tres botones de "Ahora" sigan sobre la barra sin desplazar
+//     (E31, también a 360 × 640); el nivel de práctica va DESPUÉS de "Ahora", nunca en el escudo; sin SET, "Todavía no es tu nivel" (dictamen 04 §1.3).
 import { h } from '../../ui/dom.js';
 import { crearIcono } from '../../ui/iconos.js';
 import { tituloLegible } from '../../ui/titulo.js';
@@ -33,26 +34,30 @@ const claveDeHoy = (/** @type {any} */ ctx, /** @type {string} */ fecha) => `${c
  */
 export async function cargar(ctx) {
   const tanda = await verTanda(ctx);
-  return {
+  const practica = {
     tanda,
-    /** La protagonista de "Ahora", o null (respaldo: "Tu reto de hoy" de siempre). @param {{pendiente: any, numRetos: number, respaldo: () => Node}} o */
-    tarjeta: (o) => tarjetaDeHoy(ctx, tanda, o),
+    /**
+     * La protagonista de "Ahora", o null (respaldo: "Tu reto de hoy" de siempre). Con ella, `aviso` pasa a ser el nivel de práctica, que Inicio pone
+     * DESPUÉS de las tarjetas de "Ahora" (así los tres botones siguen sobre la barra sin desplazar: E31).
+     * @param {{pendiente: any, numRetos: number, respaldo: () => Node}} o
+     */
+    tarjeta: (o) => {
+      const plan = planDeHoy(ctx, tanda);
+      // Con el feed vacío no hay con qué armar una tanda nueva: no se invita a "Jugar" a nada (queda lo de siempre).
+      if (plan.tipo === 'respaldo' || (plan.tipo === 'empezar' && o.numRetos === 0)) return null;
+      practica.aviso = crearNivel(plan);
+      return crearTarjeta(ctx, plan, o);
+    },
+    /** Lo que va después de "Ahora": el nivel de práctica (con la protagonista) o, si hoy no hay práctica de su nivel, la línea neutra. */
     aviso: tanda && !tanda.tanda && tanda.racha_protegida ? h('p', { class: 'aviso-corto', role: 'status', 'data-testid': 'practica-protegida' }, T.protegida) : null,
   };
+  return practica;
 }
 
 /** El plan con lo que la página ya supo hoy. */
 function planDeHoy(ctx, tanda) {
   const clave = tanda ? claveDeHoy(ctx, tanda.fecha) : '';
   return planDePractica(tanda, { sinNadaHoy: sinNadaHoy.has(clave), sinMasHoy: sinMasHoy.has(clave) });
-}
-
-/** @param {any} ctx @param {any} tanda @param {{pendiente: any, numRetos: number, respaldo: () => Node}} o */
-function tarjetaDeHoy(ctx, tanda, o) {
-  const plan = planDeHoy(ctx, tanda);
-  // Con el feed vacío no hay con qué armar una tanda nueva: no se invita a "Jugar" a nada (queda lo de siempre).
-  if (plan.tipo === 'respaldo' || (plan.tipo === 'empezar' && o.numRetos === 0)) return null;
-  return crearTarjeta(ctx, plan, o);
 }
 
 /** Título, apoyo y botón de cada paso. Pura. @param {import('../../ui/practica.js').PlanDePractica} plan */
@@ -78,11 +83,11 @@ function crearAvance(plan) {
   return h('div', { class: 'sx-progreso', role: 'progressbar', 'aria-valuemin': 0, 'aria-valuemax': plan.pasos, 'aria-valuenow': hechos, 'aria-label': T.avance(hechos, plan.pasos), 'data-testid': 'practica-avance' }, relleno);
 }
 
-/** "Practicas en: A2" y, sin SET, "Todavía no es tu nivel…": dentro de la tarjeta, nunca en el escudo. */
+/** "Practicas en: A2" y, sin SET, "Todavía no es tu nivel…": junto a la práctica de hoy, nunca en el escudo (dictamen 04 §1.3). */
 function crearNivel(plan) {
   if (!plan.nivel) return null;
-  return h('div', { class: 'practica-nivel', 'data-testid': 'practica-nivel' },
-    h('p', { class: 'sx-t-apoyo' }, T.nivel(plan.nivel.nivel)),
+  return h('p', { class: 'sx-t-apoyo practica-nivel', 'data-testid': 'practica-nivel' },
+    h('strong', {}, T.nivel(plan.nivel.nivel)),
     null);
 }
 
@@ -90,15 +95,14 @@ function crearNivel(plan) {
 function crearTarjeta(ctx, plan, o) {
   const texto = textoDelPaso(plan);
   const nodo = h(
-    'section', { class: 'sx-prota sx-prota--marca sx-pila fila-ahora fila-invitacion practica-hoy', 'data-testid': 'tarjeta-reto-hoy', 'data-paso': plan.tipo, 'aria-labelledby': 'practica-rotulo' },
+    'section', { class: 'sx-prota sx-prota--marca fila-ahora fila-invitacion practica-hoy', 'data-testid': 'tarjeta-reto-hoy', 'data-paso': plan.tipo, 'aria-labelledby': 'practica-rotulo' },
     h('span', { class: 'sx-rotulo', id: 'practica-rotulo' }, crearIcono('retos'), T.rotulo),
-    h('div', {},
-      h('h3', { class: 'sx-t-titulo', 'data-testid': 'practica-titulo' }, texto.titulo),
+    h('div', { class: 'practica-texto' },
+      h('h3', { class: 'sx-t-tarjeta', 'data-testid': 'practica-titulo' }, texto.titulo),
       h('p', { class: 'sx-t-apoyo', 'data-testid': 'practica-apoyo' }, texto.apoyo),
       plan.segundaVuelta ? h('span', { class: 'sx-pildora sx-pildora--sobre-marca', 'data-testid': 'practica-segunda-vuelta' }, T.segundaVuelta) : null),
-    crearAvance(plan),
     texto.boton ? crearBoton(ctx, plan, texto.boton, o, () => nodo) : null,
-    crearNivel(plan),
+    crearAvance(plan),
   );
   return nodo;
 }
@@ -107,7 +111,7 @@ function crearTarjeta(ctx, plan, o) {
 function crearBoton(ctx, plan, texto, o, tarjeta) {
   const fallback = o.pendiente ? `#/retos/${o.pendiente.id}` : '#/retos';
   const href = destinoDelPaso(plan) ?? fallback;
-  const boton = h('a', { href, class: 'sx-btn sx-btn--claro sx-btn--grande sx-btn--ancho', 'data-testid': 'jugar-reto-hoy' }, texto);
+  const boton = h('a', { href, class: 'sx-btn sx-btn--claro', 'data-testid': 'jugar-reto-hoy' }, texto);
   if (plan.tipo !== 'empezar' && plan.tipo !== 'otra') return boton;
   const pedir = accionUnica(() => pedirTanda(ctx));
   boton.addEventListener('click', (ev) => {

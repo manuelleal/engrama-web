@@ -105,7 +105,7 @@ async function tocar(raiz, testid, veces = 1) {
   await Promise.all(toques); await asentar(); await new Promise((ok) => setTimeout(ok, 20)); await asentar();
 }
 
-test('U81: sin tanda pedida, la protagonista es la primera de "Ahora" (la única que late), con "Jugar", el nivel y el aviso sin SET; al pintar, 0 POST', async () => {
+test('U81: sin tanda pedida, la protagonista es la primera de "Ahora" (la única que late), con "Jugar", y después de "Ahora" el nivel y el aviso sin SET; al pintar, 0 POST', async () => {
   const { raiz, llamadas, cerrar } = await abrirInicio(base({ 'GET /challenges/tanda': tandaDeHoy() }));
   try {
     const ahora = buscar(raiz, 'ahora');
@@ -116,7 +116,8 @@ test('U81: sin tanda pedida, la protagonista es la primera de "Ahora" (la única
     assert.deepEqual(conClase(raiz, 'fila-invitacion').map((e) => e.getAttribute('data-testid')), ['tarjeta-reto-hoy'], 'una sola invitación');
     const jugar = buscar(raiz, 'jugar-reto-hoy');
     assert.deepEqual([jugar.tagName, textoDe(jugar)], ['a', 'Jugar']);
-    assert.equal(textoDe(buscar(raiz, 'practica-nivel')), 'Practicas en: A2Todavía no es tu nivel. Confírmalo con el examen.');
+    assert.equal(textoDe(buscar(raiz, 'practica-nivel')), 'Practicas en: A2 Todavía no es tu nivel. Confírmalo con el examen.');
+    assert.ok(enOrden(raiz).indexOf(buscar(raiz, 'practica-nivel')) > enOrden(raiz).indexOf(buscar(raiz, 'tarjeta-eva_celular')), 'el nivel va después de las tarjetas de "Ahora" (E31)');
     assert.equal(posts(llamadas), 0, 'pintar no pide la tanda (gastaría el tope)');
   } finally { cerrar(); }
 });

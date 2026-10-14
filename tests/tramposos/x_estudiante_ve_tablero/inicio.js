@@ -243,8 +243,8 @@ function seccionAhora({ pendiente, numRetos, practica: p }, ctx) {
     'section', { class: 'ahora', 'data-testid': 'ahora', 'aria-labelledby': 'ahora-titulo' },
     h('h2', { id: 'ahora-titulo' }, textos.ahora.titulo),
     hoy || tarjetaRetoDeHoy(pendiente),
-    p?.aviso,
     tarjetasDelAnillo(ctx, !pendiente && !hoy),
+    p?.aviso,
   );
 }
 

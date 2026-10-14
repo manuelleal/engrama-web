@@ -69,7 +69,7 @@ export const TRAMPOSOS = {
   x_practica_aviso_de_nivel_mudo: {
     archivo: 'src/vistas/estudiante/inicio_practica.js', prueba: TANDA, tests: ['U81: sin tanda pedida, la protagonista es la primera'],
     descripcion: 'U81: "Practicas en: A2" sin el "Todavía no es tu nivel" cuando no hay SET (se lee como el nivel: riesgo 6 del dictamen)',
-    cambios: [["    plan.nivel.conSet ? null : h('p', { class: 'sx-t-apoyo', 'data-testid': 'practica-sin-set' }, T.sinSet));", '    null);']],
+    cambios: [["    plan.nivel.conSet ? null : h('span', { 'data-testid': 'practica-sin-set' }, ` ${T.sinSet}`));", '    null);']],
   },
   x_repaso_envia_value: {
     archivo: 'src/vistas/estudiante/repaso.js', prueba: REPASO, tests: ['U82: el repaso muestra una pregunta de la tanda'],
