@@ -120,3 +120,13 @@ El backend y el piloto (puertos 8088, 8089, 56421) · el sembrador (`herramienta
 ## 6. Para después (anotado, no se hace)
 El 409 genérico de `/submit` en el flujo de siempre (`reto_flujo.js:152`) también deja "Enviando…" · entrada de texto para `fill_blank` y
 `listening`, y las `pistas` · que el script de despliegue mida el árbol exportado contra el techo (otro repo) · reintento con pausa creciente.
+
+## 6b. Adenda 1 (2026-10-14, DESPUÉS de H-4: se declara, no se esconde)
+- **E35 cambia de criterio por H-4 y la espec no lo nombró** (candidato a ERR: al preregistrar H-4 se listó U78 y no se buscó qué E2E fijaba el
+  `lang` viejo). `tests/e2e/practica_l1.test.mjs` fijaba las cuatro partes de la banda A2 con `lang="es"`, justo el defecto de la auditoría. Con el
+  código de H-4, la línea vieja se puso ROJA (corrido: "E35: un reto A2…" en rojo, la de B1 en verde) y se cambia a `oracion` y `ejemplo` en `en`,
+  `regla` y `porQue` en `es`, que es lo preregistrado en §1 H-4. Ningún otro E2E fija el `lang` de la banda.
+- **`.gitattributes`:** la línea pedida (`*.js *.mjs … text eol=lf`) no es sintaxis de git (en una sola línea, los demás patrones serían nombres de
+  atributo); va un patrón por línea, con el mismo efecto.
+- **E38 tiene su propio tramposo de cruce** (`x_l1_transitorio_degrada_e38`, el defecto de `x_l1_transitorio_degrada` medido en el navegador). Ojo:
+  el corredor elige por subcadena, así que `node tests/correr_tramposos.mjs x_l1_transitorio_degrada` corre los dos, uno tras otro.

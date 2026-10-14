@@ -62,7 +62,9 @@ test('E35: un reto A2 pregunta por pregunta: nada antes de Comprobar, la banda e
       const mal = await responder(sesion, 'A');
       assert.equal(mal.veredicto, 'Esta vez no');
       assert.match(mal.banda, /✗/);
-      assert.deepEqual(mal.partes.map(([p, lang]) => [p, lang]), [['oracion', 'es'], ['regla', 'es'], ['porQue', 'es'], ['ejemplo', 'es']]);
+      // H-4 (docs/ESPEC_correcciones_practica.md): la oración y el ejemplo son frases en inglés (lang="en"); la regla y el "por qué", en español.
+      // Antes esta línea fijaba las cuatro en "es", el defecto que encontró la auditoría 05 (se declara: la espec de H-4 no nombró a E35).
+      assert.deepEqual(mal.partes.map(([p, lang]) => [p, lang]), [['oracion', 'en'], ['regla', 'es'], ['porQue', 'es'], ['ejemplo', 'en']]);
       assert.match(mal.partes[0][2], /Así queda: She goes to school every day\./);
       assert.match(mal.partes[2][2], /Por qué no la tuya: Go es para I, you, we y they\./);
       assert.ok(mal.boton.abajo <= mal.boton.alturaVentana && mal.boton.arriba >= 0 && mal.boton.alto >= 44, `el botón "Siguiente" se ve entero y mide 44 px o más: ${JSON.stringify(mal.boton)}`);

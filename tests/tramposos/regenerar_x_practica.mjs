@@ -177,6 +177,12 @@ export const TRAMPOSOS = {
     descripcion: 'U86 (H-1): con el intento ilegible por la red, el reto cae en silencio al flujo viejo en vez de ofrecer Reintentar',
     cambios: [['    pintarSinConexion(raiz, datos);\n    return true;\n', '    return false;\n']],
   },
+  // El mismo defecto, medido en el navegador (E38): el doble con dos 503 en el sondeo, y la página cae al flujo viejo.
+  x_l1_transitorio_degrada_e38: {
+    archivo: 'src/vistas/estudiante/reto_l1.js', prueba: 'tests/e2e/practica_correcciones.test.mjs', tests: ['E38: con el sondeo del intento caído dos veces'],
+    descripcion: 'E38 (H-1): el mismo defecto de x_l1_transitorio_degrada, en el navegador: con el sondeo caído el reto cae en silencio al flujo viejo',
+    cambios: [['    pintarSinConexion(raiz, datos);\n    return true;\n', '    return false;\n']],
+  },
   x_l1_finish_409_colgado: {
     archivo: 'src/vistas/estudiante/reto_l1.js', prueba: CORR, tests: ['U87: un 409 en /finish'],
     descripcion: 'U87 (H-2): un 409 en /finish solo devuelve la salida: el botón queda en "Enviando…" y Drako pensando para siempre',

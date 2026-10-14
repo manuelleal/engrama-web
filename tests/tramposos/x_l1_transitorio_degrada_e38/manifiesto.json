@@ -1,0 +1,16 @@
+{
+  "descripcion": "E38 (H-1): el mismo defecto de x_l1_transitorio_degrada, en el navegador: con el sondeo caído el reto cae en silencio al flujo viejo",
+  "archivos": {
+    "src/vistas/estudiante/reto_l1.js": "reto_l1.js"
+  },
+  "comando": [
+    "node",
+    "--test",
+    "--test-reporter=tap",
+    "tests/e2e/practica_correcciones.test.mjs"
+  ],
+  "espera_codigo_no_cero": true,
+  "espera_fallan_tests": [
+    "E38: con el sondeo del intento caído dos veces"
+  ]
+}
