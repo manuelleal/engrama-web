@@ -76,7 +76,7 @@ export const TRAMPOSOS = {
   x_repaso_envia_value: {
     archivo: 'src/vistas/estudiante/repaso.js', prueba: REPASO, tests: ['U82: el repaso muestra una pregunta de la tanda'],
     descripcion: 'U82: el repaso manda el texto de la opción en vez de su label (regla 4 del cliente)',
-    cambios: [['    estado.respuesta = await estado.enviar(estado.elegida);', '    estado.respuesta = await estado.enviar(textoDeOpcion(estado.entrada.pregunta, estado.elegida));']],
+    cambios: [['    estado.respuesta = await estado.enviar(label);', '    estado.respuesta = await estado.enviar(textoDeOpcion(estado.entrada.pregunta, label));']],
   },
   x_repaso_doble_envio: {
     archivo: 'src/vistas/estudiante/repaso.js', prueba: REPASO, tests: ['U82: el repaso muestra una pregunta de la tanda'],
@@ -193,6 +193,17 @@ export const TRAMPOSOS = {
     archivo: 'src/ui/explicacion.js', prueba: L1, tests: ['U78: en A1 y A2 (idioma es)'],
     descripcion: 'U78 (H-4): cada parte lleva el lang del idioma: en A1/A2 la oración y el ejemplo en inglés quedan marcados como español',
     cambios: [["h('p', { class: 'sx-banda__cuerpo', lang: p.lang,", "h('p', { class: 'sx-banda__cuerpo', lang: plan.idioma,"]],
+  },
+  x_l1_reelige_en_vuelo: {
+    archivo: 'src/vistas/estudiante/reto_l1.js', prueba: CORR, tests: ['U88: con "Comprobar" en vuelo las opciones del reto'],
+    descripcion: 'U88 (H-6): con Comprobar en vuelo las opciones siguen vivas: reelegir repinta, suena dos veces y sale "Quedó guardada tu primera respuesta"',
+    cambios: [['  estado.enVuelo = true; quietas(estado.opciones); // H-6: mientras vuela, la que se ve elegida es la que se envía\n', '']],
+  },
+  x_repaso_reelige_en_vuelo: {
+    archivo: 'src/vistas/estudiante/repaso.js', prueba: CORR, tests: ['U88: en el repaso'],
+    descripcion: 'U88 (H-6): en el repaso se reelige en vuelo y, como RespuestaOut no trae answer, queda marcada C con el veredicto de B',
+    cambios: [['  estado.enviada = label; estado.enVuelo = true; quietas(estado.opciones); // H-6: lo que se marca después es lo que se envió\n', ''],
+      ['estado.respuesta.answer ?? estado.enviada : estado.elegida;', 'estado.respuesta.answer ?? estado.elegida : estado.elegida;']],
   },
   x_sin_eol_lf: {
     archivo: '.gitattributes', copia: 'gitattributes.txt', prueba: 'tests/unit/sw_peso.test.mjs', tests: ['U59: cada archivo de PRECARGA sale de git archive'],

@@ -56,6 +56,11 @@ export async function renderRepaso(raiz, ctx) {
   pintarPregunta(raiz, estado);
 }
 
+/** Deja quietas las opciones (ya respondida, o con "Comprobar" en vuelo). @param {any} lista */
+function quietas(lista) {
+  for (const li of lista?.children ?? []) { const b = /** @type {any} */ (li).children?.[0]; if (b) b.disabled = true; }
+}
+
 /** Antes de responder: el panel neutro y Comprobar; después, la banda con la explicación y "Siguiente". */
 function accion(raiz, estado) {
   const pregunta = estado.entrada.pregunta;
@@ -73,14 +78,16 @@ function accion(raiz, estado) {
 
 function pintarPregunta(raiz, estado) {
   const pregunta = estado.entrada.pregunta;
-  const elegida = estado.respuesta ? estado.respuesta.answer ?? estado.elegida : estado.elegida;
+  // H-6: RespuestaOut no trae `answer`: tras responder se marca la ENVIADA (fijada al lanzar), nunca la última que se tocó.
+  const elegida = estado.respuesta ? estado.respuesta.answer ?? estado.enviada : estado.elegida;
   const opciones = nodoOpciones(pregunta, { [pregunta.id]: elegida }, (/** @type {string} */ label) => {
-    if (estado.respuesta) return;
+    if (estado.respuesta || estado.enVuelo) return; // H-6: con "Comprobar" en vuelo no se reelige
     estado.elegida = label;
     senal(senalDeSeleccion());
     pintarPregunta(raiz, estado);
   }, null);
-  if (estado.respuesta) for (const li of opciones.children) { const b = /** @type {any} */ (li).children?.[0]; if (b) b.disabled = true; }
+  if (estado.respuesta) quietas(opciones);
+  estado.opciones = opciones;
   pintar(raiz, estado.ctx,
     h('p', { class: 'aviso-corto', role: 'status', 'data-testid': 'banner-repaso' }, T.banner),
     h('p', { class: 'sx-t-apoyo', 'data-testid': 'repaso-quedan' }, T.quedan(estado.quedan)),
@@ -91,10 +98,12 @@ function pintarPregunta(raiz, estado) {
 
 /** Un toque de Comprobar = una petición; la banda sale con lo que dijo el servidor (y nunca con monedas). */
 async function comprobar(raiz, estado, boton) {
-  if (!estado.elegida) return;
+  const label = estado.elegida;
+  if (!label) return;
   boton.disabled = true; marcarCargando(boton, true); boton.textContent = textosPractica.l1.comprobando;
+  estado.enviada = label; estado.enVuelo = true; quietas(estado.opciones); // H-6: lo que se marca después es lo que se envió
   try {
-    estado.respuesta = await estado.enviar(textoDeOpcion(estado.entrada.pregunta, estado.elegida));
+    estado.respuesta = await estado.enviar(textoDeOpcion(estado.entrada.pregunta, label));
     estado.error = null;
     senal(estado.respuesta.is_correct ? 'acierto' : 'fallo');
   } catch (e) {
@@ -102,5 +111,6 @@ async function comprobar(raiz, estado, boton) {
     if (e instanceof ErrorApi && [404, 409, 422].includes(e.status)) { renderRepaso(raiz, estado.ctx); return; } // la forma cambió o ya no toca: se vuelve a pedir
     estado.error = T.noSePudo;
   }
+  estado.enVuelo = false;
   pintarPregunta(raiz, estado);
 }

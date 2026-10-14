@@ -84,17 +84,23 @@ function pintarSinConexion(raiz, datos) {
   document.body.dataset.listo = '1';
 }
 
+/** Deja quietas las opciones de una lista (ya respondida, o con "Comprobar" en vuelo). @param {any} lista */
+function quietas(lista) {
+  for (const li of lista?.children ?? []) { const b = /** @type {any} */ (li).children?.[0]; if (b) b.disabled = true; }
+}
+
 /** Las opciones de la pregunta; ya respondida, quietas (la que quedó guardada, marcada). */
 function opcionesDe(raiz, estado, pregunta, respuesta) {
   const elegida = respuesta ? respuesta.answer : estado.elegidas[pregunta.id];
   const alElegir = (/** @type {string} */ label) => {
-    if (respuesta) return;
+    if (respuesta || estado.enVuelo) return; // H-6: con "Comprobar" en vuelo no se reelige (ni repinta ni suena)
     estado.elegidas[pregunta.id] = label;
     senal(senalDeSeleccion()); // neutra: elegir no dice nada de la clave
     pintar(raiz, estado, 'quieta', label);
   };
   const lista = nodoOpciones(pregunta, { [pregunta.id]: elegida }, alElegir, null);
-  if (respuesta) for (const li of lista.children) { const b = /** @type {any} */ (li).children?.[0]; if (b) b.disabled = true; }
+  if (respuesta) quietas(lista);
+  estado.opciones = lista;
   return lista;
 }
 
@@ -155,13 +161,16 @@ async function comprobar(raiz, estado, pregunta, boton) {
   const label = estado.elegidas[pregunta.id];
   if (!label) return;
   boton.disabled = true; marcarCargando(boton, true); boton.textContent = T.comprobando;
+  estado.enVuelo = true; quietas(estado.opciones); // H-6: mientras vuela, la que se ve elegida es la que se envía
   try {
     const r = await estado.comprobar(pregunta.id, textoDeOpcion(pregunta, label)); // la label que guardó nodoOpciones (valorAlGuardar), nunca el texto
+    estado.enVuelo = false;
     estado.error = null;
     estado.respondidas.set(pregunta.id, r);
     senal(r.is_correct ? 'acierto' : 'fallo');
     pintar(raiz, estado, 'quieta');
   } catch (e) {
+    estado.enVuelo = false;
     console.warn('reto_l1: no se pudo comprobar', e);
     if (e instanceof ErrorApi && e.status === 409) { avisoDeCierre(raiz, estado); return; } // H-2: el intento ya no admite respuestas
     if (e instanceof ErrorApi && e.status === 404) { avisoDeCierre(raiz, estado, T.noDisponible); return; }

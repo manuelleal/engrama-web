@@ -1,0 +1,16 @@
+{
+  "descripcion": "U88 (H-6): en el repaso se reelige en vuelo y, como RespuestaOut no trae answer, queda marcada C con el veredicto de B",
+  "archivos": {
+    "src/vistas/estudiante/repaso.js": "repaso.js"
+  },
+  "comando": [
+    "node",
+    "--test",
+    "--test-reporter=tap",
+    "tests/unit/practica_correcciones.test.mjs"
+  ],
+  "espera_codigo_no_cero": true,
+  "espera_fallan_tests": [
+    "U88: en el repaso"
+  ]
+}

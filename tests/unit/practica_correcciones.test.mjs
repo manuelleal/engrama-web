@@ -169,3 +169,58 @@ test('U87: un 409 al Comprobar da el mismo aviso (sin el texto del servidor); un
     } finally { cerrar(); }
   }
 });
+
+// ---------- U88 (H-6): nada se reelige mientras "Comprobar" vuela ----------
+// Tramposos: x_l1_reelige_en_vuelo (reto_l1.js) y x_repaso_reelige_en_vuelo (repaso.js).
+
+const deshabilitado = (n) => n.disabled === true || n.getAttribute('disabled') !== null;
+const tarda = (valor, ms = 5) => () => new Promise((ok) => setTimeout(() => ok(valor), ms));
+/** Toca sin esperar a que termine lo que dispare (el POST queda en vuelo). */
+const tocarYa = (raiz, testid) => { const n = buscar(raiz, testid); assert.ok(n, `falta ${testid}`); return Promise.all(n.disparar('click')); };
+const presionada = (raiz, label) => buscar(raiz, `opcion-${label}`)?.getAttribute('aria-pressed');
+
+test('U88: con "Comprobar" en vuelo las opciones del reto quedan deshabilitadas y tocar otra no cambia nada (ni la nota de "quedó guardada")', async () => {
+  const cuerpos = [];
+  const { raiz, llamadas, cerrar } = await abrirReto(servidorReto(ESTADO(), {
+    'POST /challenges/attempts/int-1/answers': ({ init }) => { cuerpos.push(JSON.parse(init.body)); return tarda({ ...R1, repetida: false })(); },
+  }));
+  try {
+    await tocar(raiz, 'opcion-A');
+    const vuelo = tocarYa(raiz, 'boton-comprobar');
+    assert.ok(deshabilitado(buscar(raiz, 'opcion-B')), 'en vuelo, la otra opción no se puede tocar');
+    await tocarYa(raiz, 'opcion-B'); // aun si el toque llegara (el DOM de mentira no respeta disabled), no cambia nada
+    await vuelo; await asentar(); await new Promise((ok) => setTimeout(ok, 20)); await asentar();
+    assert.ok(buscar(raiz, 'explicacion'), 'la banda de la respuesta');
+    assert.equal(buscar(raiz, 'explicacion-nota'), null, 'sin "Quedó guardada tu primera respuesta": nada se reeligió');
+    assert.equal(presionada(raiz, 'A'), 'true');
+    assert.deepEqual(cuerpos, [{ question_id: 'q1', answer: 'A' }]);
+    assert.equal(contar(llamadas, 'POST', '/answers'), 1);
+  } finally { cerrar(); }
+});
+
+const PREGUNTA_REPASO = { id: 'p1', question_type: 'multiple_choice', question_text: 'She ___ to school.', options_json: [{ label: 'A', value: 'go' }, { label: 'B', value: 'goes' }], order_index: 1 };
+/** La tanda de hoy con estas entradas de repaso. @param {any[]} repaso */
+const tandaCon = (repaso) => ({ fecha: '2026-10-14', practica: { nivel: 'A2', con_nivel_de_set: false }, tandas_hoy: 1, tope_al_dia: 2, puede_pedir_otra: false, listo_por_hoy: false,
+  sin_contenido_nuevo: false, racha_protegida: false, tanda: { numero: 1, modo: 'nuevo', nivel: 'A2', preguntas: 0, completa: true, repaso, retos: [] } });
+const entrada = (id, p = PREGUNTA_REPASO) => ({ entrada_id: id, etapa: 'refuerzo', nodo: { id: 'n', tipo: 'grammar', nivel: 'A2', nombre_es: 'Rutina' }, pregunta: p });
+/** RespuestaOut del repaso: NO trae `answer` (refuerzo/schemas.py). */
+const RESPUESTA_REPASO = { entrada_id: 12, question_id: 'p1', is_correct: false, correct_answer: 'B', oracion_correcta: 'She goes to school.', estado: 'en_refuerzo', proxima_fecha: null, repetida: false, coins_earned: 0, explanation: null };
+const abrirRepaso = async (rutas) => { const { renderRepaso } = await import('../../src/vistas/estudiante/repaso.js'); return pintar(rutas, (r) => renderRepaso(r, ctxEstudiante())); };
+
+test('U88: en el repaso, con "Comprobar" en vuelo no se reelige, y tras responder queda marcada la ENVIADA (RespuestaOut no trae answer)', async () => {
+  const cuerpos = [];
+  const { raiz, cerrar } = await abrirRepaso({
+    'GET /challenges/tanda': json(200, tandaCon([entrada(12)])),
+    'POST /challenges/refuerzo/12/respuestas': ({ init }) => { cuerpos.push(JSON.parse(init.body)); return tarda(RESPUESTA_REPASO)(); },
+  });
+  try {
+    await tocar(raiz, 'opcion-A');
+    const vuelo = tocarYa(raiz, 'boton-comprobar');
+    assert.ok(deshabilitado(buscar(raiz, 'opcion-B')), 'en vuelo, la otra opción no se puede tocar');
+    await tocarYa(raiz, 'opcion-B');
+    await vuelo; await asentar(); await new Promise((ok) => setTimeout(ok, 20)); await asentar();
+    assert.ok(buscar(raiz, 'explicacion'), 'la banda');
+    assert.deepEqual([presionada(raiz, 'A'), presionada(raiz, 'B')], ['true', 'false'], 'marcada la que se envió, no la que se tocó en vuelo');
+    assert.deepEqual(cuerpos, [{ question_id: 'p1', answer: 'A' }]);
+  } finally { cerrar(); }
+});

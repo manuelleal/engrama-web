@@ -1,0 +1,16 @@
+{
+  "descripcion": "U88 (H-6): con Comprobar en vuelo las opciones siguen vivas: reelegir repinta, suena dos veces y sale \"Quedó guardada tu primera respuesta\"",
+  "archivos": {
+    "src/vistas/estudiante/reto_l1.js": "reto_l1.js"
+  },
+  "comando": [
+    "node",
+    "--test",
+    "--test-reporter=tap",
+    "tests/unit/practica_correcciones.test.mjs"
+  ],
+  "espera_codigo_no_cero": true,
+  "espera_fallan_tests": [
+    "U88: con \"Comprobar\" en vuelo las opciones del reto"
+  ]
+}
