@@ -268,6 +268,12 @@ export const TRAMPOSOS = {
     descripcion: 'U94 cruce (H-A): el mismo defecto medido en el navegador: el color que pinta "Comprobar" es el oro, no el navy del sistema',
     cambios: [[ORO_COMPROBAR, '']],
   },
+  x_l1_error_inesperado_es_viejo: {
+    archivo: 'src/vistas/estudiante/reto_flujo.js', prueba: CORR, tests: ['U95: si intentarL1 lanza algo inesperado'],
+    descripcion: 'U95 (H-B, auditoría 06): porPregunta como antes de H-1: cualquier error de intentarL1 (no solo un import() que falla) devuelve false y el reto cae al flujo de siempre y su /submit',
+    cambios: [["  let l1;\n  try { l1 = await import('./reto_l1.js'); } catch (e) { console.warn('reto_flujo: sin L1', e); return false; }\n  return l1.intentarL1(raiz, datos);\n",
+      "  try { return await (await import('./reto_l1.js')).intentarL1(raiz, datos); } catch (e) { console.warn('reto_flujo: sin L1', e); return false; }\n"]],
+  },
   x_humo_correcciones_500_viejo: {
     archivo: 'src/api/practica.js', prueba: 'tests/unit/humo_correcciones.test.mjs', tests: ['U93: el humo de las correcciones (desarrollo)', 'U93: la réplica'],
     descripcion: 'U93 (W83): el humo de la red irregular lo ve: dos 503 (o un corte) al leer el intento dan null, como un backend viejo',

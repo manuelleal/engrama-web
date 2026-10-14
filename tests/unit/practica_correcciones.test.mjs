@@ -119,6 +119,33 @@ test('U86: con el sondeo caído dos veces, el reto muestra "Reintentar" y "✕ S
   } finally { cerrar(); }
 });
 
+// ---------- U95 (H-B de la auditoría 06): solo un import() que falla es "como siempre" ----------
+// reto_flujo.js `porPregunta`: un error INESPERADO de intentarL1 sube y se muestra; nunca se toma por backend viejo (ni se cae al flujo de siempre y su /submit).
+// Tramposo: x_l1_error_inesperado_es_viejo (reto_flujo.js con el try/catch de antes: cualquier error de intentarL1 devuelve false).
+
+test('U95: si intentarL1 lanza algo inesperado, el reto dice "No se pudo cargar el reto." con su salida: ni preguntas del flujo de siempre, ni un /submit, ni se toma por backend viejo', async () => {
+  // El error inesperado: la lectura de `ctx` falla justo después de /attempt, que es donde intentarL1 la usa por primera vez (retomarIntento).
+  let armado = false;
+  const base = ctxEstudiante();
+  const ctx = { ...base, get token() { if (armado) throw new Error('falla inesperada dentro de intentarL1'); return base.token; } };
+  const rutas = servidorReto(ESTADO([]), { 'POST /challenges/reto-1/attempt': (/** @type {any} */ a) => { armado = true; return json(200, { attempt_id: 'int-1', attempt_number: 1, challenge: RETO })(a); } });
+  /** @type {any[][]} */
+  const escrito = [];
+  // `pintar` calla la consola (fotos_de_navegacion.mjs); aquí se recoge lo que escribe la vista y `cerrar` la restaura.
+  const { raiz, llamadas, cerrar } = await pintar(rutas, (r) => { console.warn = (/** @type {any[]} */ ...a) => { escrito.push(a); }; return renderRetoFlujo(r, { id: 'reto-1' }, {}, ctx); });
+  try {
+    assert.ok(armado, 'el error se disparó después de /attempt');
+    assert.ok(textoDe(raiz).includes('No se pudo cargar el reto.'), 'lo dice');
+    assert.equal(buscar(raiz, 'reto-salir')?.getAttribute('href'), '#/retos', 'con su salida');
+    for (const id of ['opciones', 'boton-comprobar', 'boton-siguiente', 'boton-terminar', 'reto-reintentar']) assert.equal(buscar(raiz, id), null, `sin ${id}: no cae al flujo de siempre`);
+    assert.notEqual(buscar(raiz, 'vista-reto-flujo')?.getAttribute('data-modo'), 'por-pregunta');
+    assert.equal(llamadas.filter((l) => l.metodo === 'POST' && !l.ruta.endsWith('/attempt')).length, 0, 'ningún envío');
+    const avisos = escrito.map((a) => String(a[0]));
+    assert.ok(avisos.some((m) => m.includes('no se pudo cargar el reto')), 'queda escrito como fallo del reto');
+    assert.ok(!avisos.some((m) => m.includes('sin L1')), 'no se anota como "sin L1" (backend viejo)');
+  } finally { cerrar(); }
+});
+
 // ---------- U87 (H-2): un 409 no deja la pantalla colgada en "Enviando…" ----------
 // Tramposos: x_l1_finish_409_colgado y x_l1_comprobar_409_crudo (reto_l1.js).
 
