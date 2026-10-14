@@ -11,6 +11,9 @@ import { conAppCompleta } from './ayudante_servidor.mjs';
 import { crearChallenge } from '../../herramientas/mock/rutas_challenges.mjs';
 import { DOCENTE_BOOTSTRAP_TOKEN } from '../../herramientas/mock/estado.mjs';
 
+// W78 (docs/ESPEC_practica_del_dia.md §3): con el backend viejo (estado.backend.l1 = false) la web pregunta una vez por intento si hay L1
+// (GET …/answers) y recibe 404, que es la señal del respaldo. Ese 404 esperado no es un error de la página.
+const sinSondeoL1 = (errores) => errores.filter((e) => !/\/challenges\/attempts\/[^/]+\/answers$/.test(e));
 const HAY_NAVEGADOR = [
   process.env.EDGE_PATH,
   'C:/Program Files (x86)/Microsoft/Edge/Application/msedge.exe',
@@ -40,7 +43,7 @@ test('game feel: en Inicio, si el saldo del servidor subió, las monedas vuelan 
         };
       })()`,
     });
-    assert.deepEqual(r.errores, []);
+    assert.deepEqual(sinSondeoL1(r.errores), []);
     assert.ok(r.eval.enVuelo > 0, 'al subir el saldo, hay fichas volando hacia el contador');
     assert.equal(r.eval.quedan, 0, 'las fichas se retiran solas al aterrizar');
     assert.match(r.eval.saldo, /^0 monedas$/, 'el contador termina en el saldo del servidor, no en otro');
@@ -73,7 +76,7 @@ test('game feel: si la constancia del servidor subió, Inicio la celebra (llama,
         };
       })()`,
     });
-    assert.deepEqual(r.errores, []);
+    assert.deepEqual(sinSondeoL1(r.errores), []);
     // W48 (ESPEC_juego_oleada1 4.4): de 1 a 3 la racha CRUZA el umbral de 3, asi que el aviso dice ademas que la llama crecio (antes: '¡Constancia 3!').
     assert.equal(r.eval.aviso, '¡Constancia 3! Tu llama creció.', 'est-1 llega con constancia 3 del servidor: se celebra ese número, no otro');
     assert.equal(r.eval.llamas, 1, 'la constancia lleva su llama dibujada');
@@ -94,6 +97,7 @@ test('game feel: con la misma constancia que la última vez, Inicio no celebra',
 });
 
 function sembrarReto(estado) {
+  estado.backend.l1 = false; // mide el flujo de siempre (con /submit): el pregunta por pregunta lo mide E35 (docs/ESPEC_practica_del_dia.md §3)
   const groupId = [...estado.groups.values()][0].id;
   const { cuerpo } = crearChallenge(estado, { headers: { authorization: `Bearer ${DOCENTE_BOOTSTRAP_TOKEN}` } }, {
     title: 'Reto de juego', description: 'd', group_id: groupId, coins_reward: 5, xp_reward: 3,
@@ -132,7 +136,7 @@ test('game feel: en la pregunta el botón nace plano, despierta al elegir, sube 
         };
       })()`,
     });
-    assert.deepEqual(r.errores, []);
+    assert.deepEqual(sinSondeoL1(r.errores), []);
     assert.equal(r.eval.antes.deshabilitado, true, 'el botón empieza plano (deshabilitado)');
     assert.equal(r.eval.antes.progreso, '0');
     assert.match(r.eval.antes.panel, /panel-oculto/);
@@ -177,7 +181,7 @@ test('game feel: un reto perfecto celebra a lo grande (confeti fuerte, medalla d
   await conAppCompleta(async (url, estado) => {
     const reto = sembrarReto(estado);
     const r = await revisarPagina({ url: `${url}#/retos/${reto.id}`, ancho: 375, alto: 812, espera_ms: 5000, pre: YA_ENTRO, eval: scriptTerminar(['A', 'B']) });
-    assert.deepEqual(r.errores, []);
+    assert.deepEqual(sinSondeoL1(r.errores), []);
     assert.match(r.eval.hero, /hero-perfecto/);
     assert.equal(r.eval.titulo, '¡Reto perfecto!');
     assert.equal(r.eval.drako, 'drako-celebra');
@@ -194,7 +198,7 @@ test('game feel: un reto con todo fallado anima (Drako "ups", sin confeti, sin m
   await conAppCompleta(async (url, estado) => {
     const reto = sembrarReto(estado);
     const r = await revisarPagina({ url: `${url}#/retos/${reto.id}`, ancho: 375, alto: 812, espera_ms: 5000, pre: YA_ENTRO, eval: scriptTerminar(['B', 'A']) });
-    assert.deepEqual(r.errores, []);
+    assert.deepEqual(sinSondeoL1(r.errores), []);
     assert.match(r.eval.hero, /hero-animo/);
     assert.equal(r.eval.drako, 'drako-ups');
     assert.equal(r.eval.medio.confetiAlgo, 0, 'sin confeti cuando no hubo aciertos');
@@ -230,7 +234,7 @@ test('game feel: marcar asistencia estampa el sello, cuenta las monedas del serv
         };
       })()`,
     });
-    assert.deepEqual(r.errores, []);
+    assert.deepEqual(sinSondeoL1(r.errores), []);
     assert.equal(r.eval.temprano.sello, true, 'el sello aparece al instante');
     assert.equal(r.eval.temprano.sonido, true);
     assert.match(r.eval.resultado, /✓/);
@@ -262,7 +266,7 @@ test('game feel: la carga y el vacío tienen personalidad (Drako en espera + esq
         return { carga, vacio: vacio ? { drako: !!vacio.querySelector('[data-testid="drako-espera"]'), texto: vacio.textContent } : null };
       })()`,
     });
-    assert.deepEqual(r.errores, []);
+    assert.deepEqual(sinSondeoL1(r.errores), []);
     assert.ok(r.eval.carga, 'mientras llegan los retos se vio el estado de carga');
     assert.equal(r.eval.carga.drako, true);
     assert.ok(r.eval.carga.esqueletos >= 2);

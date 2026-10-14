@@ -1,0 +1,16 @@
+{
+  "descripcion": "U79: Comprobar manda el texto de la opción en vez de su label (regla 4 del cliente)",
+  "archivos": {
+    "src/vistas/estudiante/reto_l1.js": "reto_l1.js"
+  },
+  "comando": [
+    "node",
+    "--test",
+    "--test-reporter=tap",
+    "tests/unit/practica_l1.test.mjs"
+  ],
+  "espera_codigo_no_cero": true,
+  "espera_fallan_tests": [
+    "U79: Comprobar manda la label"
+  ]
+}

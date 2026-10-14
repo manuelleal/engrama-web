@@ -11,6 +11,9 @@ import { conAppCompleta } from './ayudante_servidor.mjs';
 import { crearChallenge } from '../../herramientas/mock/rutas_challenges.mjs';
 import { DOCENTE_BOOTSTRAP_TOKEN } from '../../herramientas/mock/estado.mjs';
 
+// W78 (docs/ESPEC_practica_del_dia.md §3): con el backend viejo (estado.backend.l1 = false) la web pregunta una vez por intento si hay L1
+// (GET …/answers) y recibe 404, que es la señal del respaldo. Ese 404 esperado no es un error de la página.
+const sinSondeoL1 = (errores) => errores.filter((e) => !/\/challenges\/attempts\/[^/]+\/answers$/.test(e));
 const HAY_NAVEGADOR = [
   process.env.EDGE_PATH,
   'C:/Program Files (x86)/Microsoft/Edge/Application/msedge.exe',
@@ -30,6 +33,7 @@ function reqDocente() {
 const ENUNCIADO_MALICIOSO = '<img src=x onerror="window.__pwned = true">¿Cuál es correcta?';
 
 function sembrarReto(estado, groupId) {
+  estado.backend.l1 = false; // mide el flujo de siempre (con /submit): el pregunta por pregunta lo mide E35 (docs/ESPEC_practica_del_dia.md §3)
   const { cuerpo } = crearChallenge(estado, reqDocente(), {
     title: 'Reto de prueba', description: 'd', group_id: groupId, coins_reward: 5, xp_reward: 3,
     questions: [
@@ -83,7 +87,7 @@ test(
         url: `${url}#/retos/${reto.id}`, ancho: 375, alto: 812, espera_ms: 5000, pre: YA_ENTRO,
         eval: scriptJugar(reto.questions[0].id),
       });
-      assert.deepEqual(r.errores, []);
+      assert.deepEqual(sinSondeoL1(r.errores), []);
 
       // E2: nada de clave visible antes de responder (question_id no revela correct_answer;
       // el texto crudo de la página tampoco trae "correct_answer" ni las labels con su value real).

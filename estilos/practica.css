@@ -1,0 +1,22 @@
+/* estilos/practica.css · La práctica del día (docs/ESPEC_practica_del_dia.md): lo poco que el sistema visual (`sx-`) no trae. Va FUERA de la precarga
+   del shell (lista DIFERIDOS de sw.js, §0): sin red y sin haberla guardado, la app abre igual. Solo tokens; nada se anima aquí. */
+
+/* W78: tras comprobar, la barra de acción lleva la banda de la explicación (sx-banda). Puede ser alta: se desplaza por dentro y la pantalla deja
+   lugar abajo para volver a leer la pregunta. La barra sigue fija y del mismo ancho (juego.css, cara.css). */
+.barra-accion.con-banda {
+  max-height: 78vh;
+  overflow-y: auto;
+  padding: 0;
+  background: transparent;
+  border-top: 0;
+}
+.juego.con-banda {
+  padding-bottom: 40vh;
+}
+.banda-explicacion {
+  border-radius: var(--radio-md) var(--radio-md) 0 0;
+  padding-bottom: calc(16px + env(safe-area-inset-bottom));
+}
+.banda-explicacion .sx-banda__accion .boton-principal {
+  width: 100%;
+}

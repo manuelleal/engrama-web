@@ -10,6 +10,7 @@ const respuestasGuardadas = (sesion) => sesion.evaluar(`Object.keys(localStorage
 
 test('U70 (navegador): "✕ Salir" lleva del reto en curso a Retos sin enviar el intento, sin pedir nada del reto y sin borrar las respuestas guardadas', { skip: OMITIR, timeout: 180_000 }, async (t) => {
   await conNavegacion(async (url, estado) => {
+    estado.backend.l1 = false; // W78: mide el reto de siempre (las respuestas en el equipo); con L1 no se guarda nada en el equipo (E35, U79)
     const sesion = await abrirComo(url, 'student');
     try {
       await tocar(sesion, '[data-testid="jugar-reto-hoy"]');

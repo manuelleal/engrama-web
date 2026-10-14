@@ -1,0 +1,17 @@
+{
+  "descripcion": "U78: \"por qué no la tuya\" sale también al acertar (corrige a quien acertó)",
+  "archivos": {
+    "src/ui/explicacion.js": "explicacion.js"
+  },
+  "comando": [
+    "node",
+    "--test",
+    "--test-reporter=tap",
+    "tests/unit/practica_l1.test.mjs"
+  ],
+  "espera_codigo_no_cero": true,
+  "espera_fallan_tests": [
+    "U78: al acertar no hay",
+    "U79: Ver resultado cierra con /finish"
+  ]
+}

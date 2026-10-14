@@ -1,0 +1,16 @@
+{
+  "descripcion": "U77: la respuesta de /answers se usa sin validar (ausente pasa por cero y la banda pinta \"undefined\")",
+  "archivos": {
+    "src/api/practica.js": "practica.js"
+  },
+  "comando": [
+    "node",
+    "--test",
+    "--test-reporter=tap",
+    "tests/unit/practica_l1.test.mjs"
+  ],
+  "espera_codigo_no_cero": true,
+  "espera_fallan_tests": [
+    "U77: responderPregunta manda la label"
+  ]
+}

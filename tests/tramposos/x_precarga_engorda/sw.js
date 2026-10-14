@@ -10,7 +10,7 @@
 //
 // Súbelo un número cada vez que cambie la lista de precarga o la estrategia; la `activate`
 // borra cualquier caché con otro nombre.
-const VERSION = 'engrama-shell-v49';
+const VERSION = 'engrama-shell-v50';
 
 // Cada encargo agrega los suyos en su propio commit (W7: Inicio + api/cliente,core,retos + los
 // SVG de Drako que usa el estudiante; W10: profe/grupos,grupo,sesion_asistencia + api/profe). El
@@ -165,6 +165,18 @@ const APARTE = [
   '/publico/diseno/sistema.css',
 ];
 
+// La práctica del día (docs/ESPEC_practica_del_dia.md §0): la explicación tras cada respuesta, la tanda, el repaso y la racha semanal. Son módulos
+// DIFERIDOS: la app los carga con `import()` solo cuando el backend los ofrece, y si no cargan (sin red y sin haberlos guardado) funciona como antes.
+// No van en PRECARGA (el shell está a menos de 3 KB de su techo de 830.000; U59 lo vigila): se guardan al activar, como las fuentes y el sistema.
+// U59 exige además que todo lo que un diferido importa de forma estática esté aquí o en PRECARGA.
+const DIFERIDOS = [
+  '/estilos/practica.css',
+  '/src/textos_practica.js',
+  '/src/api/practica.js',
+  '/src/ui/explicacion.js',
+  '/src/vistas/estudiante/reto_l1.js',
+];
+
 // Cuánto se espera a CADA recurso de la precarga. Antes era `cache.addAll(PRECARGA)`: todo o nada, sin límite de tiempo. Un solo recurso
 // lento (que la primera pantalla ni siquiera necesita) tenía a la página SIN controlar hasta que llegara, y uno que fallara dejaba
 // el service worker sin instalar (medido con herramientas/medir_sw.mjs: un SVG de 40 s → la página, lista a los 2,5 s, quedó controlada a
@@ -211,9 +223,10 @@ async function guardarFuentes() {
   try {
     const cache = await caches.open(VERSION);
     const fallidos = [];
-    await Promise.all([...FUENTES, ...APARTE].map(async (ruta) => { if (!(await cache.match(ruta))) await precargarUno(cache, ruta, fallidos); }));
+    const guardar = async (ruta) => { if (!(await cache.match(ruta))) await precargarUno(cache, ruta, fallidos); };
+    await Promise.all([...FUENTES, ...APARTE].map(guardar).concat(DIFERIDOS.map(guardar)));
   } catch (e) {
-    console.warn('sw: no guardé las fuentes ni el sistema visual (se guardan al primer uso)', e && e.message);
+    console.warn('sw: no guardé las fuentes, el sistema visual ni los diferidos (se guardan al primer uso)', e && e.message);
   }
 }
 

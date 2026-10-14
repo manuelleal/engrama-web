@@ -1,0 +1,16 @@
+{
+  "descripcion": "U78: la explicación de B1 sale con rótulos en español y sin lang (el lector la pronuncia mal)",
+  "archivos": {
+    "src/ui/explicacion.js": "explicacion.js"
+  },
+  "comando": [
+    "node",
+    "--test",
+    "--test-reporter=tap",
+    "tests/unit/practica_l1.test.mjs"
+  ],
+  "espera_codigo_no_cero": true,
+  "espera_fallan_tests": [
+    "U78: desde B1 (idioma en)"
+  ]
+}

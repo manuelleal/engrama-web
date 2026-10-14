@@ -25,6 +25,8 @@ const VENTANAS = [{ ancho: 375, alto: 812 }, { ancho: 1280, alto: 800 }];
 const esperar = (ms) => new Promise((r) => setTimeout(r, ms));
 const reqDocente = () => ({ headers: { authorization: `Bearer ${DOCENTE_BOOTSTRAP_TOKEN}` } });
 const clic = (testid) => `document.querySelector('[data-testid="${testid}"]').click()`;
+// W78: tras Comprobar el botón que sigue llega con la respuesta del servidor: se espera a que exista (hasta 3 s) antes de tocarlo.
+const clicAlLlegar = (testid) => `await (async () => { for (let i = 0; i < 60 && !document.querySelector('[data-testid="${testid}"]'); i++) await new Promise((r) => setTimeout(r, 50)); })(); ${clic(testid)}`;
 
 async function levantar() {
   const estado = crearEstado();
@@ -100,13 +102,14 @@ async function faseRetos({ sesion, estado, grupoId, retos, foto, ir }) {
     await sesion.evaluar(clic(`opcion-${buena(0)}`)); await foto('08-reto-opcion-elegida');
     for (let i = 0; i < desafio.questions.length; i++) {
       const ultimo = i === desafio.questions.length - 1;
-      await sesion.evaluar(`(async () => { const e = (ms) => new Promise((r) => setTimeout(r, ms)); ${clic(`opcion-${buena(i)}`)}; await e(200); ${clic(ultimo ? 'boton-terminar' : 'boton-siguiente')}; await e(450); })()`);
+      // W78: pregunta por pregunta (Comprobar y la banda de la explicación) contra el mock con L1.
+      await sesion.evaluar(`(async () => { const e = (ms) => new Promise((r) => setTimeout(r, ms)); ${clic(`opcion-${buena(i)}`)}; await e(200); ${clic('boton-comprobar')}; await e(450); ${clicAlLlegar(ultimo ? 'boton-terminar' : 'boton-siguiente')}; await e(450); })()`);
     }
     await foto('09-fin-de-reto-perfecto-a-los-700-ms', 250);
     await foto('10-fin-de-reto-perfecto', 4200);
     const animo = retoNuevo(estado, grupoId, 'Reto de las capturas', ['A', 'B']);
     await ir('/retos'); await ir(`/retos/${animo.id}`);
-    await sesion.evaluar(`(async () => { const e = (ms) => new Promise((r) => setTimeout(r, ms)); ${clic('opcion-B')}; await e(200); ${clic('boton-siguiente')}; await e(500); ${clic('opcion-A')}; await e(200); ${clic('boton-terminar')}; })()`);
+    await sesion.evaluar(`(async () => { const e = (ms) => new Promise((r) => setTimeout(r, ms)); ${clicAlLlegar('opcion-B')}; await e(200); ${clic('boton-comprobar')}; ${clicAlLlegar('boton-siguiente')}; await e(500); ${clicAlLlegar('opcion-A')}; await e(200); ${clic('boton-comprobar')}; ${clicAlLlegar('boton-terminar')}; })()`);
     await foto('11-fin-de-reto-animo', 4000);
     await ir('/retos'); await foto('12-retos-despues');
     await sesion.evaluar(`document.querySelector('[data-testid$="-repasar"]').click()`); await foto('13-aviso-de-repaso');

@@ -12,6 +12,9 @@ import { conAppCompleta } from './ayudante_servidor.mjs';
 import { crearChallenge } from '../../herramientas/mock/rutas_challenges.mjs';
 import { DOCENTE_BOOTSTRAP_TOKEN } from '../../herramientas/mock/estado.mjs';
 
+// W78 (docs/ESPEC_practica_del_dia.md §3): con el backend viejo (estado.backend.l1 = false) la web pregunta una vez por intento si hay L1
+// (GET …/answers) y recibe 404, que es la señal del respaldo. Ese 404 esperado no es un error de la página.
+const sinSondeoL1 = (errores) => errores.filter((e) => !/\/challenges\/attempts\/[^/]+\/answers$/.test(e));
 const HAY_NAVEGADOR = [
   process.env.EDGE_PATH,
   'C:/Program Files (x86)/Microsoft/Edge/Application/msedge.exe',
@@ -24,6 +27,7 @@ const YA_ENTRO = "localStorage.setItem('engrama_actor_sintetico', 'est-1')";
 const REDUCIDO = "const mm = window.matchMedia.bind(window); window.matchMedia = (q) => (/prefers-reduced-motion/.test(q) ? { matches: true, media: q, addEventListener() {}, removeEventListener() {} } : mm(q));";
 
 function sembrarReto(estado, correctas) {
+  estado.backend.l1 = false; // mide el flujo de siempre (con /submit): el pregunta por pregunta lo mide E35 (docs/ESPEC_practica_del_dia.md §3)
   const groupId = [...estado.groups.values()][0].id;
   const q = (t, b) => ({ question_text: t, correct_answer: b, options_json: [{ label: 'A', value: 'uno' }, { label: 'B', value: 'dos' }] });
   const { cuerpo } = crearChallenge(estado, { headers: { authorization: `Bearer ${DOCENTE_BOOTSTRAP_TOKEN}` } }, {
@@ -71,7 +75,7 @@ test('línea de tiempo (E2E): Drako salta → confeti → puntaje → monedas �
   await conAppCompleta(async (url, estado) => {
     const reto = sembrarReto(estado, ['A', 'B']);
     const r = await revisarPagina({ url: `${url}#/retos/${reto.id}`, ancho: 375, alto: 812, espera_ms: 5000, pre: YA_ENTRO, eval: MEDIR_ORDEN(['A', 'B']) });
-    assert.deepEqual(r.errores, []);
+    assert.deepEqual(sinSondeoL1(r.errores), []);
     const v = r.eval.visto;
     for (const paso of ['salto', 'confeti', 'puntaje', 'monedas', 'filas', 'boton']) assert.notEqual(v[paso], undefined, `nunca se vio: ${paso} (${JSON.stringify(v)})`);
     assert.ok(v.salto <= v.confeti, `salto ${v.salto} ≤ confeti ${v.confeti}`);
@@ -107,7 +111,7 @@ test('línea de tiempo (E2E): con prefers-reduced-motion todo va directo al esta
         };
       })()`,
     });
-    assert.deepEqual(r.errores, []);
+    assert.deepEqual(sinSondeoL1(r.errores), []);
     assert.equal(r.eval.filasVisibles, true);
     assert.equal(r.eval.listas, true);
     assert.equal(r.eval.boton, '1');
@@ -121,7 +125,7 @@ test('línea de tiempo (E2E): un reto con ánimo no lleva confeti ni monedas, pe
   await conAppCompleta(async (url, estado) => {
     const reto = sembrarReto(estado, ['A', 'B']);
     const r = await revisarPagina({ url: `${url}#/retos/${reto.id}`, ancho: 375, alto: 812, espera_ms: 5000, pre: YA_ENTRO, eval: MEDIR_ORDEN(['B', 'A']) });
-    assert.deepEqual(r.errores, []);
+    assert.deepEqual(sinSondeoL1(r.errores), []);
     const v = r.eval.visto;
     assert.equal(v.confeti, undefined, 'sin confeti');
     assert.equal(v.monedas, undefined, 'sin monedas');

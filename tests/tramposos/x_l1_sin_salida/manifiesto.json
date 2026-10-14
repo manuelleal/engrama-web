@@ -1,0 +1,16 @@
+{
+  "descripcion": "U79: la pregunta del reto con L1 no trae \"✕ Salir\" (un callejón, como antes de W73)",
+  "archivos": {
+    "src/vistas/estudiante/reto_l1.js": "reto_l1.js"
+  },
+  "comando": [
+    "node",
+    "--test",
+    "--test-reporter=tap",
+    "tests/unit/practica_l1.test.mjs"
+  ],
+  "espera_codigo_no_cero": true,
+  "espera_fallan_tests": [
+    "U79: pinta las preguntas de /attempt"
+  ]
+}

@@ -1,0 +1,16 @@
+{
+  "descripcion": "U79: al recargar el reto vuelve a la pregunta 1 aunque ya se respondió (y la banda de la 1 se ve otra vez)",
+  "archivos": {
+    "src/vistas/estudiante/reto_l1.js": "reto_l1.js"
+  },
+  "comando": [
+    "node",
+    "--test",
+    "--test-reporter=tap",
+    "tests/unit/practica_l1.test.mjs"
+  ],
+  "espera_codigo_no_cero": true,
+  "espera_fallan_tests": [
+    "U79: al recargar retoma donde iba"
+  ]
+}

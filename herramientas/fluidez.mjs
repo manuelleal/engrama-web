@@ -71,6 +71,7 @@ async function medir(sesion, nombre, accion, ms) {
 }
 
 function sembrarReto(estado) {
+  estado.backend.l1 = false; // mide el flujo de siempre (con /submit): el pregunta por pregunta lo mide E35 (docs/ESPEC_practica_del_dia.md §3)
   const groupId = [...estado.groups.values()][0].id;
   const q = (texto, buena) => ({ question_text: texto, correct_answer: buena, options_json: [{ label: 'A', value: 'uno' }, { label: 'B', value: 'dos' }] });
   const { cuerpo } = crearChallenge(estado, { headers: { authorization: `Bearer ${DOCENTE_BOOTSTRAP_TOKEN}` } }, {

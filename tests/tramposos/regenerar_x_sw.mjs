@@ -46,6 +46,8 @@ const TRAMPOSOS = {
   ),
   // U59 (docs/ESPEC_practica_del_dia.md §0): el sistema visual (46 KB) entra a PRECARGA y el shell pasa su techo de 830.000.
   x_precarga_engorda: cambiar(sw, "  '/publico/diseno/tokens.css',\n", "  '/publico/diseno/tokens.css',\n  '/publico/diseno/sistema.css',\n"),
+  // U59: un módulo diferido (el reto pregunta por pregunta) no está en DIFERIDOS: nunca se guarda y, sin red, el reto no abre por ahí.
+  x_diferido_suelto: cambiar(sw, "  '/src/vistas/estudiante/reto_l1.js',\n", ''),
 };
 
 for (const [nombre, contenido] of Object.entries(TRAMPOSOS)) {

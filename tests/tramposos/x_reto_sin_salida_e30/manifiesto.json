@@ -1,7 +1,8 @@
 {
-  "descripcion": "El mismo defecto de x_reto_sin_salida, medido en el navegador: el reto en curso es un callejon (E30)",
+  "descripcion": "El mismo defecto de x_reto_sin_salida, medido en el navegador: el reto en curso es un callejon (E30), en el camino de siempre y en el de L1",
   "archivos": {
-    "src/vistas/estudiante/reto_flujo.js": "reto_flujo.js"
+    "src/vistas/estudiante/reto_flujo.js": "reto_flujo.js",
+    "src/vistas/estudiante/reto_l1.js": "reto_l1.js"
   },
   "comando": [
     "node",

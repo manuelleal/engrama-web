@@ -33,6 +33,7 @@ const ESPERAR_JS = 'const esperar = (ms) => new Promise((r) => setTimeout(r, ms)
 
 async function levantarServidores() {
   const estado = crearEstado();
+  estado.backend.l1 = false; // mide el flujo de siempre (con /submit): el pregunta por pregunta lo mide E35 (docs/ESPEC_practica_del_dia.md §3)
   const mock = crearMockApi(estado);
   await new Promise((ok) => mock.listen(0, '127.0.0.1', ok));
   const apiUrlDirecta = `http://127.0.0.1:${mock.address().port}`;

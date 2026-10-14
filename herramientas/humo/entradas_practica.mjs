@@ -62,9 +62,13 @@ export function sembrarPractica(estado, { estudiantes = [['prac-1', 'Paula Sinte
   const { cuerpo: grupo } = crearGrupo(estado, req(ADMIN_BOOTSTRAP_TOKEN), { group_code: 'SINT-PRAC-01' });
   asignarDocente(estado, req(ADMIN_BOOTSTRAP_TOKEN), grupo.id, { documento_id: 'DOCENTE-DEMO' });
   importarCsv(estado, req(ADMIN_BOOTSTRAP_TOKEN), grupo.id, `documento_id,nombre_completo\n${estudiantes.map((e) => e.join(',')).join('\n')}\n`);
-  const retos = RETOS_PRACTICA.map(([title, cefr_level, topic, skill, preguntas]) => crearChallenge(estado, req(DOCENTE_BOOTSTRAP_TOKEN), {
-    title, description: 'Reto de práctica (datos sintéticos)', group_id: grupo.id, cefr_level, topic, skill, coins_reward: 10, xp_reward: 3,
+  return { grupoId: grupo.id, retos: sembrarRetosPractica(estado, grupo.id) };
+}
+
+/** Los retos de práctica en un grupo que ya existe (las pruebas en el navegador los ponen en el de `est-1`). @param {any} estado @param {string} grupoId */
+export function sembrarRetosPractica(estado, grupoId) {
+  return RETOS_PRACTICA.map(([title, cefr_level, topic, skill, preguntas]) => crearChallenge(estado, req(DOCENTE_BOOTSTRAP_TOKEN), {
+    title, description: 'Reto de práctica (datos sintéticos)', group_id: grupoId, cefr_level, topic, skill, coins_reward: 10, xp_reward: 3,
     questions: preguntas.map(pregunta),
   }).cuerpo);
-  return { grupoId: grupo.id, retos };
 }

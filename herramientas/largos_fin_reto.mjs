@@ -13,6 +13,7 @@ const iCpu = process.argv.indexOf('--cpu');
 const cpu = iCpu >= 0 ? Number(process.argv[iCpu + 1]) : 4;
 
 await conAppCompleta(async (url, estado) => {
+  estado.backend.l1 = false; // mide el flujo de siempre (con /submit): el pregunta por pregunta lo mide E35 (docs/ESPEC_practica_del_dia.md §3)
   const groupId = [...estado.groups.values()][0].id;
   const q = (t, b) => ({ question_text: t, correct_answer: b, options_json: [{ label: 'A', value: 'uno' }, { label: 'B', value: 'dos' }] });
   const { cuerpo: reto } = crearChallenge(estado, { headers: { authorization: `Bearer ${DOCENTE_BOOTSTRAP_TOKEN}` } }, {

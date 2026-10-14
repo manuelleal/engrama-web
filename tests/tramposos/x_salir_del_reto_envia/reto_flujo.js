@@ -1,7 +1,6 @@
 // @ts-check
-// vistas/estudiante/reto_flujo.js · W9: una pregunta por pantalla (hito 1 — las respuestas se
-// guardan en el dispositivo, por `attempt_id`, y se revisan al final; la corrección pregunta a
-// pregunta es L1/W18, hito 2). Las opciones se guardan por su LABEL ("A", "B"…), nunca por su
+// vistas/estudiante/reto_flujo.js · W9: una pregunta por pantalla. Con L1 en el backend, pregunta por pregunta (reto_l1.js, W78); si no,
+// las respuestas se guardan en el equipo por `attempt_id` y se revisan al final. Las opciones se guardan por su LABEL ("A", "B"…), nunca por su
 // `value` (§7.2 regla 4; X12 lo prueba). "Repaso: no suma monedas" se dice ANTES de empezar
 // cuando el reto ya estaba ganado (matiz de F4, 2026-09-28); el cliente nunca inventa un "+N
 // monedas": muestra lo que trae `coins_earned` en la respuesta, sea lo que sea.
@@ -25,7 +24,7 @@ import { leerRespuestasGuardadas, guardarRespuestas, borrarRespuestasGuardadas }
  * petición, y las respuestas ya guardadas en el equipo no se borran. El reto sigue sin barra de abajo (una tarea por pantalla): esta es su
  * única salida. No aparece mientras se revisa el envío.
  */
-function crearSalir() {
+export function crearSalir() {
   return h('a', { href: '#/retos', class: 'salir-reto', 'data-testid': 'reto-salir', 'aria-label': textos.salirDelReto.nombre }, textos.salirDelReto.texto);
 }
 
@@ -56,7 +55,7 @@ export function valorAlGuardar(opcion) {
 // pantallas-modo-en-vivo.html .opt/.let) y el texto aparte. El escudo lleva aria-hidden porque el
 // texto solo (op.value) ya basta para el lector de pantalla — mismo patrón que ui/retro.js con su
 // ícono ✓/✗ aria-hidden y el texto real al lado.
-function nodoOpciones(pregunta, respuestas, onElegir, recienElegida) {
+export function nodoOpciones(pregunta, respuestas, onElegir, recienElegida) {
   const opciones = (pregunta.options_json || []).map((op) => h('li', {},
     h('button', {
       'data-testid': `opcion-${op.label}`,
@@ -70,10 +69,8 @@ function nodoOpciones(pregunta, respuestas, onElegir, recienElegida) {
   return h('ul', { 'data-testid': 'opciones' }, ...opciones);
 }
 
-// La barra de acción de abajo (mecánica común de las apps de aprendizaje): el botón nace PLANO
-// (deshabilitado) y despierta con un pop cuando hay una respuesta; sobre él sube un panel NEUTRO que
-// confirma lo elegido. Todavía no hay veredicto aquí: la corrección pregunta a pregunta es L1/W18
-// (hito 2) y la clave no sale antes de enviar. Cuando exista, usa este mismo panel (ui/panel_resultado.js).
+// La barra de acción de abajo: el botón nace PLANO y despierta cuando hay una respuesta; sobre él sube un panel NEUTRO que confirma
+// lo elegido. Sin veredicto: aquí la clave no sale antes de enviar (el veredicto por pregunta es de reto_l1.js).
 function nodoBarraAccion(estado, callbacks, efecto) {
   const { challenge, indice, respuestas } = estado;
   const pregunta = challenge.questions[indice];
@@ -128,14 +125,14 @@ function pintarPregunta(raiz, estado, callbacks, entrada = 'desliza', efecto = {
   document.body.dataset.listo = '1';
 }
 
-function pintarErrorFlujo(raiz, mensaje) {
+export function pintarErrorFlujo(raiz, mensaje) {
   // También si el reto no carga o no se pudo enviar: la salida a Retos, arriba (antes esta pantalla era un callejón).
   montar(raiz, h('div', { 'data-testid': 'vista-reto-flujo' }, crearSalir(), h('p', { role: 'alert' }, mensaje)));
   document.body.dataset.listo = '1';
 }
 
 // Mientras el servidor revisa: Drako PIENSA (presenta, no califica) en vez de un botón mudo.
-function nodoRevisando() {
+export function nodoRevisando() {
   return h('div', { class: 'revisando', role: 'status', 'data-testid': 'revisando' },
     crearDrako('piensa', textos.retoFlujo.drakoPiensa), h('p', {}, textos.retoFlujo.revisando));
 }
@@ -152,10 +149,16 @@ async function manejarTerminar(raiz, estado, enviarUnaVez) {
     // 409 = "Attempt already completed or abandoned": un doble toque real ya lo manejó
     // accionUnica (una sola petición); si aun así llega, es que el servidor ya lo cerró por otra
     // vía — no hay nada que mostrar como error nuevo, y NUNCA se reintenta ni se cobra dos veces.
+    if (e instanceof ErrorApi && e.cuerpo?.detail === 'intento_con_respuestas' && estado.reabrir) { estado.reabrir(); return; } // W78: va por pregunta
     if (e instanceof ErrorApi && e.status === 409) { if (estado.salir) estado.encabezado?.prepend(estado.salir); return; } // sin pantalla nueva, pero con la salida de vuelta
     console.warn('reto_flujo: no se pudo enviar el intento', e);
     pintarErrorFlujo(raiz, e instanceof ErrorApi ? e.mensaje : 'No se pudo enviar tu reto.');
   }
+}
+
+// W78: con L1 en el backend, el reto va pregunta por pregunta (módulo diferido); si no, como siempre.
+async function porPregunta(raiz, datos) {
+  try { return await (await import('./reto_l1.js')).intentarL1(raiz, datos); } catch (e) { console.warn('reto_flujo: sin L1', e); return false; }
 }
 
 /**
@@ -172,8 +175,10 @@ export async function renderRetoFlujo(raiz, params, query, ctx) {
     const previo = query.repaso === '1' ? { ganado: true, historial: null } : await yaGanado(challengeId, ctx);
     const esRepaso = previo.ganado;
     const { attempt_id: attemptId, challenge } = await arrancarIntento(challengeId, ctx);
+    if (await porPregunta(raiz, { attemptId, challenge, esRepaso, historialPrevio: previo.historial, ctx })) return;
     const respuestas = leerRespuestasGuardadas(attemptId);
     const estado = { attemptId, challenge, respuestas, esRepaso, historialPrevio: previo.historial, rol: /** @type {any} */ (ctx).sesion?.rol, indice: primeraSinResponder(challenge.questions, respuestas) };
+    if (!query.reabierto) estado.reabrir = () => renderRetoFlujo(raiz, params, { ...query, reabierto: '1' }, ctx);
     const enviarUnaVez = accionUnica(() => enviarIntento(attemptId, respuestas, ctx));
     const callbacks = {
       siguiente: () => { estado.indice++; pintarPregunta(raiz, estado, callbacks); },

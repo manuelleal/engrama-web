@@ -23,6 +23,7 @@ async function foto(sesion, carpeta, registro, archivo, titulo, descripcion, pau
 
 /** Un reto nuevo de 2 preguntas (la correcta de cada una es la que se pasa) que nadie ha jugado. */
 function retoNuevo(estado, titulo, correctas) {
+  estado.backend.l1 = false; // mide el flujo de siempre (con /submit): el pregunta por pregunta lo mide E35 (docs/ESPEC_practica_del_dia.md §3)
   const groupId = [...estado.groups.values()][0].id;
   const pregunta = (texto, buena) => ({ question_text: texto, correct_answer: buena, options_json: [{ label: 'A', value: 'Uno' }, { label: 'B', value: 'Dos' }] });
   const { cuerpo } = crearChallenge(estado, reqDocente(), {

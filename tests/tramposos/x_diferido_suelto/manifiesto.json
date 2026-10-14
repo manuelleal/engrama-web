@@ -1,0 +1,7 @@
+{
+  "descripcion": "U59: un módulo diferido (reto_l1.js) se carga con import() pero no está en DIFERIDOS de sw.js: nunca se guarda",
+  "archivos": { "sw.js": "sw.js" },
+  "comando": ["node", "--test", "--test-reporter=tap", "tests/unit/sw_peso.test.mjs"],
+  "espera_codigo_no_cero": true,
+  "espera_fallan_tests": ["U59: lo diferido (sw.js DIFERIDOS) existe"]
+}
