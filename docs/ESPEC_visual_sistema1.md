@@ -79,8 +79,13 @@ deja fuera a la nueva (`#vista a[data-testid]:where(:not(.sx-btn))`); no se suma
 `iconos.js` y `cabecera.js` entran a `PRECARGA`; se compensan borrando las reglas viejas de la barra, de las tres cabeceras y del aviso flotante.
 El número medido va en el mensaje de cada commit y en el informe. `VERSION` sube en cada commit que toque `sw.js` o la lista.
 
-Medido al cerrar (2026-10-13, `f44fd34`): `PRECARGA` 117 entradas y 829.686 bytes en disco (antes 115 y 828.324); `APARTE` 46.357; fuentes
-64.264; `VERSION` `engrama-shell-v47`.
+Medido al cerrar (2026-10-13, `2d941ee`): `PRECARGA` 117 entradas y 829.902 bytes en disco, 827.312 con fin de línea LF (antes 115, 828.324 y
+825.743); `APARTE` 46.357; fuentes 64.264; `VERSION` `engrama-shell-v49`.
+
+Fluidez (`npm run fluidez`, CPU frenada 4×, fps medio por corrida). Solo cambió de verdad el momento de Inicio con celebración: antes 58,7 /
+58,9 / 58,9 / 59,5; con la cabecera nueva cayó a 55,3 a 56,9 por UNA regla con `:has()` sobre `#vista` y un descendiente detrás (corregida, con su
+prueba); al cerrar, con la llama del aviso quieta, 57,1 / 58,4 / 58,4 / 57,5 / 57,6 / 58,2. Queda en el borde de los 58 y cerca de 1 fps bajo lo
+de antes: el aviso ahora se queda toda la pantalla. Pregunta, fin de reto, asistencia y Mis monedas: sin cambio medible.
 
 ## 4.1 Lo que quedó sin hacer en esta tanda (para después)
 
