@@ -10,7 +10,7 @@ import { h, montar } from '../../ui/dom.js';
 import { crearEscudo } from '../../ui/escudo.js';
 import { crearDrako } from '../../ui/drako.js';
 import { crearLlama, celebrarRacha, planDeRacha, crearDeNuevo, crearAvisoDeRacha } from '../../ui/racha.js';
-import { crearBotonSonido } from '../../ui/boton_sonido.js';
+import { crearCabecera } from '../../ui/cabecera.js';
 import { senal } from '../../ui/sonido.js';
 import { lanzarConfeti } from '../../ui/confeti.js';
 import { controladorDe } from '../../ui/drako_animado.js';
@@ -246,7 +246,7 @@ function barraSuperior(datos) {
     crearLlama(datos.constancia), // W48: la etapa de la llama sale del número del servidor; el número va aparte, en texto
     `${textos.inicio.constanciaPrefijo}: ${datos.constancia}`,
   );
-  return { barra: h('div', { class: 'barra-superior' }, nodoSaldo, constancia), nodoSaldo, constancia };
+  return { barra: crearCabecera({ piezas: [nodoSaldo, constancia], sonido: true }), nodoSaldo, constancia };
 }
 
 function pintarContenido(raiz, ctx, datos) {
@@ -261,8 +261,7 @@ function pintarContenido(raiz, ctx, datos) {
     h('a', { href: '#/monedas', class: 'enlace-monedas', 'data-testid': 'ir-a-monedas' }, textos.monedas.enlace), // W47: el único enlace de Inicio a "Mis monedas", fuera de todo nav
     h('div', { class: 'encabezado-reto' },
       drako,
-      h('h1', {}, textos.inicio.saludo(ctx.sesion.nombre)),
-      crearBotonSonido()),
+      h('h1', {}, textos.inicio.saludo(ctx.sesion.nombre))),
     crearSelectorColegio(ctx), // login piloto (B): solo si el estudiante está en más de una institución
     crearEscudo({ nivelConfirmado: datos.nivelConfirmado, animar: nivel.animar || Boolean(nivel.aviso) }), // W30: el de /auth/me; sin él, "Por confirmar"
     nivel.aviso,

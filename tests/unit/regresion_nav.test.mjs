@@ -120,7 +120,21 @@ const SONIDO_S1 = { retos: ['boton-sonido'], retos_vacio: ['boton-sonido'], asis
 // §2c: en la misma escena, la medalla pasa a tarjeta-dato (`sx-dato`: rótulo y valor) y la salida `revision-volver` gana las clases del botón del sistema.
 const NUMEROS_S1 = { revision: ['puntaje', { etiqueta: 'div', clase: 'medalla-monedas' }, 'revision-volver'] };
 
-const CAPAS = [HASTA_W70, VOLVER_W71, SALIR_W73, SONIDO_S1, NUMEROS_S1];
+// Tanda "sistema 1" (§3): UNA cabecera para todo el estudiante (`header.barra-superior`, ui/cabecera.js) en el lugar de lo que cada escena traía arriba:
+// la banda `div.encabezado-reto` (Retos, Asistencia, el reto), la `div.barra-rol` que solo cargaba el sonido (la revisión) o el volver y el `h1` sueltos
+// (clase en vivo, examen, aviso y solicitudes). En el reto, además, Drako sale de la franja y presenta junto al contador (`div.presenta-pregunta`).
+// Los estados de error de Retos y del reto no cambian. Las escenas del profe y del admin tampoco.
+const CABECERA = { etiqueta: 'header', clase: 'barra-superior' };
+const BANDA_VIEJA = { etiqueta: 'div', clase: 'encabezado-reto' };
+const TITULO_SUELTO = { etiqueta: 'h1' };
+const CABECERA_S1 = {
+  retos: [CABECERA, BANDA_VIEJA], retos_vacio: [CABECERA, BANDA_VIEJA], asistencia: [CABECERA, BANDA_VIEJA],
+  reto_en_curso: [CABECERA, BANDA_VIEJA, { etiqueta: 'div', clase: 'presenta-pregunta' }, 'contador-pregunta'],
+  revision: [CABECERA, { etiqueta: 'div', clase: 'barra-rol' }],
+  ...Object.fromEntries(['vivo', 'vivo_no_disponible', 'nivel', 'nivel_no_disponible', 'aviso_leer', 'solicitudes', 'solicitudes_vacio', 'solicitudes_error'].map((nombre) => [nombre, [CABECERA, TITULO_SUELTO]])),
+};
+
+const CAPAS = [HASTA_W70, VOLVER_W71, SALIR_W73, SONIDO_S1, NUMEROS_S1, CABECERA_S1];
 /** @type {Record<string, Array<string|{etiqueta: string, clase?: string}>>} */
 export const DECLARADAS_NAV = Object.fromEntries([...new Set(CAPAS.flatMap((c) => Object.keys(c)))].map((nombre) => [nombre, [...new Set(CAPAS.flatMap((c) => c[nombre] || []))]]));
 
@@ -131,7 +145,8 @@ test('R9: lo que W73 declara cambió de verdad: el reto en curso y su error gana
     assert.ok(i > 0 && hoy[nombre][i].trimStart().startsWith('a ') && hoy[nombre][i].includes('href="#/retos"') && hoy[nombre][i].includes('aria-label="Salir del reto"'), `${nombre}: falta la salida`);
     assert.equal(hoy[nombre][i + 1].trim(), '"✕ Salir"', `${nombre}: dice "✕ Salir"`);
     assert.ok(!CRUDA.vistas[nombre].some((l) => l.includes('reto-salir') || l.includes('Salir')), `${nombre}: la línea base no tenía salida (H10)`);
-    assert.equal(hoy[nombre].length, CRUDA.vistas[nombre].length + 2, `${nombre}: un nodo de más y su texto`);
+    // Desde la tanda "sistema 1" la pregunta trae además la cabecera nueva (declarada): la cuenta exacta de nodos vale para la pantalla de error, que no cambió.
+    if (nombre === 'reto_en_curso_error') assert.equal(hoy[nombre].length, CRUDA.vistas[nombre].length + 2, `${nombre}: un nodo de más y su texto`);
     assert.ok(!hoy[nombre].some((l) => l.includes('nav-inferior')), `${nombre}: sigue sin barra`);
     assert.deepEqual(sinSubarboles(hoy[nombre], DECLARADAS_NAV[nombre]), sinSubarboles(CRUDA.vistas[nombre], DECLARADAS_NAV[nombre]), `${nombre}: fuera de la salida (y de lo que declaró la tanda "sistema 1"), idéntica a la línea base`);
   }
@@ -273,6 +288,33 @@ test('R9: lo que U72 declara cambió de verdad: en la revisión el puntaje y la 
   assert.ok(!dice(hoy, '0 / 2') && !dice(hoy, '+0'), 'hoy ningún nodo dice "0 / 2" ni "+0"');
   assert.ok(dice(hoy, '1 / 2') && dice(hoy, '+15'), 'dicen lo que mandó el servidor: 1 de 2 y 15 monedas');
   assert.deepEqual(sinSubarboles(hoy, DECLARADAS_NAV.revision), sinSubarboles(BASE.vistas.revision, DECLARADAS_NAV.revision), 'fuera de lo declarado, la revisión es idéntica');
+});
+
+test('R9: lo que la tanda "sistema 1" declara de la cabecera cambió de verdad: cada escena de contenido del estudiante abre con UNA cabecera del sistema, con su título (y su volver) dentro; el sonido solo donde ya estaba; el profe y el admin, ninguna', async () => {
+  const hoy = await tomarFotosNav();
+  const sangria = (l) => l.length - l.trimStart().length;
+  const cabeceras = (lineas) => lineas.map((l, i) => [l, i]).filter(([l]) => l.trim() === 'header class="barra-superior sx-cabecera sx-cabecera--marca"').map(([, i]) => { const fin = lineas.findIndex((l, n) => n > i && sangria(l) <= sangria(lineas[i])); return lineas.slice(i, fin < 0 ? undefined : fin); });
+  const CON_SONIDO = ['retos', 'retos_vacio', 'asistencia', 'reto_en_curso', 'revision'];
+  for (const nombre of Object.keys(CABECERA_S1)) {
+    const c = cabeceras(hoy[nombre]);
+    assert.equal(c.length, 1, `${nombre}: exactamente una cabecera`);
+    assert.equal(hoy[nombre].indexOf(c[0][0]), 2, `${nombre}: es el primer bloque de la vista`);
+    assert.equal(c[0].filter((l) => l.includes('data-testid="boton-sonido"')).length, CON_SONIDO.includes(nombre) ? 1 : 0, `${nombre}: el sonido, solo donde ya estaba`);
+    assert.equal(hoy[nombre].filter((l) => l.includes('data-testid="boton-sonido"')).length, CON_SONIDO.includes(nombre) ? 1 : 0, `${nombre}: y un solo interruptor en la pantalla`);
+    if (nombre !== 'revision') assert.equal(c[0].filter((l) => l.trimStart().split(' ')[0] === 'h1').length, 1, `${nombre}: el título va dentro de la cabecera`);
+    assert.equal(c[0].filter((l) => l.includes('data-testid="volver"')).length, nombre in VUELTA_W71 ? 1 : 0, `${nombre}: y el volver, si la pantalla no es una pestaña`);
+    assert.ok(!hoy[nombre].some((l) => l.includes('class="encabezado-reto"') || l.includes('class="barra-rol"')), `${nombre}: la banda y la barra viejas salieron`);
+    assert.ok(!c[0].some((l) => l.includes('drako')), `${nombre}: la mascota no va en la franja`);
+  }
+  const sonido = hoy.retos.find((l) => l.includes('data-testid="boton-sonido"'));
+  assert.ok(sonido.includes('class="sx-btn-icono sx-btn-icono--plano boton-sonido"') && sonido.includes('aria-label="Silenciar el sonido y la vibración"') && sonido.includes('aria-pressed="true"') && sonido.includes('title="Con sonido"'), 'el sonido es un botón-ícono con nombre accesible, estado y título');
+  assert.ok(!hoy.retos.some((l) => l.includes('"Con sonido"') && !l.includes('title=')), 'la palabra ya no ocupa la cabecera');
+  const reto = hoy.reto_en_curso;
+  const presenta = reto.findIndex((l) => l.includes('class="presenta-pregunta"'));
+  assert.ok(reto[presenta + 1].includes('data-testid="drako-presenta"') && reto[presenta + 2].includes('data-testid="contador-pregunta"'), 'en el reto, Drako presenta junto a "Pregunta N de M"');
+  assert.equal(reto.filter((l) => l.includes('data-testid="drako-presenta"')).length, 1, 'una sola vez, como antes');
+  for (const nombre of ['retos_error', 'reto_en_curso_error']) assert.equal(cabeceras(hoy[nombre]).length, 0, `${nombre}: el estado de error no cambió`);
+  for (const nombre of Object.keys(hoy).filter((n) => n.startsWith('profe_') || n.startsWith('admin_'))) assert.ok(!hoy[nombre].some((l) => l.trimStart().startsWith('header ')), `${nombre}: sobrio, sin cabecera`);
 });
 
 test('R9: dos tomas seguidas dan lo mismo (la foto no depende del reloj ni del azar)', async () => {

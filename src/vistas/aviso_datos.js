@@ -10,7 +10,7 @@ import { crearDrako } from '../ui/drako.js';
 import { textos } from '../textos.js';
 import { accionUnica } from '../api/cliente.js';
 import { crearNavInferior } from '../ui/nav_inferior.js';
-import { crearEncabezado } from '../ui/encabezado.js';
+import { crearCabecera } from '../ui/cabecera.js';
 
 const T = textos.aviso;
 
@@ -108,8 +108,7 @@ function botonSolicitudes(alTocar) {
 export function renderLeerAviso(raiz, ctx) {
   const solicitudes = ctx.solicitudes ? h('a', { href: ctx.solicitudes, 'data-testid': 'aviso-ver-solicitudes' }, textos.solicitudes.enlace) : null;
   if (ctx.rol) {
-    const enc = crearEncabezado('/datos');
-    montar(raiz, h('div', { 'data-testid': 'vista-aviso-datos' }, enc.volver, enc.titulo, crearTextoAviso(ctx.aviso), solicitudes, crearNavInferior('/datos', ctx.rol)));
+    montar(raiz, h('div', { 'data-testid': 'vista-aviso-datos' }, crearCabecera({ patron: '/datos', rol: ctx.rol }), crearTextoAviso(ctx.aviso), solicitudes, crearNavInferior('/datos', ctx.rol)));
   } else {
     const volver = h('button', { type: 'button', class: 'boton-secundario', 'data-testid': 'aviso-volver' }, T.volver);
     volver.addEventListener('click', () => ctx.alVolver?.());

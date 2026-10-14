@@ -155,21 +155,56 @@ button.boton-secundario {
 }
 
 /* ====================================================================================================================================
-   3. LA CABECERA DEL ESTUDIANTE. Inicio ya tenía su franja navy (saldo y constancia); Retos y Asistencia abrían con un título suelto sobre
-      crema. Ahora las tres pestañas de juego abren con el mismo techo navy. Solo CSS: en Retos y Asistencia la franja es el bloque del
-      título que ya existía (no trae saldo: eso pide DOM y una petición más, va en otra tanda).
+   3. LA CABECERA DEL ESTUDIANTE (ui/cabecera.js): UNA en todas sus pantallas (antes, tres). Es la franja navy del sistema
+      (`sx-cabecera--marca`), de borde a borde y en el flujo; acá va solo su sitio y lo propio de Inicio. Sin labio: no se toca.
    ==================================================================================================================================== */
 .barra-superior {
-  padding: 14px 16px;
-  border-radius: 0 0 var(--radio-lg) var(--radio-lg);
+  position: static;
+  margin: -16px -16px 16px;
+}
+.barra-superior > :first-child {
+  min-width: 0;
+  margin-right: auto;
+}
+.barra-superior h1,
+.cabecera-rotulo {
+  margin: 0;
+  color: inherit;
+  font: 800 1.25rem/1.15 var(--fuente-titulos);
+  overflow-wrap: anywhere;
+}
+.cabecera-titulo {
+  display: grid;
+}
+#vista .barra-superior a.volver[data-testid] {
+  margin: 0 0 -6px;
+  color: inherit;
+}
+.barra-superior > .salir-reto {
+  margin-right: 0;
+}
+.barra-superior .titulo-reto {
+  flex: 1;
+  min-width: 0;
+}
+/* Inicio: el saldo, la constancia y el sonido caben en un renglón a 360 px; con un saldo de muchas cifras la constancia baja, nada se parte. */
+.barra-superior:has(.saldo) {
+  flex-wrap: wrap;
+  row-gap: 4px;
+}
+.barra-superior > .boton-sonido {
+  margin: 0 -8px 0 -4px;
+}
+.barra-superior .saldo,
+.barra-superior .constancia {
+  white-space: nowrap;
 }
 .barra-superior .saldo {
   gap: 8px;
-  font-size: 1.3rem;
+  font-size: 1.2rem;
   line-height: 1.1;
 }
-/* Una moneda delante del saldo: un disco dorado con su canto, dibujado (sin emoji y sin texto). Va en ::after y se adelanta con `order`
-   porque ::before es del halo de `.pulso-oro` (juego.css). */
+/* La moneda del saldo, dibujada. Va en ::after y se adelanta con `order` porque ::before es del halo de `.pulso-oro` (juego.css). */
 .barra-superior .saldo::after {
   content: "";
   order: -1;
@@ -183,13 +218,11 @@ button.boton-secundario {
 .barra-superior .constancia {
   background: color-mix(in srgb, var(--superficie) 14%, transparent);
   border-radius: var(--radio-sm);
-  padding: 5px 12px;
+  padding: 5px 10px;
   font-size: 0.9rem;
 }
 
-/* Inicio: el saludo junto a Drako, que se queda en su tamaño discreto de siempre (44 px, componentes.css). Decisión de Christiam del
-   2026-10-13: la mascota se va a reemplazar; no se le da más presencia (la tanda visual la había subido a 76 px) ni se quita todavía. El
-   interruptor del sonido deja de competir con el título. */
+/* Inicio: el saludo junto a Drako, en su tamaño discreto de siempre (la mascota está en revisión: ni crece ni se quita todavía). */
 [data-testid="vista-inicio"] > .encabezado-reto {
   gap: 12px;
   margin: 2px 0 10px;
@@ -201,19 +234,13 @@ button.boton-secundario {
   font-size: 1.45rem;
   overflow-wrap: anywhere;
 }
-.encabezado-reto .boton-sonido {
-  background: none;
-  border: 2px solid var(--cara-linea);
-  font-size: 0.8rem;
-  padding: 6px 10px;
-  gap: 6px;
-}
 
-/* Celular bajo (360 × 640, la réplica del humo de navegación): con el aire nuevo de esta hoja, el tercer botón de "Ahora" quedaba bajo la
-   barra. En ventanas de poca altura Inicio se aprieta (no se movió el criterio: las tres acciones siguen sin desplazar). */
+/* Celular bajo (360 × 640, la réplica del humo): Inicio se aprieta para que las tres acciones de "Ahora" sigan sin desplazar. */
 @media (max-height: 700px) {
   [data-testid="vista-inicio"] > .barra-superior {
-    padding: 9px 16px;
+    min-height: 48px;
+    padding-block: 2px;
+    margin-bottom: 12px;
   }
   [data-testid="vista-inicio"] > .encabezado-reto {
     margin: 0 0 4px;
@@ -226,32 +253,8 @@ button.boton-secundario {
   }
 }
 
-/* Retos y Asistencia: el título sobre navy, de borde a borde, con el mismo labio y las mismas esquinas que la franja de Inicio. */
-[data-testid="vista-retos"].juego > .encabezado-reto,
-[data-testid="vista-asistencia"].juego > .encabezado-reto {
-  justify-content: space-between;
-  background: var(--primario);
-  color: var(--superficie);
-  margin: -16px -16px 16px;
-  padding: 14px 16px 12px;
-  border-bottom: 4px solid var(--primario-oscuro);
-  border-radius: 0 0 var(--radio-lg) var(--radio-lg);
-}
-[data-testid="vista-retos"].juego > .encabezado-reto h1,
-[data-testid="vista-asistencia"].juego > .encabezado-reto h1 {
-  margin: 0;
-  color: var(--superficie);
-}
-/* Sobre navy, el interruptor del sonido es un contorno claro (su texto sigue ahí: no es un botón de solo ícono). */
-[data-testid="vista-retos"].juego > .encabezado-reto .boton-sonido,
-[data-testid="vista-asistencia"].juego > .encabezado-reto .boton-sonido {
-  color: var(--superficie);
-  border-color: color-mix(in srgb, var(--superficie) 45%, transparent);
-}
-
 /* ====================================================================================================================================
-   4. LA BARRA DE ABAJO es la del sistema (`sx-barra`): íconos propios en SVG (ui/iconos.js) y el registro puesto por rol en la barra misma
-      (ui/nav_inferior.js). La pestaña activa se dice con color, peso y, acá, un trazo más grueso; nunca solo con color: lleva aria-current.
+   4. LA BARRA DE ABAJO es la del sistema (`sx-barra`, ui/nav_inferior.js). La pestaña activa lleva, además, un trazo más grueso.
    ==================================================================================================================================== */
 .sx-barra__pestana[aria-current="page"] .sx-icono {
   stroke-width: 2.7;
@@ -311,14 +314,9 @@ button.boton-secundario {
   #vista:has(.juego) .barra-accion {
     max-width: 600px;
   }
-  .juego > .barra-superior {
+  .barra-superior {
     margin: -20px -28px 20px;
-    padding: 16px 28px;
-  }
-  [data-testid="vista-retos"].juego > .encabezado-reto,
-  [data-testid="vista-asistencia"].juego > .encabezado-reto {
-    margin: -20px -28px 24px;
-    padding: 20px 28px 18px;
+    padding-inline: 28px;
   }
 }
 
@@ -358,6 +356,10 @@ button.boton-secundario {
   align-self: stretch;
   min-height: 52px;
   font-size: 1.1rem;
+}
+/* El botón principal de un formulario del estudiante va siempre a todo el ancho (antes, unos sí y otros no). */
+#vista:has(.nav-inferior a[href="#/inicio"]) form button[type="submit"] {
+  width: 100%;
 }
 #vista [data-testid="form-asistencia"] [data-testid="asistencia-sin-red"]:empty {
   display: none;

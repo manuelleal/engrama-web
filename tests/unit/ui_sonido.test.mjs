@@ -4,8 +4,9 @@
 // verdad, si el celular vibra) queda dicho en el informe del encargo.
 import test from 'node:test';
 import assert from 'node:assert/strict';
-import { PERFILES, planDeSonido, preferenciaInicial, puedeSonar, reproducir, vibrar } from '../../src/ui/sonido.js';
-import { contenidoDelBoton } from '../../src/ui/boton_sonido.js';
+import { PERFILES, planDeSonido, preferenciaInicial, puedeSonar, reproducir, vibrar, estaSilenciado } from '../../src/ui/sonido.js';
+import { contenidoDelBoton, crearBotonSonido } from '../../src/ui/boton_sonido.js';
+import { instalarDomFalso } from './dom_falso.mjs';
 import { MINIMO_MS, duracionEfectiva } from '../../src/ui/movimiento.js';
 
 const MOMENTOS = ['toque', 'acierto', 'fallo', 'moneda', 'racha', 'sello', 'fin', 'perfecto'];
@@ -61,13 +62,28 @@ test('sonido: un tipo desconocido cae en un tono válido, y "error" sigue siendo
   assert.equal(planDeSonido('error'), PERFILES.fallo);
 });
 
-test('boton sonido: ícono y palabra en ambos estados, nunca solo el ícono', () => {
+// Tanda "sistema 1" (docs/ESPEC_visual_sistema1.md §3): el interruptor es un botón-ícono discreto (la palabra "Con sonido" ocupaba el sitio de honor de
+// la cabecera). Sigue siendo UN interruptor a la vista y nunca dice su estado solo con un dibujo: el dibujo cambia (ondas o equis), el nombre
+// accesible dice la acción, `aria-pressed` el estado, y la palabra del estado va de `title`. Tramposo: x_boton_sonido_sin_palabra (ui/boton_sonido.js).
+test('boton sonido: en los dos estados trae su dibujo, su acción (el nombre accesible) y la palabra de su estado; el botón pintado es un ícono con aria-label, aria-pressed y title', () => {
   for (const silenciado of [true, false]) {
     const c = contenidoDelBoton(silenciado);
     assert.ok(c.icono.length > 0 && c.texto.length > 0 && c.accion.length > 0);
     assert.equal(c.activo, !silenciado);
   }
   assert.notEqual(contenidoDelBoton(true).texto, contenidoDelBoton(false).texto);
+  assert.notEqual(contenidoDelBoton(true).accion, contenidoDelBoton(false).accion);
+  assert.notEqual(contenidoDelBoton(true).icono, contenidoDelBoton(false).icono, 'el dibujo también cambia: el estado no se dice solo con color');
+  const quitar = instalarDomFalso();
+  try {
+    const boton = /** @type {any} */ (crearBotonSonido());
+    const esperado = contenidoDelBoton(estaSilenciado());
+    assert.equal(boton.tagName, 'button');
+    assert.deepEqual(String(boton.className).split(' '), ['sx-btn-icono', 'sx-btn-icono--plano', 'boton-sonido'], 'un botón-ícono plano del sistema (44 px)');
+    assert.deepEqual([boton.getAttribute('aria-label'), boton.getAttribute('title'), boton.getAttribute('aria-pressed')], [esperado.accion, esperado.texto, String(esperado.activo)]);
+    assert.ok(boton.getAttribute('aria-label').length > 10 && boton.getAttribute('title').length > 3, 'nunca queda sin nombre ni sin la palabra de su estado');
+    assert.deepEqual(boton.children.map((n) => [n.tagName, n.getAttribute('data-icono'), n.getAttribute('aria-hidden')]), [['svg', esperado.icono, 'true']], 'adentro, solo el dibujo (decorativo)');
+  } finally { quitar(); }
 });
 
 test('movimiento: con reduced-motion ninguna duración supera el mínimo', () => {

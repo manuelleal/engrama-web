@@ -13,7 +13,7 @@ import { crearDrako } from '../../ui/drako.js';
 import { ligarEscrituraARed } from '../../ui/red.js';
 import { registrarCelebracion } from '../../ui/celebraciones.js';
 import { crearNavInferior } from '../../ui/nav_inferior.js';
-import { crearEncabezado } from '../../ui/encabezado.js';
+import { crearCabecera } from '../../ui/cabecera.js';
 import { crearNotaDeSalida } from '../../ui/nota_salida.js';
 import { textos } from '../../textos.js';
 import { destinosDeLaSesion, crearSalida, alVolverDeOtroOrigen } from '../../anillo/abrir.js';
@@ -43,11 +43,9 @@ const barraDe = (cfg, ctx) => crearNavInferior(rutaDe(cfg), ctx?.sesion?.rol);
  */
 
 function pantallaNoDisponible(raiz, cfg, ctx) {
-  const enc = crearEncabezado(rutaDe(cfg)); // W71: "‹ Inicio" arriba, antes del título; el mismo volver de toda la app
   montar(raiz, h(
     'div', { 'data-testid': cfg.testid },
-    enc.volver,
-    enc.titulo,
+    crearCabecera({ patron: rutaDe(cfg) }), // W71: "‹ Inicio" arriba, antes del título; el mismo volver de toda la app
     h('p', { role: 'status', 'data-testid': 'salida-no-disponible' }, T.noDisponible),
     barraDe(cfg, ctx),
   ));
@@ -102,12 +100,10 @@ export function renderSalidaConCodigo(raiz, query, ctx, cfg) {
   const form = h('form', { 'data-testid': 'form-salida', novalidate: true }, h('label', { for: 'salida-codigo' }, cfg.campo), campo, boton, error, avisoRed);
   form.addEventListener('submit', alEnviar(cfg, salida, { campo, boton, error }));
   form.style.minWidth = '700px'; // el error: ancho fijo, desborda en un celular
-  const enc = crearEncabezado(rutaDe(cfg)); // W71: "‹ Inicio" arriba, antes del título
   montar(raiz, h(
     'div', { 'data-testid': cfg.testid },
-    enc.volver,
+    crearCabecera({ patron: rutaDe(cfg) }), // W71: "‹ Inicio" arriba, antes del título
     crearDrako('presenta', cfg.drako, { desde: 'reposo' }),
-    enc.titulo,
     h('p', { id: 'salida-ayuda', 'data-testid': 'salida-ayuda' }, cfg.ayuda),
     form,
     crearNotaDeSalida('salida-sales'),

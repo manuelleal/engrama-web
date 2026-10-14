@@ -5,7 +5,7 @@
 // presenta y nunca califica" — un Drako ahí adentro sería la mascota calificando al estudiante).
 import { h, montar } from '../../ui/dom.js';
 import { crearResultado } from '../../ui/retro.js';
-import { crearBotonSonido } from '../../ui/boton_sonido.js';
+import { crearCabecera } from '../../ui/cabecera.js';
 import { nivelDeCelebracion, crearHeroResultado, celebrarFinDeReto } from '../../ui/celebracion.js';
 import { crearNavInferior } from '../../ui/nav_inferior.js';
 import { meritoDelReto } from '../../ui/merito.js';
@@ -63,7 +63,7 @@ export function renderRevision(raiz, datos) {
   const volver = h('a', { href: '#/retos', class: 'sx-btn sx-btn--ancho', 'data-testid': 'revision-volver' }, textos.revision.volver);
   const nodo = h(
     'div', { 'data-testid': 'vista-revision', class: 'juego' },
-    h('div', { class: 'barra-rol' }, crearBotonSonido()),
+    crearCabecera({ piezas: [h('p', { class: 'cabecera-rotulo' }, textos.retos.titulo)], sonido: true }), // de la pestaña Retos
     hero.nodo,
     banner,
     h('h2', { class: 'subtitulo-revision' }, textos.revision.titulo),

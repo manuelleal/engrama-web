@@ -6,9 +6,8 @@
 // `a[data-testid]` en un chip de acción — esta es la barra fija, no una acción suelta. Son enlaces internos (un hash): funcionan sin red.
 // W68: el estudiante gana "Perfil" (ahí viven su cuenta y "Cerrar sesión"). W70: el profe (Mis grupos · Retos · Perfil) y el admin (Grupos ·
 // Perfil) tienen la suya, SOBRIA: el rebote del ícono activo es solo de las pantallas `.juego` del estudiante (estilos/juego.css).
-// docs/ESPEC_visual_sistema1.md §1: es la barra del sistema (`sx-barra`), con íconos propios (ui/iconos.js, no emoji). El registro va en la barra
-// misma: el de juego (el valor por defecto del sistema, sin clase: píldora en la pestaña activa) es SOLO del estudiante; el profe y el admin
-// llevan `sx-sereno` (una marca arriba, sin píldora).
+// Es la barra del sistema (`sx-barra`), con íconos propios (ui/iconos.js). El registro de juego (el valor por defecto, sin clase: píldora en la
+// activa) es SOLO del estudiante; el profe y el admin llevan `sx-sereno` (una marca arriba).
 import { h } from './dom.js';
 import { crearIcono } from './iconos.js';
 import { textos } from '../textos.js';

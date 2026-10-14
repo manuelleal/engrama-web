@@ -1,7 +1,7 @@
 // @ts-check
 // ui/iconos.js · Los íconos de la casa (docs/ESPEC_visual_sistema1.md §1): SVG de trazo armados con createElementNS, nunca emoji del sistema
-// (cambian de dibujo en cada teléfono) ni HTML como texto. Son los dibujos de la guía (diseno/sistema/guia.html) más `silencio` y `moneda`:
-// caja de 24, trazo 2,2 con puntas redondas y color heredado (`currentColor`). Decorativos: la palabra o el nombre accesible va al lado.
+// (cambian de dibujo en cada teléfono). Son los de la guía (diseno/sistema/guia.html) más `silencio` y `moneda`: caja de 24, trazo 2,2,
+// puntas redondas y color heredado. Decorativos: la palabra o el nombre accesible va al lado.
 
 const NS = 'http://www.w3.org/2000/svg';
 const ALTAVOZ = 'M4 10v4h3.5l4.5 4V6l-4.5 4z';
@@ -35,8 +35,8 @@ function forma(f) {
 }
 
 /**
- * El ícono con ese nombre, o null si no existe (o si el entorno no dibuja SVG: una pantalla nunca depende de su ícono).
- * Trae su tamaño y su trazo en atributos: se ve bien aunque la hoja del sistema (`.sx-icono`) no haya llegado.
+ * El ícono con ese nombre, o null si no existe o el entorno no dibuja SVG (una pantalla nunca depende de su ícono). Trae tamaño y trazo en
+ * atributos: se ve bien aunque la hoja del sistema no haya llegado.
  * @param {string} nombre @returns {SVGElement|null}
  */
 export function crearIcono(nombre) {

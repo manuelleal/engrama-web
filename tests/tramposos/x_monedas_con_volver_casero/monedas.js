@@ -8,7 +8,7 @@
 import { h, montar } from '../../ui/dom.js';
 import { crearCargando, crearVacio } from '../../ui/estados.js';
 import { crearNavInferior } from '../../ui/nav_inferior.js';
-import { crearEncabezado } from '../../ui/encabezado.js';
+import { crearCabecera } from '../../ui/cabecera.js';
 import { filasDeMovimientos, planDeMovimientos } from '../../ui/movimientos.js';
 import { crearIcono } from '../../ui/iconos.js';
 import { textos } from '../../textos.js';
@@ -22,8 +22,7 @@ const T = textos.monedas;
 
 /** La pantalla con su encabezado y su barra, en cualquier estado: nunca un callejón. */
 function marco(ctx, ...contenido) {
-  const enc = crearEncabezado(RUTA);
-  return h('div', { 'data-testid': 'vista-monedas', class: 'juego' }, h('a', { href: '#/inicio', 'data-testid': 'volver-a-inicio' }, 'Volver a Inicio'), enc.titulo, ...contenido, crearNavInferior(RUTA, ctx.sesion?.rol));
+  return h('div', { 'data-testid': 'vista-monedas', class: 'juego' }, h('a', { href: '#/inicio', 'data-testid': 'volver-a-inicio' }, 'Volver a Inicio'), h('h1', {}, T.titulo), ...contenido, crearNavInferior(RUTA, ctx.sesion?.rol));
 }
 
 /** Los títulos de los retos son un adorno de las filas: si la lista falla, la pantalla sale igual con "Reto". Nunca lanza. */

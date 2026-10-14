@@ -1,7 +1,7 @@
 // @ts-check
-// ui/boton_sonido.js · El botón de silencio, siempre visible en las pantallas del estudiante.
-// Ícono + palabra (nunca solo el ícono), `aria-pressed` y su preferencia guardada (ui/sonido.js).
-// Un solo interruptor manda sobre el sonido y la vibración.
+// ui/boton_sonido.js · El interruptor del sonido, siempre visible en las pantallas de juego del estudiante (en su cabecera, ui/cabecera.js).
+// Un botón-ícono discreto del sistema: el dibujo cambia con el estado (ondas o equis), su nombre accesible dice la acción, `aria-pressed`
+// el estado y la palabra queda de `title`. Un solo interruptor manda sobre el sonido y la vibración; su preferencia se guarda (ui/sonido.js).
 import { h, vaciar } from './dom.js';
 import { crearIcono } from './iconos.js';
 import { textos } from '../textos.js';
@@ -15,17 +15,15 @@ export function contenidoDelBoton(silenciado) {
 }
 
 export function crearBotonSonido() {
-  const icono = h('span', { 'aria-hidden': 'true' });
-  const texto = h('span', {});
-  const boton = h('button', { type: 'button', class: 'boton-secundario boton-chico boton-sonido', 'data-testid': 'boton-sonido' }, icono, texto);
+  const boton = h('button', { type: 'button', class: 'sx-btn-icono sx-btn-icono--plano boton-sonido', 'data-testid': 'boton-sonido' });
   const pintar = () => {
     const c = contenidoDelBoton(estaSilenciado());
-    vaciar(icono);
+    vaciar(boton);
     const dibujo = crearIcono(c.icono);
-    if (dibujo) icono.appendChild(dibujo);
-    texto.textContent = c.texto;
+    if (dibujo) boton.appendChild(dibujo);
     boton.setAttribute('aria-pressed', String(c.activo));
     boton.setAttribute('aria-label', c.accion);
+    boton.setAttribute('title', c.texto);
   };
   boton.addEventListener('click', () => {
     alternarSilencio(!estaSilenciado());

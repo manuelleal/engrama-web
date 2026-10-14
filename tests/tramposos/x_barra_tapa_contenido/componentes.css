@@ -464,23 +464,21 @@ nav {
   min-width: 0;
 }
 
-/* ---------- La pregunta (reto_flujo.js): encabezado chico (Drako + título limpio) y el
-   enunciado como protagonista de la pantalla — antes el enunciado se veía chico y el título
-   crudo del contenido ("[BORRADOR] sint-u01 · ...") dominaba arriba. ---------- */
-.encabezado-reto {
+/* ---------- Drako presenta, en su tamaño discreto: junto al saludo de Inicio (`encabezado-reto`) y junto a "Pregunta N de M" en el reto
+   (`presenta-pregunta`). El título del reto va en la cabecera (ui/cabecera.js); el enunciado es el protagonista de la pantalla. ---------- */
+.encabezado-reto,
+.presenta-pregunta {
   display: flex;
   align-items: center;
   gap: 12px;
   margin-bottom: 4px;
 }
-.encabezado-reto .drako {
+.encabezado-reto .drako,
+.presenta-pregunta .drako {
   width: 44px;
   height: 44px;
 }
-.titulo-reto {
-  font-size: 1rem;
-  font-weight: 700;
-  color: color-mix(in srgb, var(--texto) 75%, white);
+.presenta-pregunta p {
   margin: 0;
 }
 .enunciado {
@@ -492,21 +490,8 @@ nav {
   margin: 14px 0 18px;
 }
 
-/* ---------- Barra superior del estudiante (saldo + racha) y navegación inferior. Ambas son
-   parte del sistema visual base (§1 del encargo); la barra se usa en Inicio, donde el saldo y la
-   racha ya se cargan — así no se agregan llamadas nuevas a la red en el resto de pantallas. ---------- */
-.barra-superior {
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  gap: 12px;
-  background: var(--primario);
-  color: var(--superficie);
-  padding: 10px 16px;
-  margin: -16px -16px 16px;
-  border-bottom: 4px solid var(--primario-oscuro);
-  border-radius: 0 0 var(--radio-md) var(--radio-md);
-}
+/* ---------- El saldo y la racha, en la cabecera de Inicio (la franja es del sistema: ver cara.css §3). Solo en Inicio, donde ya se cargan: así
+   no se agregan llamadas a la red en el resto de pantallas. ---------- */
 .barra-superior .saldo {
   margin: 0;
   display: flex;

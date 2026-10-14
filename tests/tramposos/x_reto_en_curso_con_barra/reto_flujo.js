@@ -14,7 +14,7 @@ import { accionUnica, ErrorApi } from '../../api/cliente.js';
 import { renderRevision, textoDeOpcion } from './revision.js';
 import { crearPanelResultado } from '../../ui/panel_resultado.js';
 import { avanceDelReto, crearBarraProgreso, senalDeSeleccion } from '../../ui/progreso.js';
-import { crearBotonSonido } from '../../ui/boton_sonido.js';
+import { crearCabecera } from '../../ui/cabecera.js';
 import { marcarCargando } from '../../ui/boton.js';
 import { crearCargando } from '../../ui/estados.js';
 import { senal } from '../../ui/sonido.js';
@@ -113,14 +113,13 @@ function pintarPregunta(raiz, estado, callbacks, entrada = 'desliza', efecto = {
   estado.salir = crearSalir();
   const nodo = h(
     'div', { 'data-testid': 'vista-reto-flujo', class: `juego juego-${entrada}` },
-    estado.encabezado = h('div', { class: 'encabezado-reto' },
-      estado.salir,
-      crearDrako('presenta', textos.retoFlujo.drakoPresenta, { estatico: true }) /* chico y se repinta con cada opción: imagen */,
-      h('h1', { class: 'titulo-reto' }, tituloLegible(challenge.title)),
-      crearBotonSonido()),
+    estado.encabezado = crearCabecera({ piezas: [estado.salir, h('h1', { class: 'titulo-reto' }, tituloLegible(challenge.title))], sonido: true }),
     barra,
     esRepaso ? h('p', { role: 'status', class: 'aviso-corto', 'data-testid': 'banner-repaso' }, textos.retoFlujo.bannerRepaso) : null,
-    h('p', { class: 'texto-apoyo', 'data-testid': 'contador-pregunta' }, textos.retoFlujo.pregunta(indice + 1, challenge.questions.length)),
+    // Drako presenta la pregunta (fuera de la franja navy, donde no se vería); chico y se repinta con cada opción: imagen.
+    h('div', { class: 'presenta-pregunta' },
+      crearDrako('presenta', textos.retoFlujo.drakoPresenta, { estatico: true }),
+      h('p', { class: 'texto-apoyo', 'data-testid': 'contador-pregunta' }, textos.retoFlujo.pregunta(indice + 1, challenge.questions.length))),
     h('p', { class: 'enunciado', 'data-testid': 'enunciado' }, pregunta.question_text),
     nodoOpciones(pregunta, respuestas, onElegir, efecto.elegida),
     nodoBarraAccion(estado, callbacks, efecto),

@@ -1,0 +1,16 @@
+{
+  "descripcion": "Tanda \"sistema 1\": el interruptor del sonido (un botón-ícono) queda sin la palabra de su estado en silencio: el estado se diría solo con el dibujo",
+  "archivos": {
+    "src/ui/boton_sonido.js": "boton_sonido.js"
+  },
+  "comando": [
+    "node",
+    "--test",
+    "--test-reporter=tap",
+    "tests/unit/ui_sonido.test.mjs"
+  ],
+  "espera_codigo_no_cero": true,
+  "espera_fallan_tests": [
+    "boton sonido: en los dos estados trae su dibujo, su acción (el nombre accesible) y la palabra de su estado"
+  ]
+}

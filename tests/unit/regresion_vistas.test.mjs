@@ -71,7 +71,9 @@ export const DECLARADAS = {
   // W51 (docs/ESPEC_juego_oleada1.md §17.1.4): `progreso-semana` cambia por dentro ("Esta semana" con dos contadores → "Tu semana" con sus 7 puntos);
   // conserva su `data-testid` y su sitio (después de "Ahora").
   // Tanda "sistema 1" (docs/ESPEC_visual_sistema1.md §1 y §5): el ícono del botón del sonido (`boton-sonido`) pasa de emoji a SVG de ui/iconos.js.
-  inicio: ['ahora', 'tarjeta-reto-hoy', { etiqueta: 'nav' }, 'ir-a-monedas', 'constancia', 'progreso-semana', 'boton-sonido'],
+  // Tanda "sistema 1" (§3): la barra del saldo (`div.barra-superior`) pasa a ser la cabecera única (`header.barra-superior`, con las clases del sistema) y
+  // recibe el interruptor del sonido, que sale de junto al saludo. Se declaran el nodo viejo y el nuevo; el saludo (`div.encabezado-reto`) no cambia.
+  inicio: ['ahora', 'tarjeta-reto-hoy', { etiqueta: 'nav' }, 'ir-a-monedas', 'constancia', 'progreso-semana', 'boton-sonido', { etiqueta: 'div', clase: 'barra-superior' }, { etiqueta: 'header', clase: 'barra-superior' }],
 };
 
 test('R4: lo que W51 declara cambió de verdad: "Esta semana" pasa a "Tu semana" con sus 7 puntos de lunes a domingo, en el mismo sitio; lo demás no cambió', async () => {
@@ -112,7 +114,7 @@ test('R4: lo que W47 declara cambió de verdad: Inicio gana el enlace "Ver mis m
   const i = hoy.indexOf(enlaces[0]);
   const sangria = (l) => l.length - l.trimStart().length;
   const anteriorHermano = hoy.slice(0, i).reverse().find((l) => sangria(l) === sangria(enlaces[0]));
-  assert.ok(anteriorHermano?.includes('class="barra-superior"'), 'va inmediatamente debajo de la barra del saldo, hijo directo de la vista');
+  assert.ok(/^ *header class="barra-superior[ "]/.test(anteriorHermano ?? ''), 'va inmediatamente debajo de la barra del saldo (hoy, la cabecera), hijo directo de la vista');
   assert.equal(hoy.filter((l) => l.includes('href="#/monedas"')).length, 1, 'el único enlace de Inicio a ese destino');
   assert.equal(hoy[i + 1]?.trim(), '"Ver mis movimientos"');
   assert.deepEqual(sinSubarboles(hoy, ['ir-a-monedas']), sinSubarboles(hoy, []).filter((l, n) => n !== i && n !== i + 1), 'la exclusión quita el enlace y su texto, nada más');
@@ -324,6 +326,24 @@ test('R4: lo que la tanda "sistema 1" declara cambió de verdad: la barra es la 
     assert.ok(!b.some((l) => EMOJI.test(l)), `${nombre}: ningún emoji en la barra`);
   }
   assert.ok(desdeLaBarra(BASE.vistas.inicio).some((l) => EMOJI.test(l)), 'la línea base de Inicio traía emoji en la barra');
+});
+
+test('R4: lo que la tanda "sistema 1" declara de la cabecera cambió de verdad: en Inicio la barra del saldo es la cabecera del sistema, con el saldo, la constancia y el sonido; el saludo ya no trae el sonido; y el profe no recibe cabecera', async () => {
+  const hoy = await tomarFotos();
+  const sangria = (l) => l.length - l.trimStart().length;
+  const subarbol = (lineas, i) => { const fin = lineas.findIndex((l, n) => n > i && sangria(l) <= sangria(lineas[i])); return lineas.slice(i, fin < 0 ? undefined : fin); };
+  const i = hoy.inicio.findIndex((l) => l.trim() === 'header class="barra-superior sx-cabecera sx-cabecera--marca"');
+  assert.ok(i > 0, 'Inicio abre con la cabecera del sistema');
+  assert.equal(hoy.inicio.filter((l) => l.trimStart().startsWith('header ')).length, 1, 'una sola');
+  const cabecera = subarbol(hoy.inicio, i);
+  for (const testid of ['saldo', 'constancia', 'boton-sonido']) assert.ok(cabecera.some((l) => l.includes(`data-testid="${testid}"`)), `la cabecera de Inicio trae ${testid}`);
+  const saludo = subarbol(hoy.inicio, hoy.inicio.findIndex((l) => l.includes('class="encabezado-reto"')));
+  assert.ok(saludo.some((l) => l.trim() === 'h1') && !saludo.some((l) => l.includes('boton-sonido')), 'el saludo conserva su título y ya no carga el sonido');
+  assert.equal(hoy.inicio.filter((l) => l.includes('data-testid="boton-sonido"')).length, 1, 'un solo interruptor');
+  const boton = hoy.inicio.find((l) => l.includes('data-testid="boton-sonido"'));
+  assert.ok(boton.includes('aria-label="Silenciar el sonido y la vibración"') && boton.includes('aria-pressed="true"') && boton.includes('title="Con sonido"'), 'el interruptor dice su acción y su estado sin la palabra a la vista');
+  assert.ok(BASE.vistas.inicio.some((l) => l.trim() === 'div class="barra-superior"'), 'en la línea base era un div con el saldo y la constancia');
+  for (const nombre of ['profe_grupos', 'profe_grupo']) assert.ok(!hoy[nombre].some((l) => l.trimStart().startsWith('header ')), `${nombre}: sobrio, sin cabecera`);
 });
 
 test('R4: dos tomas seguidas dan lo mismo (la foto no depende del reloj ni del azar)', async () => {

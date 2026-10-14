@@ -7,7 +7,7 @@ import { crearResultado } from '../../ui/retro.js';
 import { crearNavInferior } from '../../ui/nav_inferior.js';
 import { suscribirRed } from '../../ui/red.js';
 import { celebrarAsistencia } from '../../ui/sello.js';
-import { crearBotonSonido } from '../../ui/boton_sonido.js';
+import { crearCabecera } from '../../ui/cabecera.js';
 import { marcarCargando, destelloExito } from '../../ui/boton.js';
 import { textos } from '../../textos.js';
 import { marcarAsistencia, leerHistorialMonedas, leerHistorialAsistencia } from '../../api/core.js';
@@ -128,7 +128,7 @@ function mostrarFallo(zonaResultado, e) {
 export function renderAsistencia(raiz, query, ctx) {
   const { form, campo, boton, avisoRed, zonaResultado } = crearFormulario({ codigoInicial: query.codigo || '' });
   montar(raiz, h('div', { 'data-testid': 'vista-asistencia', class: 'juego' },
-    h('div', { class: 'encabezado-reto' }, h('h1', {}, textos.asistencia.titulo), crearBotonSonido()), form, crearNavInferior('/asistencia', /** @type {any} */ (ctx).sesion?.rol)));
+    crearCabecera({ patron: '/asistencia', sonido: true }), form, crearNavInferior('/asistencia', /** @type {any} */ (ctx).sesion?.rol)));
 
   const cancelarRed = suscribirRed((enLinea) => actualizarBotonPorRed(boton, avisoRed, enLinea));
 

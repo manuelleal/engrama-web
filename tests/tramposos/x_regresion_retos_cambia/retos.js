@@ -7,7 +7,7 @@ import { textos } from '../../textos.js';
 import { tituloLegible } from '../../ui/titulo.js';
 import { crearNavInferior } from '../../ui/nav_inferior.js';
 import { crearCargando, crearVacio } from '../../ui/estados.js';
-import { crearBotonSonido } from '../../ui/boton_sonido.js';
+import { crearCabecera } from '../../ui/cabecera.js';
 import { listarRetos, historialDeIntentos } from '../../api/retos.js';
 import { ErrorApi } from '../../api/cliente.js';
 
@@ -59,7 +59,7 @@ function pintarLista(raiz, ctx, retos, ganados) {
     ? crearVacio({ titulo: textos.estados.retosVacioTitulo, texto: textos.estados.retosVacio, testid: 'retos-vacio' })
     : h('ul', {}, ...retos.map((r) => filaDeReto(r, ganados.has(r.id))));
   montar(raiz, h('div', { 'data-testid': 'vista-retos', class: 'juego' },
-    h('div', { class: 'encabezado-reto' }, h('h1', {}, textos.retos.titulo), crearBotonSonido()), h('a', { href: '#/inicio' }, textos.nav.inicio), cuerpo, crearNavInferior('/retos', ctx.sesion?.rol)));
+    crearCabecera({ patron: '/retos', sonido: true }), h('a', { href: '#/inicio' }, textos.nav.inicio), cuerpo, crearNavInferior('/retos', ctx.sesion?.rol)));
   document.body.dataset.listo = '1';
 }
 

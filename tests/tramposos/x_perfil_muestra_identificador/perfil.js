@@ -10,6 +10,7 @@ import { textos } from '../textos.js';
 import { crearFormularioContrasena } from './formulario_contrasena.js';
 import { crearBotonSalir } from '../ui/boton_salir.js';
 import { crearNavInferior } from '../ui/nav_inferior.js';
+import { crearCabecera } from '../ui/cabecera.js';
 
 const T = textos.cuenta;
 
@@ -52,7 +53,7 @@ function enlacesDeDatos(ctx) {
 export function renderPerfil(raiz, ctx) {
   montar(raiz, h(
     'div', { 'data-testid': 'vista-perfil' },
-    h('h1', {}, textos.perfil.titulo),
+    crearCabecera({ patron: '/perfil', rol: ctx.sesion?.rol ?? null }),
     quienSoy(ctx.sesion),
     seccionContrasena(ctx),
     enlacesDeDatos(ctx),

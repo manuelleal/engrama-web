@@ -153,8 +153,7 @@
   100% { transform: scale(1); }
 }
 
-/* Aviso "¡Constancia N!": un renglón en el FLUJO de la pantalla, en oro suave (racha = logro). No flota (flotando tapaba el saludo) y se queda
-   mientras dure la pantalla. Entra con opacidad y escala; sin movimiento, está puesto. */
+/* Aviso "¡Constancia N!": un renglón en el FLUJO de la pantalla, en oro suave (racha = logro). No flota: flotando tapaba el saludo. */
 .celebra-racha {
   display: flex;
   align-items: center;
@@ -841,9 +840,7 @@ body {
   from { opacity: 0; transform: scale(0.3); }
 }
 
-/* El botón de silencio nunca parte su texto en dos renglones. */
 .boton-sonido {
-  white-space: nowrap;
   flex: none;
 }
 
