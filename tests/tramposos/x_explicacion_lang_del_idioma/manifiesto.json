@@ -1,0 +1,16 @@
+{
+  "descripcion": "U78 (H-4): cada parte lleva el lang del idioma: en A1/A2 la oración y el ejemplo en inglés quedan marcados como español",
+  "archivos": {
+    "src/ui/explicacion.js": "explicacion.js"
+  },
+  "comando": [
+    "node",
+    "--test",
+    "--test-reporter=tap",
+    "tests/unit/practica_l1.test.mjs"
+  ],
+  "espera_codigo_no_cero": true,
+  "espera_fallan_tests": [
+    "U78: en A1 y A2 (idioma es)"
+  ]
+}

@@ -121,6 +121,21 @@ test('U78: desde B1 (idioma en) los rótulos van en inglés y cada parte lleva l
   } finally { entorno.restaurar(); }
 });
 
+// H-4 (docs/ESPEC_correcciones_practica.md): antes cada parte llevaba el `lang` del idioma, y en A1/A2 "He plays football." quedaba como español (el
+// lector de pantalla la leía con voz en español). Tramposo: x_explicacion_lang_del_idioma (ui/explicacion.js).
+test('U78: en A1 y A2 (idioma es) la oración y el ejemplo van con lang="en" y la regla y por qué no la tuya con lang="es"; los rótulos, con lang="es"', () => {
+  const entorno = entornoDeFotos({});
+  try {
+    const banda = crearBanda(planDeExplicacion(RESPUESTAS.q1));
+    const langs = Object.fromEntries(['oracion', 'regla', 'porQue', 'ejemplo'].map((c) => [c, buscar(banda, `explicacion-${c}`).getAttribute('lang')]));
+    assert.deepEqual(langs, { oracion: 'en', regla: 'es', porQue: 'es', ejemplo: 'en' });
+    for (const c of ['oracion', 'regla', 'porQue', 'ejemplo']) {
+      const rotulo = buscar(banda, `explicacion-${c}`).children.find((n) => n.tagName === 'strong');
+      assert.equal(rotulo?.getAttribute('lang'), 'es', `el rótulo de ${c} ("Así queda", "La regla"…) es español`);
+    }
+  } finally { entorno.restaurar(); }
+});
+
 // ---------- U79: el reto pregunta por pregunta ----------
 
 test('U79: pinta las preguntas de /attempt (nunca las del detalle) y antes de Comprobar no hay nada de la clave', async () => {

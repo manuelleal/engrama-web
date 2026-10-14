@@ -189,6 +189,11 @@ export const TRAMPOSOS = {
     cambios: [['    if (e instanceof ErrorApi && e.status === 409) { avisoDeCierre(raiz, estado); return; } // H-2: el intento ya no admite respuestas\n    if (e instanceof ErrorApi && e.status === 404) { avisoDeCierre(raiz, estado, T.noDisponible); return; }',
       '    if (e instanceof ErrorApi && [404, 409].includes(e.status)) { pintarErrorFlujo(raiz, e.mensaje); return; }']],
   },
+  x_explicacion_lang_del_idioma: {
+    archivo: 'src/ui/explicacion.js', prueba: L1, tests: ['U78: en A1 y A2 (idioma es)'],
+    descripcion: 'U78 (H-4): cada parte lleva el lang del idioma: en A1/A2 la oración y el ejemplo en inglés quedan marcados como español',
+    cambios: [["h('p', { class: 'sx-banda__cuerpo', lang: p.lang,", "h('p', { class: 'sx-banda__cuerpo', lang: plan.idioma,"]],
+  },
   x_sin_eol_lf: {
     archivo: '.gitattributes', copia: 'gitattributes.txt', prueba: 'tests/unit/sw_peso.test.mjs', tests: ['U59: cada archivo de PRECARGA sale de git archive'],
     descripcion: 'U59 (H-5): sin `*.js text eol=lf`, git archive con core.autocrlf=true sirve el shell en CRLF (más pesado que lo que mide U59) y nada lo ve',
