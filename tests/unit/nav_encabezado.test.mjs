@@ -14,6 +14,7 @@ import { instalarDomFalso } from './dom_falso.mjs';
 import { RUTAS_NAV, GID, ctxEstudiante, ctxProfe, ctxAdmin, CONFIG_NAV, asentar } from './fotos_de_navegacion.mjs';
 import { pintar, enOrden, volveres, vaAntes, primero, barraDe, error500, nuncaResponde } from './apoyo_nav.mjs';
 import { RUTAS, tituloDe, vueltaDe } from '../../src/navegacion.js';
+import { renderRepaso } from '../../src/vistas/estudiante/repaso.js';
 import { leerAviso } from '../../src/aviso.js';
 import { ruta, iniciar, detener, reiniciarRutas } from '../../src/rutas.js';
 import { renderInicio } from '../../src/vistas/estudiante/inicio.js';
@@ -58,6 +59,7 @@ const PANTALLAS = /** @type {Record<string, (r: any) => unknown>} */ ({
   '/vivo': (r) => renderVivo(r, {}, est()),
   '/nivel': (r) => renderNivel(r, {}, est()),
   '/monedas': (r) => renderMonedas(r, est()),
+  '/repaso': (r) => renderRepaso(r, est()), // W80 (módulo diferido): sin la ruta de la tanda en este servidor, "No hay repaso por ahora."
   '/asistencia': (r) => renderAsistencia(r, {}, est()),
   '/retos': (r) => renderRetos(r, est()),
   '/profe/grupos': (r) => renderGrupos(r, ctxProfe()),

@@ -52,4 +52,15 @@ export const textosPractica = {
     /** @param {number} hechos @param {number} total */
     avance: (hechos, total) => `Llevas ${hechos} de ${total} retos de hoy`,
   },
+  // W80: la pantalla "Repaso" (#/repaso). El repaso paga 0 y cuenta para la racha (dictamen 04 §1.4): se dice antes de empezar, sin "+0".
+  repaso: {
+    cargando: 'Buscando tu repaso…',
+    banner: 'Repaso: no suma monedas, sí cuenta para tu racha',
+    /** @param {number} n */
+    quedan: (n) => (n === 1 ? 'Te queda 1 pregunta de repaso' : `Te quedan ${n} preguntas de repaso`),
+    alDia: 'Repaso al día.',
+    nada: 'No hay repaso por ahora.',
+    seguir: 'Seguir con tu práctica',
+    noSePudo: 'No se pudo comprobar tu respuesta. Toca Comprobar otra vez.',
+  },
 };

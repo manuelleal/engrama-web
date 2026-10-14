@@ -137,6 +137,17 @@ async function medirRetoEnCurso(sesion, foto) {
   return medida;
 }
 
+/**
+ * W80 (docs/ESPEC_practica_del_dia.md): el repaso se abre desde "Tu práctica de hoy" solo cuando la tanda trae repaso, y con las entradas del
+ * recorrido no lo trae: se mide entrando por su dirección (sin repaso dice "No hay repaso por ahora." con su barra y su volver).
+ */
+async function medirPorDireccion(sesion, hash, patron, foto) {
+  await ir(sesion, hash);
+  const medida = await sesion.evaluar(MEDIR);
+  await foto(patron);
+  return medida;
+}
+
 /** La asistencia abierta del profe: se abre, se mide la salida, se va al grupo y se vuelve. */
 async function medirAsistenciaAbierta(sesion, paginas, foto) {
   const formulario = paginas.get('/profe/grupo/:gid/sesion');
@@ -170,6 +181,7 @@ async function medirEstudiante(sesion, paginas, r, foto, inicio) {
   const extras = [];
   const reto = await medirRetoEnCurso(sesion, foto);
   if (reto) { if (!paginas.has('/retos/:id')) extras.push(['/retos/:id', reto]); r.toques.est_reto = 1; }
+  if (!paginas.has('/repaso')) extras.push(['/repaso', await medirPorDireccion(sesion, '#/repaso', '/repaso', foto)]);
   r.toques.est_asistencia = sumar(paginas.get('/asistencia')?.toques, 1);
   r.toques.est_clase = sumar(paginas.get('/vivo')?.toques, 1);
   r.toques.est_examen = sumar(paginas.get('/nivel')?.toques, 1);

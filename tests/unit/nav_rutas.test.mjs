@@ -18,7 +18,7 @@ import { ruta, iniciar, detener, reiniciarRutas, definirPorDefecto, definirGuard
 
 const ROLES = /** @type {const} */ (['student', 'teacher', 'admin']);
 const DE_TODOS = ['/perfil', '/datos', '/datos/solicitudes'];
-const DEL_ESTUDIANTE = ['/inicio', '/vivo', '/nivel', '/monedas', '/asistencia', '/retos', '/retos/:id']; // W47: "Mis monedas" es del estudiante
+const DEL_ESTUDIANTE = ['/inicio', '/vivo', '/nivel', '/monedas', '/repaso', '/asistencia', '/retos', '/retos/:id']; // W47: "Mis monedas" es del estudiante; W80: el repaso
 const DEL_PROFE = ['/profe/grupos', '/profe/grupo/:gid', '/profe/grupo/:gid/sesion', '/profe/grupo/:gid/inscripcion', '/profe/grupo/:gid/logro', '/profe/grupo/:gid/errores', '/profe/retos'];
 const DEL_ADMIN = ['/admin', '/admin/asignar-docente/:gid', '/admin/importar-csv/:gid'];
 

@@ -13,7 +13,7 @@ import { RUTAS } from '../../src/navegacion.js';
 
 /** La pestaña activa de §5.6 para cada ruta del estudiante (null = la pantalla no lleva barra). */
 const ACTIVA_DEL_ESTUDIANTE = {
-  '/inicio': 'inicio', '/vivo': 'inicio', '/nivel': 'inicio',
+  '/inicio': 'inicio', '/vivo': 'inicio', '/nivel': 'inicio', '/repaso': 'inicio', // W80: el repaso se abre desde Inicio
   '/retos': 'retos',
   '/asistencia': 'asistencia',
   '/perfil': 'perfil', '/datos': 'perfil', '/datos/solicitudes': 'perfil',

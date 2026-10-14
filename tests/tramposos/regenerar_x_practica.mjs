@@ -22,6 +22,7 @@ function cambiar(texto, de, a) {
 const L1 = 'tests/unit/practica_l1.test.mjs';
 const R10 = 'tests/contrato/mock_practica.test.mjs';
 const TANDA = 'tests/unit/practica_tanda.test.mjs';
+const REPASO = 'tests/unit/practica_repaso.test.mjs';
 /** @type {[string, string]} */
 const SIN_SALIDA_L1 = ["    estado.encabezado = crearCabecera({ piezas: [estado.salir, h('h1', { class: 'titulo-reto' }, tituloLegible(challenge.title))], sonido: true }),",
   "    estado.encabezado = crearCabecera({ piezas: [/* TRAMPOSO: sin salida */ h('h1', { class: 'titulo-reto' }, tituloLegible(challenge.title))], sonido: true }),"];
@@ -69,6 +70,16 @@ export const TRAMPOSOS = {
     archivo: 'src/vistas/estudiante/inicio_practica.js', prueba: TANDA, tests: ['U81: sin tanda pedida, la protagonista es la primera'],
     descripcion: 'U81: "Practicas en: A2" sin el "Todavía no es tu nivel" cuando no hay SET (se lee como el nivel: riesgo 6 del dictamen)',
     cambios: [["    plan.nivel.conSet ? null : h('p', { class: 'sx-t-apoyo', 'data-testid': 'practica-sin-set' }, T.sinSet));", '    null);']],
+  },
+  x_repaso_envia_value: {
+    archivo: 'src/vistas/estudiante/repaso.js', prueba: REPASO, tests: ['U82: el repaso muestra una pregunta de la tanda'],
+    descripcion: 'U82: el repaso manda el texto de la opción en vez de su label (regla 4 del cliente)',
+    cambios: [['    estado.respuesta = await estado.enviar(estado.elegida);', '    estado.respuesta = await estado.enviar(textoDeOpcion(estado.entrada.pregunta, estado.elegida));']],
+  },
+  x_repaso_doble_envio: {
+    archivo: 'src/vistas/estudiante/repaso.js', prueba: REPASO, tests: ['U82: el repaso muestra una pregunta de la tanda'],
+    descripcion: 'U82: dos toques de Comprobar en el repaso mandan dos respuestas (regla 5 del cliente)',
+    cambios: [['  estado.enviar = accionUnica((label) => responderRepaso(', '  estado.enviar = ((label) => responderRepaso(']],
   },
   x_api_l1_sin_validar: {
     archivo: 'src/api/practica.js', prueba: L1, tests: ['U77: responderPregunta manda la label'],

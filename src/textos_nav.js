@@ -6,6 +6,7 @@ export const textosNav = {
   nav: {
     // Los nombres de las pestañas son los títulos de sus pantallas (Retos y Asistencia reusan textos.retos.titulo y textos.asistencia.titulo).
     inicio: 'Inicio',
+    repaso: 'Repaso', // W80: el repaso de la tanda
     // W68 (§5.6): la entrada de la barra que lleva a "mi cuenta" (el aviso, las solicitudes y "Cerrar sesión" viven ahí).
     perfil: 'Perfil',
     // W70 (§5.6): las entradas de la barra del profe y del admin. Cada una dice lo mismo que el título de su pantalla.

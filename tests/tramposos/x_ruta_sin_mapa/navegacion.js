@@ -47,6 +47,7 @@ export const RUTAS = [
   { patron: '/vivo', roles: ['student'], pestana: 'inicio', barra: true, vuelve: '/inicio', titulo: () => textos.anillo.vivoTitulo },
   { patron: '/nivel', roles: ['student'], pestana: 'inicio', barra: true, vuelve: '/inicio', titulo: () => textos.anillo.nivelTitulo },
   { patron: '/monedas', roles: ['student'], pestana: 'inicio', barra: true, vuelve: '/inicio', titulo: () => textos.monedas.titulo }, // W47: "Mis monedas", se abre desde Inicio
+  { patron: '/repaso', roles: ['student'], pestana: 'inicio', barra: true, vuelve: '/inicio', titulo: () => textos.nav.repaso }, // W80: el repaso de la tanda
   { patron: '/asistencia', roles: ['student'], pestana: 'asistencia', barra: true, vuelve: null, titulo: () => textos.asistencia.titulo },
   { patron: '/retos', roles: ['student'], pestana: 'retos', barra: true, vuelve: null, titulo: () => textos.retos.titulo },
   { patron: '/retos/:id', roles: ['student'], pestana: null, barra: false, vuelve: null, titulo: () => textos.retos.titulo }, // una tarea por pantalla (decisión 001)
