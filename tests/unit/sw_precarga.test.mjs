@@ -56,3 +56,18 @@ test('sw.js: anime.js y canvas-confetti se precargan, y la VERSION subió al cam
   assert.ok(sw.precarga.includes('/vendor/canvas-confetti@1.9.4/confetti.module.mjs'));
   assert.ok(sw.version >= 18, `VERSION v${sw.version}: al cambiar la precarga hay que subirla`);
 });
+
+// docs/ESPEC_visual_sistema1.md §0: el sistema visual único entra como copia de diseno/sistema/ (R1 vigila que sea idéntica) y se enlaza después de
+// los tokens. Pesa 46 KB: NO va en PRECARGA (el techo del shell es 830.000); va en APARTE, que se guarda al activar junto con las fuentes.
+test('sw.js: el sistema visual (publico/diseno/sistema.css) está enlazado después de tokens.css, fuera de PRECARGA y en la lista APARTE, que se guarda con las fuentes', () => {
+  const texto = readFileSync(join(RAIZ, 'sw.js'), 'utf8');
+  const aparte = [...(/const APARTE = \[([\s\S]*?)\n\];/.exec(texto)?.[1] || '').matchAll(/^\s*'([^']+)'/gm)].map((m) => m[1]);
+  assert.deepEqual(aparte, ['/publico/diseno/sistema.css']);
+  assert.ok(existsSync(join(RAIZ, aparte[0])), 'el archivo existe');
+  assert.ok(!sw.precarga.includes(aparte[0]), 'en PRECARGA engordaría el shell 46 KB');
+  assert.match(texto, /\[\.\.\.FUENTES, \.\.\.APARTE\]\.map/, 'se guarda al activar, con las fuentes');
+  const hojas = [...readFileSync(join(RAIZ, 'index.html'), 'utf8').matchAll(/<link rel="stylesheet" href="([^"]+)">/g)].map((m) => m[1]);
+  assert.equal(hojas.indexOf(aparte[0]), hojas.indexOf('/publico/diseno/tokens.css') + 1, 'justo después de los tokens y antes de lo propio');
+  const css = readFileSync(join(RAIZ, aparte[0]), 'utf8');
+  for (const m of css.matchAll(/url\('([^']+)'\)/g)) assert.ok(existsSync(join(RAIZ, 'publico', 'diseno', m[1])), `sistema.css pide ${m[1]}, que no existe desde publico/diseno/`);
+});

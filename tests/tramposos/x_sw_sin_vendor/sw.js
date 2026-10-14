@@ -10,7 +10,7 @@
 //
 // Súbelo un número cada vez que cambie la lista de precarga o la estrategia; la `activate`
 // borra cualquier caché con otro nombre.
-const VERSION = 'engrama-shell-v41';
+const VERSION = 'engrama-shell-v42';
 
 // Cada encargo agrega los suyos en su propio commit (W7: Inicio + api/cliente,core,retos + los
 // SVG de Drako que usa el estudiante; W10: profe/grupos,grupo,sesion_asistencia + api/profe). El
@@ -151,6 +151,13 @@ const FUENTES = [
   '/publico/fuentes/nunito-sans-latin-wght-normal.woff2',
 ];
 
+// El sistema visual único (publico/diseno/sistema.css, copia byte a byte de diseno/sistema/; docs/ESPEC_visual_sistema1.md §0) tampoco va en
+// PRECARGA: pesa 46.357 bytes. Se guarda con las fuentes, al activar y sin frenar nada. Sin red y sin haberlo guardado, la app abre y se lee
+// (las hojas de `estilos/` sí están en el shell); se ve sin el cromo del sistema.
+const APARTE = [
+  '/publico/diseno/sistema.css',
+];
+
 // Cuánto se espera a CADA recurso de la precarga. Antes era `cache.addAll(PRECARGA)`: todo o nada, sin límite de tiempo. Un solo recurso
 // lento (que la primera pantalla ni siquiera necesita) tenía a la página SIN controlar hasta que llegara, y uno que fallara dejaba
 // el service worker sin instalar (medido con herramientas/medir_sw.mjs: un SVG de 40 s → la página, lista a los 2,5 s, quedó controlada a
@@ -190,16 +197,16 @@ self.addEventListener('activate', (ev) => {
       .then((nombres) => Promise.all(nombres.filter((n) => n !== VERSION).map((n) => caches.delete(n))))
       .then(() => self.clients.claim()),
   );
-  guardarFuentes(); // en segundo plano, a propósito fuera de `waitUntil`: nada espera por las fuentes
+  guardarFuentes(); // en segundo plano, a propósito fuera de `waitUntil`: nada espera por las fuentes ni por el sistema visual
 });
 
 async function guardarFuentes() {
   try {
     const cache = await caches.open(VERSION);
     const fallidos = [];
-    await Promise.all(FUENTES.map(async (ruta) => { if (!(await cache.match(ruta))) await precargarUno(cache, ruta, fallidos); }));
+    await Promise.all([...FUENTES, ...APARTE].map(async (ruta) => { if (!(await cache.match(ruta))) await precargarUno(cache, ruta, fallidos); }));
   } catch (e) {
-    console.warn('sw: no guardé las fuentes (se guardan al primer uso)', e && e.message);
+    console.warn('sw: no guardé las fuentes ni el sistema visual (se guardan al primer uso)', e && e.message);
   }
 }
 

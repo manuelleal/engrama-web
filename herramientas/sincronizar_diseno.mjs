@@ -1,6 +1,6 @@
 #!/usr/bin/env node
 // @ts-check
-// sincronizar_diseno.mjs · Copia de solo lectura de diseno/ hacia publico/diseno/ (R1, ESPEC_mvp_uis.md §9.2).
+// sincronizar_diseno.mjs · Copia de solo lectura de diseno/ hacia publico/diseno/ (R1, ESPEC_mvp_uis.md §9.2): los tokens, el sistema visual y Drako.
 //
 // engrama-web NUNCA define sus propios colores: los toma de diseno/tokens.json (decisión 001).
 // Como el cliente no tiene build, no puede "importar" diseno/dist/tokens.css desde fuera de su
@@ -26,6 +26,8 @@ const ESTADOS_DRAKO = ['presenta', 'piensa', 'explica', 'celebra', 'ups', 'esper
 export function archivosASincronizar() {
   const pares = [
     { origen: join(RAIZ_DISENO, 'dist', 'tokens.css'), destino: join(RAIZ_PROYECTO, 'publico', 'diseno', 'tokens.css') },
+    // El sistema visual unico (diseno/sistema/LEEME.md): se copia TAL CUAL. Desde publico/diseno/ sus url('../fuentes/...') caen en publico/fuentes/.
+    { origen: join(RAIZ_DISENO, 'sistema', 'sistema.css'), destino: join(RAIZ_PROYECTO, 'publico', 'diseno', 'sistema.css') },
   ];
   for (const estado of ESTADOS_DRAKO) {
     pares.push({

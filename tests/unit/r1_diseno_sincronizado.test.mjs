@@ -7,9 +7,9 @@ import test from 'node:test';
 import assert from 'node:assert/strict';
 import { archivosASincronizar, verificarSincronizado } from '../../herramientas/sincronizar_diseno.mjs';
 
-test('R1: publico/diseno/ está sincronizado con diseno/ (8 archivos: tokens.css + 7 SVG de Drako)', () => {
+test('R1: publico/diseno/ está sincronizado con diseno/ (9 archivos: tokens.css + sistema.css + 7 SVG de Drako)', () => {
   const pares = archivosASincronizar();
-  assert.equal(pares.length, 8, 'tokens.css + 7 estados de Drako');
+  assert.equal(pares.length, 9, 'tokens.css + sistema.css + 7 estados de Drako');
   const discrepancias = verificarSincronizado();
   assert.deepEqual(discrepancias, [], 'ejecuta `node herramientas/sincronizar_diseno.mjs` y commitea el resultado');
 });

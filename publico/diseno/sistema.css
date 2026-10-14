@@ -1,0 +1,574 @@
+/* sistema.css · sistema visual único de ENGRAMA, EVA y SET (dirección Navy Real, decisión 001).
+   Fuente única: diseno/sistema/. Guía viva: guia.html. Cómo adoptarlo: LEEME.md.
+   Se enlaza DESPUÉS del CSS de tokens (diseno/dist/tokens.css o su copia en el producto).
+   Reglas: solo var(--token) o color-mix() con white / black / transparent; se animan solo transform y opacity;
+   sin backdrop-filter; sin librerías. Las variables --sx-* son DERIVADAS: están pedidas en PEDIDO_tokens.md.
+   Medidas de origen: investigacion/diseno/06 (Duolingo, Brilliant, Khan) y 07 (Kahoot, Vercel, Stripe, Linear). */
+
+/* ───────── 1. Fuentes (cada producto reescribe la ruta). Rangos medidos en la tabla fvar de cada archivo. ───────── */
+@font-face { font-family: 'Baloo 2'; font-style: normal; font-weight: 400 800; font-display: swap;
+  src: url('../fuentes/baloo-2-latin-wght-normal.woff2') format('woff2-variations'),
+       url('../fuentes/baloo-2-latin-wght-normal.woff2') format('woff2'); }
+@font-face { font-family: 'Nunito Sans'; font-style: normal; font-weight: 200 1000; font-display: swap;
+  src: url('../fuentes/nunito-sans-latin-wght-normal.woff2') format('woff2-variations'),
+       url('../fuentes/nunito-sans-latin-wght-normal.woff2') format('woff2'); }
+
+/* ───────── 2. Variables derivadas. Claro por defecto. ───────── */
+:root, [data-theme] {
+  /* forma y tiempo */
+  --sx-radio-control: var(--radio-sm);            /* 12: botón, opción, campo */
+  --sx-radio-caja: var(--radio-md);               /* 16: tarjeta, modal, banda */
+  --sx-radio-pildora: 999px;
+  --sx-dur-1: 100ms;                              /* el toque */
+  --sx-dur-2: 200ms;                              /* un cambio de estado, la banda */
+  --sx-dur-3: 400ms;                              /* el progreso, la entrada de pantalla */
+  --sx-curva: cubic-bezier(.22, 1, .36, 1);       /* salida que frena: todo */
+  --sx-curva-rebote: cubic-bezier(.35, 1.8, .35, .83); /* solo registro juego: banda y dato */
+
+  /* escala tipográfica (documento 06 §5) */
+  --sx-t-numero: 4rem;
+  --sx-t-titulo: 1.75rem;
+  --sx-t-sub: 1.375rem;
+  --sx-t-tarjeta: 1.125rem;
+  --sx-t-opcion: 1.125rem;
+  --sx-t-cuerpo: 1.0625rem;
+  --sx-t-apoyo: 1rem;
+  --sx-t-boton: 1.0625rem;
+  --sx-t-etiqueta: .8125rem;
+
+  /* superficies */
+  --sx-fondo: var(--fondo);
+  --sx-pozo: color-mix(in srgb, var(--fondo) 94%, black);
+  --sx-superficie: var(--superficie);
+  --sx-superficie-alta: var(--superficie);
+  --sx-marca: var(--primario);
+  --sx-sobre-marca: var(--superficie);
+
+  /* tinta: tres tonos de la misma */
+  --sx-tinta: var(--texto);
+  --sx-tinta-2: color-mix(in srgb, currentColor 78%, transparent);   /* salen del color heredado: sirven igual sobre crema, navy u oscuro */
+  --sx-tinta-3: color-mix(in srgb, currentColor 68%, transparent);
+
+  /* acción (navy) */
+  --sx-accion: var(--primario);
+  --sx-sobre-accion: var(--superficie);
+  --sx-accion-labio: color-mix(in srgb, var(--primario) 50%, black);
+  --sx-accion-tinta-0: var(--primario);
+  --sx-accion-tinta: var(--sx-accion-tinta-0);
+  --sx-accion-suave: color-mix(in srgb, var(--primario) 8%, white);
+  --sx-accion-borde: color-mix(in srgb, var(--primario) 40%, white);
+
+  /* logro (oro) */
+  --sx-oro: var(--oro);
+  --sx-sobre-oro: var(--oro-texto);
+  --sx-oro-labio: color-mix(in srgb, var(--oro) 72%, black);
+  --sx-oro-suave: color-mix(in srgb, var(--oro) 18%, white);
+  --sx-sobre-oro-suave: var(--oro-texto);
+
+  /* veredicto: fondo tenue, borde medio, texto fuerte */
+  --sx-ok: var(--correcto);
+  --sx-ok-fondo: var(--correcto-fondo);
+  --sx-ok-borde: color-mix(in srgb, var(--correcto) 45%, white);
+  --sx-ok-cara: var(--correcto);
+  --sx-sobre-ok: var(--superficie);
+  --sx-mal: var(--incorrecto);
+  --sx-mal-fondo: var(--incorrecto-fondo);
+  --sx-mal-borde: color-mix(in srgb, var(--incorrecto) 45%, white);
+  --sx-mal-cara: var(--incorrecto);
+  --sx-sobre-mal: var(--superficie);
+
+  /* aviso (toast) */
+  --sx-aviso-fondo: var(--texto);
+  --sx-aviso-tinta: var(--fondo);
+
+  /* la sombra se tiñe de navy en claro */
+  --sx-umbra: var(--primario);
+  --sx-velo: color-mix(in srgb, var(--primario-oscuro) 62%, transparent);
+
+  /* bordes y anillos (van después de la tinta porque salen de ella) */
+  --sx-borde-1: color-mix(in srgb, currentColor 9%, transparent);    /* anillo, divisor */
+  --sx-borde-2: color-mix(in srgb, currentColor 17%, transparent);   /* borde de 2 px del juego */
+  --sx-borde-3: color-mix(in srgb, currentColor 52%, transparent);   /* contorno de campo y de radio: 3:1 */
+  --sx-labio-neutro: color-mix(in srgb, currentColor 24%, transparent);
+  --sx-pista: color-mix(in srgb, currentColor 13%, transparent);
+  --sx-inactivo: color-mix(in srgb, currentColor 14%, transparent);
+  --sx-brillo: inset 0 1px 0 color-mix(in srgb, white 16%, transparent); /* solo sobre color, nunca sobre blanco */
+  --sx-foco-color: var(--sx-accion-tinta);
+
+  /* elevación medida (documento 07 §2.3): anillo de 1 px + capas con spread negativo */
+  --sx-anillo: 0 0 0 1px var(--sx-borde-1);
+  --sx-sombra-1: 0 1px 2px color-mix(in srgb, var(--sx-umbra) 7%, transparent);
+  --sx-sombra-2: 0 2px 2px color-mix(in srgb, var(--sx-umbra) 5%, transparent),
+                 0 8px 16px -4px color-mix(in srgb, var(--sx-umbra) 9%, transparent);
+  --sx-sombra-3: 0 1px 1px color-mix(in srgb, var(--sx-umbra) 4%, transparent),
+                 0 4px 8px -4px color-mix(in srgb, var(--sx-umbra) 8%, transparent),
+                 0 16px 24px -8px color-mix(in srgb, var(--sx-umbra) 12%, transparent);
+  --sx-sombra-4: 0 1px 1px color-mix(in srgb, var(--sx-umbra) 4%, transparent),
+                 0 8px 16px -4px color-mix(in srgb, var(--sx-umbra) 9%, transparent),
+                 0 24px 32px -8px color-mix(in srgb, var(--sx-umbra) 16%, transparent);
+  --sx-sombra-arriba: 0 -2px 2px color-mix(in srgb, var(--sx-umbra) 4%, transparent),
+                      0 -8px 16px -4px color-mix(in srgb, var(--sx-umbra) 9%, transparent);
+  --sx-elev-1: var(--sx-anillo), var(--sx-sombra-1);       /* apoyado: tarjeta, fila, campo */
+  --sx-elev-2: var(--sx-anillo), var(--sx-sombra-2);       /* elevado: protagonista, cabecera */
+  --sx-elev-3: var(--sx-anillo), var(--sx-sombra-3);       /* flotante: aviso, menú */
+  --sx-elev-4: var(--sx-anillo), var(--sx-sombra-4);       /* modal */
+  --sx-elev-arriba: var(--sx-anillo), var(--sx-sombra-arriba); /* barra inferior, banda, pie */
+}
+
+/* Oscuro (hoy solo SET lo usa). Manda la luz del borde, no la sombra. */
+[data-theme="dark"] {
+  --sx-fondo: color-mix(in srgb, var(--texto) 55%, black);
+  --sx-pozo: color-mix(in srgb, var(--texto) 34%, black);
+  --sx-superficie: var(--texto);
+  --sx-superficie-alta: color-mix(in srgb, var(--texto) 90%, white);
+  --sx-tinta: var(--fondo);
+  --sx-accion: color-mix(in srgb, var(--primario) 42%, white);
+  --sx-sobre-accion: color-mix(in srgb, var(--texto) 55%, black);
+  --sx-accion-labio: color-mix(in srgb, var(--primario) 72%, white);
+  --sx-accion-tinta-0: color-mix(in srgb, var(--primario) 32%, white);
+  --sx-accion-suave: color-mix(in srgb, var(--primario) 70%, black);
+  --sx-accion-borde: color-mix(in srgb, var(--primario) 58%, white);
+  --sx-oro-suave: color-mix(in srgb, var(--oro) 22%, black);
+  --sx-sobre-oro-suave: color-mix(in srgb, var(--oro) 70%, white);
+  --sx-ok: color-mix(in srgb, var(--correcto) 42%, white);
+  --sx-ok-fondo: color-mix(in srgb, var(--correcto) 42%, black);
+  --sx-ok-borde: color-mix(in srgb, var(--correcto) 82%, white);
+  --sx-ok-cara: color-mix(in srgb, var(--correcto) 42%, white);
+  --sx-sobre-ok: color-mix(in srgb, var(--texto) 55%, black);
+  --sx-mal: color-mix(in srgb, var(--incorrecto) 38%, white);
+  --sx-mal-fondo: color-mix(in srgb, var(--incorrecto) 34%, black);
+  --sx-mal-borde: color-mix(in srgb, var(--incorrecto) 82%, white);
+  --sx-mal-cara: color-mix(in srgb, var(--incorrecto) 38%, white);
+  --sx-sobre-mal: color-mix(in srgb, var(--texto) 55%, black);
+  --sx-aviso-fondo: color-mix(in srgb, var(--texto) 84%, white);
+  --sx-aviso-tinta: var(--fondo);
+  --sx-umbra: black;
+  --sx-velo: color-mix(in srgb, black 64%, transparent);
+  --sx-borde-1: color-mix(in srgb, currentColor 14%, transparent);   /* Vercel oscuro: 14,5 % */
+  --sx-labio-neutro: color-mix(in srgb, currentColor 13%, transparent);
+  --sx-sombra-1: 0 1px 2px color-mix(in srgb, black 16%, transparent);
+  --sx-sombra-2: 0 2px 2px color-mix(in srgb, black 32%, transparent),
+                 0 8px 8px -8px color-mix(in srgb, black 16%, transparent);
+  --sx-sombra-3: 0 2px 32px color-mix(in srgb, black 25%, transparent);
+  --sx-sombra-4: 0 2px 32px color-mix(in srgb, black 32%, transparent);
+  --sx-sombra-arriba: 0 -2px 2px color-mix(in srgb, black 24%, transparent);
+}
+
+/* ───────── 3. Los dos registros: una familia ───────── */
+/* Juego (estudiante de ENGRAMA, EVA): labio sólido, borde de 2 px, rebote. Es el valor por defecto.
+   Todo lo que cambia entre registros va en estas variables (ninguna regla ".sx-sereno .algo"): así un registro
+   puede vivir dentro del otro sin pisarse. */
+:root, [data-theme], .sx-juego {
+  --sx-trazo: 2px;
+  --sx-labio: 4px;                 /* sobre relleno de color */
+  --sx-labio-b: 2px;               /* sobre blanco: borde 2 + labio 2 */
+  --sx-escala-presion: 1;
+  --sx-sombra-control: 0 0 0 0 transparent;
+  --sx-borde-control: var(--sx-borde-2);
+  --sx-caja: inset 0 0 0 2px var(--sx-borde-2);
+  --sx-caja-2: inset 0 0 0 2px var(--sx-borde-2), var(--sx-sombra-2);
+  --sx-alto-progreso: 16px;
+  --sx-entrada: var(--sx-curva-rebote);
+  --sx-ver-brillo: block;                                   /* brillo de la barra de progreso */
+  --sx-pestana-fondo: var(--sx-accion-suave); --sx-pestana-borde: var(--sx-accion-borde); --sx-ver-marca: none;
+  --sx-banda-radio: 0px; --sx-banda-sombra: var(--sx-elev-arriba);
+}
+/* Sereno (SET, profe, admin): anillo de 1 px, elevación tenue, sin labio ni rebote. */
+.sx-sereno {
+  --sx-trazo: 1px;
+  --sx-labio: 0px;
+  --sx-labio-b: 0px;
+  --sx-escala-presion: .98;
+  --sx-sombra-control: var(--sx-sombra-1);
+  --sx-borde-control: var(--sx-borde-3);
+  --sx-caja: var(--sx-elev-1);
+  --sx-caja-2: var(--sx-elev-2);
+  --sx-alto-progreso: 8px;
+  --sx-entrada: var(--sx-curva);
+  --sx-ver-brillo: none;
+  --sx-pestana-fondo: transparent; --sx-pestana-borde: transparent; --sx-ver-marca: block;
+  --sx-banda-radio: var(--sx-radio-caja); --sx-banda-sombra: var(--sx-elev-1);
+  --sx-t-cuerpo: 1.125rem;
+}
+.sx-juego, .sx-sereno { font: 500 var(--sx-t-cuerpo)/1.45 var(--fuente-cuerpo); -webkit-font-smoothing: antialiased; }
+:where(.sx-juego, .sx-sereno) { color: var(--sx-tinta); }
+.sx-sereno { line-height: 1.56; }
+.sx-juego *, .sx-sereno *, .sx-juego *::before, .sx-sereno *::before, .sx-juego *::after, .sx-sereno *::after { box-sizing: border-box; }
+
+/* Toda superficie devuelve la tinta de la casa (así una tarjeta blanca dentro de un lienzo navy no hereda letra blanca). */
+.sx-lienzo, .sx-tarjeta, .sx-prota, .sx-modal, .sx-lista, .sx-tabla-caja, .sx-banda, .sx-pie, .sx-barra, .sx-cabecera, .sx-globo,
+.sx-btn, .sx-btn-icono, .sx-opcion, .sx-ficha, .sx-entrada {
+  color: var(--sx-tinta); --sx-accion-tinta: var(--sx-accion-tinta-0); --sx-foco-color: var(--sx-accion-tinta-0);
+  --sx-pista: color-mix(in srgb, currentColor 13%, transparent); --sx-progreso-color: var(--sx-accion);
+}
+/* Sobre navy: la tinta es clara y el foco, blanco. Los tres tonos salen solos del color heredado. */
+.sx-sobre-marca, .sx-lienzo--marca, .sx-cabecera--marca, .sx-prota--marca, .sx-proyector {
+  color: var(--sx-sobre-marca); --sx-accion-tinta: var(--sx-sobre-marca); --sx-foco-color: var(--sx-sobre-marca);
+  --sx-pista: color-mix(in srgb, white 22%, transparent); --sx-progreso-color: var(--oro);   /* sobre navy la barra va en oro */
+}
+.sx-lienzo { background: var(--sx-fondo); }
+.sx-lienzo--marca { background: var(--sx-marca); }
+.sx-columna { width: min(100% - 32px, 44rem); margin-inline: auto; }   /* columna de lectura: 34 a 44 rem */
+.sx-columna--angosta { width: min(100% - 32px, 34rem); }
+.sx-pila { display: grid; gap: 12px; }
+.sx-pila--holgada { gap: 20px; }
+.sx-fila-flex { display: flex; align-items: center; gap: 12px; }
+.sx-crece { flex: 1; min-width: 0; }
+
+/* Foco idéntico en todo */
+:where([class*="sx-"]):is(:focus-visible, .es-foco) { outline: 3px solid var(--sx-foco-color); outline-offset: 2px; }
+
+/* ───────── 4. Tipografía ───────── */
+.sx-t-numero   { font: 800 var(--sx-t-numero)/1 var(--fuente-titulos); letter-spacing: -.02em; font-variant-numeric: tabular-nums; margin: 0; }
+.sx-t-titulo   { font: 800 var(--sx-t-titulo)/1.15 var(--fuente-titulos); letter-spacing: -.01em; margin: 0; text-wrap: balance; }
+.sx-t-sub      { font: 700 var(--sx-t-sub)/1.2 var(--fuente-titulos); margin: 0; text-wrap: balance; }
+.sx-t-tarjeta  { font: 700 var(--sx-t-tarjeta)/1.25 var(--fuente-titulos); margin: 0; }
+.sx-t-opcion   { font: 600 var(--sx-t-opcion)/1.4 var(--fuente-cuerpo); margin: 0; }
+.sx-t-cuerpo   { font: 500 var(--sx-t-cuerpo)/1.45 var(--fuente-cuerpo); margin: 0; }
+.sx-t-apoyo    { font: 500 var(--sx-t-apoyo)/1.45 var(--fuente-cuerpo); color: var(--sx-tinta-2); margin: 0; }
+.sx-t-etiqueta { font: 800 var(--sx-t-etiqueta)/1.2 var(--fuente-cuerpo); letter-spacing: .05em; text-transform: uppercase; margin: 0; }
+.sx-t-tenue    { color: var(--sx-tinta-3); }
+.sx-lectura    { font: 400 1.125rem/1.56 var(--fuente-cuerpo); max-width: 34rem; margin: 0; }
+@media (min-width: 1024px) {
+  :root, [data-theme] { --sx-t-numero: 5.5rem; --sx-t-titulo: 2.25rem; --sx-t-sub: 1.5rem; }
+}
+
+/* Ícono: SVG de trazo que hereda el color del texto */
+.sx-icono { flex: none; width: 1.25em; height: 1.25em; fill: none; stroke: currentColor; stroke-width: 2.2; stroke-linecap: round; stroke-linejoin: round; }
+.sx-icono--lleno { fill: currentColor; stroke: none; }
+
+/* ───────── 5. La tecla: mecánica común de todo lo tocable ─────────
+   Dos capas en pseudo-elementos: ::before es la cara y ::after el labio. Al presionar, la cara baja el alto del
+   labio y el labio se queda en su sitio. Solo se mueve transform. */
+.sx-btn, .sx-btn-icono, .sx-opcion, .sx-ficha {
+  --_cara: var(--sx-superficie); --_tinta: var(--sx-tinta); --_trazo: var(--sx-borde-control);
+  --_labio: var(--sx-labio-neutro); --_alto: var(--sx-labio-b); --_brillo: 0 0 0 0 transparent; --_hover: .975;
+  position: relative; isolation: isolate; box-sizing: border-box;
+  margin: 0 0 var(--_alto); border: 0; background: none;
+  border-radius: var(--sx-radio-control); cursor: pointer; text-decoration: none;
+  -webkit-tap-highlight-color: transparent; touch-action: manipulation; user-select: none;
+  transition: transform var(--sx-dur-1) var(--sx-curva);
+}
+:is(.sx-btn, .sx-btn-icono, .sx-opcion, .sx-ficha) { color: var(--_tinta); }
+:is(.sx-btn, .sx-btn-icono, .sx-opcion, .sx-ficha)::before {
+  content: ""; position: absolute; inset: 0; z-index: -1; border-radius: inherit; background: var(--_cara);
+  box-shadow: var(--_brillo), inset 0 0 0 var(--_grosor, var(--sx-trazo)) var(--_trazo), var(--sx-sombra-control);
+}
+:is(.sx-btn, .sx-btn-icono, .sx-opcion, .sx-ficha)::after {
+  content: ""; position: absolute; inset: 0; z-index: -2; border-radius: inherit; background: var(--_labio);
+  transform: translateY(var(--_alto)); transition: transform var(--sx-dur-1) var(--sx-curva);
+}
+@media (hover: hover) {
+  :is(.sx-btn, .sx-btn-icono, .sx-opcion, .sx-ficha):hover:not(:disabled, [aria-disabled="true"])::before { filter: brightness(var(--_hover)); }
+}
+:is(.sx-btn, .sx-btn-icono, .sx-opcion, .sx-ficha):is(:active, .es-presionado):not(:disabled, [aria-disabled="true"]) {
+  transform: translateY(var(--_alto)) scale(var(--sx-escala-presion));
+}
+:is(.sx-btn, .sx-btn-icono, .sx-opcion, .sx-ficha):is(:active, .es-presionado, :disabled, [aria-disabled="true"])::after { transform: none; }
+/* Deshabilitado es estar ya hundido */
+:is(.sx-btn, .sx-btn-icono, .sx-opcion, .sx-ficha):is(:disabled, [aria-disabled="true"]) { transform: translateY(var(--_alto)); cursor: not-allowed; }
+
+/* ───────── 6. Botones ───────── */
+.sx-btn {
+  --_cara: var(--sx-accion); --_tinta: var(--sx-sobre-accion); --_trazo: transparent; --_labio: var(--sx-accion-labio);
+  --_alto: var(--sx-labio); --_brillo: var(--sx-brillo); --_hover: 1.14;
+  display: inline-flex; align-items: center; justify-content: center; gap: 8px;
+  min-height: 48px; padding: 2px 20px 0; text-align: center;
+  font: 800 var(--sx-t-boton)/1.2 var(--fuente-titulos); letter-spacing: .02em;
+}
+.sx-btn--sec      { --_cara: var(--sx-superficie); --_tinta: var(--sx-accion-tinta); --_trazo: var(--sx-borde-control);
+                    --_labio: var(--sx-labio-neutro); --_alto: var(--sx-labio-b); --_brillo: 0 0 0 0 transparent; --_hover: .975; }
+.sx-btn--oro      { --_cara: var(--sx-oro); --_tinta: var(--sx-sobre-oro); --_labio: var(--sx-oro-labio); --_hover: 1.06; }
+.sx-btn--ok       { --_cara: var(--sx-ok-cara); --_tinta: var(--sx-sobre-ok); --_labio: color-mix(in srgb, var(--sx-ok-cara) 68%, black); }
+.sx-btn--mal      { --_cara: var(--sx-mal-cara); --_tinta: var(--sx-sobre-mal); --_labio: color-mix(in srgb, var(--sx-mal-cara) 68%, black); }
+.sx-btn--claro    { --_cara: var(--superficie); --_tinta: var(--primario); --_labio: color-mix(in srgb, var(--primario) 34%, white);
+                    --_brillo: 0 0 0 0 transparent; --_hover: .96; }           /* sobre navy */
+.sx-btn--fantasma { --_cara: transparent; --_tinta: var(--sx-accion-tinta); --_labio: transparent; --_alto: 0px;
+                    --_brillo: 0 0 0 0 transparent; --sx-sombra-control: 0 0 0 0 transparent; }
+@media (hover: hover) { .sx-btn--fantasma:hover:not(:disabled)::before { background: color-mix(in srgb, currentColor 7%, transparent); filter: none; } }
+.sx-btn--fantasma:is(:active, .es-presionado):not(:disabled) { transform: scale(.97); }
+.sx-btn--fantasma:is(:active, .es-presionado)::before { background: color-mix(in srgb, currentColor 12%, transparent); }
+.sx-btn--ancho { display: flex; width: 100%; }
+.sx-btn--chico { min-height: 40px; padding-inline: 14px; font-size: .9375rem; }
+.sx-btn--grande { min-height: 56px; padding-inline: 28px; font-size: 1.25rem; }
+.sx-btn:is(:disabled, [aria-disabled="true"]) { --_cara: var(--sx-inactivo); --_tinta: var(--sx-tinta-3); --_trazo: transparent;
+                    --_labio: transparent; --_brillo: 0 0 0 0 transparent; --sx-sombra-control: 0 0 0 0 transparent; }
+
+.sx-btn-icono { display: inline-grid; place-items: center; width: 44px; height: 44px; padding: 0; font-size: 1.125rem; }
+.sx-btn-icono--plano { --_cara: transparent; --_trazo: transparent; --_labio: transparent; --_alto: 0px; --sx-sombra-control: 0 0 0 0 transparent; }
+@media (hover: hover) { .sx-btn-icono--plano:hover::before { background: color-mix(in srgb, currentColor 8%, transparent); filter: none; } }
+.sx-btn-icono--plano:is(:active, .es-presionado) { transform: scale(.94); }
+.sx-btn-icono:disabled { --_tinta: var(--sx-tinta-3); --_labio: transparent; }
+/* El fantasma y el ícono plano no son superficie: toman la tinta del lugar donde están (navy o claro). */
+.sx-btn--fantasma, .sx-btn-icono--plano { --sx-accion-tinta: inherit; --sx-foco-color: inherit; }
+.sx-btn-icono--plano { color: inherit; }
+
+/* ───────── 7. Tarjetas ───────── */
+.sx-tarjeta { background: var(--sx-superficie); border-radius: var(--sx-radio-caja); padding: 16px; box-shadow: var(--sx-caja); }
+.sx-tarjeta--pozo { background: var(--sx-pozo); box-shadow: none; }           /* bloque separado por tono, sin borde */
+/* Ficha: tarjeta que se toca (lleva la tecla) */
+.sx-ficha { display: flex; align-items: center; gap: 12px; width: 100%; padding: 14px 16px; border-radius: var(--sx-radio-caja);
+            text-align: start; font: inherit; user-select: auto; }
+.sx-ficha__fin { margin-inline-start: auto; color: var(--sx-tinta-3); }
+/* Protagonista: una por pantalla. Lleva elevación medida en los dos registros. */
+.sx-prota { background: var(--sx-superficie); border-radius: var(--sx-radio-caja); padding: 20px; box-shadow: var(--sx-caja-2); }
+.sx-prota--marca { background: var(--sx-marca);
+  box-shadow: var(--sx-brillo), 0 var(--sx-labio) 0 color-mix(in srgb, var(--primario) 50%, black),
+              0 12px 20px -6px color-mix(in srgb, var(--sx-umbra) 26%, transparent);
+  margin-bottom: var(--sx-labio); }
+[data-theme="dark"] .sx-prota--marca, [data-theme="dark"] .sx-cabecera--marca { box-shadow: inset 0 0 0 1px color-mix(in srgb, white 14%, transparent), var(--sx-sombra-2); }
+
+/* ───────── 8. Opción de respuesta: tres pasos por estado (fondo tenue, borde medio, texto fuerte) ───────── */
+.sx-opcion { display: flex; align-items: center; gap: 12px; width: 100%; min-height: 56px; padding: 10px 16px;
+             text-align: start; font: 600 var(--sx-t-opcion)/1.4 var(--fuente-cuerpo); }
+.sx-opcion__marca { flex: none; display: grid; place-items: center; width: 32px; height: 32px; border-radius: 10px;
+                    background: var(--sx-pozo); color: var(--sx-tinta-2); font: 800 1rem/1 var(--fuente-titulos);
+                    box-shadow: inset 0 0 0 var(--sx-trazo) var(--sx-borde-2); padding-top: 2px; }
+.sx-opcion__marca--radio { width: 22px; height: 22px; border-radius: 50%; background: var(--sx-superficie); padding: 0;
+                    box-shadow: inset 0 0 0 2px var(--sx-borde-3); color: inherit; }
+.sx-opcion__texto { flex: 1; min-width: 0; }
+.sx-opcion__estado { flex: none; display: none; align-items: center; gap: 6px; font: 800 var(--sx-t-etiqueta)/1 var(--fuente-cuerpo);
+                     letter-spacing: .04em; text-transform: uppercase; }
+.sx-opcion:is(.es-elegida, .es-correcta, .es-incorrecta, [aria-checked="true"]) .sx-opcion__estado { display: inline-flex; }
+
+.sx-opcion:is(.es-elegida, [aria-checked="true"]) { --_cara: var(--sx-accion-suave); --_trazo: var(--sx-accion-borde);
+             --_labio: var(--sx-accion-borde); --_tinta: var(--sx-accion-tinta); --_grosor: 2px; }
+.sx-opcion:is(.es-elegida, [aria-checked="true"]) .sx-opcion__marca { background: var(--sx-accion); color: var(--sx-sobre-accion); box-shadow: none; }
+.sx-opcion:is(.es-elegida, [aria-checked="true"]) .sx-opcion__marca--radio { background: var(--sx-accion);
+             box-shadow: inset 0 0 0 2px var(--sx-accion), inset 0 0 0 6px var(--sx-superficie); }
+.sx-opcion:is(:disabled, [aria-disabled="true"]):not(.es-elegida, .es-correcta, .es-incorrecta, [aria-checked="true"], [class*="sx-opcion--s"]) {
+             --_tinta: var(--sx-tinta-3); --_cara: var(--sx-fondo); }
+.sx-opcion.es-correcta   { --_cara: var(--sx-ok-fondo);  --_trazo: var(--sx-ok-borde);  --_labio: var(--sx-ok-borde);  --_tinta: var(--sx-ok);  --_grosor: 2px; }
+.sx-opcion.es-incorrecta { --_cara: var(--sx-mal-fondo); --_trazo: var(--sx-mal-borde); --_labio: var(--sx-mal-borde); --_tinta: var(--sx-mal); --_grosor: 2px; }
+.sx-opcion.es-correcta .sx-opcion__marca   { background: var(--sx-ok-cara);  color: var(--sx-sobre-ok);  box-shadow: none; }
+.sx-opcion.es-incorrecta .sx-opcion__marca { background: var(--sx-mal-cara); color: var(--sx-sobre-mal); box-shadow: none; }
+.sx-opcion.es-correcta .sx-opcion__marca--radio   { box-shadow: inset 0 0 0 2px var(--sx-ok-cara),  inset 0 0 0 6px var(--sx-ok-fondo); }
+.sx-opcion.es-incorrecta .sx-opcion__marca--radio { box-shadow: inset 0 0 0 2px var(--sx-mal-cara), inset 0 0 0 6px var(--sx-mal-fondo); }
+.sx-opcion.es-apagada { opacity: .5; }
+
+/* Opción sólida (EVA): bloque de color con su letra. Siempre navy y oro; la paleta la decide el chat de EVA. */
+.sx-opcion--s1, .sx-opcion--s2, .sx-opcion--s3, .sx-opcion--s4 { --_trazo: transparent; --_alto: var(--sx-labio); --_brillo: var(--sx-brillo);
+             --_labio: color-mix(in srgb, var(--_cara) 70%, black); --_hover: 1.06; font-family: var(--fuente-titulos); font-weight: 700; }
+.sx-opcion--s1 { --_cara: var(--superficie); --_tinta: var(--primario); --_brillo: 0 0 0 0 transparent; --_hover: .96; }
+.sx-opcion--s2 { --_cara: var(--oro); --_tinta: var(--oro-texto); }
+.sx-opcion--s3 { --_cara: color-mix(in srgb, var(--secundario) 78%, black); --_tinta: var(--superficie); }
+.sx-opcion--s4 { --_cara: color-mix(in srgb, var(--primario) 30%, white); --_tinta: var(--primario-oscuro); --_brillo: 0 0 0 0 transparent; }
+:is(.sx-opcion--s1, .sx-opcion--s2, .sx-opcion--s3, .sx-opcion--s4) .sx-opcion__marca { background: color-mix(in srgb, black 16%, transparent); color: inherit; box-shadow: none; }
+:is(.sx-opcion--s1, .sx-opcion--s4) .sx-opcion__marca { background: var(--primario); color: var(--superficie); }
+:is(.sx-opcion--s1, .sx-opcion--s2, .sx-opcion--s3, .sx-opcion--s4).es-correcta { --_cara: var(--correcto-fondo); --_tinta: var(--correcto);
+             --_labio: color-mix(in srgb, var(--correcto) 45%, white); --_brillo: 0 0 0 0 transparent; }
+:is(.sx-opcion--s1, .sx-opcion--s2, .sx-opcion--s3, .sx-opcion--s4).es-correcta .sx-opcion__marca { background: var(--correcto); color: var(--superficie); }
+
+/* ───────── 9. Campos ───────── */
+.sx-campo { display: grid; gap: 6px; }
+.sx-campo__rotulo { font: 700 var(--sx-t-apoyo)/1.3 var(--fuente-cuerpo); }
+.sx-campo__ayuda { font: 500 .9375rem/1.4 var(--fuente-cuerpo); color: var(--sx-tinta-2); display: flex; gap: 6px; align-items: center; }
+.sx-entrada { box-sizing: border-box; width: 100%; min-height: 48px; padding: 8px 14px; border-radius: var(--sx-radio-control);
+              border: var(--sx-trazo) solid var(--sx-borde-3); background: var(--sx-superficie); color: var(--sx-tinta);
+              font: 600 1.0625rem/1.3 var(--fuente-cuerpo); box-shadow: var(--sx-sombra-control); }
+.sx-entrada::placeholder { color: var(--sx-tinta-3); opacity: 1; font-weight: 500; }
+.sx-entrada:hover { border-color: var(--sx-tinta-2); }
+.sx-entrada:focus-visible, .sx-entrada.es-foco { border-color: var(--sx-accion-tinta); outline: 3px solid var(--sx-foco-color); outline-offset: 2px; }
+.sx-entrada:disabled { background: var(--sx-inactivo); color: var(--sx-tinta-3); border-color: transparent; }
+.sx-campo.es-error .sx-entrada { border-color: var(--sx-mal); }
+.sx-campo.es-error .sx-campo__ayuda { color: var(--sx-mal); font-weight: 700; }
+/* Código de sala o de examen: un campo y un botón, dígitos grandes */
+.sx-entrada--codigo { min-height: 64px; padding: 6px 8px 0; text-align: center; font: 800 2rem/1 var(--fuente-titulos);
+              letter-spacing: .14em; font-variant-numeric: tabular-nums; text-transform: uppercase; }
+.sx-entrada--codigo::placeholder { letter-spacing: .14em; font-weight: 700; }
+
+/* ───────── 10. Píldora y rótulo ───────── */
+.sx-pildora { display: inline-flex; align-items: center; gap: 6px; min-height: 28px; padding: 2px 12px; border-radius: var(--sx-radio-pildora);
+              background: var(--sx-pozo); color: var(--sx-tinta); font: 700 .875rem/1.2 var(--fuente-cuerpo);
+              box-shadow: inset 0 0 0 1px var(--sx-borde-1); white-space: nowrap; }
+.sx-pildora--marca { background: var(--sx-accion-suave); color: var(--sx-accion-tinta); box-shadow: inset 0 0 0 1px color-mix(in srgb, var(--sx-accion-borde) 60%, transparent); }
+.sx-pildora--oro   { background: var(--sx-oro); color: var(--sx-sobre-oro); box-shadow: inset 0 -2px 0 color-mix(in srgb, black 16%, transparent); font-family: var(--fuente-titulos); font-weight: 800; font-size: 1rem; padding-top: 3px; }
+.sx-pildora--oro-suave { background: var(--sx-oro-suave); color: var(--sx-sobre-oro-suave); box-shadow: inset 0 0 0 1px color-mix(in srgb, var(--oro) 45%, transparent); }
+.sx-pildora--ok    { background: var(--sx-ok-fondo); color: var(--sx-ok); box-shadow: inset 0 0 0 1px var(--sx-ok-borde); }
+.sx-pildora--mal   { background: var(--sx-mal-fondo); color: var(--sx-mal); box-shadow: inset 0 0 0 1px var(--sx-mal-borde); }
+.sx-pildora--sobre-marca { background: color-mix(in srgb, white 14%, transparent); color: var(--sx-sobre-marca); box-shadow: inset 0 0 0 1px color-mix(in srgb, white 18%, transparent); }
+.sx-rotulo { display: inline-flex; align-items: center; gap: 6px; color: var(--sx-accion-tinta);
+             font: 800 var(--sx-t-etiqueta)/1.2 var(--fuente-cuerpo); letter-spacing: .05em; text-transform: uppercase; }
+/* Moneda dibujada con CSS (oro = logro) */
+.sx-moneda { flex: none; display: inline-block; width: 1.05em; height: 1.05em; border-radius: 50%; background: var(--oro);
+             box-shadow: inset 0 0 0 .12em color-mix(in srgb, white 34%, transparent), inset 0 -.14em 0 .02em color-mix(in srgb, black 24%, transparent); }
+.sx-pildora--oro .sx-moneda { background: color-mix(in srgb, var(--oro) 78%, white); }
+
+/* ───────── 11. Barra de progreso ───────── */
+.sx-progreso { --_c: var(--sx-progreso-color, var(--sx-accion)); height: var(--sx-alto-progreso); border-radius: var(--sx-radio-pildora); background: var(--sx-pista); overflow: hidden; }
+.sx-progreso__relleno { position: relative; height: 100%; border-radius: inherit; background: var(--_c);
+              transform: translateX(calc((var(--p, 0) - 1) * 100%)); transition: transform var(--sx-dur-3) var(--sx-curva); }
+.sx-progreso__relleno::after { content: ""; display: var(--sx-ver-brillo); position: absolute; left: 8px; right: 6px; top: 25%; height: 30%;
+              border-radius: inherit; background: color-mix(in srgb, white 24%, transparent); }
+.sx-progreso--oro { --_c: var(--sx-oro); }
+.sx-progreso--ok { --_c: var(--sx-ok-cara); }
+
+/* ───────── 12. Cabecera, encabezado con volver, barra inferior, pie de acción ───────── */
+.sx-cabecera { position: sticky; top: 0; z-index: 5; display: flex; align-items: center; gap: 12px; min-height: 56px; padding: 8px 16px;
+               background: var(--sx-superficie); box-shadow: var(--sx-elev-2); }
+.sx-cabecera--marca { background: var(--sx-marca); box-shadow: var(--sx-brillo), 0 2px 2px color-mix(in srgb, var(--sx-umbra) 8%, transparent),
+               0 10px 18px -6px color-mix(in srgb, var(--sx-umbra) 28%, transparent); }
+.sx-cabecera__titulo { font: 800 1.25rem/1.15 var(--fuente-titulos); margin: 0; padding-top: 2px; }
+.sx-cabecera__apoyo { font: 600 .875rem/1.2 var(--fuente-cuerpo); color: var(--sx-tinta-2); margin: 0; }
+
+.sx-encabezado { display: grid; gap: 4px; padding: 16px 0 12px; }
+.sx-volver { display: inline-flex; align-items: center; gap: 4px; min-height: 44px; width: fit-content; margin-inline-start: -6px; padding: 0 10px 0 6px;
+             border-radius: var(--sx-radio-control); color: var(--sx-accion-tinta); text-decoration: none; font: 700 1rem/1.2 var(--fuente-cuerpo); }
+@media (hover: hover) { .sx-volver:hover { background: color-mix(in srgb, currentColor 7%, transparent); } }
+
+.sx-barra { position: sticky; bottom: 0; z-index: 5; display: grid; grid-auto-flow: column; grid-auto-columns: 1fr; gap: 4px;
+            padding: 6px 8px calc(6px + env(safe-area-inset-bottom, 0px)); background: var(--sx-superficie); box-shadow: var(--sx-elev-arriba); }
+.sx-barra__pestana { position: relative; display: grid; justify-items: center; align-content: center; gap: 2px; min-height: 54px; padding: 4px;
+            border-radius: var(--sx-radio-control); color: var(--sx-tinta-2); text-decoration: none; font: 700 .8125rem/1.2 var(--fuente-cuerpo);
+            transition: transform var(--sx-dur-1) var(--sx-curva); }
+.sx-barra__pestana .sx-icono { width: 24px; height: 24px; }
+.sx-barra__pestana:active { transform: scale(.95); }
+.sx-barra__pestana[aria-current="page"] { color: var(--sx-accion-tinta); font-weight: 800; background: var(--sx-pestana-fondo);
+            box-shadow: inset 0 0 0 2px var(--sx-pestana-borde); }
+.sx-barra__pestana[aria-current="page"]::before { content: ""; display: var(--sx-ver-marca); position: absolute; top: -6px; left: 22%; right: 22%; height: 3px;
+            border-radius: 0 0 3px 3px; background: var(--sx-accion-tinta); }
+
+.sx-pie { position: sticky; bottom: 0; z-index: 4; display: grid; gap: 8px; padding: 16px 16px calc(16px + env(safe-area-inset-bottom, 0px));
+          background: var(--sx-superficie); box-shadow: var(--sx-elev-arriba); }
+.sx-pie__nota { font: 600 .9375rem/1.35 var(--fuente-cuerpo); color: var(--sx-tinta-2); text-align: center; margin: 0; }
+
+/* ───────── 13. Banda de resultado: ícono, veredicto, la correcta y la explicación; la mascota queda fuera ───────── */
+.sx-banda { --_c: var(--sx-accion-tinta); --_f: var(--sx-superficie); --_cara: var(--sx-accion); --_sobre: var(--sx-sobre-accion);
+            position: relative; display: grid; grid-template-columns: auto 1fr; align-items: center; gap: 10px 12px; padding: 20px 16px;
+            background: var(--_f); border-radius: var(--sx-banda-radio); box-shadow: var(--sx-banda-sombra); }
+.sx-banda__icono { display: grid; place-items: center; width: 40px; height: 40px; border-radius: 50%; background: var(--_cara); color: var(--_sobre); font-size: 1.25rem; }
+.sx-banda__titulo { font: 800 1.5rem/1.1 var(--fuente-titulos); color: var(--_c); margin: 0; padding-top: 3px; }
+.sx-banda__cuerpo { grid-column: 1 / -1; font: 500 1rem/1.45 var(--fuente-cuerpo); margin: 0; }
+.sx-banda__cuerpo strong { font-weight: 800; color: var(--_c); }
+.sx-banda__accion { grid-column: 1 / -1; margin-top: 4px; }
+.sx-banda--ok  { --_c: var(--sx-ok);  --_f: var(--sx-ok-fondo);  --_cara: var(--sx-ok-cara);  --_sobre: var(--sx-sobre-ok); }
+.sx-banda--mal { --_c: var(--sx-mal); --_f: var(--sx-mal-fondo); --_cara: var(--sx-mal-cara); --_sobre: var(--sx-sobre-mal); }
+.sx-banda--fija { position: fixed; inset: auto 0 0 0; z-index: 8; padding-bottom: calc(20px + env(safe-area-inset-bottom, 0px));
+            animation: sx-sube var(--sx-dur-2) var(--sx-entrada) both; }
+.sx-banda--fija::after { content: ""; position: absolute; left: 0; right: 0; top: 100%; height: 48px; background: inherit; }  /* tapa el hueco del rebote */
+@keyframes sx-sube { from { transform: translateY(100%); } to { transform: none; } }
+
+/* ───────── 14. Modal y aviso ───────── */
+.sx-velo { position: fixed; inset: 0; z-index: 20; display: grid; place-items: center; padding: 24px; background: var(--sx-velo); }
+.sx-modal { width: min(100%, 26rem); padding: 24px; border-radius: var(--sx-radio-caja); background: var(--sx-superficie-alta);
+            box-shadow: var(--sx-elev-4); display: grid; gap: 12px; animation: sx-abre var(--sx-dur-2) var(--sx-curva) both; }
+.sx-modal__acciones { display: grid; gap: 8px; margin-top: 8px; }
+@keyframes sx-abre { from { transform: scale(.96); opacity: 0; } to { transform: none; opacity: 1; } }
+
+.sx-aviso { display: flex; align-items: center; gap: 10px; width: fit-content; max-width: min(100% - 32px, 28rem); min-height: 48px; padding: 10px 16px;
+            border-radius: var(--sx-radio-control); background: var(--sx-aviso-fondo); color: var(--sx-aviso-tinta);
+            font: 700 1rem/1.35 var(--fuente-cuerpo); box-shadow: var(--sx-elev-3); animation: sx-abre var(--sx-dur-2) var(--sx-curva) both; }
+.sx-aviso--fijo { position: fixed; left: 50%; bottom: calc(88px + env(safe-area-inset-bottom, 0px)); z-index: 30; translate: -50% 0; }
+.sx-aviso__icono { display: grid; place-items: center; width: 26px; height: 26px; border-radius: 50%; flex: none;
+            background: color-mix(in srgb, white 18%, transparent); }
+.sx-aviso--ok .sx-aviso__icono  { background: var(--correcto-fondo); color: var(--correcto); }
+.sx-aviso--mal .sx-aviso__icono { background: var(--incorrecto-fondo); color: var(--incorrecto); }
+
+/* ───────── 15. Lista de filas y tabla sobria ───────── */
+.sx-lista { list-style: none; margin: 0; padding: 0; background: var(--sx-superficie); border-radius: var(--sx-radio-caja); box-shadow: var(--sx-caja); overflow: hidden; }
+.sx-fila { display: flex; align-items: center; gap: 12px; min-height: 60px; padding: 10px 16px; color: inherit; text-decoration: none; }
+.sx-fila + .sx-fila, li + li > .sx-fila { box-shadow: inset 0 1px 0 var(--sx-borde-1); }
+.sx-fila__texto { flex: 1; min-width: 0; display: grid; gap: 1px; }
+.sx-fila__titulo { font: 700 1.0625rem/1.3 var(--fuente-cuerpo); }
+.sx-fila__apoyo { font: 500 .9375rem/1.35 var(--fuente-cuerpo); color: var(--sx-tinta-2); }
+.sx-fila__fin { flex: none; display: inline-flex; align-items: center; gap: 8px; color: var(--sx-tinta-2); font: 700 1rem/1 var(--fuente-cuerpo); font-variant-numeric: tabular-nums; }
+@media (hover: hover) { a.sx-fila:hover, button.sx-fila:hover { background: color-mix(in srgb, currentColor 4%, transparent); } }
+a.sx-fila:active, button.sx-fila:active { background: color-mix(in srgb, currentColor 8%, transparent); }
+.sx-fila.es-ahora { background: var(--sx-accion-suave); }
+
+.sx-tabla-caja { overflow-x: auto; background: var(--sx-superficie); border-radius: var(--sx-radio-caja); box-shadow: var(--sx-elev-1); }
+.sx-tabla { width: 100%; border-collapse: collapse; font: 500 1rem/1.35 var(--fuente-cuerpo); }
+.sx-tabla th { padding: 12px 16px; text-align: start; white-space: nowrap; background: var(--sx-pozo); color: var(--sx-tinta-2);
+               font: 800 var(--sx-t-etiqueta)/1.2 var(--fuente-cuerpo); letter-spacing: .04em; text-transform: uppercase; }
+.sx-tabla td { padding: 12px 16px; box-shadow: inset 0 1px 0 var(--sx-borde-1); }
+.sx-tabla :is(th, td).es-numero { text-align: end; font-variant-numeric: tabular-nums; }
+.sx-tabla td.es-numero { font-weight: 700; }
+@media (hover: hover) { .sx-tabla tbody tr:hover td { background: color-mix(in srgb, currentColor 3%, transparent); } }
+
+/* ───────── 16. Estado vacío, esqueleto, hueco de mascota y globo ───────── */
+.sx-vacio { display: grid; justify-items: center; gap: 8px; padding: 32px 20px; text-align: center; }
+.sx-vacio > .sx-btn { margin-top: 12px; }
+.sx-esqueleto { display: block; min-height: 16px; border-radius: 8px; background: var(--sx-pista); animation: sx-late 1.2s ease-in-out infinite alternate; }
+.sx-esqueleto--titulo { height: 28px; width: 60%; }
+.sx-esqueleto--linea { height: 16px; }
+.sx-esqueleto--caja { height: 72px; border-radius: var(--sx-radio-caja); }
+@keyframes sx-late { from { opacity: 1; } to { opacity: .45; } }
+/* Mascota: un hueco neutro. El sistema no depende de ningún personaje; lo que entre aquí ocupa esta caja. */
+.sx-mascota { --_t: 88px; flex: none; display: grid; place-items: center; width: var(--_t); height: var(--_t); }
+.sx-mascota--chica { --_t: 56px; } .sx-mascota--grande { --_t: 128px; }
+.sx-mascota > :is(svg, img, canvas) { width: 100%; height: 100%; }
+.sx-globo { position: relative; padding: 12px 16px; border-radius: var(--sx-radio-control); background: var(--sx-superficie);
+            box-shadow: inset 0 0 0 var(--sx-trazo) var(--sx-borde-2), var(--sx-sombra-control); font: 600 1.0625rem/1.35 var(--fuente-cuerpo); }
+.sx-proyector .sx-globo, .sx-lienzo--marca .sx-globo { background: var(--superficie); color: var(--texto); box-shadow: none; }
+
+/* ───────── 17. Celebración: tarjeta-dato y racha (oro = logro) ───────── */
+.sx-dato { --_c: var(--sx-oro); --_s: var(--sx-sobre-oro); display: grid; padding: 0 2px 2px; border-radius: var(--sx-radio-caja); background: var(--_c); text-align: center;
+           box-shadow: 0 var(--sx-labio-b) 0 color-mix(in srgb, var(--_c) 72%, black); margin-bottom: var(--sx-labio-b); }
+.sx-dato__rotulo { padding: 8px 8px 7px; color: var(--_s); font: 800 var(--sx-t-etiqueta)/1 var(--fuente-cuerpo); letter-spacing: .05em; text-transform: uppercase; }
+.sx-dato__valor { display: flex; align-items: center; justify-content: center; gap: 8px; padding: 14px 12px 10px; border-radius: 14px; background: var(--sx-superficie); color: var(--sx-tinta);
+           font: 800 1.75rem/1 var(--fuente-titulos); font-variant-numeric: tabular-nums; }
+.sx-dato--marca { --_c: var(--sx-accion); --_s: var(--sx-sobre-accion); }
+.sx-dato--ok { --_c: var(--sx-ok-cara); --_s: var(--sx-sobre-ok); }
+.sx-dato.es-entrando { animation: sx-dato var(--sx-dur-2) var(--sx-entrada) both; }
+@keyframes sx-dato { from { transform: scale(.85); opacity: 0; } to { transform: none; opacity: 1; } }
+
+.sx-racha { display: grid; gap: 12px; }
+.sx-racha__cifra { display: flex; align-items: center; gap: 12px; }
+.sx-racha__numero { font: 800 var(--sx-t-numero)/.9 var(--fuente-titulos); letter-spacing: -.02em; font-variant-numeric: tabular-nums; padding-top: .08em; }
+.sx-racha__llama { width: 56px; height: 56px; flex: none; }
+.sx-semana { display: grid; grid-template-columns: repeat(7, 1fr); gap: 6px; margin: 0; padding: 0; list-style: none; }
+.sx-dia { display: grid; justify-items: center; gap: 6px; font: 800 var(--sx-t-etiqueta)/1 var(--fuente-cuerpo); letter-spacing: .04em; text-transform: uppercase; color: var(--sx-tinta-2); }
+.sx-dia__punto { display: grid; place-items: center; width: 100%; max-width: 40px; aspect-ratio: 1; border-radius: 50%; background: color-mix(in srgb, currentColor 18%, transparent); font-size: 1rem; }
+.sx-dia__punto .sx-icono { opacity: 0; }
+.sx-dia.es-hecho .sx-dia__punto .sx-icono { opacity: 1; }
+.sx-dia.es-hecho .sx-dia__punto { background: var(--sx-oro); color: var(--sx-sobre-oro); box-shadow: inset 0 -3px 0 color-mix(in srgb, black 18%, transparent); }
+.sx-dia.es-hoy { color: inherit; }
+.sx-dia.es-hoy .sx-dia__punto { outline: 2px solid currentColor; outline-offset: 2px; }
+
+/* ───────── 18. SET: escala de nivel MCER y barra por destreza ─────────
+   Los colores NO son del sistema: SET conserva su rampa (--n1 a --n6) y su paleta por destreza (--s1 a --s5),
+   validadas para daltonismo. Aquí solo se leen; sin ellas cae a una rampa de un solo tono navy. */
+.sx-nivel { --_n1: var(--n1, color-mix(in srgb, var(--sx-accion) 30%, transparent));
+            --_n2: var(--n2, color-mix(in srgb, var(--sx-accion) 44%, transparent));
+            --_n3: var(--n3, color-mix(in srgb, var(--sx-accion) 58%, transparent));
+            --_n4: var(--n4, color-mix(in srgb, var(--sx-accion) 72%, transparent));
+            --_n5: var(--n5, color-mix(in srgb, var(--sx-accion) 86%, transparent));
+            --_n6: var(--n6, var(--sx-accion));
+            display: grid; grid-template-columns: repeat(6, 1fr); gap: 4px; margin: 0; padding: 0; list-style: none; }
+.sx-nivel__tramo { display: grid; gap: 8px; justify-items: center; font: 800 .875rem/1 var(--fuente-cuerpo); color: var(--sx-tinta-2); letter-spacing: .02em; }
+.sx-nivel__tramo::before { content: ""; width: 100%; height: 12px; border-radius: 4px; background: var(--_c); opacity: .38; }
+.sx-nivel__tramo:nth-child(1) { --_c: var(--_n1); } .sx-nivel__tramo:nth-child(2) { --_c: var(--_n2); } .sx-nivel__tramo:nth-child(3) { --_c: var(--_n3); }
+.sx-nivel__tramo:nth-child(4) { --_c: var(--_n4); } .sx-nivel__tramo:nth-child(5) { --_c: var(--_n5); } .sx-nivel__tramo:nth-child(6) { --_c: var(--_n6); }
+.sx-nivel__tramo:first-child::before { border-radius: 999px 4px 4px 999px; } .sx-nivel__tramo:last-child::before { border-radius: 4px 999px 999px 4px; }
+.sx-nivel__tramo.es-alcanzado::before { opacity: 1; }
+.sx-nivel__tramo.es-actual { color: inherit; }
+.sx-nivel__tramo.es-actual::before { opacity: 1; height: 20px; margin-top: -4px; margin-bottom: -4px; border-radius: 6px; box-shadow: 0 0 0 2px var(--sx-superficie), 0 0 0 4px currentColor; }
+.sx-nivel-cifra { font: 800 5rem/.9 var(--fuente-titulos); letter-spacing: -.02em; margin: 0; padding-top: .08em; }
+
+.sx-destreza { --_c: var(--sx-accion); display: grid; grid-template-columns: auto 1fr auto; align-items: center; gap: 6px 10px; }
+.sx-destreza__icono { color: var(--_c); font-size: 1.25rem; display: grid; }
+.sx-destreza__nombre { font: 700 1.0625rem/1.2 var(--fuente-cuerpo); }
+.sx-destreza__valor { font: 800 1.125rem/1 var(--fuente-titulos); font-variant-numeric: tabular-nums; padding-top: 2px; }
+.sx-destreza > .sx-progreso { grid-column: 1 / -1; height: 10px; }
+.sx-destreza--1 { --_c: var(--s1, var(--sx-accion)); } .sx-destreza--2 { --_c: var(--s2, var(--sx-accion)); } .sx-destreza--3 { --_c: var(--s3, var(--sx-accion)); }
+.sx-destreza--4 { --_c: var(--s4, var(--sx-accion)); } .sx-destreza--5 { --_c: var(--s5, var(--sx-accion)); }
+.sx-destreza > .sx-progreso { --_c: inherit; }
+
+/* ───────── 19. Proyector (tablero de EVA): se lee a ocho metros. Tamaños por ancho del propio tablero. ───────── */
+.sx-proyector { container-type: inline-size; background: var(--sx-marca); --sx-labio: 6px; --sx-labio-b: 6px; }
+.sx-proyector .sx-t-titulo { font-size: clamp(2rem, 3.4vw, 4rem); font-size: clamp(2rem, 3.4cqw, 4rem); line-height: 1.08; }
+.sx-proyector .sx-t-sub    { font-size: clamp(1.25rem, 1.7vw, 2rem); font-size: clamp(1.25rem, 1.7cqw, 2rem); }
+.sx-proyector .sx-t-numero { font-size: clamp(4rem, 6vw, 7rem); font-size: clamp(4rem, 6cqw, 7rem); letter-spacing: .06em; }
+.sx-proyector .sx-opcion   { min-height: clamp(88px, 8.4vw, 168px); min-height: clamp(88px, 8.4cqw, 168px); padding-inline: 1em; gap: .6em;
+                             font-size: clamp(1.5rem, 2.3vw, 2.75rem); font-size: clamp(1.5rem, 2.3cqw, 2.75rem); line-height: 1.15; border-radius: var(--sx-radio-caja); }
+.sx-proyector .sx-opcion__marca { width: 1.7em; height: 1.7em; border-radius: .4em; font-size: .8em; }
+.sx-proyector .sx-opcion__estado { font-size: .5em; }
+.sx-proyector .sx-pildora  { font-size: clamp(1rem, 1.25vw, 1.5rem); font-size: clamp(1rem, 1.25cqw, 1.5rem); min-height: 2.2em; padding-inline: 1em; }
+.sx-proyector .sx-globo    { font-size: clamp(1.125rem, 1.5vw, 1.75rem); font-size: clamp(1.125rem, 1.5cqw, 1.75rem); }
+.sx-proyector .sx-progreso { height: clamp(16px, 1.2vw, 24px); height: clamp(16px, 1.2cqw, 24px); }
+.sx-proyector .sx-mascota  { --_t: clamp(88px, 9vw, 168px); --_t: clamp(88px, 9cqw, 168px); }
+
+/* ───────── 20. Movimiento reducido: el estado final queda completo y quieto ───────── */
+@media (prefers-reduced-motion: reduce) {
+  [class*="sx-"], [class*="sx-"]::before, [class*="sx-"]::after { transition: none !important; animation: none !important; }
+}
