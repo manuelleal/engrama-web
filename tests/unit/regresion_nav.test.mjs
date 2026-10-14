@@ -115,7 +115,11 @@ const SALIR_W73 = { reto_en_curso: ['reto-salir'], reto_en_curso_error: ['reto-s
 // ui/iconos.js. Cambia SOLO ese botón, en las escenas del estudiante que lo llevan.
 const SONIDO_S1 = { retos: ['boton-sonido'], retos_vacio: ['boton-sonido'], asistencia: ['boton-sonido'], reto_en_curso: ['boton-sonido'], revision: ['boton-sonido'] };
 
-const CAPAS = [HASTA_W70, VOLVER_W71, SALIR_W73, SONIDO_S1];
+// Tanda "sistema 1" (§2a, U72): en la revisión, el puntaje y la medalla NACEN con el número del servidor (en la línea base nacían en "0 / 2" y "+0" y la
+// foto traía los dos: el de nacer y el final). Cambian SOLO esos dos nodos.
+const NUMEROS_S1 = { revision: ['puntaje', { etiqueta: 'div', clase: 'medalla-monedas' }] };
+
+const CAPAS = [HASTA_W70, VOLVER_W71, SALIR_W73, SONIDO_S1, NUMEROS_S1];
 /** @type {Record<string, Array<string|{etiqueta: string, clase?: string}>>} */
 export const DECLARADAS_NAV = Object.fromEntries([...new Set(CAPAS.flatMap((c) => Object.keys(c)))].map((nombre) => [nombre, [...new Set(CAPAS.flatMap((c) => c[nombre] || []))]]));
 
@@ -259,6 +263,15 @@ test('R9: lo que la tanda "sistema 1" declara cambió de verdad: la barra es sx-
     if (base.length) assert.deepEqual(enlaces(b).slice(0, enlaces(base).length), enlaces(base), `${nombre}: las entradas que ya había, en su orden y con la misma activa`);
   }
   assert.equal(conBarra, Object.keys(hoy).length - 2, 'todas las escenas menos el reto en curso y su error');
+});
+
+test('R9: lo que U72 declara cambió de verdad: en la revisión el puntaje y la medalla ya no nacen en "0 / 2" y "+0" (la línea base sí); dicen solo lo del servidor, y nada más cambió', async () => {
+  const hoy = (await tomarFotosNav({ solo: ['revision'] })).revision;
+  const dice = (lineas, texto) => lineas.some((l) => l.trim() === JSON.stringify(texto));
+  assert.ok(dice(CRUDA.vistas.revision, '0 / 2') && dice(CRUDA.vistas.revision, '+0'), 'la línea base nacía en cero');
+  assert.ok(!dice(hoy, '0 / 2') && !dice(hoy, '+0'), 'hoy ningún nodo dice "0 / 2" ni "+0"');
+  assert.ok(dice(hoy, '1 / 2') && dice(hoy, '+15'), 'dicen lo que mandó el servidor: 1 de 2 y 15 monedas');
+  assert.deepEqual(sinSubarboles(hoy, DECLARADAS_NAV.revision), sinSubarboles(BASE.vistas.revision, DECLARADAS_NAV.revision), 'fuera de lo declarado, la revisión es idéntica');
 });
 
 test('R9: dos tomas seguidas dan lo mismo (la foto no depende del reloj ni del azar)', async () => {

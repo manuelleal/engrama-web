@@ -12,8 +12,7 @@ import { textos } from '../textos.js';
 import { crearDrako } from './drako.js';
 import { controladorDe } from './drako_animado.js';
 import { lanzarConfeti } from './confeti.js';
-import { celebrarMonedas, planDeMonedas, duracionTotal } from './monedas.js';
-import { animarConteo } from './conteo.js';
+import { celebrarMonedas, pulsoOro } from './monedas.js';
 import { senal } from './sonido.js';
 import { correrLinea } from './linea_fin_reto.js';
 import { registrarCelebracion } from './celebraciones.js';
@@ -49,8 +48,9 @@ export function crearHeroResultado(d) {
   const plan = planDeCelebracion(d.nivel);
   // Nace quieto en la pose de antes del momento; quien celebra (celebrarFinDeReto) le dice qué hacer: saltar o bajar la cabeza.
   const drako = crearDrako(plan.drako, textosNivel.drako, { desde: d.nivel === 'animo' ? 'presenta' : 'reposo', sinCiclo: true });
-  const puntaje = h('span', { class: 'hero-puntaje-num', 'aria-hidden': 'true' }, `0 / ${d.total}`);
-  const medallaNum = d.monedas > 0 ? h('span', { class: 'medalla-num' }, '+0') : null;
+  // U72: los dos números NACEN con lo que dijo el servidor y no cambian nunca (antes contaban desde 0: «0 / 2» y «+0» bajo «¡Reto perfecto!»).
+  const puntaje = h('span', { class: 'hero-puntaje-num', 'aria-hidden': 'true' }, `${d.aciertos} / ${d.total}`);
+  const medallaNum = d.monedas > 0 ? h('span', { class: 'medalla-num' }, `+${d.monedas}`) : null;
   const sello = d.merito ? crearSelloDeMerito(d.merito, { enEspera: !reducirMovimiento() }) : null;
   sello?.prepend(crearDrako('celebra', textos.merito.drako, { sinCiclo: true }));
   const nodo = h(
@@ -67,7 +67,7 @@ export function crearHeroResultado(d) {
 }
 
 /**
- * El momento, como UNA línea de tiempo (ui/linea_fin_reto.js, anime.js): Drako salta → confeti (y su fanfarria) → el puntaje cuenta →
+ * El momento, como UNA línea de tiempo (ui/linea_fin_reto.js, anime.js): Drako salta → confeti (y su fanfarria) → el puntaje da su golpe de oro →
  * las monedas vuelan a su medalla → las filas de la revisión entran en cascada → el botón. El orden y los tiempos salen del resultado
  * (nivel, monedas del servidor, número de filas), nunca del tiempo que tardó el estudiante ni de ningún azar. Con prefers-reduced-motion
  * no hay línea: todo va directo al estado final.
@@ -75,9 +75,20 @@ export function crearHeroResultado(d) {
  *   filas?: HTMLElement[], boton?: HTMLElement|null, merito?: import('./merito.js').Merito|null}} d
  */
 export function celebrarFinDeReto(d) {
+  const acciones = accionesDeFinDeReto(d);
+  // Si el estudiante cambia de pantalla antes del paso del sello, el sello no se queda escondido.
+  if (d.merito && d.hero.sello) registrarCelebracion(() => d.hero.sello?.classList.remove('merito-espera'));
+  correrLinea({ nivel: d.nivel, monedas: d.monedas, filas: d.filas || [], boton: d.boton || null, merito: Boolean(d.merito && d.hero.sello), acciones });
+}
+
+/**
+ * Lo que hace cada paso de la línea de tiempo. Ninguno escribe un número: su paso solo MUEVE el puntaje (golpe de oro) y la medalla (las fichas).
+ * @param {Parameters<typeof celebrarFinDeReto>[0]} d
+ */
+export function accionesDeFinDeReto(d) {
   const plan = planDeCelebracion(d.nivel);
   const drako = controladorDe(d.hero.drako);
-  const acciones = {
+  return {
     drako: () => {
       if (d.nivel !== 'animo') { drako?.celebrarSalto(); return; }
       senal(plan.sonido);
@@ -88,26 +99,15 @@ export function celebrarFinDeReto(d) {
       if (plan.confeti) lanzarConfeti(plan.confeti);
       if (plan.segundoEstalloMs) segundoEstallo(plan.segundoEstalloMs);
     },
-    puntaje: () => animarConteo(d.hero.puntaje, { desde: 0, hasta: d.aciertos, formato: (n) => `${n} / ${d.total}`, golpe: d.nivel !== 'animo' }),
-    monedas: () => contarMonedas(d),
+    puntaje: () => { if (d.nivel !== 'animo') pulsoOro(d.hero.puntaje); },
+    // Las monedas vuelan desde Drako hasta la medalla, que late al recibirlas.
+    monedas: () => { if (d.hero.medallaNum) celebrarMonedas({ desde: d.hero.drako, hasta: d.hero.medallaNum, cantidad: d.monedas }); },
     merito: () => { if (d.merito) estamparMerito(d.hero.sello, d.merito); },
   };
-  // Si el estudiante cambia de pantalla antes del paso del sello, el sello no se queda escondido.
-  if (d.merito && d.hero.sello) registrarCelebracion(() => d.hero.sello?.classList.remove('merito-espera'));
-  correrLinea({ nivel: d.nivel, monedas: d.monedas, filas: d.filas || [], boton: d.boton || null, merito: Boolean(d.merito && d.hero.sello), acciones });
 }
 
 // El segundo estallido del perfecto: se cancela con el cambio de pantalla, como todo lo demás.
 function segundoEstallo(ms) {
   const reloj = setTimeout(() => { terminar(); lanzarConfeti('normal'); }, ms);
   const terminar = registrarCelebracion(() => clearTimeout(reloj));
-}
-
-// Las monedas vuelan desde Drako hasta la medalla, que cuenta hasta lo que dijo el servidor.
-function contarMonedas(d) {
-  if (!d.hero.medallaNum) return;
-  const medalla = d.hero.medallaNum;
-  const duracion = Math.max(900, duracionTotal(planDeMonedas(d.monedas)));
-  celebrarMonedas({ desde: d.hero.drako, hasta: medalla, cantidad: d.monedas });
-  animarConteo(medalla, { desde: 0, hasta: d.monedas, formato: (n) => `+${n}`, golpe: false, duracionMs: duracion });
 }

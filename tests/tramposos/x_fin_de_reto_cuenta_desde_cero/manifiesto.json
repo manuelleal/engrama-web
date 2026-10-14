@@ -1,0 +1,18 @@
+{
+  "descripcion": "U72 (compuerta visual, hallazgo 4): en el fin de reto el puntaje nace en \"0 / T\" y la medalla en \"+0\" y cuentan hasta el valor del servidor (el código de antes): bajo «¡Reto perfecto!» se lee «0 / 2» y «+0 monedas» durante más de un segundo",
+  "archivos": {
+    "src/ui/celebracion.js": "celebracion.js"
+  },
+  "comando": [
+    "node",
+    "--test",
+    "--test-reporter=tap",
+    "tests/unit/ui_fin_de_reto_numeros.test.mjs"
+  ],
+  "espera_codigo_no_cero": true,
+  "espera_fallan_tests": [
+    "U72: con 2 de 2 y 10 monedas, el puntaje dice",
+    "U72: con 3 de 3 y 20 monedas, el puntaje dice",
+    "U72: con 4 de 5 y 7 monedas, el puntaje dice"
+  ]
+}

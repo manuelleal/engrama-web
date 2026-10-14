@@ -1,7 +1,9 @@
 // @ts-check
-// La línea de tiempo del fin de reto, en la app real: Drako salta → confeti → el puntaje cuenta → las monedas vuelan → las filas entran en
+// La línea de tiempo del fin de reto, en la app real: Drako salta → confeti → el puntaje da su golpe de oro → las monedas vuelan → las filas entran en
 // cascada → el botón. Se mide el PRIMER instante en que se ve cada cosa y se exige ese orden. Con prefers-reduced-motion, todo directo al
 // estado final (sin nada escondido, sin confeti ni fichas).
+// U72 (docs/ESPEC_visual_sistema1.md §2a): el puntaje y la medalla dicen lo del servidor desde el primer cuadro; su paso solo los mueve. Por eso el
+// paso "puntaje" se reconoce por su golpe de oro (la clase `pulso-oro`), no porque el número empiece a contar; y se anota TODO lo que dijeron.
 import test from 'node:test';
 import assert from 'node:assert/strict';
 import { existsSync } from 'node:fs';
@@ -47,11 +49,13 @@ const MEDIR_ORDEN = (etiquetas) => `(async () => {
   const opacidad = (el) => (el ? Number(getComputedStyle(el).opacity) : 0);
   const fin = performance.now() + 7000;
   let filaOcultaAlPrincipio = null;
+  const dicho = { puntaje: new Set(), medalla: new Set() };
   while (performance.now() < fin) {
+    for (const [clave, sel] of [['puntaje', '.hero-puntaje-num'], ['medalla', '.medalla-num']]) { const n = document.querySelector(sel); if (n) dicho[clave].add(n.textContent); }
     const fig = document.querySelector('[data-testid="hero-resultado"] [data-parte="figura"]');
     marca('salto', () => fig && /translateY|scale/.test(fig.style.transform || '') && !/^scale\\(1, 1\\)$/.test(fig.style.transform));
     marca('confeti', () => document.querySelector('canvas[data-testid="confeti"]'));
-    marca('puntaje', () => { const p = document.querySelector('.hero-puntaje-num'); return p && /^[1-9]/.test(p.textContent); });
+    marca('puntaje', () => { const p = document.querySelector('.hero-puntaje-num'); return p && p.classList.contains('pulso-oro'); });
     marca('monedas', () => document.querySelector('.ficha-moneda'));
     const filas = [...document.querySelectorAll('li[data-testid^="revision-"]')];
     if (filas.length && filaOcultaAlPrincipio === null) filaOcultaAlPrincipio = filas.every((f) => opacidad(f) === 0);
@@ -60,7 +64,7 @@ const MEDIR_ORDEN = (etiquetas) => `(async () => {
     await esperar(25);
   }
   const filas = [...document.querySelectorAll('li[data-testid^="revision-"]')];
-  return { visto, filaOcultaAlPrincipio, final: { filasVisibles: filas.every((f) => opacidad(f) === 1), listas: filas.every((f) => f.classList.contains('fila-lista')), boton: opacidad(q('revision-volver')), puntaje: q('puntaje').textContent } };
+  return { visto, filaOcultaAlPrincipio, dicho: { puntaje: [...dicho.puntaje], medalla: [...dicho.medalla] }, final: { filasVisibles: filas.every((f) => opacidad(f) === 1), listas: filas.every((f) => f.classList.contains('fila-lista')), boton: opacidad(q('revision-volver')), puntaje: q('puntaje').textContent } };
 })()`;
 
 test('línea de tiempo (E2E): Drako salta → confeti → puntaje → monedas → filas → botón, EN ESE ORDEN', { skip: SKIP }, async () => {
@@ -75,6 +79,7 @@ test('línea de tiempo (E2E): Drako salta → confeti → puntaje → monedas �
     assert.ok(v.puntaje < v.monedas, `puntaje ${v.puntaje} < monedas ${v.monedas}`);
     assert.ok(v.monedas < v.filas, `monedas ${v.monedas} < filas ${v.filas}`);
     assert.ok(v.filas <= v.boton, `filas ${v.filas} ≤ botón ${v.boton}`);
+    assert.deepEqual(r.eval.dicho, { puntaje: ['3 / 3'], medalla: ['+20'] }, 'U72: en 7 segundos de celebración, el puntaje y la medalla dijeron UN solo número cada uno: el del servidor');
     assert.equal(r.eval.filaOcultaAlPrincipio, true, 'las filas esperan su turno (empiezan invisibles)');
     assert.equal(r.eval.final.filasVisibles, true, 'al final todas las filas se ven');
     assert.equal(r.eval.final.listas, true);

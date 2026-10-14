@@ -853,13 +853,6 @@ body {
   from { opacity: 0; transform: scale(0.3); }
 }
 
-/* Los contadores que cambian de texto en cada fotograma (odómetro) no relayan el resto de la página. */
-.chip-num,
-.medalla-num,
-.hero-puntaje-num {
-  contain: layout paint;
-}
-
 /* El botón de silencio y el aviso de constancia nunca parten su texto en dos renglones. */
 .boton-sonido,
 .celebra-racha {

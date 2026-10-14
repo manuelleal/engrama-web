@@ -8,6 +8,7 @@ import { cancelarCelebraciones } from '../../src/ui/celebraciones.js';
 import { textos } from '../../src/textos.js';
 import { entornoDeFotos, crearRaiz, buscar, textoDe } from './foto_vistas.mjs';
 import { NodoFalso } from './dom_falso.mjs';
+import { conRelojFalso } from './reloj_falso.mjs';
 
 test('asistencia: el sello siempre; las monedas y la llama solo si el servidor las dio', () => {
   assert.deepEqual(planDeAsistencia(3, 2), { sello: true, monedas: true, llama: true });
@@ -20,30 +21,7 @@ test('asistencia: el sello siempre; las monedas y la llama solo si el servidor l
 // Reloj y requestAnimationFrame de mentira, con movimiento PLENO (con "reducir movimiento" el conteo viejo saltaba directo y no se vería el defecto).
 // Tramposo: x_chip_cuenta_desde_cero (src/ui/sello.js: el código de antes).
 
-/** Corre `fn` con un reloj de mentira y devuelve cómo avanzarlo. Todo es síncrono: ninguna promesa se resuelve aquí dentro. */
-function conRelojFalso(fn) {
-  const g = /** @type {any} */ (globalThis);
-  const previo = { setTimeout: g.setTimeout, clearTimeout: g.clearTimeout, raf: g.requestAnimationFrame, now: performance.now };
-  let ahora = 0; let serie = 0;
-  /** @type {{id: number, t: number, fn: Function, cuadro: boolean}[]} */ let cola = [];
-  g.setTimeout = (f, ms = 0) => { cola.push({ id: ++serie, t: ahora + ms, fn: f, cuadro: false }); return serie; };
-  g.clearTimeout = (id) => { cola = cola.filter((c) => c.id !== id); };
-  g.requestAnimationFrame = (f) => { cola.push({ id: ++serie, t: ahora + 16, fn: f, cuadro: true }); return serie; };
-  performance.now = () => ahora;
-  const avanzarHasta = (ms) => {
-    for (;;) {
-      const sig = cola.filter((c) => c.t <= ms).sort((a, b) => a.t - b.t || a.id - b.id)[0];
-      if (!sig) break;
-      cola = cola.filter((c) => c !== sig);
-      ahora = sig.t;
-      try { sig.fn(ahora); } catch { /* un adorno que no puede correr en el DOM de mentira no es lo que se mide aquí */ }
-    }
-    ahora = ms;
-  };
-  try { return fn(avanzarHasta); } finally {
-    g.setTimeout = previo.setTimeout; g.clearTimeout = previo.clearTimeout; g.requestAnimationFrame = previo.raf; performance.now = previo.now;
-  }
-}
+// El reloj de mentira vive en reloj_falso.mjs (lo comparte U72, el mismo arreglo en el fin de reto).
 
 for (const monedas of [10, 5, 1]) {
   test(`U71: con ${monedas} monedas el chip dice "+${monedas} monedas" desde el primer pintado y en cada instante de la celebración (0, 100, 150, 500 y 2.000 ms)`, async () => {
