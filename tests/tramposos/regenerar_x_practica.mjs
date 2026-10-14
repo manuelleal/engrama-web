@@ -109,6 +109,12 @@ export const TRAMPOSOS = {
     cambios: [['    semanaNueva: (mejor, total) => `Semana nueva. Tu mejor racha: ${mejor}. Semanas cumplidas: ${total}.`,',
       '    semanaNueva: (mejor, total) => `Perdiste tu racha. Tu mejor racha: ${mejor}. Semanas cumplidas: ${total}.`,']],
   },
+  x_humo_practica_repaso_paga: {
+    archivo: 'herramientas/mock/practica.mjs', prueba: 'tests/unit/humo_practica.test.mjs', tests: ['W82: el humo de la práctica (desarrollo)'],
+    descripcion: 'W82: el repaso del doble paga al acertar: el humo del día de práctica lo ve (monedas del repaso distintas de 0)',
+    cambios: [['      estado: entrada.estado, proxima_fecha: entrada.toca === null ? null : new Date(entrada.toca).toISOString(), repetida, coins_earned: 0,',
+      '      estado: entrada.estado, proxima_fecha: entrada.toca === null ? null : new Date(entrada.toca).toISOString(), repetida, coins_earned: acierto ? 2 : 0,']],
+  },
   x_api_l1_sin_validar: {
     archivo: 'src/api/practica.js', prueba: L1, tests: ['U77: responderPregunta manda la label'],
     descripcion: 'U77: la respuesta de /answers se usa sin validar (ausente pasa por cero y la banda pinta "undefined")',

@@ -65,6 +65,42 @@ export function sembrarPractica(estado, { estudiantes = [['prac-1', 'Paula Sinte
   return { grupoId: grupo.id, retos: sembrarRetosPractica(estado, grupo.id) };
 }
 
+/** Los retos de la réplica (B1, explicación en inglés): no se usan al desarrollar. */
+export const RETOS_REPLICA = [
+  ['Viajes · Gramática 1', 'B1', 'sint-b1-u02', 'grammar', [
+    ['She ___ to Lima twice.', 'A', ['has been', 'was', 'is going'], 'Use the present perfect for experiences without a time.',
+      { B: 'Was needs a past time, like "last year".', C: 'Is going talks about plans, not experiences.' }, 'I have seen that film twice.'],
+    ['We ___ our tickets yesterday.', 'B', ['have bought', 'bought', 'buy'], 'Use the past simple with a finished time like yesterday.',
+      { A: 'Have bought does not go with yesterday.', C: 'Buy is the present.' }, 'They arrived last night.'],
+    ['The bus ___ when we got there.', 'C', ['left', 'leaves', 'had left'], 'Use the past perfect for the earlier of two past actions.',
+      { A: 'Left puts both actions at the same time.', B: 'Leaves is the present.' }, 'The film had started when we arrived.'],
+  ]],
+  ['Viajes · Vocabulario 1', 'B1', 'sint-b1-u02', 'vocabulary', [
+    ['You need a ___ to enter the country.', 'A', ['passport', 'ticket office', 'luggage'], 'A passport shows who you are when you travel.',
+      { B: 'A ticket office is a place to buy tickets.', C: 'Luggage is your bags.' }, 'Show your passport at the gate.'],
+    ['Our flight was ___ because of the storm.', 'B', ['booked', 'delayed', 'boarded'], 'Delayed means later than planned.',
+      { A: 'Booked means reserved.', C: 'Boarded means you got on.' }, 'The train was delayed by an hour.'],
+    ['Please ___ your seatbelt.', 'A', ['fasten', 'close', 'lock'], 'We fasten a seatbelt.',
+      { B: 'We close doors, not seatbelts.', C: 'We lock doors with a key.' }, 'Fasten your seatbelt before take-off.'],
+  ]],
+];
+
+/**
+ * Las entradas de la réplica: el grupo SINT-PRAC-REP con `prac-rep-1` (con nivel de SET en B1, lo fija un efecto de fuera) y los retos B1 de la réplica.
+ * @param {any} estado
+ */
+export function sembrarReplicaPractica(estado) {
+  const { cuerpo: grupo } = crearGrupo(estado, req(ADMIN_BOOTSTRAP_TOKEN), { group_code: 'SINT-PRAC-REP' });
+  asignarDocente(estado, req(ADMIN_BOOTSTRAP_TOKEN), grupo.id, { documento_id: 'DOCENTE-DEMO' });
+  importarCsv(estado, req(ADMIN_BOOTSTRAP_TOKEN), grupo.id, 'documento_id,nombre_completo\nprac-rep-1,Rafa Sintetico\n');
+  estado.niveles.set(`${estado.tokens.get('prac-rep-1')}:${estado.tenantDemoId}`, { cefr: 'B1', source: 'set', provisional: false, assessed_at: '2026-10-01T00:00:00Z' });
+  const retos = RETOS_REPLICA.map(([title, cefr_level, topic, skill, preguntas]) => crearChallenge(estado, req(DOCENTE_BOOTSTRAP_TOKEN), {
+    title, description: 'Reto de la réplica (datos sintéticos)', group_id: grupo.id, cefr_level, topic, skill, coins_reward: 10, xp_reward: 3,
+    questions: preguntas.map(pregunta),
+  }).cuerpo);
+  return { grupoId: grupo.id, retos };
+}
+
 /** Los retos de práctica en un grupo que ya existe (las pruebas en el navegador los ponen en el de `est-1`). @param {any} estado @param {string} grupoId */
 export function sembrarRetosPractica(estado, grupoId) {
   return RETOS_PRACTICA.map(([title, cefr_level, topic, skill, preguntas]) => crearChallenge(estado, req(DOCENTE_BOOTSTRAP_TOKEN), {

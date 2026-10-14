@@ -1,0 +1,16 @@
+{
+  "descripcion": "W82: el repaso del doble paga al acertar: el humo del día de práctica lo ve (monedas del repaso distintas de 0)",
+  "archivos": {
+    "herramientas/mock/practica.mjs": "practica.mjs"
+  },
+  "comando": [
+    "node",
+    "--test",
+    "--test-reporter=tap",
+    "tests/unit/humo_practica.test.mjs"
+  ],
+  "espera_codigo_no_cero": true,
+  "espera_fallan_tests": [
+    "W82: el humo de la práctica (desarrollo)"
+  ]
+}
