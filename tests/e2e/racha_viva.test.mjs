@@ -84,7 +84,8 @@ test('E22: la llama crece al cruzar 3 (aviso, etapa 1 y confeti); con el mismo v
         const quieto = await salirYVolver();
         assert.deepEqual([quieto.confeti, quieto.fichas, quieto.avisos, quieto.deNuevo], [0, 0, 0, null], `${vez} apertura sin cambios: 0 lienzos, 0 fichas, 0 avisos`);
       }
-      assert.deepEqual(sesion.errores, []);
+      // W81: con la racha apagada en el doble (backend viejo), el 404 de GET /core/racha es la señal del respaldo, no un error de la página.
+      assert.deepEqual(sesion.errores.filter((e) => !/\/core\/racha$/.test(e)), []);
     } finally { await sesion.cerrar(); }
   });
 });

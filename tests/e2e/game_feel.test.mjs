@@ -11,9 +11,9 @@ import { conAppCompleta } from './ayudante_servidor.mjs';
 import { crearChallenge } from '../../herramientas/mock/rutas_challenges.mjs';
 import { DOCENTE_BOOTSTRAP_TOKEN } from '../../herramientas/mock/estado.mjs';
 
-// W78 (docs/ESPEC_practica_del_dia.md §3): con el backend viejo (estado.backend.l1 = false) la web pregunta una vez por intento si hay L1
-// (GET …/answers) y recibe 404, que es la señal del respaldo. Ese 404 esperado no es un error de la página.
-const sinSondeoL1 = (errores) => errores.filter((e) => !/\/challenges\/attempts\/[^/]+\/answers$/.test(e));
+// W78 y W81 (docs/ESPEC_practica_del_dia.md §3): con el backend viejo (estado.backend.l1 o .racha = false) la web pregunta si hay L1 (GET …/answers)
+// o racha semanal (GET /core/racha) y recibe 404, que es la señal del respaldo. Ese 404 esperado no es un error de la página.
+const sinSondeoL1 = (errores) => errores.filter((e) => !/(\/challenges\/attempts\/[^/]+\/answers|\/core\/racha)$/.test(e));
 const HAY_NAVEGADOR = [
   process.env.EDGE_PATH,
   'C:/Program Files (x86)/Microsoft/Edge/Application/msedge.exe',
