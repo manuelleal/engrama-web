@@ -24,6 +24,7 @@ import {
 } from './mock/rutas_teachers.mjs';
 import { listarChallenges, listarTodosLosChallenges, verChallenge, cambiarEstado, crearChallenge } from './mock/rutas_challenges.mjs';
 import { arrancarIntento, enviarIntento, historialDeIntentos } from './mock/rutas_intentos.mjs';
+import { responderPregunta, retomarIntento, terminarIntento } from './mock/por_pregunta.mjs';
 import { registrarse, crearCodigo, leerCodigo, apagarCodigo, listarSolicitudes, aprobarSolicitud, rechazarSolicitud } from './mock/rutas_registro.mjs';
 import { crearSolicitudDatos, misSolicitudesDatos, solicitudesDeLaInstitucion, responderSolicitudDatos } from './mock/rutas_datos.mjs';
 import {
@@ -86,6 +87,10 @@ function construirRutas() {
     r('GET', '/challenges/', (estado, req) => listarChallenges(estado, req)),
     r('POST', '/challenges/', (estado, req, p, body) => crearChallenge(estado, req, body)),
     r('POST', '/challenges/attempts/:attempt_id/submit', (estado, req, p, body) => enviarIntento(estado, req, p.attempt_id, body)),
+    // L1 (backend f7f7aeb): pregunta por pregunta, retomar y cerrar con lo guardado (mock/por_pregunta.mjs).
+    r('POST', '/challenges/attempts/:attempt_id/answers', (estado, req, p, body) => responderPregunta(estado, req, p.attempt_id, body)),
+    r('GET', '/challenges/attempts/:attempt_id/answers', (estado, req, p) => retomarIntento(estado, req, p.attempt_id)),
+    r('POST', '/challenges/attempts/:attempt_id/finish', (estado, req, p) => terminarIntento(estado, req, p.attempt_id)),
     r('PATCH', '/challenges/:challenge_id/status', (estado, req, p, body) => cambiarEstado(estado, req, p.challenge_id, body)),
     r('POST', '/challenges/:challenge_id/attempt', (estado, req, p) => arrancarIntento(estado, req, p.challenge_id)),
     r('GET', '/challenges/:challenge_id', (estado, req, p) => verChallenge(estado, req, p.challenge_id)),

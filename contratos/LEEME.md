@@ -31,3 +31,9 @@ Al hacerlo: guardar como `contratos/openapi_<sha>.json`, borrar `openapi_c7a8b89
   `base`, `puntualidad`, `puntual` y `ya_cobrada_hoy` (los cuatro con valor por defecto, no requeridos). **Desde W42 este es el archivo de R2**: va primero por
   orden alfabético (`03…` antes que `5a…`). R6 y las pruebas que nombran `openapi_5aad55e.json` siguen contra ese. El validador propio no rechaza
   propiedades de más ni exige las que tienen valor por defecto: que el mock mande SIEMPRE los cuatro campos lo afirma `tests/unit/mock_asistencia.test.mjs` (U33).
+
+- `openapi_f7f7aeb.json`: **exportación real** del OpenAPI del backend en `f7f7aeb` (rama `test/fixture-integ`: racha semanal, nivel de práctica y la
+  tanda, `solo_refuerzo` y L1, la corrección por pregunta), hecha el 2026-10-14 con la misma instrucción y el `.venv` del backend, sin tocar su repo
+  (árbol limpio en ese commit; `PYTHONDONTWRITEBYTECODE=1`; `SUPABASE_JWT_SECRET`, `SUPABASE_URL` y `DATABASE_URL` de mentira solo en el entorno del
+  proceso). Contra él valida R10 (`tests/contrato/mock_practica.test.mjs`, por nombre) las rutas de la práctica del día (`docs/ESPEC_practica_del_dia.md`).
+  **R2 no cambia de archivo:** sigue tomando el primero por orden alfabético (`03c9c0a`).

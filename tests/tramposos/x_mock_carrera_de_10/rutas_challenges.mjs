@@ -103,6 +103,7 @@ function validarChallengeCreate(body) {
     errores.push(`challenge_type inválido: "${body.challenge_type}" (válidos: ${CHALLENGE_TYPES_VALIDOS.join(', ')})`);
   }
   (body.questions || []).forEach((q, i) => {
+    if (q.explanation?.idioma !== undefined && !['es', 'en'].includes(q.explanation.idioma)) errores.push(`questions[${i}].explanation.idioma debe ser es o en`);
     if (q.order_index !== undefined && (!Number.isInteger(q.order_index) || q.order_index < 1)) {
       errores.push(`questions[${i}].order_index debe ser un entero >= 1 (llegó ${JSON.stringify(q.order_index)})`);
     }
@@ -127,9 +128,11 @@ export function crearChallenge(estado, req, body) {
   if (errores.length) fallar(422, errores.join('; '));
   const id = randomUUID();
   const correct_answers = {};
+  const explicaciones = {}; // L1 (backend f7f7aeb, ExplicacionIn): la explicación sembrada de cada pregunta; solo sale tras responderla (mock/por_pregunta.mjs)
   const questions = body.questions.map((q, i) => {
     const qid = randomUUID();
     correct_answers[qid] = q.correct_answer;
+    if (q.explanation) explicaciones[qid] = q.explanation;
     // order_index por defecto es 1-based (contrato: default 1), nunca el índice 0-based del map.
     return { id: qid, question_type: q.question_type || 'multiple_choice', question_text: q.question_text, options_json: q.options_json ?? null, order_index: q.order_index ?? (i + 1) };
   });
@@ -138,7 +141,7 @@ export function crearChallenge(estado, req, body) {
     challenge_type: body.challenge_type || 'multiple_choice', cefr_level: body.cefr_level ?? null, skill: body.skill ?? null,
     topic: body.topic ?? null, coins_reward: body.coins_reward ?? eco.recompensaDelReto, xp_reward: body.xp_reward ?? 0,
     max_attempts: body.max_attempts ?? 2, max_winners: body.max_winners ?? 10, current_winners: 0,
-    status: 'active', created_at: new Date(estado.reloj.ahora()).toISOString(), questions, correct_answers,
+    status: 'active', created_at: new Date(estado.reloj.ahora()).toISOString(), questions, correct_answers, explicaciones,
   };
   estado.challenges.set(id, challenge);
   return { status: 201, cuerpo: challengeOutPublico(challenge, { tope: estado.economia.topeDelReto }) };

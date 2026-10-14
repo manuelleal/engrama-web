@@ -1,0 +1,7 @@
+{
+  "descripcion": "R10: en el doble de L1 la ÚLTIMA respuesta gana (se puede corregir una pregunta después de ver la clave)",
+  "archivos": { "herramientas/mock/por_pregunta.mjs": "por_pregunta.mjs" },
+  "comando": ["node", "--test", "--test-reporter=tap", "tests/contrato/mock_practica.test.mjs"],
+  "espera_codigo_no_cero": true,
+  "espera_fallan_tests": ["R10: /answers responde RespuestaDeIntentoOut"]
+}

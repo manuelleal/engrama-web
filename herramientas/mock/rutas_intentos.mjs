@@ -8,6 +8,9 @@ import { buscarChallengeVisible, challengeOutPublico } from './rutas_challenges.
 import { recompensaDelReto } from './economia.mjs';
 import { otorgarMonedas } from './monedas.mjs';
 
+/** El 409 de /submit sobre un intento con respuestas guardadas por /answers (backend f7f7aeb, `attempts.CON_RESPUESTAS`). */
+export const CON_RESPUESTAS = 'intento_con_respuestas';
+
 function intentosDe(estado, studentId, challengeId) {
   return [...estado.attempts.values()].filter((a) => a.student_id === studentId && a.challenge_id === challengeId);
 }
@@ -51,12 +54,21 @@ export function enviarIntento(estado, req, attemptId, body) {
   const intento = estado.attempts.get(attemptId);
   if (!intento || intento.student_id !== auth.profileId || intento.tenant_id !== auth.tenantId) fallar(404, 'Attempt not found');
   if (intento.status !== 'in_progress') fallar(409, 'Attempt already completed or abandoned');
+  // L1 (backend f7f7aeb): un intento que ya tiene respuestas por /answers no se envía entero (si no, "gana la primera" se saltaría reenviando todo).
+  if (intento.porPregunta?.size > 0) fallar(409, CON_RESPUESTAS);
 
   const challenge = [...estado.challenges.values()].find((c) => c.id === intento.challenge_id);
   const n = challenge.questions.length; const m = body.answers.length;
   if (n !== m) fallar(400, `Expected ${n} answers, got ${m}`);
+  return cerrarIntento(estado, auth, intento, challenge, body.answers);
+}
 
-  const { dadas, correctas, score_percent, is_correct } = calificar(challenge, body.answers);
+/**
+ * Califica, paga (una vez, con la llave) y cierra el intento: el MISMO camino para /submit y para /finish de L1 (mock/por_pregunta.mjs), como
+ * `attempts.cerrar_intento` del backend. Devuelve el AttemptSubmitOut.
+ */
+export function cerrarIntento(estado, auth, intento, challenge, respuestas) {
+  const { dadas, score_percent, is_correct } = calificar(challenge, respuestas);
   const pago = pagarSiCorresponde(estado, auth, challenge, is_correct);
 
   Object.assign(intento, { status: 'completed', completed_at: new Date(estado.reloj.ahora()).toISOString(), is_correct, score_percent, answers: dadas, coins_earned: pago.coins_earned, xp_earned: pago.xp_earned });

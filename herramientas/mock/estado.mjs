@@ -41,6 +41,14 @@ function economiaYReloj() {
   return { economia: { ...ECONOMIA_POR_DEFECTO }, reloj: { ahora: () => Date.now() } };
 }
 
+/**
+ * docs/ESPEC_practica_del_dia.md §W82: qué trae el backend que el doble imita (f7f7aeb). En false, esa parte responde como un backend viejo (404, 405 o
+ * 422): así se prueba el respaldo de la web. `l1`: /answers y /finish; `tanda`: /challenges/tanda; `racha`: /core/racha.
+ */
+function backendQueImita() {
+  return { backend: { l1: true, tanda: true, racha: true } };
+}
+
 /** Crea el estado inicial: un tenant "UIS (demo)", un admin y un docente de arranque. */
 export function crearEstado() {
   const estado = {
@@ -59,7 +67,7 @@ export function crearEstado() {
     solicitudesDatos: [], // las solicitudes sobre mis datos: {id, profileId, tenantId, tipo, mensaje, estado, creada_en, respuesta, respondida_en}
     niveles: new Map(), // `${profileId}:${tenantId}` -> {cefr, source, provisional, assessed_at}: el nivel confirmado (lo fija un "efecto de fuera", nunca una ruta)
     autorregistro: { configurado: true, versionesPermitidas: null, espera429: 0, ahora: () => Date.now() },
-    secuencias: { solicitudInscripcion: 0, solicitudDatos: 0, codigo: 0 }, ...economiaYReloj(),
+    secuencias: { solicitudInscripcion: 0, solicitudDatos: 0, codigo: 0 }, ...economiaYReloj(), ...backendQueImita(),
   };
   // El interruptor del registro vive en `estado.autorregistro.configurado`; la espec lo nombra `estado.registro.configurado`
   // y `estado.registro` ya era el diario de peticiones: la propiedad del diario lo refleja (apagar el registro = ponerla en false).
