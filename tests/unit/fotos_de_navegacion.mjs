@@ -48,11 +48,17 @@ const ESTUDIANTES = [
 const SESION_ABIERTA = { id: 's1', session_code: '123456', starts_at: '2020-01-01T10:00:00Z', expires_at: '2099-01-01T10:15:00Z', status: 'active' };
 const eje = (axis, status) => ({ axis, status, label: status, cefr_levels: { B1: 2 } });
 
+/** Un backend anterior a la práctica del día: la ruta no existe (404). Una función: cada petición recibe su propia respuesta. */
+export const sinLaRuta = () => new Response(JSON.stringify({ detail: 'Not Found' }), { status: 404, headers: { 'Content-Type': 'application/json' } });
+
 /** Lo que el servidor devuelve en el estado de CONTENIDO de cada vista: todo fijo, sin fechas de hoy ni azar. */
 export const RUTAS_NAV = {
   'GET /challenges/': [{ id: 'reto-1', title: 'at_the_airport', status: 'published' }, { id: 'reto-0', title: 'daily_routines', status: 'published' }],
   'GET /challenges/attempts/history': [{ challenge_id: 'reto-0', status: 'completed', is_correct: true, completed_at: '2020-01-01T00:00:00Z' }],
   'POST /challenges/reto-1/attempt': { attempt_id: 'int-1', challenge: RETO },
+  // H-1 (docs/ESPEC_correcciones_practica.md): estas fotos son de un backend SIN la práctica del día, y ahora se DICE (404). Antes una ruta no
+  // declarada lanzaba y eso se leía como "backend viejo"; desde H-1 un fetch que lanza es "sin red" (otra pantalla). El criterio no cambia.
+  'GET /challenges/attempts/int-1/answers': sinLaRuta, 'GET /challenges/tanda': sinLaRuta, 'GET /core/racha': sinLaRuta,
   'GET /auth/solicitudes-datos': [{ id: 7, tipo: 'conocer', estado: 'abierta', mensaje: 'Quiero saber qué datos míos guardan.', creada_en: '2020-01-01T00:00:00Z', respuesta: null, respondida_en: null }],
   'GET /teachers/groups': GRUPOS,
   [`GET /teachers/groups/${GID}/students`]: ESTUDIANTES,

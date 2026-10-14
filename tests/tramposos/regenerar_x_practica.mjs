@@ -24,6 +24,7 @@ const R10 = 'tests/contrato/mock_practica.test.mjs';
 const TANDA = 'tests/unit/practica_tanda.test.mjs';
 const REPASO = 'tests/unit/practica_repaso.test.mjs';
 const RACHA = 'tests/unit/practica_racha.test.mjs';
+const CORR = 'tests/unit/practica_correcciones.test.mjs'; // W83: docs/ESPEC_correcciones_practica.md
 /** @type {[string, string]} */
 const SIN_SALIDA_L1 = ["    estado.encabezado = crearCabecera({ piezas: [estado.salir, h('h1', { class: 'titulo-reto' }, tituloLegible(challenge.title))], sonido: true }),",
   "    estado.encabezado = crearCabecera({ piezas: [/* TRAMPOSO: sin salida */ h('h1', { class: 'titulo-reto' }, tituloLegible(challenge.title))], sonido: true }),"];
@@ -52,8 +53,8 @@ export const TRAMPOSOS = {
   x_tanda_422_como_vacia: {
     archivo: 'src/api/practica.js', prueba: TANDA, tests: ['U81: con un backend sin la tanda'],
     descripcion: 'U81: el 422 de un backend viejo se toma como "tanda vacía": Inicio invita a una práctica que no existe en vez de quedar como antes',
-    cambios: [["  } catch (e) {\n    console.warn(e instanceof ErrorApi && SIN_LA_RUTA.has(e.status) ? 'api/practica: este backend no arma tandas'",
-      "  } catch (e) {\n    if (e instanceof ErrorApi && SIN_LA_RUTA.has(e.status)) return { fecha: '', practica: { nivel: 'A2', con_nivel_de_set: false }, tanda: null, tandas_hoy: 0, tope_al_dia: 2, puede_pedir_otra: true, listo_por_hoy: false, sin_contenido_nuevo: false };\n    console.warn(e instanceof ErrorApi && SIN_LA_RUTA.has(e.status) ? 'api/practica: este backend no arma tandas'"]],
+    cambios: [["  } catch (e) {\n    registrar('/challenges/tanda', claseDeError(e), e);",
+      "  } catch (e) {\n    if (e instanceof ErrorApi && SIN_LA_RUTA.has(e.status)) return { fecha: '', practica: { nivel: 'A2', con_nivel_de_set: false }, tanda: null, tandas_hoy: 0, tope_al_dia: 2, puede_pedir_otra: true, listo_por_hoy: false, sin_contenido_nuevo: false };\n    registrar('/challenges/tanda', claseDeError(e), e);"]],
   },
   x_practica_reto_antes_del_repaso: {
     archivo: 'src/ui/practica.js', prueba: TANDA, tests: ['U80: el repaso va antes que cualquier reto'],
@@ -164,6 +165,17 @@ export const TRAMPOSOS = {
     archivo: 'src/vistas/estudiante/reto_flujo.js', prueba: L1, tests: ['U79: con un backend sin L1'],
     descripcion: 'U79: con un backend sin /answers el reto muestra un error en vez de jugarse como hoy',
     cambios: [['ctx })) return;', "ctx })) return;\n    pintarErrorFlujo(raiz, 'No se pudo cargar el reto.'); return;"]],
+  },
+  // ---------- W83: las correcciones de la auditoría 05 (docs/ESPEC_correcciones_practica.md) ----------
+  x_l1_500_es_viejo: {
+    archivo: 'src/api/practica.js', prueba: CORR, tests: ['U86: retomarIntento reintenta UNA vez', 'U86: con el sondeo caído dos veces'],
+    descripcion: 'U86 (H-1): un 500 o un corte al leer el intento se toma por backend viejo (null): el reto se juega con el flujo viejo y se pierde la explicación',
+    cambios: [["    if (clase === 'transitorio') throw new ErrorTransitorio(RUTA_ANSWERS, codigoDe(e));\n", '']],
+  },
+  x_l1_transitorio_degrada: {
+    archivo: 'src/vistas/estudiante/reto_l1.js', prueba: CORR, tests: ['U86: con el sondeo caído dos veces'],
+    descripcion: 'U86 (H-1): con el intento ilegible por la red, el reto cae en silencio al flujo viejo en vez de ofrecer Reintentar',
+    cambios: [['    pintarSinConexion(raiz, datos);\n    return true;\n', '    return false;\n']],
   },
   x_l1_409_mudo: {
     archivo: 'src/vistas/estudiante/reto_flujo.js', prueba: L1, tests: ['U79: si /submit responde 409 intento_con_respuestas'],

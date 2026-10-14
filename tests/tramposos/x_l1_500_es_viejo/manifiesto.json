@@ -1,0 +1,17 @@
+{
+  "descripcion": "U86 (H-1): un 500 o un corte al leer el intento se toma por backend viejo (null): el reto se juega con el flujo viejo y se pierde la explicación",
+  "archivos": {
+    "src/api/practica.js": "practica.js"
+  },
+  "comando": [
+    "node",
+    "--test",
+    "--test-reporter=tap",
+    "tests/unit/practica_correcciones.test.mjs"
+  ],
+  "espera_codigo_no_cero": true,
+  "espera_fallan_tests": [
+    "U86: retomarIntento reintenta UNA vez",
+    "U86: con el sondeo caído dos veces"
+  ]
+}

@@ -14,6 +14,10 @@ export const textosPractica = {
     enviando: 'Enviando…',
     antesDeComprobar: 'Toca Comprobar para ver si acertaste.',
     noSePudo: 'No se pudo comprobar tu respuesta. Toca Comprobar otra vez.',
+    // H-1: el intento no se pudo leer (sin red o el servidor falló). Lo respondido vive en el servidor: no se pierde.
+    sinConexion: 'No pudimos abrir tu reto: la conexión falló. Lo que ya respondiste sigue guardado.',
+    reintentar: 'Reintentar',
+    noSePudoAbrir: 'No se pudo abrir tu reto. Sal y vuelve a entrar en un momento.',
     /** Los rótulos van en el idioma de la explicación (dictamen 04 §1.5: español en A1 y A2, inglés sencillo desde B1). */
     rotulos: {
       es: { oracion: 'Así queda', regla: 'La regla', porQue: 'Por qué no la tuya', ejemplo: 'Otro ejemplo' },

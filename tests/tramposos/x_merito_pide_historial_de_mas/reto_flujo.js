@@ -155,9 +155,12 @@ async function manejarTerminar(raiz, estado, enviarUnaVez) {
   }
 }
 
-// W78: con L1 en el backend, el reto va pregunta por pregunta (módulo diferido); si no, como siempre.
+// W78: con L1 en el backend, el reto va pregunta por pregunta (módulo diferido); si no, como siempre. H-1: solo un import() que falla es "como
+// siempre"; un error de intentarL1 sube y se muestra (nunca se toma por backend viejo).
 async function porPregunta(raiz, datos) {
-  try { return await (await import('./reto_l1.js')).intentarL1(raiz, datos); } catch (e) { console.warn('reto_flujo: sin L1', e); return false; }
+  let l1;
+  try { l1 = await import('./reto_l1.js'); } catch (e) { console.warn('reto_flujo: sin L1', e); return false; }
+  return l1.intentarL1(raiz, datos);
 }
 
 /**

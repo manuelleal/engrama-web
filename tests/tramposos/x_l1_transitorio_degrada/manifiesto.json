@@ -1,0 +1,16 @@
+{
+  "descripcion": "U86 (H-1): con el intento ilegible por la red, el reto cae en silencio al flujo viejo en vez de ofrecer Reintentar",
+  "archivos": {
+    "src/vistas/estudiante/reto_l1.js": "reto_l1.js"
+  },
+  "comando": [
+    "node",
+    "--test",
+    "--test-reporter=tap",
+    "tests/unit/practica_correcciones.test.mjs"
+  ],
+  "espera_codigo_no_cero": true,
+  "espera_fallan_tests": [
+    "U86: con el sondeo caído dos veces"
+  ]
+}

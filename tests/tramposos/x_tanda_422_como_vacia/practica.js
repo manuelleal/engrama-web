@@ -11,6 +11,16 @@ import { rachaValida } from '../ui/racha_semanal.js';
 
 export class RespuestaMalFormada extends Error {}
 
+/** H-1 (docs/ESPEC_correcciones_practica.md): la ruta existe pero no respondió (sin red, 408, 429, 5xx), ni al reintentar. NO es "backend viejo". */
+export class ErrorTransitorio extends Error {
+  /** @param {string} ruta @param {number|string} codigo */
+  constructor(ruta, codigo) {
+    super(`api/practica: ${ruta} no respondió (${codigo})`);
+    this.ruta = ruta;
+    this.codigo = codigo;
+  }
+}
+
 const esObjeto = (/** @type {unknown} */ v) => typeof v === 'object' && v !== null && !Array.isArray(v);
 const esTexto = (/** @type {unknown} */ v) => typeof v === 'string';
 const textoONulo = (/** @type {unknown} */ v) => v === null || v === undefined || typeof v === 'string';
@@ -35,19 +45,63 @@ export function estadoValido(e) {
 export const SIN_LA_RUTA = new Set([404, 405, 422]);
 
 /**
- * GET /challenges/attempts/{id}/answers — lo ya respondido de un intento (para retomar), o null si este backend no tiene L1 o no se pudo leer
- * (entonces el reto se juega como hoy, con /submit). Nunca lanza.
+ * H-1: qué clase de error es — pura. 'sin_ruta' = un backend viejo (se juega como antes); 'transitorio' = la red o el servidor fallaron (sin red es el
+ * 0 de cliente.js; 408, 429, 5xx; o algo que no es ErrorApi, p. ej. un proxy que responde HTML): se reintenta y NUNCA se toma por backend viejo;
+ * 'otro' = los demás 4xx (401, 403, 409…), como hoy.
+ * @param {unknown} e @returns {'sin_ruta'|'transitorio'|'otro'}
+ */
+export function claseDeError(e) {
+  if (!(e instanceof ErrorApi)) return 'transitorio';
+  if (SIN_LA_RUTA.has(e.status)) return 'sin_ruta';
+  return e.status === 0 || e.status === 408 || e.status === 429 || e.status >= 500 ? 'transitorio' : 'otro';
+}
+
+const codigoDe = (/** @type {any} */ e) => (e instanceof ErrorApi ? e.status : e?.name ?? 'error');
+
+/** GET con UN reintento inmediato ante un error transitorio (sin pausa: un corte de verdad sigue cortado y lo dice quien llama). Lanza el último error. */
+async function leerConReintento(/** @type {string} */ ruta, /** @type {{token: string, tenantId?: string}} */ ctx) {
+  try {
+    return await pedirJson(ruta, ctx);
+  } catch (e) {
+    if (claseDeError(e) !== 'transitorio') throw e;
+    console.warn(`api/practica: ${ruta} falló (${codigoDe(e)}); un reintento`);
+    return pedirJson(ruta, ctx);
+  }
+}
+
+// H-1: cada vez que Inicio o el reto quedan "como antes", queda escrito por qué (en memoria, sin datos de la persona; los últimos 50).
+/** @type {Array<{ruta: string, motivo: string}>} */
+const degradaciones = [];
+/** Lo que cayó a "lo de siempre" y por qué: `{ruta, motivo}`, motivo 'sin_ruta' | 'transitorio' | 'otro' | 'mal_formada'. Para el humo y las pruebas. */
+export const degradacionesDePractica = () => degradaciones.slice();
+/** @param {string} ruta @param {string} motivo @param {unknown} [e] */
+function registrar(ruta, motivo, e) {
+  degradaciones.push({ ruta, motivo });
+  if (degradaciones.length > 50) degradaciones.shift();
+  console.warn(`api/practica: ${ruta} → lo de siempre (${motivo}${e === undefined ? '' : `, ${codigoDe(e)}`})`);
+}
+
+const RUTA_ANSWERS = '/challenges/attempts/{id}/answers';
+
+/**
+ * GET /challenges/attempts/{id}/answers — lo ya respondido de un intento (para retomar), o null si este backend no tiene L1 (404, 405, 422), si
+ * responde otro 4xx o si llega mal formado (entonces el reto se juega como hoy, con /submit). H-1: si la red o el servidor fallan, UN reintento; si
+ * sigue, lanza `ErrorTransitorio` (la vista ofrece "Reintentar": nunca juega con el flujo viejo por un corte ni pierde lo respondido).
  * @param {string} attemptId @param {{token: string, tenantId?: string}} ctx
  */
 export async function retomarIntento(attemptId, { token, tenantId }) {
+  let datos;
   try {
-    const datos = await pedirJson(`/challenges/attempts/${attemptId}/answers`, { token, tenantId });
-    if (estadoValido(datos)) return datos;
-    console.warn('api/practica: el estado del intento llegó mal formado; se juega como antes', datos);
+    datos = await leerConReintento(`/challenges/attempts/${attemptId}/answers`, { token, tenantId });
   } catch (e) {
-    const sinRuta = e instanceof ErrorApi && SIN_LA_RUTA.has(e.status);
-    console.warn(sinRuta ? 'api/practica: este backend no responde pregunta por pregunta; se juega como antes' : 'api/practica: no se pudo leer el intento; se juega como antes', e);
+    const clase = claseDeError(e);
+    if (clase === 'transitorio') throw new ErrorTransitorio(RUTA_ANSWERS, codigoDe(e));
+    registrar(RUTA_ANSWERS, clase, e);
+    return null;
   }
+  if (estadoValido(datos)) return datos;
+  console.warn('api/practica: el estado del intento llegó mal formado; se juega como antes', datos);
+  registrar(RUTA_ANSWERS, 'mal_formada');
   return null;
 }
 
@@ -93,18 +147,19 @@ export function tandaSinClave(t) {
 }
 
 /**
- * GET /challenges/tanda — la tanda de hoy (no escribe), o null si el backend no la ofrece (404, 405, 422: uno anterior a la tanda), si falla o si
- * llega mal formada: Inicio queda como antes. Nunca lanza.
+ * GET /challenges/tanda — la tanda de hoy (no escribe), o null si el backend no la ofrece (404, 405, 422: uno anterior a la tanda), si falla (tras UN
+ * reintento si fue la red o el servidor) o si llega mal formada: Inicio queda como antes, y queda registrado por qué (H-1). Nunca lanza.
  * @param {{token: string, tenantId?: string}} ctx
  */
 export async function verTanda({ token, tenantId }) {
   try {
-    const datos = await pedirJson('/challenges/tanda', { token, tenantId });
+    const datos = await leerConReintento('/challenges/tanda', { token, tenantId });
     if (tandaValida(datos)) return tandaSinClave(datos);
     console.warn('api/practica: la tanda llegó mal formada; Inicio queda como antes', datos);
+    registrar('/challenges/tanda', 'mal_formada');
   } catch (e) {
     if (e instanceof ErrorApi && SIN_LA_RUTA.has(e.status)) return { fecha: '', practica: { nivel: 'A2', con_nivel_de_set: false }, tanda: null, tandas_hoy: 0, tope_al_dia: 2, puede_pedir_otra: true, listo_por_hoy: false, sin_contenido_nuevo: false };
-    console.warn(e instanceof ErrorApi && SIN_LA_RUTA.has(e.status) ? 'api/practica: este backend no arma tandas' : 'api/practica: no se pudo leer la tanda', e);
+    registrar('/challenges/tanda', claseDeError(e), e);
   }
   return null;
 }
@@ -138,17 +193,18 @@ export async function responderRepaso(entradaId, questionId, label, { token, ten
 // ---------- W81: la racha semanal ----------
 
 /**
- * GET /core/racha — la racha semanal de esta persona en esta institución, o null si el backend no la tiene (404), falla o llega mal formada: Inicio
- * queda con la constancia de siempre. Nunca lanza.
+ * GET /core/racha — la racha semanal de esta persona en esta institución, o null si el backend no la tiene (404), falla (tras UN reintento si fue la
+ * red o el servidor) o llega mal formada: Inicio queda con la constancia de siempre, y queda registrado por qué (H-1). Nunca lanza.
  * @param {{token: string, tenantId?: string}} ctx
  */
 export async function leerRacha({ token, tenantId }) {
   try {
-    const datos = await pedirJson('/core/racha', { token, tenantId });
+    const datos = await leerConReintento('/core/racha', { token, tenantId });
     if (rachaValida(datos)) return datos;
     console.warn('api/practica: la racha llegó mal formada; Inicio queda como antes', datos);
+    registrar('/core/racha', 'mal_formada');
   } catch (e) {
-    console.warn(e instanceof ErrorApi && SIN_LA_RUTA.has(e.status) ? 'api/practica: este backend no tiene la racha semanal' : 'api/practica: no se pudo leer la racha', e);
+    registrar('/core/racha', claseDeError(e), e);
   }
   return null;
 }

@@ -65,9 +65,11 @@ test('U77: respuestaValida acepta la forma del contrato y rechaza lo mal formado
   }
 });
 
-test('U77: retomarIntento devuelve el estado con 200 y null con un backend sin la ruta (404, 405, 422), un 500 o una respuesta mal formada', async () => {
+// H-1 (docs/ESPEC_correcciones_practica.md): un 500 ya no es "null" (backend viejo): se reintenta y, si sigue, lanza ErrorTransitorio (lo mide U86 en
+// practica_correcciones.test.mjs). Aquí quedan los casos que SÍ son "jugar como antes": sin la ruta, otro 4xx o mal formada.
+test('U77: retomarIntento devuelve el estado con 200 y null con un backend sin la ruta (404, 405, 422), otro 4xx o una respuesta mal formada', async () => {
   const casos = [[json(200, { status: 'in_progress', total: 2, pistas: {}, respondidas: [] }), true], [json(404, { detail: 'Not Found' }), false],
-    [json(405, { detail: 'Method Not Allowed' }), false], [json(422, { detail: [] }), false], [json(500, { detail: 'x' }), false], [json(200, { total: 2 }), false]];
+    [json(405, { detail: 'Method Not Allowed' }), false], [json(422, { detail: [] }), false], [json(409, { detail: 'x' }), false], [json(200, { total: 2 }), false]];
   for (const [respuesta, hay] of casos) {
     const entorno = entornoDeFotos({ 'GET /challenges/attempts/int-1/answers': respuesta });
     try { assert.equal((await retomarIntento('int-1', { token: 't' })) !== null, hay); } finally { entorno.restaurar(); }
@@ -212,7 +214,8 @@ test('U79: con un backend sin L1 (GET …/answers da 404) el reto se juega como 
 test('U79: si /submit responde 409 intento_con_respuestas (el intento ya va por /answers), el reto se vuelve a abrir pregunta por pregunta', async () => {
   let veces = 0;
   const { rutas } = servidor({
-    answersGet: () => (++veces === 1 ? json(500, { detail: 'falla' })() : json(200, { status: 'in_progress', total: 2, pistas: {}, respondidas: [{ ...RESPUESTAS.q1, repetida: true }] })()),
+    // H-1: "sin poder leer el intento" ya no lo provoca un 500 (eso es un corte: se reintenta) sino una respuesta mal formada (jugar como antes).
+    answersGet: () => (++veces === 1 ? json(200, { total: 2 })() : json(200, { status: 'in_progress', total: 2, pistas: {}, respondidas: [{ ...RESPUESTAS.q1, repetida: true }] })()),
     submit: json(409, { detail: 'intento_con_respuestas' }),
   });
   const { raiz, cerrar } = await abrir(rutas);

@@ -19,7 +19,7 @@ import { crearPanelResultado } from '../../ui/panel_resultado.js';
 import { marcarCargando } from '../../ui/boton.js';
 import { senal } from '../../ui/sonido.js';
 import { accionUnica, ErrorApi } from '../../api/cliente.js';
-import { retomarIntento, responderPregunta, terminarIntento } from '../../api/practica.js';
+import { retomarIntento, responderPregunta, terminarIntento, ErrorTransitorio } from '../../api/practica.js';
 import { planDeExplicacion, crearBanda } from '../../ui/explicacion.js';
 import { renderRevision, textoDeOpcion } from './revision.js';
 import { crearSalir, nodoOpciones, pintarErrorFlujo, nodoRevisando } from './reto_flujo.js';
@@ -36,12 +36,22 @@ export function indiceInicial(preguntas, respondidas) {
 }
 
 /**
- * Intenta jugar el reto pregunta por pregunta. Devuelve false (sin pintar nada) si este backend no responde `GET …/answers`: el reto se juega como antes.
+ * Intenta jugar el reto pregunta por pregunta. Devuelve false (sin pintar nada) si este backend no tiene `GET …/answers` (404, 405, 422) o lo manda
+ * mal formado: el reto se juega como antes. H-1: si la red o el servidor fallan (ya con un reintento), NO es "backend viejo": pinta el error con
+ * "Reintentar" y "✕ Salir" y devuelve true (lo respondido sigue en el servidor; nunca se juega con /submit por un corte).
  * @param {HTMLElement} raiz
  * @param {{attemptId: string, challenge: any, esRepaso: boolean, historialPrevio: unknown, ctx: any}} datos
  */
 export async function intentarL1(raiz, datos) {
-  const retomado = await retomarIntento(datos.attemptId, datos.ctx);
+  let retomado;
+  try {
+    retomado = await retomarIntento(datos.attemptId, datos.ctx);
+  } catch (e) {
+    if (!(e instanceof ErrorTransitorio)) throw e;
+    console.warn('reto_l1: no se pudo leer el intento', e);
+    pintarSinConexion(raiz, datos);
+    return true;
+  }
   if (!retomado) return false;
   const preguntas = datos.challenge.questions;
   const ids = new Set(preguntas.map((/** @type {any} */ q) => q.id));
@@ -52,6 +62,26 @@ export async function intentarL1(raiz, datos) {
   estado.terminar = accionUnica(() => terminarIntento(datos.attemptId, datos.ctx));
   pintar(raiz, estado);
   return true;
+}
+
+/**
+ * H-1: el intento no se pudo leer (sin red o el servidor falló dos veces). "Reintentar" (un toque = un intento) lo vuelve a leer y, si responde, sigue
+ * pregunta por pregunta donde iba; si el backend dijera que no tiene la ruta, un error con su salida (no hay flujo viejo desde aquí).
+ */
+function pintarSinConexion(raiz, datos) {
+  const reintentar = h('button', {
+    type: 'button', class: 'sx-btn sx-btn--ancho', 'data-testid': 'reto-reintentar',
+    onClick: () => {
+      reintentar.disabled = true; marcarCargando(reintentar, true);
+      intentarL1(raiz, datos).then((ok) => { if (!ok) pintarErrorFlujo(raiz, T.noSePudoAbrir); }).catch((e) => {
+        console.warn('reto_l1: el reintento falló', e);
+        pintarErrorFlujo(raiz, T.noSePudoAbrir);
+      });
+    },
+  }, T.reintentar);
+  montar(raiz, h('div', { 'data-testid': 'vista-reto-flujo', class: 'juego' },
+    crearSalir(), h('p', { role: 'alert', 'data-testid': 'reto-sin-conexion' }, T.sinConexion), reintentar));
+  document.body.dataset.listo = '1';
 }
 
 /** Las opciones de la pregunta; ya respondida, quietas (la que quedó guardada, marcada). */
