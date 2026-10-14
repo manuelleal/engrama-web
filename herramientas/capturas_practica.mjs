@@ -2,7 +2,7 @@
 // @ts-check
 // capturas_practica.mjs · Las pantallas de la práctica del día (docs/ESPEC_practica_del_dia.md) contra el mock, a 375 × 812 y a 1280 × 800, para
 // MIRARLAS: Inicio con "Tu práctica de hoy" (para empezar, a mitad, terminada, listo por hoy y con nivel de SET), el reto con su explicación
-// (fallo y acierto; A2 en español y B1 en inglés) y la racha semanal. Cada ancho arranca con su mock recién sembrado
+// (fallo y acierto; A2 en español y B1 en inglés), el repaso y la racha semanal. Cada ancho arranca con su mock recién sembrado
 // (herramientas/humo/entradas_practica.mjs, en el grupo de `est-1`). Nada toca el piloto ni un puerto fijo.
 // Uso: node herramientas/capturas_practica.mjs [carpeta]   (por defecto: salida/practica/)
 import { mkdirSync, writeFileSync } from 'node:fs';
@@ -13,6 +13,7 @@ import { abrirSesion } from './cdp.mjs';
 import { sembrarRetosPractica } from './humo/entradas_practica.mjs';
 import { arrancarIntento } from './mock/rutas_intentos.mjs';
 import { responderPregunta, terminarIntento } from './mock/por_pregunta.mjs';
+import { ponerEnRepaso } from './mock/practica.mjs';
 
 const RAIZ = resolve(fileURLToPath(new URL('.', import.meta.url)), '..');
 const VENTANAS = [{ ancho: 375, alto: 812 }, { ancho: 1280, alto: 800 }];
@@ -101,6 +102,22 @@ async function faseRacha({ sesion, url, retos, foto, estado }) {
   await foto('inicio-07-racha-semanal-tarjeta');
 }
 
+/** El repaso: otro día, con una pregunta fallada que ya toca. Inicio ("Repaso primero"), la pantalla del repaso y su banda. @param {any} c */
+async function faseRepaso({ sesion, url, retos, foto, estado }) {
+  const g2 = retos.find((r) => r.title === 'Rutina diaria · Gramática 2');
+  estado.tandas.length = 0; // otro día
+  ponerEnRepaso(estado, { tenantId: estado.tenantDemoId, profileId: estado.tokens.get('est-1'), challengeId: g2.id, questionId: g2.questions[0].id, toca: 0 });
+  await sesion.navegar(`${url}#/retos`); await sesion.navegar(`${url}#/inicio`); await esperar(1500);
+  await tocar(sesion, 'jugar-reto-hoy'); await esperar(1500); // pide la tanda: el repaso va primero
+  await sesion.navegar(`${url}#/inicio`); await esperar(1500);
+  await foto('inicio-08-repaso-primero');
+  await sesion.navegar(`${url}#/repaso`); await esperar(1500);
+  await foto('repaso-01-pregunta');
+  await tocar(sesion, 'opcion-B'); await esperar(300);
+  await tocar(sesion, 'boton-comprobar'); await esperar(900);
+  await foto('repaso-02-explicacion');
+}
+
 /** @param {{ancho: number, alto: number}} ventana @param {string} carpeta @param {string[]} hechas */
 async function serie(ventana, carpeta, hechas) {
   await conAppCompleta(async (url, estado) => {
@@ -116,6 +133,7 @@ async function serie(ventana, carpeta, hechas) {
       await sesion.evaluar("localStorage.setItem('engrama_actor_sintetico', 'est-1')");
       await faseInicio({ sesion, url, retos, foto, estado });
       await faseExplicacion({ sesion, url, retos, foto, estado });
+      await faseRepaso({ sesion, url, retos, foto, estado });
       await faseRacha({ sesion, url, retos, foto, estado });
     } finally { await sesion.cerrar(); }
   });
