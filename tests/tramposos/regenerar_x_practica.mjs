@@ -245,6 +245,11 @@ export const TRAMPOSOS = {
     descripcion: 'U91 (H-9): "No se pudo enviar tu reto." vuelve a estar fijo en la vista (regla 6 del cliente: las cadenas, en su archivo de textos)',
     cambios: [["    pintarErrorFlujo(raiz, e instanceof ErrorApi ? e.mensaje : T.noSeEnvio);", "    pintarErrorFlujo(raiz, e instanceof ErrorApi ? e.mensaje : 'No se pudo enviar tu reto.');"]],
   },
+  x_aviso_corto_en_oro: {
+    archivo: 'estilos/componentes.css', prueba: CORR, tests: ['U92: los avisos cortos'],
+    descripcion: 'U92: el aviso "Repaso: no suma monedas" vuelve a ser un chip de oro (el oro es solo logro, monedas y racha)',
+    cambios: [['  background: color-mix(in srgb, var(--primario) 10%, white);\n  color: var(--primario);\n  font-weight: 800;', '  background: var(--oro);\n  color: var(--oro-texto);\n  font-weight: 800;']],
+  },
   x_sin_eol_lf: {
     archivo: '.gitattributes', copia: 'gitattributes.txt', prueba: 'tests/unit/sw_peso.test.mjs', tests: ['U59: cada archivo de PRECARGA sale de git archive'],
     descripcion: 'U59 (H-5): sin `*.js text eol=lf`, git archive con core.autocrlf=true sirve el shell en CRLF (más pesado que lo que mide U59) y nada lo ve',

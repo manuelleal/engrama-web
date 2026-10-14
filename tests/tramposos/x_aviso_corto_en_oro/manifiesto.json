@@ -1,0 +1,16 @@
+{
+  "descripcion": "U92: el aviso \"Repaso: no suma monedas\" vuelve a ser un chip de oro (el oro es solo logro, monedas y racha)",
+  "archivos": {
+    "estilos/componentes.css": "componentes.css"
+  },
+  "comando": [
+    "node",
+    "--test",
+    "--test-reporter=tap",
+    "tests/unit/practica_correcciones.test.mjs"
+  ],
+  "espera_codigo_no_cero": true,
+  "espera_fallan_tests": [
+    "U92: los avisos cortos"
+  ]
+}

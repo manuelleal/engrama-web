@@ -20,6 +20,12 @@
 .banda-explicacion .sx-banda__accion .boton-principal {
   width: 100%;
 }
+/* El botón que sigue (Siguiente / Ver resultado) va en navy, la acción del sistema: el oro de la barra de acción (juego.css) es solo para logros. */
+.banda-explicacion .sx-banda__accion .boton-principal:not(:disabled) {
+  background: var(--sx-accion);
+  color: var(--sx-sobre-accion);
+  border-bottom: 4px solid var(--sx-accion-labio);
+}
 
 /* W79: "Tu práctica de hoy", la protagonista de "Ahora" (sx-prota de marca). Compacta: el texto a la izquierda y "Jugar" a la derecha, como las demás
    filas de "Ahora", para que los tres botones sigan sobre la barra sin desplazar (E31, también a 360 × 640). La barra de avance, abajo y delgada. */

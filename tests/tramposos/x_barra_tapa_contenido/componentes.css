@@ -290,11 +290,11 @@ nav {
   border-radius: var(--radio-sm);
 }
 
-/* Aviso corto (p. ej. "Repaso: no suma monedas"): chip dorado, nunca un párrafo suelto. */
+/* Aviso corto (p. ej. "Repaso: no suma monedas"): chip navy suave, nunca un párrafo suelto. Sin oro: oro = logro, monedas y racha. */
 .aviso-corto {
   display: inline-block;
-  background: var(--oro);
-  color: var(--oro-texto);
+  background: color-mix(in srgb, var(--primario) 10%, white);
+  color: var(--primario);
   font-weight: 800;
   font-size: 0.8rem;
   padding: 4px 12px;

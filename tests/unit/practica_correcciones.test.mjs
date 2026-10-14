@@ -348,3 +348,20 @@ test('U91: "No se pudo enviar tu reto." sale de textos_practica.js (un /finish q
     assert.ok(textoDe(raiz).includes(textosPractica.l1.noSeEnvio), 'el texto del archivo de textos');
   } finally { cerrar(); }
 });
+
+// ---------- U92 (el oro es solo logro, monedas y racha) ----------
+// Tramposo: x_aviso_corto_en_oro (estilos/componentes.css).
+
+test('U92: los avisos cortos ("no suma monedas", "No sumaste monedas") no van en oro, y el botón que sigue en la banda va en navy', async () => {
+  const { readFileSync } = await import('node:fs');
+  const css = (/** @type {string} */ r) => readFileSync(new URL(`../../${r}`, import.meta.url), 'utf8').replace(/\/\*[\s\S]*?\*\//g, '');
+  const bloque = (/** @type {string} */ texto, /** @type {string} */ selector) => {
+    const i = texto.indexOf(`${selector} {`);
+    assert.ok(i >= 0, `falta la regla ${selector}`);
+    return texto.slice(i, texto.indexOf('}', i));
+  };
+  assert.doesNotMatch(bloque(css('estilos/componentes.css'), '.aviso-corto'), /--oro/, '.aviso-corto en oro');
+  const boton = bloque(css('estilos/practica.css'), '.banda-explicacion .sx-banda__accion .boton-principal:not(:disabled)');
+  assert.match(boton, /background:\s*var\(--sx-accion\)/, 'el botón de la banda, navy');
+  assert.doesNotMatch(boton, /--oro/);
+});
