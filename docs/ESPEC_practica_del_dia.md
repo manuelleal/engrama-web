@@ -190,8 +190,8 @@ demás filas de "Ahora"; título de tarjeta, 18 px; la barra de avance delgada) 
   `9db85d0` E2E y tramposos al cerrar · este, docs.
 - **`verificar.mjs`:** sin violaciones. **Unit + contrato:** 699 en verde (base 652: +47). **E2E:** los 44 archivos (menos `e2e_real`, que toca el piloto),
   uno a uno: 44 en verde (`celebraciones_ruta` se puso rojo en la corrida completa por la racha del doble y quedó verde con la racha apagada, como `racha_viva`).
-- **Tramposos:** 27 nuevos, todos rojos por su razón (U59 2, R10 4, W78 9, W79 5, W80 2, W81 4, W82 1); 51 copias de archivos viejos rehechas
-  (`reto_flujo.js` 9, `inicio.js` 11, `app.js` 9, `navegacion.js` 6, `sw.js` 6, `index.html` 2, `cara.css` 4, `rutas_challenges.mjs` 2, `fluidez.mjs` 1,
+- **Tramposos:** 27 nuevos, todos rojos por su razón (U59 2, R10 4, W78 9, W79 5, W80 2, W81 4, W82 1); 49 copias de archivos viejos rehechas
+  (`reto_flujo.js` 9, `inicio.js` 11, `app.js` 9, `navegacion.js` 6, `sw.js` 4, `index.html` 2, `cara.css` 4, `rutas_challenges.mjs` 2, `fluidez.mjs` 1,
   `flujo_navegacion.mjs` 1) y corridas una a una: todas rojas. Tres quedaron VERDES en su primera corrida y se reforzó la PRUEBA (no el criterio):
   `x_mock_repaso_paga` y `x_mock_tanda_sin_tope` (R10) y, antes de escribirlo como tramposo, el esperado del cierre de la racha (un error de cuenta en la
   prueba). Las copias de `sw.js` quedaron en la v50 hasta el cierre (se rehicieron recién ahí: candidato a ERR, "regenerar al tocar, no al final").
