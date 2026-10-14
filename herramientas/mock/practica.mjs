@@ -16,6 +16,7 @@ import { fallar } from './errores.mjs';
 import { diaLocal, recompensaDelReto } from './economia.mjs';
 import { challengeOutPublico } from './rutas_challenges.mjs';
 import { oracionCorrecta, explicacionPara } from './explicar.mjs';
+import { pagarBonoSiCumplio } from './racha.mjs';
 
 
 const DIA_MS = 86_400_000;
@@ -189,6 +190,7 @@ export function responderRepaso(estado, req, entradaId, body) {
   const repetida = estado.repaso.respuestas.some((r) => r.entrada_id === entrada.id && diaLocal(r.en, estado.economia.desfaseHoras) === hoy);
   if (!repetida) moverEntrada(estado, entrada, acierto, ahora);
   estado.repaso.respuestas.push({ entrada_id: entrada.id, tenant_id: auth.tenantId, profile_id: auth.profileId, question_id: entrada.question_id, is_correct: acierto, en: ahora, repetida });
+  pagarBonoSiCumplio(estado, auth.tenantId, auth.profileId); // el repaso cuenta para el día activo (mock/racha.mjs)
   const explicacion = reto.explicaciones?.[pregunta.id] ?? null;
   return {
     status: 200,

@@ -81,6 +81,11 @@ export const TRAMPOSOS = {
     descripcion: 'U82: dos toques de Comprobar en el repaso mandan dos respuestas (regla 5 del cliente)',
     cambios: [['  estado.enviar = accionUnica((label) => responderRepaso(', '  estado.enviar = ((label) => responderRepaso(']],
   },
+  x_mock_racha_seis_dias: {
+    archivo: 'herramientas/mock/racha.mjs', prueba: R10, tests: ['R10: GET /core/racha responde RachaOut'],
+    descripcion: 'R10: la semana del doble tiene 6 días (se pierde el domingo): los puntos de "Tu semana" no son los del backend',
+    cambios: [['export const diasDeSemana = (lunes) => Array.from({ length: 7 }, (_, i) => sumarDias(lunes, i));', 'export const diasDeSemana = (lunes) => Array.from({ length: 6 }, (_, i) => sumarDias(lunes, i));']],
+  },
   x_api_l1_sin_validar: {
     archivo: 'src/api/practica.js', prueba: L1, tests: ['U77: responderPregunta manda la label'],
     descripcion: 'U77: la respuesta de /answers se usa sin validar (ausente pasa por cero y la banda pinta "undefined")',

@@ -160,3 +160,56 @@ test('R10: con nivel de SET (B1) la práctica es B1 con_nivel_de_set y la tanda 
     assert.equal((await api('POST', '/challenges/tanda')).status, 405);
   }, conReloj(LUNES));
 });
+
+// ---------- W81: la racha semanal ----------
+
+/** Una asistencia del día (un efecto de fuera: el check-in que respondió 200), sin pasar por la sesión del profe. */
+const asistio = (estado, fecha) => estado.attendanceRecords.push({ tenant_id: estado.tenantDemoId, student_id: estado.tokens.get(EST), attendance_date: fecha });
+
+test('R10: GET /core/racha responde RachaOut: estado inicial (racha 0, 1 protector), los 7 días de lunes a domingo y lo que lleva hoy; no escribe', async () => {
+  await conMockPractica(async ({ api, estado }) => {
+    const r = await api('GET', '/core/racha');
+    assert.equal(r.status, 200);
+    validarEstricto('RachaOut', r.json);
+    assert.deepEqual([r.json.racha_semanas, r.json.mejor_racha, r.json.protectores, r.json.protectores_tope], [0, 0, 1, 2]);
+    assert.deepEqual(r.json.semana.dias.map((d) => d.fecha), ['2026-10-12', '2026-10-13', '2026-10-14', '2026-10-15', '2026-10-16', '2026-10-17', '2026-10-18']);
+    assert.deepEqual([r.json.hoy.fecha, r.json.hoy.meta_respuestas, r.json.hoy.meta_correctas, r.json.semana.meta_dias], ['2026-10-14', 6, 4, 3]);
+    assert.equal(estado.ledger.length, 0, 'leer no paga ni escribe');
+    estado.backend.racha = false;
+    assert.equal((await api('GET', '/core/racha')).status, 404, 'un backend anterior a la racha');
+  }, conReloj(Date.parse('2026-10-14T15:00:00Z')));
+});
+
+test('R10: un día es activo con 6 respuestas y 4 correctas (5 no); al 3.er día la semana se cumple: racha 1 y el bono de 5, una sola vez', async () => {
+  await conMockPractica(async ({ api, estado, retos }) => {
+    asistio(estado, '2026-10-12'); asistio(estado, '2026-10-13'); // lunes y martes, por asistencia
+    await jugar(api, reto(retos, 'Rutina diaria · Gramática 1').id, ['B', 'B', 'A']);
+    await jugar(api, reto(retos, 'Rutina diaria · Vocabulario 1').id, ['A', 'B']); // 5 respuestas, 4 correctas: todavía no
+    const cinco = (await api('GET', '/core/racha')).json;
+    assert.deepEqual([cinco.hoy.respuestas, cinco.hoy.correctas, cinco.hoy.activo, cinco.racha_semanas], [5, 4, false, 0]);
+    await jugar(api, reto(retos, 'Rutina diaria · Gramática 2').id, ['A', 'B', 'B']);
+    const r = (await api('GET', '/core/racha')).json;
+    validarEstricto('RachaOut', r);
+    assert.deepEqual([r.hoy.respuestas, r.hoy.correctas, r.hoy.activo], [8, 7, true]);
+    assert.deepEqual([r.semana.dias_activos, r.semana.cumplida, r.racha_semanas, r.mejor_racha, r.semanas_cumplidas], [3, true, 1, 1, 1]);
+    assert.deepEqual(r.semana.dias.map((d) => [d.activo, d.via_asistencia]).slice(0, 3), [[true, true], [true, true], [true, false]]);
+    assert.deepEqual(r.bono_semana, { monedas: 5, pagado: true });
+    const bonos = estado.ledger.filter((e) => e.action === 'streak_week');
+    assert.deepEqual(bonos.map((e) => e.amount), [5], 'el bono, una vez');
+  }, conReloj(Date.parse('2026-10-14T15:00:00Z')));
+});
+
+test('R10: una semana sin cumplir gasta el protector y la racha queda; la siguiente sin protector vuelve a 0 sin bajar la mejor ("semana nueva")', async () => {
+  await conMockPractica(async ({ api, estado }) => {
+    for (const f of ['2026-09-28', '2026-09-29', '2026-09-30', '2026-10-01', '2026-10-02']) asistio(estado, f); // 5 días: racha 1 y un protector más (tope 2)
+    const primera = (await api('GET', '/core/racha')).json;
+    // La del 28 se cumplió (racha 1) y al 5.º día ganó un protector (1 → 2); la del 5 no tuvo nada: gastó uno (2 → 1) y la racha quedó en 1.
+    assert.deepEqual([primera.racha_semanas, primera.protectores, primera.mejor_racha, primera.semanas_cumplidas], [1, 1, 1, 1]);
+    estado.mover(7 * DIA); // la semana del 19: la del 12 se cerró sin nada, gastó el último protector
+    const r = (await api('GET', '/core/racha')).json;
+    assert.deepEqual([r.racha_semanas, r.protectores, r.mejor_racha], [1, 0, 1]);
+    estado.mover(7 * DIA); // la semana del 26: la del 19 se cerró sin nada y sin protector
+    const nueva = (await api('GET', '/core/racha')).json;
+    assert.deepEqual([nueva.racha_semanas, nueva.mejor_racha, nueva.semanas_cumplidas, nueva.semana_pasada.cumplida, nueva.semana.dias_activos], [0, 1, 1, false, 0]);
+  }, conReloj(Date.parse('2026-10-14T15:00:00Z')));
+});

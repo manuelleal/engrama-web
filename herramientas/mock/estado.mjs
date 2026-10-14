@@ -52,9 +52,14 @@ function backendQueImita() {
 /** Los valores por defecto de la tanda en el backend (ESPEC_practica_y_tanda §1.4), como configuración del doble (mock/practica.mjs). */
 export const PRACTICA_POR_DEFECTO = Object.freeze({ nivelInicial: 'A2', repasosMax: 3, preguntasMin: 6, retosMax: 4, maxAlDia: 2, diasRepaso: 7 });
 
+/** Los valores por defecto de la racha semanal del backend (ESPEC_racha_semanal §1.6), como configuración del doble (mock/racha.mjs). */
+export const RACHA_POR_DEFECTO = Object.freeze({
+  diasPorSemana: 3, diasProtector: 5, respuestasDia: 6, correctasDia: 4, protectorInicial: 1, protectorTope: 2, bonoSemana: 5,
+});
+
 /** La práctica del día en el doble: su configuración, las tandas pedidas y la cola de repaso (entradas y respuestas). */
 function practicaDelDoble() {
-  return { practica: { ...PRACTICA_POR_DEFECTO }, tandas: [], repaso: { entradas: [], respuestas: [], secuencia: 0 } };
+  return { practica: { ...PRACTICA_POR_DEFECTO }, tandas: [], repaso: { entradas: [], respuestas: [], secuencia: 0 }, racha: { ...RACHA_POR_DEFECTO } };
 }
 
 /** Crea el estado inicial: un tenant "UIS (demo)", un admin y un docente de arranque. */

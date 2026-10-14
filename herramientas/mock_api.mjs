@@ -26,6 +26,8 @@ import { listarChallenges, listarTodosLosChallenges, verChallenge, cambiarEstado
 import { arrancarIntento, enviarIntento, historialDeIntentos } from './mock/rutas_intentos.mjs';
 import { responderPregunta, retomarIntento, terminarIntento } from './mock/por_pregunta.mjs';
 import { verTanda, pedirTanda, responderRepaso } from './mock/practica.mjs';
+import { leerRacha, pagarBonoSiCumplio } from './mock/racha.mjs';
+import { autenticar } from './mock/auth.mjs';
 import { registrarse, crearCodigo, leerCodigo, apagarCodigo, listarSolicitudes, aprobarSolicitud, rechazarSolicitud } from './mock/rutas_registro.mjs';
 import { crearSolicitudDatos, misSolicitudesDatos, solicitudesDeLaInstitucion, responderSolicitudDatos } from './mock/rutas_datos.mjs';
 import {
@@ -75,6 +77,8 @@ function rutasDeLaPractica(r) {
     r('GET', '/challenges/tanda', (estado, req) => verTanda(estado, req)),
     r('POST', '/challenges/tanda', (estado, req) => pedirTanda(estado, req)),
     r('POST', '/challenges/refuerzo/:entrada_id/respuestas', (estado, req, p, body) => responderRepaso(estado, req, p.entrada_id, body)),
+    // La racha semanal (mock/racha.mjs): se lee aquí; el bono se paga tras cada escritura que puede volver activo un día.
+    r('GET', '/core/racha', (estado, req) => leerRacha(estado, req)),
   ];
 }
 
@@ -110,10 +114,17 @@ function construirRutas() {
 
     r('GET', '/core/coins/balance', (estado, req) => leerSaldo(estado, req)),
     r('GET', '/core/coins/history', (estado, req, p, body, url) => leerHistorialMonedas(estado, req, Number(url.searchParams.get('limit')) || 20)),
-    r('POST', '/core/attendance/check-in', (estado, req, p, body) => checkIn(estado, req, body)),
+    r('POST', '/core/attendance/check-in', (estado, req, p, body) => conBonoDeSemana(estado, req, checkIn(estado, req, body))),
     r('GET', '/core/attendance/history', (estado, req) => historialAsistenciaPropio(estado, req)),
     r('GET', '/core/attendance/history/:student_id', (estado, req, p) => historialAsistenciaDeEstudiante(estado, req, p.student_id)),
   ];
+}
+
+/** Tras un check-in que respondió 200, la asistencia vuelve activo el día: si con eso la semana se cumplió, el bono (mock/racha.mjs). */
+function conBonoDeSemana(estado, req, respuesta) {
+  const auth = autenticar(estado, req);
+  pagarBonoSiCumplio(estado, auth.tenantId, auth.profileId);
+  return respuesta;
 }
 
 function compilar(patron) {

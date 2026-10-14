@@ -1,0 +1,16 @@
+{
+  "descripcion": "R10: la semana del doble tiene 6 días (se pierde el domingo): los puntos de \"Tu semana\" no son los del backend",
+  "archivos": {
+    "herramientas/mock/racha.mjs": "racha.mjs"
+  },
+  "comando": [
+    "node",
+    "--test",
+    "--test-reporter=tap",
+    "tests/contrato/mock_practica.test.mjs"
+  ],
+  "espera_codigo_no_cero": true,
+  "espera_fallan_tests": [
+    "R10: GET /core/racha responde RachaOut"
+  ]
+}
