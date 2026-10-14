@@ -1,0 +1,16 @@
+{
+  "descripcion": "SR4: la lectura sale con rol original (PEDIDO_sembrador §2: las lecturas van sin rol y sin familia)",
+  "archivos": {
+    "herramientas/sembrar/mapeo.mjs": "mapeo.mjs"
+  },
+  "comando": [
+    "node",
+    "--test",
+    "--test-reporter=tap",
+    "tests/unit/sembrar_refuerzo.test.mjs"
+  ],
+  "espera_codigo_no_cero": true,
+  "espera_fallan_tests": [
+    "SR4: la lectura lleva la explicación"
+  ]
+}

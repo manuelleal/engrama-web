@@ -1,0 +1,16 @@
+{
+  "descripcion": "SR2: también el original se marca solo_refuerzo: el feed y la tanda quedan sin retos nuevos de Accuracy",
+  "archivos": {
+    "herramientas/sembrar/mapeo.mjs": "mapeo.mjs"
+  },
+  "comando": [
+    "node",
+    "--test",
+    "--test-reporter=tap",
+    "tests/unit/sembrar_refuerzo.test.mjs"
+  ],
+  "espera_codigo_no_cero": true,
+  "espera_fallan_tests": [
+    "SR2: solo_refuerzo true en exactamente los retos de gemelas y repasos"
+  ]
+}

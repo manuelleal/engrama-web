@@ -11,6 +11,9 @@
 export const COINS_REWARD = 10; // W43 (ESPEC_juego_oleada1 §4.1): reto individual = 10 (era 5, la base de Lingo).
 export const MAX_ATTEMPTS = 2; // D4.
 const ORDEN_ROLES = ['original', 'gemela', 'repaso'];
+// ESPEC_sembrador_refuerzo §1.3 (PEDIDO_sembrador §3 del backend): solo el original y las lecturas entran al feed y a la tanda; un reto de
+// gemelas o de repasos se siembra `solo_refuerzo` (sus preguntas son las formas de la cola de repaso y de la segunda vuelta, que paga 5).
+export const ROLES_SOLO_REFUERZO = ['gemela', 'repaso'];
 const ORDEN_DESTREZAS = ['grammar', 'vocabulary'];
 const ETIQUETA_DESTREZA = { vocabulary: 'Vocabulario', grammar: 'Gramática' };
 const OPCIONES_LO_DICE = [{ label: 'V', value: 'True' }, { label: 'F', value: 'False' }, { label: 'ND', value: 'Not given' }];
@@ -33,19 +36,38 @@ export function tituloLectura(unidad, numero) {
 }
 
 /**
+ * Lo que el backend usa para el repaso y la explicación (ESPEC_sembrador_refuerzo §1.1; PEDIDO_sembrador §1 y §3b): la identidad de la
+ * pregunta en el banco (`item_ref`), su familia y su rol (para emparejar la gemela con su original), los nodos que practica (de
+ * `curriculo/etiquetas_unidades.json`, por familia) y la explicación TAL CUAL la trae el banco. Lo que el banco no trae no se manda (el
+ * backend pone su valor por defecto); no se inventa nada.
+ * @param {{id: string, rol: string, explicacion?: object}} item
+ * @param {string|undefined} familia  @param {string[]|undefined} nodos
+ */
+export function marcasDelBanco(item, familia, nodos) {
+  const marcas = { item_ref: item.id, ...(familia ? { familia } : {}), rol: item.rol };
+  if (nodos?.length) marcas.nodos = [...nodos];
+  if (item.explicacion) marcas.explanation = item.explicacion;
+  return marcas;
+}
+
+/**
  * `piensalo` -> pregunta de opción múltiple. `correct_answer` es SIEMPRE la label ("A", "B"…),
  * nunca el texto de la opción (§7.2 regla 4, X12): las opciones YA vienen etiquetadas en el JSON
  * (`opciones: {A: "...", B: "..."}`) y `clave` ya es esa misma letra.
  */
-export function preguntaDePiensalo(item, ordenIndex) {
+export function preguntaDePiensalo(item, ordenIndex, { familia, nodos } = {}) {
   const options_json = Object.entries(item.opciones).map(([label, value]) => ({ label, value }));
-  return { question_type: 'multiple_choice', question_text: item.enunciado, options_json, correct_answer: item.clave, order_index: ordenIndex };
+  const pregunta = { question_type: 'multiple_choice', question_text: item.enunciado, options_json, correct_answer: item.clave, order_index: ordenIndex };
+  return { ...pregunta, ...marcasDelBanco(item, familia, nodos) };
 }
 
 /** Cada afirmación de un `lo_dice` -> una pregunta V/F/ND. El texto de la lectura va en la
- * `description` del reto (lo arma sembrar_retos.mjs), nunca en la pregunta: así no revela nada. */
+ * `description` del reto (lo arma sembrar_retos.mjs), nunca en la pregunta: así no revela nada.
+ * Su explicación (un texto en el banco, no un objeto) va como `regla`, sin `idioma`: lo pone el servidor por el nivel (ESPEC_sembrador_refuerzo
+ * §1.2). Sin `rol`, `familia`, `item_ref` ni `nodos`: la afirmación no tiene id en el banco ni etiqueta (PEDIDO_sembrador §2). */
 export function preguntaDeAfirmacion(afirmacion, ordenIndex) {
-  return { question_type: 'multiple_choice', question_text: afirmacion.texto, options_json: OPCIONES_LO_DICE, correct_answer: afirmacion.clave, order_index: ordenIndex };
+  const pregunta = { question_type: 'multiple_choice', question_text: afirmacion.texto, options_json: OPCIONES_LO_DICE, correct_answer: afirmacion.clave, order_index: ordenIndex };
+  return afirmacion.explicacion ? { ...pregunta, explanation: { regla: afirmacion.explicacion } } : pregunta;
 }
 
 /**
@@ -63,7 +85,7 @@ export function agruparPiensalo(unidad) {
       if (item.formato !== 'piensalo') continue; // excluye tu_palabra
       const llave = `${item.rol}:${destreza}`;
       if (!bloques.has(llave)) bloques.set(llave, { rol: item.rol, destreza, items: [] });
-      bloques.get(llave).items.push(item);
+      bloques.get(llave).items.push({ ...item, familia: familia.familia }); // la familia viaja con su ítem (§1.1)
     }
   }
   return bloques;
@@ -75,8 +97,10 @@ export function familiasLoDice(unidad) {
 }
 
 /** Los bloques de Accuracy de la unidad, listos para volverse ChallengeCreate (sin group_id ni
- * max_winners: eso lo agrega sembrar_retos.mjs, que sabe del grupo destino). */
-export function bloquesDePiensalo(unidad) {
+ * max_winners: eso lo agrega sembrar_retos.mjs, que sabe del grupo destino).
+ * `nodosPorFamilia` ({familia: [ids]}, de curriculo/etiquetas_unidades.json) lo pasa quien siembra; sin él, las preguntas van sin nodos.
+ * @param {object} unidad @param {{nodosPorFamilia?: Record<string, string[]>}} [opciones] */
+export function bloquesDePiensalo(unidad, { nodosPorFamilia = {} } = {}) {
   const agrupado = agruparPiensalo(unidad);
   const salida = [];
   for (const destreza of ORDEN_DESTREZAS) {
@@ -86,11 +110,11 @@ export function bloquesDePiensalo(unidad) {
       if (!bloque) continue;
       numero += 1;
       salida.push({
-        destreza, rol,
+        destreza, rol, soloRefuerzo: ROLES_SOLO_REFUERZO.includes(rol),
         titulo: tituloBloque(unidad, destreza, numero, rol),
         // order_index empieza en 1 (contrato: ChallengeQuestionIn.order_index, minimum 1) — el
         // índice del .map() es 0-based, así que se suma 1 aquí, en el único lugar que lo produce.
-        questions: bloque.items.map((item, qi) => preguntaDePiensalo(item, qi + 1)),
+        questions: bloque.items.map((item, qi) => preguntaDePiensalo(item, qi + 1, { familia: item.familia, nodos: nodosPorFamilia[item.familia] })),
       });
     }
   }
@@ -144,8 +168,10 @@ function conPrefijoBorrador(titulo, borrador) {
  * que le cabe a este contenido: todo lo que siembra F8 (piensalo y lo_dice) son preguntas de
  * opción múltiple. 'practice' no es un valor válido — era el bug F8 (encargo B).
  */
-export function challengeCreate(unidad, { titulo, destreza, description = '', questions }, { groupId, borrador }) {
+export function challengeCreate(unidad, { titulo, destreza, description = '', questions, soloRefuerzo = false }, { groupId, borrador }) {
   return {
+    // ESPEC_sembrador_refuerzo §1.3: solo en los bloques de gemelas y repasos; el original y las lecturas van sin el campo (como antes).
+    ...(soloRefuerzo ? { solo_refuerzo: true } : {}),
     title: conPrefijoBorrador(titulo, borrador), description, challenge_type: 'multiple_choice',
     cefr_level: unidad.nivel, skill: destreza, topic: unidad.titulo,
     // W43: el cuerpo NO lleva `max_winners`. Lo resuelve el servidor (el tamaño del grupo, con piso): mandarlo con un grupo vacío daba 0 y un 422.

@@ -1,0 +1,16 @@
+{
+  "descripcion": "SR3: gemelas y repasos de una destreza van en un mismo reto (sirve a la cola, pero nunca a la segunda vuelta: PEDIDO_sembrador §3)",
+  "archivos": {
+    "herramientas/sembrar/mapeo.mjs": "mapeo.mjs"
+  },
+  "comando": [
+    "node",
+    "--test",
+    "--test-reporter=tap",
+    "tests/unit/sembrar_refuerzo.test.mjs"
+  ],
+  "espera_codigo_no_cero": true,
+  "espera_fallan_tests": [
+    "SR3: ningún reto mezcla roles"
+  ]
+}

@@ -21,6 +21,9 @@ function cambiar(texto, de, a) {
 
 const MAPEO = 'herramientas/sembrar/mapeo.mjs';
 const IDENTIDAD = 'tests/unit/sembrar_identidad.test.mjs';
+const REFUERZO = 'tests/unit/sembrar_refuerzo.test.mjs';
+const SR2 = 'SR2: solo_refuerzo true en exactamente los retos de gemelas y repasos';
+const SOLO_REFUERZO_BUENO = "export const ROLES_SOLO_REFUERZO = ['gemela', 'repaso'];";
 const tap = (prueba) => ['node', '--test', '--test-reporter=tap', prueba];
 
 /**
@@ -32,6 +35,48 @@ export const TRAMPOSOS = {
     archivo: MAPEO, comando: tap(IDENTIDAD), tests: ['SR5: los cuerpos de a1-u01-my-family sin los campos nuevos son la foto de antes del cambio'],
     descripcion: 'SR5: el sembrador manda como topic el título de la unidad y no su id (la tanda ordena por topic: PEDIDO_sembrador §2 dice no cambiarlo)',
     cambios: [['cefr_level: unidad.nivel, skill: destreza, topic: unidad.id,', 'cefr_level: unidad.nivel, skill: destreza, topic: unidad.titulo,']],
+  },
+  x_sembrador_sin_marcas: {
+    archivo: MAPEO, comando: tap(REFUERZO), tests: ['SR1: cada pregunta de piensalo lleva item_ref'],
+    descripcion: 'SR1: la pregunta de piensalo sale como antes, sin item_ref, familia, rol, nodos ni explicación (el repaso queda sin formas y la banda sin regla)',
+    cambios: [['  return { ...pregunta, ...marcasDelBanco(item, familia, nodos) };', '  return pregunta;']],
+  },
+  x_sembrador_gemela_en_feed: {
+    archivo: MAPEO, comando: tap(REFUERZO), tests: [SR2],
+    descripcion: 'SR2: solo el repaso se marca solo_refuerzo; las gemelas siguen en el feed pagando 10 (lo que el dictamen 04 pidió quitar)',
+    cambios: [[SOLO_REFUERZO_BUENO, "export const ROLES_SOLO_REFUERZO = ['repaso'];"]],
+  },
+  x_sembrador_todo_refuerzo: {
+    archivo: MAPEO, comando: tap(REFUERZO), tests: [SR2],
+    descripcion: 'SR2: también el original se marca solo_refuerzo: el feed y la tanda quedan sin retos nuevos de Accuracy',
+    cambios: [[SOLO_REFUERZO_BUENO, "export const ROLES_SOLO_REFUERZO = ['original', 'gemela', 'repaso'];"]],
+  },
+  x_sembrador_mezcla_roles: {
+    archivo: MAPEO, comando: tap(REFUERZO), tests: ['SR3: ningún reto mezcla roles'],
+    descripcion: 'SR3: gemelas y repasos de una destreza van en un mismo reto (sirve a la cola, pero nunca a la segunda vuelta: PEDIDO_sembrador §3)',
+    cambios: [['      const llave = `${item.rol}:${destreza}`;', "      const llave = `${item.rol === 'repaso' ? 'gemela' : item.rol}:${destreza}`;"]],
+  },
+  x_sembrador_lectura_con_rol: {
+    archivo: MAPEO, comando: tap(REFUERZO), tests: ['SR4: la lectura lleva la explicación'],
+    descripcion: 'SR4: la lectura sale con rol original (PEDIDO_sembrador §2: las lecturas van sin rol y sin familia)',
+    cambios: [['  return afirmacion.explicacion ? { ...pregunta, explanation:', "  return afirmacion.explicacion ? { ...pregunta, rol: 'original', explanation:"]],
+  },
+  // Los dos que ya existían sobre mapeo.mjs eran copias del mapeo VIEJO: se rehacen con su misma rotura sobre el bueno de hoy.
+  x15_mapeo_incumple_contrato: {
+    archivo: MAPEO, comando: tap('tests/unit/sembrar_retos.test.mjs'),
+    tests: ['sembrar(): con --borrador contra la API local, siembra los 7 retos (6 Accuracy + 1 lectura) de 10 monedas, sin mandar max_winners (lo resuelve el servidor: 40)'],
+    descripcion: "Encargo B (F9): mapeo.mjs vuelve a violar el contrato real (description null, order_index 0-based, challenge_type 'practice'). Con el mock YA estricto, sembrar_retos.mjs debe reventar contra /challenges/ en vez de colarse.",
+    cambios: [
+      ['preguntaDePiensalo(item, qi + 1, {', 'preguntaDePiensalo(item, qi, {'],
+      ['preguntaDeAfirmacion(a, qi + 1)', 'preguntaDeAfirmacion(a, qi)'],
+      ["{ titulo, destreza, description = '', questions,", '{ titulo, destreza, description = null, questions,'],
+      ["description, challenge_type: 'multiple_choice',", "description, challenge_type: 'practice',"],
+    ],
+  },
+  x_sembrador_reto_de_5: {
+    archivo: MAPEO, comando: tap('tests/unit/mock_retos_economia.test.mjs'), tests: ['U36: el sembrador usa 10 por reto'],
+    descripcion: 'W43 (U36): el sembrador vuelve a poner 5 monedas por reto (la base de Lingo), no las 10 decididas',
+    cambios: [['export const COINS_REWARD = 10;', 'export const COINS_REWARD = 5;']],
   },
 };
 
