@@ -164,6 +164,35 @@ Fuente de cómo se ve: `..\..\diseno\sistema\` (`sistema.css`, `LEEME.md`). Regl
 - **Peso:** `PRECARGA` no pasa de 830.000 bytes en disco (hoy 829.902, con 98 de margen; 827.312 con fin de línea LF, que es lo que guarda git): lo nuevo entra borrando lo viejo. Se mide sumando en disco los archivos de la lista. Ojo: un `git checkout` de un archivo en esta máquina lo deja en CRLF y engorda la medida en disco.
 - **Nada de `:has()` sobre la raíz de la app con un descendiente detrás** (`#vista:has(…) form button`), fuera de un `@media` de escritorio: recalcula el estilo de todo el árbol en cada cambio del DOM y bajó la celebración de Inicio de 59 a 55,5 fps (lo vigila `css_cara.test.mjs`; se midió con `npm run fluidez`, varias corridas: una sola engaña, el ruido es de 1 fps).
 
+## La práctica del día sin profe (2026-10-14, `docs/ESPEC_practica_del_dia.md`, W78 a W82; backend `f7f7aeb`)
+
+- **Todo lo nuevo es DIFERIDO:** se carga con `import()` y va en la lista `DIFERIDOS` de `sw.js` (se guarda al activar, como las fuentes y `sistema.css`),
+  nunca en `PRECARGA`. **U59** (`tests/unit/sw_peso.test.mjs`) vigila el techo (830.000 bytes LF) y que todo `import()` y lo que importa un diferido estén
+  guardados. Lo que crece dentro del shell son solo los enchufes (`reto_flujo.js`, `inicio.js`, `app.js`, `navegacion.js`). Si un diferido no carga, la
+  app es la de antes. Los textos nuevos viven en `src/textos_practica.js` (no se esparcen en `textos.js`: los importa solo lo diferido).
+  Ojo: el despliegue exporta con `git archive` y esta máquina tiene `core.autocrlf=true`: lo servido lleva CRLF y pesa unos 12 KB más que lo que mide U59
+  (841.241 al cerrar W82; ya pasaba el techo en `8ef6298`). Para servir lo que mide U59: `git -c core.autocrlf=false archive`.
+- **Respaldo = backend viejo:** cada ruta nueva (`/answers`, `/finish`, `/challenges/tanda`, `/core/racha`) que responde 404, 405 o 422 (o falla, o llega
+  mal formada) deja la pantalla como antes. El mock lo imita con `estado.backend = {l1, tanda, racha}` en `false`. El 409 `intento_con_respuestas` de
+  `/submit` reabre el reto pregunta por pregunta (una vez).
+- **L1 (`vistas/estudiante/reto_l1.js`):** pinta las preguntas de `/attempt` (nunca el detalle); elegir es neutro; "Comprobar" manda la label, una vez;
+  la banda (`ui/explicacion.js`, `sx-banda`) dice veredicto con ícono y texto, oración, regla, "por qué no la tuya" SOLO si falló y ejemplo, con rótulos
+  y `lang` por idioma (`es` A1/A2, `en` desde B1); retoma con `GET …/answers`; cierra con `/finish`. Nada de una pregunta aparece antes de comprobarla.
+- **"Tu práctica de hoy" (`inicio_practica.js`, `ui/practica.js`):** la protagonista de "Ahora" conserva `tarjeta-reto-hoy`, `jugar-reto-hoy` (un enlace),
+  `fila-ahora` y la única invitación, y es compacta (E31: los tres botones de "Ahora" sobre la barra sin desplazar, también a 360 × 640). **0 `POST
+  /challenges/tanda` al pintar**: "Jugar" lo hace con un toque. El nivel de práctica va después de "Ahora", nunca en el escudo. `#/repaso`
+  (`repaso.js`) responde el repaso de la tanda (paga 0, nunca "+0").
+- **Racha semanal (`ui/racha_semanal.js`):** todo sale de `GET /core/racha` (la web no cuenta puntos ni decide la semana); la llama solo se celebra si
+  SUBIÓ (clave `racha_semanas` de `ultimo_visto`); "Semana nueva…" sin rojo; prohibidas las palabras de pérdida (U85).
+- Pruebas: `practica_l1`, `practica_tanda`, `practica_repaso`, `practica_racha` (U77 a U85), R10 (`tests/contrato/mock_practica.test.mjs` contra
+  `contratos/openapi_f7f7aeb.json`), E35 a E37 (`tests/e2e/practica_*.test.mjs`), el humo `node herramientas/humo_practica.mjs --contra mock [--replica]`
+  y las capturas `node herramientas/capturas_practica.mjs <carpeta>`. Las copias rotas de lo nuevo las rehace `tests/tramposos/regenerar_x_practica.mjs`;
+  las de un archivo viejo que cambió, `tests/tramposos/regenerar_por_mezcla.mjs <archivo>` (si choca, a mano).
+- **No hecho (va a "Después"):** el sembrador (`herramientas/sembrar/`) todavía no manda `explanation`, `solo_refuerzo`, `item_ref`, `familia` ni `nodos`
+  (`engrama-backend/docs/PEDIDO_sembrador.md`): sin eso, en el piloto la banda dice veredicto y oración, sin regla ni ejemplo, y las gemelas siguen en el
+  feed. Los guiones del despliegue que juegan un reto con clics (`e2e_piloto`, `capturas_juego`, `capturas_sistema`, `medir_desborde_reto`,
+  `recorrido_registro`) no conocen "Comprobar".
+
 Capa de juego, oleada 1 (W41 a W60, sin empezar): se reparte con `docs/ESPEC_juego_oleada1.md` **más su adenda 1 (§17.1)**, que dice qué cambió tras la navegación (la tabla de estado, el orden de reparto, el techo de peso del shell y las insignias como SVG generado a código).
 
 ## Pantallas del anillo: EVA, SET, cuentas por aprobar y datos personales (2026-10-07)

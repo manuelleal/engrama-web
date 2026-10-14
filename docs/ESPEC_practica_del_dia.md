@@ -184,6 +184,24 @@ demás filas de "Ahora"; título de tarjeta, 18 px; la barra de avance delgada) 
 - E30 (`nav_sin_callejones`) deja fuera `/repaso` de "toda ruta de la tabla se alcanza por toques", igual que el reto en curso: solo se enlaza cuando la
   tanda trae repaso. Su barra y su volver los miden U62 y el humo de navegación (que lo visita por su dirección: rutas del estudiante 10 → 11).
 
-## 7. Medido al cerrar
-(Se llena al cerrar: commits, cifras de `verificar.mjs` y de la suite, peso LF y `VERSION`, tabla de E2E, sha256 del humo y de la réplica, y lo que
-no se probó.)
+## 7. Medido al cerrar (2026-10-14)
+- **Commits** (sobre `8ef6298`): `75b71d3` espec · `37e067e` U59 · `bf08b06` W78 mock · `176d90c` W78 · `bb4a2c1` W79 mock · `a33b7d8` W79 · `cb2fd84` W80 ·
+  `3e65199` W79 corrección por E31 (adenda 2) y E36 · `48de093` W81 mock · `4fb17aa` W81 · `f4b4e32` W81 E2E · `309a9bc` W82 humo · `c3c639b` capturas ·
+  `9db85d0` E2E y tramposos al cerrar · este, docs.
+- **`verificar.mjs`:** sin violaciones. **Unit + contrato:** 699 en verde (base 652: +47). **E2E:** los 44 archivos (menos `e2e_real`, que toca el piloto),
+  uno a uno: 44 en verde (`celebraciones_ruta` se puso rojo en la corrida completa por la racha del doble y quedó verde con la racha apagada, como `racha_viva`).
+- **Tramposos:** 27 nuevos, todos rojos por su razón (U59 2, R10 4, W78 9, W79 5, W80 2, W81 4, W82 1); 51 copias de archivos viejos rehechas
+  (`reto_flujo.js` 9, `inicio.js` 11, `app.js` 9, `navegacion.js` 6, `sw.js` 6, `index.html` 2, `cara.css` 4, `rutas_challenges.mjs` 2, `fluidez.mjs` 1,
+  `flujo_navegacion.mjs` 1) y corridas una a una: todas rojas. Tres quedaron VERDES en su primera corrida y se reforzó la PRUEBA (no el criterio):
+  `x_mock_repaso_paga` y `x_mock_tanda_sin_tope` (R10) y, antes de escribirlo como tramposo, el esperado del cierre de la racha (un error de cuenta en la
+  prueba). Las copias de `sw.js` quedaron en la v50 hasta el cierre (se rehicieron recién ahí: candidato a ERR, "regenerar al tocar, no al final").
+- **Peso:** `PRECARGA` 117 entradas, **829.254 bytes LF** (U59; margen 746), `engrama-shell-v53`; 9 archivos en `DIFERIDOS`. En el disco de esta
+  máquina 831.667 (copias en CRLF). **Hallazgo (candidato a ERR):** el despliegue exporta con `git archive` y esta máquina tiene `core.autocrlf=true`:
+  lo servido lleva CRLF y pesa **839.282** en `8ef6298` (ya sobre el techo, sin que nada lo midiera) y **841.241** en este cierre. U59 mide lo que guarda
+  git; para que lo servido sea eso, exportar con `git -c core.autocrlf=false archive` (o fijar `eol=lf` en `.gitattributes`).
+- **Humo** (`humo_practica`, dos corridas iguales): desarrollo `2d8cad40c0fe75b0da9e689dca1edc52a19951e8eee3420abc68e559ece5cdd7`, réplica
+  `1adbcb719fb6991d0100bfd0c6518df8864613bb5f8074a0a245c3472a23e5fb`. R5 (`humo_mvp_uis`) no cambió. El humo de navegación (W75) cambió de sha,
+  declarado en §3: desarrollo `909fb7b8…f9e0a`, réplica `16106a57…757ee` (rutas del estudiante 10 → 11).
+- **No probado:** contra el backend real `f7f7aeb` (todo fue contra el doble); el respaldo contra un backend viejo DE VERDAD (el doble imita sus 404/405/422);
+  la segunda vuelta servida por el backend (solo con una tanda sembrada en las pruebas); `racha_protegida` real; las pistas; lectores de pantalla de
+  verdad (solo `lang` y `aria-label` en el DOM); la fluidez (`npm run fluidez`) con la tarjeta nueva; Edge sin red con los diferidos guardados.
