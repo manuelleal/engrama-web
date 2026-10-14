@@ -102,7 +102,7 @@ test('U49: en la revisión el sello va después de la medalla y antes de la prim
     assert.match(sello.className, /merito-estampado/);
     assert.equal(elementos(sello).filter((e) => /drako/.test(e.className) || e.tagName === 'img' || e.tagName === 'svg').length, 0, 'Drako no va dentro del sello');
     const orden = elementos(v.raiz);
-    const medalla = orden.findIndex((e) => e.className === 'medalla-monedas');
+    const medalla = orden.findIndex((e) => String(e.className).split(' ').includes('medalla-monedas'));
     const fila = orden.findIndex((e) => e.getAttribute('data-testid') === 'revision-q1');
     assert.ok(medalla >= 0 && medalla < orden.indexOf(sello) && orden.indexOf(sello) < fila, 'medalla → sello → primera fila');
     assert.equal(elementos(buscar(v.raiz, 'revision-q1')).filter((e) => /drako/.test(e.className)).length, 0, 'ni dentro de una fila');

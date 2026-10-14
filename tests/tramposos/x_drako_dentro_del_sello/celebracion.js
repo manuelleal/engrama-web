@@ -60,7 +60,10 @@ export function crearHeroResultado(d) {
     h('p', { class: 'hero-mensaje' }, textosNivel.mensaje),
     h('p', { class: 'hero-puntaje', 'data-testid': 'puntaje' },
       puntaje, h('span', { class: 'solo-lectores' }, textos.celebracion.puntaje(d.aciertos, d.total))),
-    medallaNum ? h('div', { class: 'medalla-monedas', 'aria-hidden': 'true' }, medallaNum, h('span', {}, textos.inicio.monedas)) : null,
+    // Las monedas ganadas son un DATO (la tarjeta-dato del sistema), no un bloque navy con cara de botón.
+    medallaNum ? h('div', { class: 'medalla-monedas sx-dato', 'aria-hidden': 'true' },
+      h('span', { class: 'sx-dato__rotulo' }, textos.inicio.monedas),
+      h('span', { class: 'sx-dato__valor' }, h('span', { class: 'sx-moneda' }), medallaNum)) : null,
     sello,
   );
   return { nodo, drako, puntaje, medallaNum, sello };

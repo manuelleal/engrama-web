@@ -59,7 +59,8 @@ export function renderRevision(raiz, datos) {
     'p', { role: 'status', class: monedas > 0 ? 'solo-lectores' : 'aviso-corto', 'data-testid': 'revision-monedas' },
     monedas > 0 ? textos.revision.gananciaMonedas(monedas) : textos.revision.sinGanancia,
   );
-  const volver = h('a', { href: '#/retos', 'data-testid': 'revision-volver' }, textos.revision.volver);
+  // La salida es EL botón de la pantalla: primario del sistema, a todo el ancho (antes, un chip chico).
+  const volver = h('a', { href: '#/retos', class: 'sx-btn sx-btn--ancho', 'data-testid': 'revision-volver' }, textos.revision.volver);
   const nodo = h(
     'div', { 'data-testid': 'vista-revision', class: 'juego' },
     h('div', { class: 'barra-rol' }, crearBotonSonido()),

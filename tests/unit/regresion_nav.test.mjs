@@ -117,7 +117,8 @@ const SONIDO_S1 = { retos: ['boton-sonido'], retos_vacio: ['boton-sonido'], asis
 
 // Tanda "sistema 1" (§2a, U72): en la revisión, el puntaje y la medalla NACEN con el número del servidor (en la línea base nacían en "0 / 2" y "+0" y la
 // foto traía los dos: el de nacer y el final). Cambian SOLO esos dos nodos.
-const NUMEROS_S1 = { revision: ['puntaje', { etiqueta: 'div', clase: 'medalla-monedas' }] };
+// §2c: en la misma escena, la medalla pasa a tarjeta-dato (`sx-dato`: rótulo y valor) y la salida `revision-volver` gana las clases del botón del sistema.
+const NUMEROS_S1 = { revision: ['puntaje', { etiqueta: 'div', clase: 'medalla-monedas' }, 'revision-volver'] };
 
 const CAPAS = [HASTA_W70, VOLVER_W71, SALIR_W73, SONIDO_S1, NUMEROS_S1];
 /** @type {Record<string, Array<string|{etiqueta: string, clase?: string}>>} */

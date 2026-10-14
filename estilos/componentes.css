@@ -70,9 +70,9 @@ button.boton-chico:active:not(:disabled) {
 
 /* ---------- Enlaces con data-testid: son acciones (navegar, jugar, repasar, volver), no prosa —
    se ven como chips, nunca como texto azul subrayado. Se excluye el enlace del código de
-   asistencia (es una URL real para copiar, no una acción). La navegación inferior (más abajo) NO
-   lleva data-testid a propósito, para no pelear con esta regla por especificidad. ---------- */
-#vista a[data-testid]:not([data-testid="sesion-enlace"]) {
+   asistencia (es una URL real para copiar, no una acción) y lo que ya es un botón del sistema (`sx-btn`). La navegación inferior
+   NO lleva data-testid a propósito, para no pelear con esta regla por especificidad. ---------- */
+#vista a[data-testid]:not([data-testid="sesion-enlace"]):where(:not(.sx-btn)) {
   display: inline-flex;
   align-items: center;
   gap: 6px;
@@ -87,10 +87,10 @@ button.boton-chico:active:not(:disabled) {
   border-radius: var(--radio-sm);
   padding: 8px 14px;
 }
-#vista a[data-testid]:not([data-testid="sesion-enlace"]):hover {
+#vista a[data-testid]:not([data-testid="sesion-enlace"]):where(:not(.sx-btn)):hover {
   border-color: var(--secundario);
 }
-#vista a[data-testid]:not([data-testid="sesion-enlace"]):active {
+#vista a[data-testid]:not([data-testid="sesion-enlace"]):where(:not(.sx-btn)):active {
   transform: translateY(2px);
   border-bottom-width: 2px;
 }
