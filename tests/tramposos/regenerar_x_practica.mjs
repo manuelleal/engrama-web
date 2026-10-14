@@ -250,6 +250,11 @@ export const TRAMPOSOS = {
     descripcion: 'U92: el aviso "Repaso: no suma monedas" vuelve a ser un chip de oro (el oro es solo logro, monedas y racha)',
     cambios: [['  background: color-mix(in srgb, var(--primario) 10%, white);\n  color: var(--primario);\n  font-weight: 800;', '  background: var(--oro);\n  color: var(--oro-texto);\n  font-weight: 800;']],
   },
+  x_humo_correcciones_500_viejo: {
+    archivo: 'src/api/practica.js', prueba: 'tests/unit/humo_correcciones.test.mjs', tests: ['U93: el humo de las correcciones (desarrollo)', 'U93: la réplica'],
+    descripcion: 'U93 (W83): el humo de la red irregular lo ve: dos 503 (o un corte) al leer el intento dan null, como un backend viejo',
+    cambios: [["    if (clase === 'transitorio') throw new ErrorTransitorio(RUTA_ANSWERS, codigoDe(e));\n", '']],
+  },
   x_sin_eol_lf: {
     archivo: '.gitattributes', copia: 'gitattributes.txt', prueba: 'tests/unit/sw_peso.test.mjs', tests: ['U59: cada archivo de PRECARGA sale de git archive'],
     descripcion: 'U59 (H-5): sin `*.js text eol=lf`, git archive con core.autocrlf=true sirve el shell en CRLF (más pesado que lo que mide U59) y nada lo ve',

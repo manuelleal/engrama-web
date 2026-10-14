@@ -158,9 +158,25 @@ function leerCuerpo(req) {
 }
 
 /** @param {ReturnType<typeof crearEstado>} estado */
+/**
+ * W83 (docs/ESPEC_correcciones_practica.md §3): una falla programada. `estado.fallas` es una cola de `{metodo, ruta: RegExp, status?, cuerpo?,
+ * cortar?}`; la primera que calza con la petición se usa UNA vez y se quita, ANTES de la ruta de verdad (que no se entera): un 5xx con su cuerpo,
+ * o `cortar` (se cierra la conexión sin responder: detrás del proxy de servidor_dev.mjs llega como 502). Sin fallas, el doble es el de siempre.
+ */
+function tomarFalla(estado, metodo, ruta) {
+  const i = (estado.fallas ?? []).findIndex((f) => f.metodo === metodo && f.ruta.test(ruta));
+  return i < 0 ? null : estado.fallas.splice(i, 1)[0];
+}
+
 export function crearMockApi(estado = crearEstado()) {
   return createServer(async (req, res) => {
     const url = new URL(req.url || '/', 'http://localhost');
+    const falla = tomarFalla(estado, req.method || 'GET', url.pathname);
+    if (falla) {
+      anotar(estado, req, url, falla.cortar ? 0 : falla.status);
+      if (falla.cortar) req.socket.destroy(); else responder(res, falla.status, falla.cuerpo ?? { detail: 'falla programada' });
+      return;
+    }
     const emparejado = emparejar(req.method || 'GET', url.pathname);
     if (!emparejado) { responder(res, 404, { detail: 'Not Found' }); return; }
     try {
