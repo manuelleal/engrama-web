@@ -114,5 +114,33 @@ con su misma rotura, para que sigan diferenciándose del bueno en una sola cosa.
 - Los 2 enunciados de A1 sin un solo hueco (`a1-u05-f02-2`, `a1-u05-f02-3`).
 - Las 20 unidades A1/A2 sin firma de unidad.
 
-## 7. Medido al cerrar
-(se llena al terminar; no se mueve el criterio)
+## 7. Medido al cerrar (2026-10-14; el criterio no se movió)
+Commits: `ac9e8d6` (esta espec), `bdc7abe` (SR5 y la foto, ANTES del cambio: verde con el código viejo), `22308cc` (el cambio, SR1 a SR4),
+`b84a21e` (revisión y SR6/SR7), `6eac494` (SR8), `16889f2` (humo, réplica y SR9).
+
+| Qué | Medido |
+|---|---|
+| `node --test "tests/unit/*.test.mjs" "tests/contrato/*.test.mjs"` | **714 tests, 713 pass, 1 fail** (el mismo R1 de la línea base, ajeno). 699 + 15 nuevos |
+| `node herramientas/verificar.mjs` | sin violaciones |
+| `node tests/correr_tramposos.mjs x_sembrador` | **11/11** en rojo por su test (9 nuevos + `x_sembrador_reto_de_5` rehecho + `x_sembrador_cambia_topic`) |
+| `node tests/correr_tramposos.mjs x15` / `x2b` / `x_demo_reto_de_30` | 1/1 cada uno |
+| R5 (humo W15, `humo_mvp_uis.mock.json`) | mismo sha que antes (`37625fa5…`): el cambio no movió el humo viejo |
+| Humo `--semilla 20261014` | OK, sha256 `9e21cbc07192e2c5693ca52e65acd82ae4f93aa9318891265b78f80230851904` (dos corridas, el mismo) |
+| Réplica `--semilla 7` | OK, sha256 `5f33a16693655d82c0a283335092a1b53446b195e7f83a9abcb03307b918a6c4` (dos corridas, el mismo) |
+| El humo con el mapeo de `x_sembrador_humo_ve_gemela` | código 1: A1 y A2 con 60 en feed, 20 `solo_refuerzo`, 20 errores, 20 gemelas en el feed cada uno |
+
+Lo real, por nivel (igual en las dos semillas; **la predicción de §3 se cumplió entera**):
+| Nivel | Retos | En feed | `solo_refuerzo` | Solo-gemela | Preguntas (lectura) | Sin explicación | Sin nodos | Errores | Monedas del feed |
+|---|---|---|---|---|---|---|---|---|---|
+| A1 | 80 | 40 | 40 | 20 | 179 (59) | 0 | 0 | 0 | 400 |
+| A2 | 80 | 40 | 40 | 20 | 180 (60) | 0 | 0 | 0 | 400 |
+
+Lo sintético (esperado = medido en todas las claves): semilla 20261014, A1 8 retos / 4 `solo_refuerzo` / 3 sin explicación; A2 13 / 7 / 0.
+Semilla 7: A1 6 / 2 / 1; A2 25 / 13 / 5, con 10 preguntas sin nodos (la 20261014 no sacó ninguna familia sin etiqueta: por eso hace falta la réplica).
+
+### Hallazgo para quien siembre de verdad (se declara; no se tocó)
+`ENGRAMA/despliegue/sembrar.mjs`, que es el que siembra el piloto, **no usa `sembrar()`**: llama `armarCuerpos(unidad, { groupId, maxWinners, borrador })`
+del export `_web_build/`. Con este cambio sus cuerpos ya llevan `item_ref`, `familia`, `rol`, `explanation` y `solo_refuerzo`, pero **sin `nodos`**
+(no le pasa `nodosPorFamilia`) y **sin la revisión previa**. Para la resiembra: (1) exportar `_web_build` desde un commit con esta rama;
+(2) en `despliegue/sembrar.mjs`, pasar `nodosPorFamilia` (de `herramientas/sembrar/curriculo.mjs` sobre `curriculo/etiquetas_unidades.json`) y correr
+`revisarCuerpos` con los vigentes antes del primer POST; (3) el backend con las migraciones 044 y 045 y el catálogo cargado.
