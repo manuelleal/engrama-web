@@ -1,0 +1,16 @@
+{
+  "descripcion": "U87 (H-2): un 409 en /finish solo devuelve la salida: el botón queda en \"Enviando…\" y Drako pensando para siempre",
+  "archivos": {
+    "src/vistas/estudiante/reto_l1.js": "reto_l1.js"
+  },
+  "comando": [
+    "node",
+    "--test",
+    "--test-reporter=tap",
+    "tests/unit/practica_correcciones.test.mjs"
+  ],
+  "espera_codigo_no_cero": true,
+  "espera_fallan_tests": [
+    "U87: un 409 en /finish"
+  ]
+}

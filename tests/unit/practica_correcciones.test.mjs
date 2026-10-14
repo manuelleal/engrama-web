@@ -118,3 +118,54 @@ test('U86: con el sondeo caído dos veces, el reto muestra "Reintentar" y "✕ S
     assert.equal(textoDe(buscar(raiz, 'contador-pregunta')), 'Pregunta 2 de 2', 'donde iba: lo respondido no se perdió');
   } finally { cerrar(); }
 });
+
+// ---------- U87 (H-2): un 409 no deja la pantalla colgada en "Enviando…" ----------
+// Tramposos: x_l1_finish_409_colgado y x_l1_comprobar_409_crudo (reto_l1.js).
+
+const R2 = { ...R1, question_id: 'q2', is_correct: true, answer: 'B', correct_answer: 'B', oracion_correcta: 'We have breakfast at seven.', respondidas: 2 };
+const CRUDO = 'Attempt already completed or abandoned';
+
+/** Lo que se ve de "enviando" o del servidor tras el 409: nada de eso debe quedar. */
+function sinRestosDelEnvio(raiz) {
+  const texto = textoDe(raiz);
+  assert.ok(!texto.includes(textosPractica.l1.enviando), 'sin "Enviando…"');
+  assert.ok(!texto.includes(textosPractica.l1.comprobando), 'sin "Comprobando…"');
+  assert.equal(buscar(raiz, 'revisando'), null, 'sin Drako pensando');
+  assert.ok(!texto.includes(CRUDO), 'nunca el texto del servidor');
+}
+
+test('U87: un 409 en /finish quita "Enviando…", relee el intento y deja un aviso neutro propio con "Volver a Retos" y la salida', async () => {
+  const { raiz, llamadas, cerrar } = await abrirReto(servidorReto(enOrden(ESTADO([R1, R2]), json(200, { status: 'completed', total: 2, pistas: {}, respondidas: [R1, R2] })), {
+    'POST /challenges/attempts/int-1/finish': json(409, { detail: CRUDO }),
+  }));
+  try {
+    assert.ok(buscar(raiz, 'boton-terminar'), 'todo respondido: Ver resultado');
+    await tocar(raiz, 'boton-terminar');
+    sinRestosDelEnvio(raiz);
+    const aviso = buscar(raiz, 'reto-aviso');
+    assert.ok(aviso, 'el aviso');
+    assert.equal(aviso.getAttribute('role'), 'status', 'neutro: un estado, no una alerta');
+    assert.equal(textoDe(buscar(raiz, 'reto-aviso-texto')), textosPractica.l1.yaCerrado, 'releyó: ya está cerrado');
+    assert.equal(buscar(raiz, 'reto-aviso-a-retos')?.getAttribute('href'), '#/retos');
+    assert.equal(textoDe(buscar(raiz, 'reto-aviso-a-retos')), textosPractica.l1.aRetos);
+    assert.equal(buscar(raiz, 'reto-salir')?.getAttribute('href'), '#/retos', 'y "✕ Salir"');
+    assert.equal(contar(llamadas, 'GET', '/answers'), 2, 'releyó el intento una vez');
+    assert.equal(contar(llamadas, 'POST', '/finish'), 1, 'nunca reintenta el cierre');
+  } finally { cerrar(); }
+});
+
+test('U87: un 409 al Comprobar da el mismo aviso (sin el texto del servidor); un 404, "ya no está disponible"', async () => {
+  for (const [status, esperado] of [[409, textosPractica.l1.yaCerrado], [404, textosPractica.l1.noDisponible]]) {
+    const { raiz, cerrar } = await abrirReto(servidorReto(enOrden(ESTADO(), json(200, { status: 'abandoned', total: 2, pistas: {}, respondidas: [] })), {
+      'POST /challenges/attempts/int-1/answers': json(status, { detail: status === 409 ? CRUDO : 'Question not found in this attempt' }),
+    }));
+    try {
+      await tocar(raiz, 'opcion-A');
+      await tocar(raiz, 'boton-comprobar');
+      sinRestosDelEnvio(raiz);
+      assert.ok(!textoDe(raiz).includes('Question not found'), `${status}: nunca el texto del servidor`);
+      assert.equal(textoDe(buscar(raiz, 'reto-aviso-texto')), esperado, String(status));
+      assert.equal(buscar(raiz, 'reto-aviso-a-retos')?.getAttribute('href'), '#/retos');
+    } finally { cerrar(); }
+  }
+});

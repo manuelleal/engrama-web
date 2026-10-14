@@ -8,7 +8,7 @@
 //   - gana la primera respuesta: lo que se muestra es lo que el servidor guardó (`answer`);
 //   - retomar: lo ya respondido llega en `GET …/answers`; se abre en la primera sin responder;
 //   - "Ver resultado" cierra con `/finish` (una vez) y muestra la revisión de siempre.
-import { h, montar } from '../../ui/dom.js';
+import { h, montar, texto as nodoDeTexto } from '../../ui/dom.js';
 import { textos } from '../../textos.js';
 import { textosPractica } from '../../textos_practica.js';
 import { crearDrako } from '../../ui/drako.js';
@@ -162,10 +162,28 @@ async function comprobar(raiz, estado, pregunta, boton) {
     pintar(raiz, estado, 'quieta');
   } catch (e) {
     console.warn('reto_l1: no se pudo comprobar', e);
-    if (e instanceof ErrorApi && [404, 409].includes(e.status)) { pintarErrorFlujo(raiz, e.mensaje); return; }
+    if (e instanceof ErrorApi && e.status === 409) { avisoDeCierre(raiz, estado); return; } // H-2: el intento ya no admite respuestas
+    if (e instanceof ErrorApi && e.status === 404) { avisoDeCierre(raiz, estado, T.noDisponible); return; }
     estado.error = T.noSePudo; // sin red o un 500: se puede volver a tocar Comprobar
     pintar(raiz, estado, 'quieta');
   }
+}
+
+/**
+ * H-2 (docs/ESPEC_correcciones_practica.md): el servidor ya no admite nada en este intento (409; o 404 en una pregunta). Se repinta la pantalla al
+ * instante (fuera "Enviando…" y Drako pensando), se relee el intento para decir lo justo y queda un aviso neutro con "Volver a Retos" (la acción del
+ * aviso, como el botón final de la revisión) además de "✕ Salir". Nunca el texto del servidor: viene en inglés ("Attempt already completed…").
+ * @param {string|null} [fijo] el texto, si no hace falta releer
+ */
+function avisoDeCierre(raiz, estado, fijo = null) {
+  const parrafo = h('p', { class: 'sx-t-tarjeta', 'data-testid': 'reto-aviso-texto' }, fijo ?? T.noSeCerro);
+  montar(raiz, h('div', { 'data-testid': 'vista-reto-flujo', class: 'juego' }, crearSalir(),
+    h('section', { class: 'sx-vacio', role: 'status', 'data-testid': 'reto-aviso' }, parrafo,
+      h('a', { href: '#/retos', class: 'sx-btn sx-btn--ancho', 'data-testid': 'reto-aviso-a-retos' }, T.aRetos))));
+  document.body.dataset.listo = '1';
+  if (fijo) return;
+  retomarIntento(estado.attemptId, estado.ctx).then((leido) => { if (leido && leido.status !== 'in_progress') montar(parrafo, nodoDeTexto(T.yaCerrado)); })
+    .catch((e) => console.warn('reto_l1: no se pudo releer el intento', e)); // queda "no se pudo cerrar ahora": lo respondido sigue guardado
 }
 
 function siguiente(raiz, estado) {
@@ -183,7 +201,7 @@ async function terminar(raiz, estado, boton) {
     const respuestasDadas = Object.fromEntries([...estado.respondidas].map(([qid, r]) => [qid, r.answer]));
     renderRevision(raiz, { challenge: estado.challenge, resultado, respuestasDadas, rol: estado.rol, esRepaso: estado.esRepaso, historialPrevio: estado.historialPrevio });
   } catch (e) {
-    if (e instanceof ErrorApi && e.status === 409) { if (estado.salir) estado.encabezado?.prepend(estado.salir); return; } // ya estaba cerrado: nunca se cobra dos veces
+    if (e instanceof ErrorApi && e.status === 409) { avisoDeCierre(raiz, estado); return; } // H-2: ya estaba cerrado (nunca se cobra dos veces)
     console.warn('reto_l1: no se pudo cerrar el intento', e);
     pintarErrorFlujo(raiz, e instanceof ErrorApi ? e.mensaje : 'No se pudo enviar tu reto.');
   }

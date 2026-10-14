@@ -18,6 +18,11 @@ export const textosPractica = {
     sinConexion: 'No pudimos abrir tu reto: la conexión falló. Lo que ya respondiste sigue guardado.',
     reintentar: 'Reintentar',
     noSePudoAbrir: 'No se pudo abrir tu reto. Sal y vuelve a entrar en un momento.',
+    // H-2: el servidor ya no admite nada en este intento (409/404). Textos propios: el del servidor viene en inglés.
+    yaCerrado: 'Este reto ya quedó cerrado, quizá desde otra pestaña o en otro equipo. Tu resultado quedó guardado.',
+    noSeCerro: 'Este reto no se pudo cerrar ahora. Lo que respondiste sigue guardado.',
+    noDisponible: 'Esta pregunta ya no está disponible en este reto.',
+    aRetos: 'Volver a Retos',
     /** Los rótulos van en el idioma de la explicación (dictamen 04 §1.5: español en A1 y A2, inglés sencillo desde B1). */
     rotulos: {
       es: { oracion: 'Así queda', regla: 'La regla', porQue: 'Por qué no la tuya', ejemplo: 'Otro ejemplo' },

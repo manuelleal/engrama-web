@@ -177,6 +177,18 @@ export const TRAMPOSOS = {
     descripcion: 'U86 (H-1): con el intento ilegible por la red, el reto cae en silencio al flujo viejo en vez de ofrecer Reintentar',
     cambios: [['    pintarSinConexion(raiz, datos);\n    return true;\n', '    return false;\n']],
   },
+  x_l1_finish_409_colgado: {
+    archivo: 'src/vistas/estudiante/reto_l1.js', prueba: CORR, tests: ['U87: un 409 en /finish'],
+    descripcion: 'U87 (H-2): un 409 en /finish solo devuelve la salida: el botón queda en "Enviando…" y Drako pensando para siempre',
+    cambios: [['    if (e instanceof ErrorApi && e.status === 409) { avisoDeCierre(raiz, estado); return; } // H-2: ya estaba cerrado (nunca se cobra dos veces)',
+      '    if (e instanceof ErrorApi && e.status === 409) { if (estado.salir) estado.encabezado?.prepend(estado.salir); return; }']],
+  },
+  x_l1_comprobar_409_crudo: {
+    archivo: 'src/vistas/estudiante/reto_l1.js', prueba: CORR, tests: ['U87: un 409 al Comprobar'],
+    descripcion: 'U87 (H-2): un 409 o un 404 al Comprobar pinta el mensaje crudo del servidor, en inglés ("Attempt already completed or abandoned")',
+    cambios: [['    if (e instanceof ErrorApi && e.status === 409) { avisoDeCierre(raiz, estado); return; } // H-2: el intento ya no admite respuestas\n    if (e instanceof ErrorApi && e.status === 404) { avisoDeCierre(raiz, estado, T.noDisponible); return; }',
+      '    if (e instanceof ErrorApi && [404, 409].includes(e.status)) { pintarErrorFlujo(raiz, e.mensaje); return; }']],
+  },
   x_l1_409_mudo: {
     archivo: 'src/vistas/estudiante/reto_flujo.js', prueba: L1, tests: ['U79: si /submit responde 409 intento_con_respuestas'],
     descripcion: 'U79: el 409 intento_con_respuestas se calla: el estudiante queda en un reto que no se puede enviar',

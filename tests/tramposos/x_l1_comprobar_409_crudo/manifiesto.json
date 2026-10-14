@@ -1,0 +1,16 @@
+{
+  "descripcion": "U87 (H-2): un 409 o un 404 al Comprobar pinta el mensaje crudo del servidor, en inglés (\"Attempt already completed or abandoned\")",
+  "archivos": {
+    "src/vistas/estudiante/reto_l1.js": "reto_l1.js"
+  },
+  "comando": [
+    "node",
+    "--test",
+    "--test-reporter=tap",
+    "tests/unit/practica_correcciones.test.mjs"
+  ],
+  "espera_codigo_no_cero": true,
+  "espera_fallan_tests": [
+    "U87: un 409 al Comprobar"
+  ]
+}
