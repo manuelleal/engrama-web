@@ -205,6 +205,16 @@ export const TRAMPOSOS = {
     cambios: [['  estado.enviada = label; estado.enVuelo = true; quietas(estado.opciones); // H-6: lo que se marca después es lo que se envió\n', ''],
       ['estado.respuesta.answer ?? estado.enviada : estado.elegida;', 'estado.respuesta.answer ?? estado.elegida : estado.elegida;']],
   },
+  x_fuga_campos_nuevos: {
+    archivo: 'src/api/retos.js', prueba: CORR, tests: ['U89: el filtro de la clave quita y cuenta los 6 campos'],
+    descripcion: 'U89 (H-7): el filtro de la clave es el de antes: la oración correcta, las aceptadas, la tolerancia, el "por qué" y las pistas pasan',
+    cambios: [["'explicacion', 'explanation', 'oracion_correcta', 'accepted_answers', 'tolerance', 'tolerancia', 'por_opcion', 'pistas'];", "'explicacion', 'explanation'];"]],
+  },
+  x_practica_loguea_payload: {
+    archivo: 'src/api/practica.js', prueba: CORR, tests: ['U89: con una respuesta mal formada'],
+    descripcion: 'U89 (H-7): la tanda mal formada se vuelca entera en la consola (con la clave, si la trae)',
+    cambios: [["console.warn('api/practica: la tanda llegó mal formada; Inicio queda como antes', camposDe(datos));", "console.warn('api/practica: la tanda llegó mal formada; Inicio queda como antes', datos);"]],
+  },
   x_sin_eol_lf: {
     archivo: '.gitattributes', copia: 'gitattributes.txt', prueba: 'tests/unit/sw_peso.test.mjs', tests: ['U59: cada archivo de PRECARGA sale de git archive'],
     descripcion: 'U59 (H-5): sin `*.js text eol=lf`, git archive con core.autocrlf=true sirve el shell en CRLF (más pesado que lo que mide U59) y nada lo ve',

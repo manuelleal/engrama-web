@@ -24,6 +24,8 @@ export class ErrorTransitorio extends Error {
 const esObjeto = (/** @type {unknown} */ v) => typeof v === 'object' && v !== null && !Array.isArray(v);
 const esTexto = (/** @type {unknown} */ v) => typeof v === 'string';
 const textoONulo = (/** @type {unknown} */ v) => v === null || v === undefined || typeof v === 'string';
+/** H-7: lo que se puede escribir en la consola de una respuesta mal formada: los NOMBRES de sus campos, nunca el cuerpo (podría traer la clave). */
+const camposDe = (/** @type {unknown} */ v) => (esObjeto(v) ? Object.keys(/** @type {object} */ (v)) : Array.isArray(v) ? 'una lista' : typeof v);
 
 /**
  * ¿Una respuesta de `/answers` (RespuestaDeIntentoOut) trae lo que la banda usa, con su tipo? Pura; nunca lanza.
@@ -100,7 +102,7 @@ export async function retomarIntento(attemptId, { token, tenantId }) {
     return null;
   }
   if (estadoValido(datos)) return datos;
-  console.warn('api/practica: el estado del intento llegó mal formado; se juega como antes', datos);
+  console.warn('api/practica: el estado del intento llegó mal formado; se juega como antes', camposDe(datos));
   registrar(RUTA_ANSWERS, 'mal_formada');
   return null;
 }
@@ -155,7 +157,7 @@ export async function verTanda({ token, tenantId }) {
   try {
     const datos = await leerConReintento('/challenges/tanda', { token, tenantId });
     if (tandaValida(datos)) return tandaSinClave(datos);
-    console.warn('api/practica: la tanda llegó mal formada; Inicio queda como antes', datos);
+    console.warn('api/practica: la tanda llegó mal formada; Inicio queda como antes', camposDe(datos));
     registrar('/challenges/tanda', 'mal_formada');
   } catch (e) {
     if (e instanceof ErrorApi && SIN_LA_RUTA.has(e.status)) return { fecha: '', practica: { nivel: 'A2', con_nivel_de_set: false }, tanda: null, tandas_hoy: 0, tope_al_dia: 2, puede_pedir_otra: true, listo_por_hoy: false, sin_contenido_nuevo: false };
@@ -201,7 +203,7 @@ export async function leerRacha({ token, tenantId }) {
   try {
     const datos = await leerConReintento('/core/racha', { token, tenantId });
     if (rachaValida(datos)) return datos;
-    console.warn('api/practica: la racha llegó mal formada; Inicio queda como antes', datos);
+    console.warn('api/practica: la racha llegó mal formada; Inicio queda como antes', camposDe(datos));
     registrar('/core/racha', 'mal_formada');
   } catch (e) {
     registrar('/core/racha', claseDeError(e), e);

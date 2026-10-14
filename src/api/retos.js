@@ -7,7 +7,8 @@
 // justamente esto con un mock roto.
 import { pedirJson } from './cliente.js';
 
-const CAMPOS_PROHIBIDOS = ['correct_answer', 'clave', 'aceptadas', 'explicacion', 'explanation'];
+// H-7: y lo que L1 (f7f7aeb) trae solo DESPUÉS de responder (oración, aceptadas y su tolerancia, "por qué no la tuya", pistas).
+const CAMPOS_PROHIBIDOS = ['correct_answer', 'clave', 'aceptadas', 'explicacion', 'explanation', 'oracion_correcta', 'accepted_answers', 'tolerance', 'tolerancia', 'por_opcion', 'pistas'];
 
 let fugasDetectadas = 0;
 

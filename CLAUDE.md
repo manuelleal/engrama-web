@@ -45,8 +45,10 @@ a `vendor/`, pero V1/V4 y los tamaños siguen sobre `src/`. Cualquier librería 
    ni `postgres://` (decisión 005). El único origen externo permitido es
    Supabase Auth (`/auth/v1/*`), y solo en el hito 3.
 3. **La clave nunca se muestra antes de responder.** `api/retos.js` descarta
-   `correct_answer`/`clave`/`aceptadas`/`explicacion`/`explanation` si llegan
-   antes de tiempo y registra `fuga_de_clave`.
+   `correct_answer`/`clave`/`aceptadas`/`explicacion`/`explanation` (y, desde H-7,
+   `oracion_correcta`/`accepted_answers`/`tolerance`/`tolerancia`/`por_opcion`/`pistas`)
+   si llegan antes de tiempo y registra `fuga_de_clave`. De una respuesta mal
+   formada, la consola recibe solo los nombres de sus campos, nunca el cuerpo.
 4. Opción múltiple: se envía la `label` ("A", "B"…), nunca el `value`.
 5. Una sola acción por toque: todo botón que escribe queda bloqueado mientras
    su petición vuela.

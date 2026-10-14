@@ -1,0 +1,16 @@
+{
+  "descripcion": "U89 (H-7): el filtro de la clave es el de antes: la oración correcta, las aceptadas, la tolerancia, el \"por qué\" y las pistas pasan",
+  "archivos": {
+    "src/api/retos.js": "retos.js"
+  },
+  "comando": [
+    "node",
+    "--test",
+    "--test-reporter=tap",
+    "tests/unit/practica_correcciones.test.mjs"
+  ],
+  "espera_codigo_no_cero": true,
+  "espera_fallan_tests": [
+    "U89: el filtro de la clave quita y cuenta los 6 campos"
+  ]
+}

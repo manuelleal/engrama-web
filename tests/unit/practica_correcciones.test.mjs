@@ -224,3 +224,35 @@ test('U88: en el repaso, con "Comprobar" en vuelo no se reelige, y tras responde
     assert.deepEqual(cuerpos, [{ question_id: 'p1', answer: 'A' }]);
   } finally { cerrar(); }
 });
+
+// ---------- U89 (H-7): el filtro de la clave cubre los campos nuevos y la consola nunca recibe el cuerpo ----------
+// Tramposos: x_fuga_campos_nuevos (api/retos.js) y x_practica_loguea_payload (api/practica.js).
+
+test('U89: el filtro de la clave quita y cuenta los 6 campos que L1 trae solo después de responder (en el reto y en cada pregunta)', async () => {
+  const { filtrarFugaDeClave } = await import('../../src/api/retos.js');
+  const NUEVOS = ['oracion_correcta', 'accepted_answers', 'tolerance', 'tolerancia', 'por_opcion', 'pistas'];
+  const envenenado = { id: 'c1', title: 'Reto', oracion_correcta: 'She goes.', pistas: { q1: 'x' },
+    questions: [{ id: 'q1', question_text: '?', options_json: [], accepted_answers: ['goes'], tolerance: 1, tolerancia: 1, por_opcion: 'porque' }] };
+  const { limpio, fugas } = filtrarFugaDeClave(envenenado);
+  assert.deepEqual([...fugas].sort(), [...NUEVOS].sort());
+  for (const c of NUEVOS) assert.ok(!(c in limpio) && !(c in /** @type {any} */ (limpio).questions[0]), `${c} quedó`);
+  assert.equal(/** @type {any} */ (limpio).title, 'Reto', 'el resto se conserva');
+});
+
+test('U89: con una respuesta mal formada (la tanda, el intento o la racha) la consola recibe solo los NOMBRES de sus campos, nunca el cuerpo', async () => {
+  const SECRETO = 'CLAVE-SECRETA-B';
+  const malas = {
+    'GET /challenges/tanda': json(200, { practica: 'x', tanda: { repaso: [{ pregunta: { id: 'p', correct_answer: SECRETO } }] } }),
+    'GET /challenges/attempts/int-1/answers': json(200, { status: 'in_progress', respondidas: [{ correct_answer: SECRETO }] }),
+    'GET /core/racha': json(200, { racha_semanas: 'dos', nota: SECRETO }),
+  };
+  const entorno = entornoDeFotos(malas);
+  try {
+    const { valor, escrito } = await conConsola(async () => [await verTanda({ token: 't' }), await retomarIntento('int-1', { token: 't' }), await leerRacha({ token: 't' })]);
+    assert.deepEqual(valor, [null, null, null], 'mal formadas: lo de siempre');
+    const todo = JSON.stringify(escrito);
+    assert.ok(escrito.length > 0, 'algo se registró');
+    assert.ok(!todo.includes(SECRETO), `la consola recibió el cuerpo: ${todo.slice(0, 200)}`);
+    assert.ok(todo.includes('["practica","tanda"]'), 'y dice los nombres de los campos de la tanda');
+  } finally { entorno.restaurar(); }
+});
