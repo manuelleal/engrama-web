@@ -1,0 +1,766 @@
+{
+  "id": "a2-u01",
+  "nivel": "A2",
+  "titulo": "Taking the Bus",
+  "situacion": "Fabián writes a blog guide for new UIS students on Metrolínea and on intercity buses from the Bucaramanga terminal to San Gil.",
+  "puedo_hacer": [
+    "I can compare two ways of travelling around Bucaramanga (Metrolínea vs. an intercity bus).",
+    "I can say what I have to do and don't have to do to take a bus.",
+    "I can understand a simple station announcement and buy a bus ticket.",
+    "I can give a friend advice about buses using comparatives."
+  ],
+  "contenido": {
+    "lectura": {
+      "genero": "blog (guía para estudiantes nuevos)",
+      "texto": "GETTING AROUND BUCARAMANGA: A GUIDE FOR NEW STUDENTS\nBy Fabián, second-year Systems Engineering student\n\nWelcome to the UIS! Here is my advice about buses in Bucaramanga.\n\nFor daily trips, Metrolínea is faster than a regular bus, and it's cheaper too. You have to buy a card before you get on, and you have to touch it at the station. You don't have to pay in cash. Try to avoid rush hour: the buses are more crowded between 6:00 and 7:00 a.m., and it's hard to find a seat.\n\nFor trips outside the city, go to the bus terminal downtown. Buses to San Gil leave every 30 minutes on this route, from different platforms. A direct bus is better than one with stops, but it's also more expensive. Buy your ticket early and check the platform number on the screen.\n\nThe driver is usually on time, but he won't wait if you're late, so don't miss your bus! Tell the driver where you want to get off. Passengers can always ask the driver for the fare before they get on. Have a safe trip!",
+      "palabras": 183
+    },
+    "escucha": {
+      "hablantes": [
+        "Fabián",
+        "Rosa"
+      ],
+      "guion": "Attention, passengers: the bus to San Gil is now boarding at platform four. Please have your ticket ready and take a seat quickly.\nFabián: Good morning. One ticket to San Gil, please.\nRosa: Sure. Do you want the direct bus or the one with stops?\nFabián: The direct one, please. Is it more expensive?\nRosa: A little. It's twenty-six thousand pesos. The one with stops is twenty-two thousand.\nFabián: OK, I'll take the direct bus. What time does it leave?\nRosa: At 9:30, from platform four. It's usually on time. You don't have to wait in line again — just show your ticket to the driver, and tell him where you want to get off.\nFabián: Perfect, thanks a lot!\nRosa: Have a safe trip!",
+      "segundos_estimados": 61
+    },
+    "vocabulario": [
+      {
+        "en": "ticket",
+        "def_en": "a small piece of paper or card that shows you paid for a bus trip",
+        "es": "un tiquete (boleto)",
+        "ejemplo": "One ticket to San Gil, please."
+      },
+      {
+        "en": "fare",
+        "def_en": "the price you pay for a bus or train trip",
+        "es": "la tarifa (el pasaje)",
+        "ejemplo": "Passengers can always ask the driver for the fare."
+      },
+      {
+        "en": "passenger",
+        "def_en": "a person who travels on a bus but doesn't drive it",
+        "es": "un pasajero / una pasajera",
+        "ejemplo": "Attention, passengers: the bus to San Gil is now boarding."
+      },
+      {
+        "en": "driver",
+        "def_en": "the person who drives the bus",
+        "es": "el conductor / la conductora",
+        "ejemplo": "The driver is usually on time."
+      },
+      {
+        "en": "seat",
+        "def_en": "the place where you sit on the bus",
+        "es": "el asiento",
+        "ejemplo": "it's hard to find a seat."
+      },
+      {
+        "en": "get on",
+        "def_en": "to enter a bus or train",
+        "es": "subirse (al bus)",
+        "ejemplo": "you have to buy a card before you get on."
+      },
+      {
+        "en": "get off",
+        "def_en": "to leave a bus or train",
+        "es": "bajarse (del bus)",
+        "ejemplo": "Tell the driver where you want to get off."
+      },
+      {
+        "en": "miss (the bus)",
+        "def_en": "to arrive too late and not catch the bus",
+        "es": "perder el bus",
+        "ejemplo": "so don't miss your bus!"
+      },
+      {
+        "en": "crowded",
+        "def_en": "full of people",
+        "es": "lleno de gente",
+        "ejemplo": "the buses are more crowded between 6:00 and 7:00 a.m."
+      },
+      {
+        "en": "on time",
+        "def_en": "not late; at the correct time",
+        "es": "a tiempo",
+        "ejemplo": "The driver is usually on time."
+      },
+      {
+        "en": "platform",
+        "def_en": "the place in a bus terminal where a bus leaves from",
+        "es": "el andén",
+        "ejemplo": "check the platform number on the screen."
+      },
+      {
+        "en": "direct (bus)",
+        "def_en": "a bus that doesn't stop in other towns on the way",
+        "es": "directo (sin paradas)",
+        "ejemplo": "A direct bus is better than one with stops."
+      },
+      {
+        "en": "rush hour",
+        "def_en": "the time of day when the roads are full of cars",
+        "es": "la hora pico",
+        "ejemplo": "Try to avoid rush hour."
+      },
+      {
+        "en": "terminal",
+        "def_en": "the building where intercity buses leave from",
+        "es": "la terminal (de transportes)",
+        "ejemplo": "go to the bus terminal downtown."
+      },
+      {
+        "en": "route",
+        "def_en": "the roads a bus follows between two places",
+        "es": "la ruta",
+        "ejemplo": "Buses to San Gil leave every 30 minutes on this route."
+      }
+    ],
+    "gramatica": [
+      {
+        "estructura": "comparativos (-er / more ... than; better, worse)",
+        "regla": "Adjetivos cortos + -er + than; adjetivos largos + more + than; good/bad son irregulares (better/worse).",
+        "ejemplos": [
+          "Metrolínea is faster than a regular bus.",
+          "A direct bus is better than one with stops.",
+          "it's also more expensive."
+        ],
+        "errores_tipicos": [
+          "Metrolinea is more fast than a bus. (adjetivo corto con more en vez de -er)",
+          "The direct bus is gooder. (good es irregular: better, no -er)",
+          "It's more cheaper. (doble comparativo: more + -er a la vez)"
+        ]
+      },
+      {
+        "estructura": "have to / don't have to",
+        "regla": "Have to / has to = obligación; don't have to / doesn't have to = no es necesario (no prohibido).",
+        "ejemplos": [
+          "You have to buy a card before you get on.",
+          "You don't have to pay in cash.",
+          "You don't have to wait in line again."
+        ],
+        "errores_tipicos": [
+          "You have not to pay in cash. (calco de 'no tienes que': falta el auxiliar do)",
+          "She have to show her ticket. (falta la -s: has to)",
+          "You must to buy a ticket. (must no lleva to)"
+        ]
+      }
+    ],
+    "produccion": {
+      "speaking": {
+        "tarea": "Recomienda a un compañero nuevo la mejor forma de llegar a la universidad, comparando dos opciones (por ejemplo, Metrolínea frente a un bus directo).",
+        "criterios": [
+          "Usa al menos 2 comparativos (-er / more... than)",
+          "Usa have to o don't have to al menos una vez",
+          "Compara dos opciones de transporte con datos concretos",
+          "Habla con oraciones completas y se le entiende bien"
+        ]
+      },
+      "writing": {
+        "tarea": "Escribe un comentario de blog (80-100 palabras) con 3 consejos de transporte para un estudiante nuevo.",
+        "criterios": [
+          "3 consejos claros y ordenados",
+          "Usa al menos 2 comparativos",
+          "Usa have to o don't have to correctamente",
+          "80-100 palabras"
+        ]
+      }
+    }
+  },
+  "practicas": [
+    {
+      "familia": "a2-u01-f01",
+      "estructura": "comparativos: adjetivo corto + -er + than — eje: el enunciado da los datos y decide qué comparativo es verdad; atractor fijo: 'more + adjetivo corto' (calco de 'más rápido / más temprano / más ocupada'), derivado siempre de un distractor y nunca de la clave; tres de las cuatro opciones son comparativos bien formados; claves: cheaper, slower, shorter",
+      "items": [
+        {
+          "id": "a2-u01-f01-1",
+          "rol": "original",
+          "formato": "piensalo",
+          "enunciado": "A Metrolínea trip to the UIS costs 3,000 pesos, and a taxi costs 12,000. Both take 20 minutes. Metrolínea is ___ than a taxi.",
+          "opciones": {
+            "A": "faster",
+            "B": "more fast",
+            "C": "cheaper",
+            "D": "more expensive"
+          },
+          "clave": "C",
+          "calco": "B",
+          "explicacion": {
+            "regla": "Adjetivo de una sílaba o de dos con -y: -er + than.",
+            "por_opcion": {
+              "A": "Faster compara la velocidad, pero los dos tardan 20 minutos. Lo que cambia es el precio: cheaper.",
+              "B": "Tienta por el calco de 'más rápido'. Fast es corto: faster. Y aquí cambia el precio, no la velocidad.",
+              "D": "More expensive está bien formado, pero Metrolínea cuesta menos que el taxi: cheaper."
+            },
+            "ejemplo": "The 5:45 bus is faster than the 6:30 bus.",
+            "idioma": "es"
+          },
+          "pool": "practice",
+          "segundos": 25,
+          "generado_por": "creador-opus@F8-a2-u01",
+          "revisado_por": null
+        },
+        {
+          "id": "a2-u01-f01-2",
+          "rol": "gemela",
+          "formato": "piensalo",
+          "enunciado": "The 6:30 bus gets to the UIS in 25 minutes on Saturdays, but in 45 minutes on Mondays, at rush hour. On Mondays it is ___ than on Saturdays.",
+          "opciones": {
+            "A": "slower",
+            "B": "earlier",
+            "C": "more early",
+            "D": "faster"
+          },
+          "clave": "A",
+          "calco": "C",
+          "explicacion": {
+            "regla": "Adjetivo de una sílaba o de dos con -y: -er + than.",
+            "por_opcion": {
+              "B": "Earlier habla de la hora, pero es el mismo bus de las 6:30. El lunes tarda más: slower.",
+              "C": "Tienta por el calco de 'más temprano'. Early termina en -y: earlier. Y aquí tarda más: slower.",
+              "D": "Faster es lo contrario: el lunes tarda 45 minutos, no 25. Tarda más: slower."
+            },
+            "ejemplo": "Metrolínea is cheaper than a taxi.",
+            "idioma": "es"
+          },
+          "pool": "practice",
+          "segundos": 25,
+          "generado_por": "creador-opus@F8-a2-u01",
+          "revisado_por": null
+        },
+        {
+          "id": "a2-u01-f01-3",
+          "rol": "repaso",
+          "formato": "piensalo",
+          "enunciado": "At the terminal, there are four people in line at window two and twelve at window five. The line at window two is ___ than the line at window five.",
+          "opciones": {
+            "A": "more busy",
+            "B": "busier",
+            "C": "longer",
+            "D": "shorter"
+          },
+          "clave": "D",
+          "calco": "A",
+          "explicacion": {
+            "regla": "Adjetivo de una sílaba o de dos con -y: -er + than.",
+            "por_opcion": {
+              "A": "Tienta por el calco de 'más ocupada'. Busy termina en -y: busier. Y la ventanilla dos tiene menos gente.",
+              "B": "Busier está bien formado, pero en la ventanilla dos hay menos gente, no más: shorter.",
+              "C": "Longer es lo contrario: cuatro personas son menos que doce. La fila es shorter."
+            },
+            "ejemplo": "The direct bus is faster than the bus with stops.",
+            "idioma": "es"
+          },
+          "pool": "practice",
+          "segundos": 25,
+          "generado_por": "creador-opus@F8-a2-u01",
+          "revisado_por": null
+        }
+      ]
+    },
+    {
+      "familia": "a2-u01-f02",
+      "estructura": "have to / don't have to — eje: el contexto decide si es necesario (have/has to) o no es necesario (don't/doesn't have to); el sujeto fija la persona; atractor fijo: la concordancia de persona del hispanohablante ('he don't have to', 'they has to'), presente en los tres ítems; contrapeso dentro de la familia (§15.49B): en el original la clave es la afirmativa y la meta (don't have to) es el distractor; sin calco (4 formas reales); claves: have to buy, doesn't have to go, don't have to wait",
+      "items": [
+        {
+          "id": "a2-u01-f02-1",
+          "rol": "original",
+          "formato": "piensalo",
+          "enunciado": "Drivers on the buses to San Gil don't sell tickets. So at the terminal, passengers ___ one at the window before they get on.",
+          "opciones": {
+            "A": "doesn't have to buy",
+            "B": "have to buy",
+            "C": "don't have to buy",
+            "D": "has to buy"
+          },
+          "clave": "B",
+          "explicacion": {
+            "regla": "Have/has to = es necesario. Don't/doesn't have to = no es necesario.",
+            "por_opcion": {
+              "A": "Doesn't have to es 'no es necesario' y va con he/she. Aquí sí es necesario.",
+              "C": "Don't have to es 'no es necesario', pero el conductor no vende tiquetes: sí es necesario comprarlo.",
+              "D": "Tienta porque 'tiene que' suena a has. Has to va con he/she/it; passengers es plural: have to."
+            },
+            "ejemplo": "Passengers have to show their ticket to the driver.",
+            "idioma": "es"
+          },
+          "pool": "practice",
+          "segundos": 25,
+          "generado_por": "creador-opus@F8-a2-u01",
+          "revisado_por": null
+        },
+        {
+          "id": "a2-u01-f02-2",
+          "rol": "gemela",
+          "formato": "piensalo",
+          "enunciado": "Fabián already has his ticket in his hand, so he ___ to the window again.",
+          "opciones": {
+            "A": "have to go",
+            "B": "don't have to go",
+            "C": "has to go",
+            "D": "doesn't have to go"
+          },
+          "clave": "D",
+          "explicacion": {
+            "regla": "Have/has to = es necesario. Don't/doesn't have to = no es necesario.",
+            "por_opcion": {
+              "A": "Have to es 'es necesario' y va con they. Fabián ya tiene el tiquete: doesn't have to.",
+              "B": "Tienta porque 'no tiene que' se dice igual para todos. Con he (Fabián) va doesn't, no don't.",
+              "C": "Has to es 'es necesario'. Fabián ya tiene el tiquete en la mano: doesn't have to."
+            },
+            "ejemplo": "Dayana doesn't have to buy a new card this month.",
+            "idioma": "es"
+          },
+          "pool": "practice",
+          "segundos": 25,
+          "generado_por": "creador-opus@F8-a2-u01",
+          "revisado_por": null
+        },
+        {
+          "id": "a2-u01-f02-3",
+          "rol": "repaso",
+          "formato": "piensalo",
+          "enunciado": "Ramiro and Dayana have 30,000 pesos on their Metrolínea cards, so they ___ in line to recharge them today.",
+          "opciones": {
+            "A": "don't have to wait",
+            "B": "has to wait",
+            "C": "doesn't have to wait",
+            "D": "have to wait"
+          },
+          "clave": "A",
+          "explicacion": {
+            "regla": "Have/has to = es necesario. Don't/doesn't have to = no es necesario.",
+            "por_opcion": {
+              "B": "Has to va con he/she y dice 'es necesario'. Sus tarjetas ya tienen dinero: don't have to.",
+              "C": "Tienta porque 'no tienen que' se dice igual para todos. Ramiro and Dayana son they: don't.",
+              "D": "Have to dice 'es necesario', pero sus tarjetas ya tienen dinero: don't have to."
+            },
+            "ejemplo": "We don't have to change buses: this one is direct.",
+            "idioma": "es"
+          },
+          "pool": "practice",
+          "segundos": 25,
+          "generado_por": "creador-opus@F8-a2-u01",
+          "revisado_por": null
+        }
+      ]
+    },
+    {
+      "familia": "a2-u01-f03",
+      "estructura": "vocab: public transport (grupo 1: fare, passenger, route) — las 4 opciones son sustantivos de la unidad; la clave nunca es la palabra prototípica (ticket, driver, seat quedan de distractores)",
+      "items": [
+        {
+          "id": "a2-u01-f03-1",
+          "rol": "original",
+          "formato": "piensalo",
+          "enunciado": "At the window, passengers pay the ___: 22,000 pesos for the bus with stops to San Gil.",
+          "opciones": {
+            "A": "seat",
+            "B": "fare",
+            "C": "terminal",
+            "D": "platform"
+          },
+          "clave": "B",
+          "explicacion": {
+            "regla": "Fare = la tarifa, el precio del pasaje.",
+            "por_opcion": {
+              "A": "Seat es el asiento; no es un precio. Los 22.000 pesos son la tarifa: fare.",
+              "C": "Terminal es el edificio de los buses; no es un precio que se paga: fare.",
+              "D": "Platform es el andén de donde sale el bus; no es un precio: fare."
+            },
+            "ejemplo": "The fare on Metrolínea is 3,000 pesos.",
+            "idioma": "es"
+          },
+          "pool": "practice",
+          "segundos": 20,
+          "generado_por": "creador-opus@F8-a2-u01",
+          "revisado_por": null
+        },
+        {
+          "id": "a2-u01-f03-2",
+          "rol": "gemela",
+          "formato": "piensalo",
+          "enunciado": "Mr. Pinzón drives the 9:30 bus to San Gil. Today 30 ___ get on, and each one shows him a ticket.",
+          "opciones": {
+            "A": "drivers",
+            "B": "platforms",
+            "C": "passengers",
+            "D": "stations"
+          },
+          "clave": "C",
+          "explicacion": {
+            "regla": "Passenger = pasajero: viaja en el bus, pero no lo maneja.",
+            "por_opcion": {
+              "A": "Drivers son conductores. El conductor es Mr. Pinzón, y los 30 le muestran un tiquete: passengers.",
+              "B": "Platforms son andenes: lugares, no personas. Un andén no se sube al bus: passengers.",
+              "D": "Stations son estaciones: lugares, no personas. No se suben al bus: passengers."
+            },
+            "ejemplo": "Every passenger has a seat on the direct bus.",
+            "idioma": "es"
+          },
+          "pool": "practice",
+          "segundos": 20,
+          "generado_por": "creador-opus@F8-a2-u01",
+          "revisado_por": null
+        },
+        {
+          "id": "a2-u01-f03-3",
+          "rol": "repaso",
+          "formato": "piensalo",
+          "enunciado": "The direct bus and the bus with stops leave from different platforms, but they use the same ___: the same roads to San Gil.",
+          "opciones": {
+            "A": "route",
+            "B": "ticket",
+            "C": "card",
+            "D": "driver"
+          },
+          "clave": "A",
+          "explicacion": {
+            "regla": "Route = la ruta, el camino que sigue el bus.",
+            "por_opcion": {
+              "B": "Ticket es el tiquete que muestras al subir; no son las carreteras: route.",
+              "C": "Card es la tarjeta para pagar; no son las carreteras: route.",
+              "D": "Driver es el conductor, una persona; no son las carreteras: route."
+            },
+            "ejemplo": "Metrolínea has a route to the UIS.",
+            "idioma": "es"
+          },
+          "pool": "practice",
+          "segundos": 20,
+          "generado_por": "creador-opus@F8-a2-u01",
+          "revisado_por": null
+        }
+      ]
+    },
+    {
+      "familia": "a2-u01-f04",
+      "estructura": "vocab: public transport (grupo 2: get off, miss, get on) — las 4 opciones son siempre los mismos verbos de la unidad (get on, get off, miss, wait for) en otra forma (base, -s, -ing); la situación decide y la clave rota",
+      "items": [
+        {
+          "id": "a2-u01-f04-1",
+          "rol": "original",
+          "formato": "piensalo",
+          "enunciado": "Dayana's aunt lives in a small town before San Gil. On the bus with stops, Dayana tells the driver, 'I'd like to ___ there, please.'",
+          "opciones": {
+            "A": "get on",
+            "B": "wait for",
+            "C": "get off",
+            "D": "miss"
+          },
+          "clave": "C",
+          "explicacion": {
+            "regla": "Get off = bajarse del bus; get on = subirse.",
+            "por_opcion": {
+              "A": "Tienta porque get on se parece. Dayana ya va en el bus: quiere bajarse, get off.",
+              "B": "Wait for es esperar algo y necesita objeto (wait for the bus). Ella quiere bajarse: get off.",
+              "D": "Miss es perder el bus. Dayana ya va en el bus: quiere bajarse, get off."
+            },
+            "ejemplo": "Fabián gets off at the UIS station.",
+            "idioma": "es"
+          },
+          "pool": "practice",
+          "segundos": 20,
+          "generado_por": "creador-opus@F8-a2-u01",
+          "revisado_por": null
+        },
+        {
+          "id": "a2-u01-f04-2",
+          "rol": "gemela",
+          "formato": "piensalo",
+          "enunciado": "The 9:30 bus to San Gil leaves on time, but Ramiro gets to the terminal at 9:40. He ___ it, so he takes the 10:00 bus.",
+          "opciones": {
+            "A": "gets on",
+            "B": "misses",
+            "C": "waits for",
+            "D": "gets off"
+          },
+          "clave": "B",
+          "explicacion": {
+            "regla": "Miss the bus = perder el bus: llegas y ya se fue.",
+            "por_opcion": {
+              "A": "Get on es subirse, pero el bus salió a las 9:30 y Ramiro llegó a las 9:40: misses.",
+              "C": "Wait for es esperar, pero ese bus ya salió; espera el de las 10:00: misses.",
+              "D": "Get off es bajarse; Ramiro nunca se subió a ese bus: misses."
+            },
+            "ejemplo": "Ramiro never misses the 5:45 bus.",
+            "idioma": "es"
+          },
+          "pool": "practice",
+          "segundos": 20,
+          "generado_por": "creador-opus@F8-a2-u01",
+          "revisado_por": null
+        },
+        {
+          "id": "a2-u01-f04-3",
+          "rol": "repaso",
+          "formato": "piensalo",
+          "enunciado": "Look! Ramiro is ___ the bus through the front door. Now he's showing his ticket to the driver and looking for a seat.",
+          "opciones": {
+            "A": "waiting for",
+            "B": "missing",
+            "C": "getting off",
+            "D": "getting on"
+          },
+          "clave": "D",
+          "explicacion": {
+            "regla": "Get on = subirse al bus; get off = bajarse.",
+            "por_opcion": {
+              "A": "Wait for es esperar afuera, pero ya le muestra el tiquete al conductor y busca asiento: getting on.",
+              "B": "Miss es perder el bus, pero Ramiro está entrando y busca asiento: getting on.",
+              "C": "Tienta porque get off se parece. Si busca asiento, está subiendo: getting on."
+            },
+            "ejemplo": "Dayana gets on the bus at platform four.",
+            "idioma": "es"
+          },
+          "pool": "practice",
+          "segundos": 20,
+          "generado_por": "creador-opus@F8-a2-u01",
+          "revisado_por": null
+        }
+      ]
+    },
+    {
+      "familia": "a2-u01-f05",
+      "estructura": "comparativos sin -er: better, worse y more + adjetivo largo (contrapeso §15.32 de f01) — eje: el adjetivo entre paréntesis decide; atractor fijo: el -er sobregeneralizado ('gooder', 'badder', 'comfortabler'); claves: better, worse, more comfortable",
+      "items": [
+        {
+          "id": "a2-u01-f05-1",
+          "rol": "original",
+          "formato": "tu_palabra",
+          "enunciado": "(good) The 5:45 bus is ___ than the 6:30 bus for Fabián: it's faster, and there are free seats.",
+          "aceptadas": [
+            "better",
+            "much better",
+            "a lot better",
+            "a little better"
+          ],
+          "tolerancia": "exacta",
+          "explicacion": {
+            "regla": "Good: better; bad: worse; adjetivo largo: more + adjetivo + than.",
+            "ejemplo": "For Dayana, the bike is better than the bus on Sundays.",
+            "idioma": "es"
+          },
+          "pool": "practice",
+          "segundos": 40,
+          "generado_por": "creador-opus@F8-a2-u01",
+          "revisado_por": null
+        },
+        {
+          "id": "a2-u01-f05-2",
+          "rol": "gemela",
+          "formato": "tu_palabra",
+          "enunciado": "(bad) It's very hot on the bus with stops, and the windows don't open. The trip on it is ___ than the trip on the direct bus.",
+          "aceptadas": [
+            "worse",
+            "much worse",
+            "a lot worse",
+            "a little worse"
+          ],
+          "tolerancia": "exacta",
+          "explicacion": {
+            "regla": "Good: better; bad: worse; adjetivo largo: more + adjetivo + than.",
+            "ejemplo": "The traffic at 6:30 is worse than at 5:45.",
+            "idioma": "es"
+          },
+          "pool": "practice",
+          "segundos": 40,
+          "generado_por": "creador-opus@F8-a2-u01",
+          "revisado_por": null
+        },
+        {
+          "id": "a2-u01-f05-3",
+          "rol": "repaso",
+          "formato": "tu_palabra",
+          "enunciado": "(comfortable) The direct bus has big seats and lots of space for your legs. It's ___ than the bus with stops.",
+          "aceptadas": [
+            "more comfortable",
+            "much more comfortable"
+          ],
+          "tolerancia": "exacta",
+          "explicacion": {
+            "regla": "Good: better; bad: worse; adjetivo largo: more + adjetivo + than.",
+            "ejemplo": "The new buses are more modern than the old ones.",
+            "idioma": "es"
+          },
+          "pool": "practice",
+          "segundos": 40,
+          "generado_por": "creador-opus@F8-a2-u01",
+          "revisado_por": null
+        }
+      ]
+    },
+    {
+      "familia": "a2-u01-f06",
+      "estructura": "vocab: public transport (grupo 3: seat, crowded, on time)",
+      "items": [
+        {
+          "id": "a2-u01-f06-1",
+          "rol": "original",
+          "formato": "tu_palabra",
+          "enunciado": "There are 60 people on the Metrolínea bus, but it has only 40 s___ (asientos). Twenty people stand.",
+          "aceptadas": [
+            "seats"
+          ],
+          "tolerancia": "1_letra",
+          "explicacion": {
+            "regla": "Seat = asiento: el lugar donde te sientas en el bus.",
+            "ejemplo": "Fabián finds a seat near the window.",
+            "idioma": "es"
+          },
+          "pool": "practice",
+          "segundos": 40,
+          "generado_por": "creador-opus@F8-a2-u01",
+          "revisado_por": null
+        },
+        {
+          "id": "a2-u01-f06-2",
+          "rol": "gemela",
+          "formato": "tu_palabra",
+          "enunciado": "At 6:30 a.m., the Metrolínea bus is c___ (lleno de gente): Fabián can't move.",
+          "aceptadas": [
+            "crowded"
+          ],
+          "tolerancia": "1_letra",
+          "explicacion": {
+            "regla": "Crowded = lleno de gente.",
+            "ejemplo": "Metrolínea is more crowded at rush hour.",
+            "idioma": "es"
+          },
+          "pool": "practice",
+          "segundos": 40,
+          "generado_por": "creador-opus@F8-a2-u01",
+          "revisado_por": null
+        },
+        {
+          "id": "a2-u01-f06-3",
+          "rol": "repaso",
+          "formato": "tu_palabra",
+          "enunciado": "Mr. Pinzón's bus leaves at 9:30, not at 9:25 and not at 9:40. It's on t___ (a tiempo).",
+          "aceptadas": [
+            "time",
+            "on time"
+          ],
+          "tolerancia": "exacta",
+          "explicacion": {
+            "regla": "On time = a tiempo: ni antes ni después de la hora.",
+            "ejemplo": "The 5:45 bus is usually on time.",
+            "idioma": "es"
+          },
+          "pool": "practice",
+          "segundos": 40,
+          "generado_por": "creador-opus@F8-a2-u01",
+          "revisado_por": null
+        }
+      ]
+    },
+    {
+      "id": "a2-u01-c01",
+      "formato": "conecta",
+      "pool": "practice",
+      "segundos": 50,
+      "generado_por": "creador-opus@F8-a2-u01",
+      "revisado_por": null,
+      "pares": [
+        [
+          "ticket",
+          "a paper or card that shows you paid for your trip"
+        ],
+        [
+          "driver",
+          "the person who drives the bus"
+        ],
+        [
+          "platform",
+          "the numbered place where your bus leaves from"
+        ],
+        [
+          "terminal",
+          "the big building for buses to other cities"
+        ],
+        [
+          "rush hour",
+          "the time of day when the roads are full of cars"
+        ]
+      ],
+      "sobrante": "the money you pay for a trip"
+    },
+    {
+      "id": "a2-u01-l01",
+      "formato": "lo_dice",
+      "pool": "practice",
+      "segundos": 120,
+      "generado_por": "creador-opus@F8-a2-u01",
+      "revisado_por": null,
+      "texto": "Every Monday, Fabián takes Metrolínea to the UIS. He always recharges his card on Fridays, so he doesn't have to wait in line. The 6:30 a.m. bus is usually crowded, so he takes the 5:45 one. On weekends, Fabián sometimes visits his cousin in San Gil by intercity bus.",
+      "afirmaciones": [
+        {
+          "texto": "Fabián recharges his card on Fridays.",
+          "clave": "V",
+          "cita": "He always recharges his card on Fridays",
+          "explicacion": "Verdadero. El texto dice: 'He always recharges his card on Fridays'."
+        },
+        {
+          "texto": "Fabián takes the 6:15 bus on Mondays.",
+          "clave": "F",
+          "cita": "so he takes the 5:45 one",
+          "explicacion": "Falso. Toma el bus de las 5:45, no el de las 6:15: 'so he takes the 5:45 one'."
+        },
+        {
+          "texto": "Fabián's cousin is nineteen years old.",
+          "clave": "ND",
+          "cita": "Fabián sometimes visits his cousin in San Gil by intercity bus",
+          "explicacion": "No lo dice. El texto menciona a su primo o prima en San Gil, pero no dice cuántos años tiene."
+        }
+      ]
+    },
+    {
+      "id": "a2-u01-l02",
+      "formato": "lo_dice",
+      "pool": "practice",
+      "segundos": 120,
+      "generado_por": "creador-opus@F8-a2-u01",
+      "revisado_por": null,
+      "texto": "The first bus to San Gil leaves the Bucaramanga terminal at 4:30 a.m. Direct buses are more expensive than buses with stops, but they are faster. Rosa sells tickets at window three. She says the line at her window is longer on Fridays than on Mondays.",
+      "afirmaciones": [
+        {
+          "texto": "Rosa sells tickets at window five.",
+          "clave": "F",
+          "cita": "Rosa sells tickets at window three.",
+          "explicacion": "Falso. Rosa atiende en la ventanilla tres, no en la cinco: 'Rosa sells tickets at window three'."
+        },
+        {
+          "texto": "The first bus to San Gil leaves at 4:30 a.m.",
+          "clave": "V",
+          "cita": "The first bus to San Gil leaves the Bucaramanga terminal at 4:30 a.m.",
+          "explicacion": "Verdadero. El primer bus sale a las 4:30 a.m.: 'leaves the Bucaramanga terminal at 4:30 a.m.'."
+        },
+        {
+          "texto": "Rosa lives in San Gil.",
+          "clave": "ND",
+          "cita": "Rosa sells tickets at window three.",
+          "explicacion": "No lo dice. El texto cuenta que Rosa vende tiquetes, pero no dónde vive."
+        }
+      ]
+    },
+    {
+      "id": "a2-u01-o01",
+      "formato": "oido",
+      "pool": "practice",
+      "segundos": 37,
+      "generado_por": "creador-opus@F8-a2-u01",
+      "revisado_por": null,
+      "guion": "Attention, passengers. The direct bus to San Gil leaves from platform four in fifteen minutes. The bus with stops leaves from platform fourteen in forty minutes. Please have your ticket ready.",
+      "pregunta": "Which platform does the direct bus to San Gil leave from?",
+      "opciones": {
+        "A": "Fourteen",
+        "B": "Four",
+        "C": "Forty",
+        "D": "Fifteen"
+      },
+      "clave": "B",
+      "explicacion": "Attention, passengers. **The direct bus to San Gil leaves from platform four** in fifteen minutes. The bus with stops leaves from platform fourteen in forty minutes. Please have your ticket ready. — Four (4) es corto; fourteen (14) termina en -teen y es el andén del otro bus. Fifteen y forty son minutos, no andenes."
+    }
+  ],
+  "fuente": null,
+  "generado_por": "creador-opus@F8-a2-u01: prácticas rehechas bajo la §15 sobre textos de redactor-sonnet@F8-a2",
+  "revisado_por": null
+}

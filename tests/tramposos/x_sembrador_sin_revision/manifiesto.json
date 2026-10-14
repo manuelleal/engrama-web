@@ -1,0 +1,16 @@
+{
+  "descripcion": "SR7: sembrar() arma la revisión pero no la usa: manda los cuerpos con errores (en el backend real, 422 a la mitad de la siembra)",
+  "archivos": {
+    "herramientas/sembrar_retos.mjs": "sembrar_retos.mjs"
+  },
+  "comando": [
+    "node",
+    "--test",
+    "--test-reporter=tap",
+    "tests/unit/sembrar_revision.test.mjs"
+  ],
+  "espera_codigo_no_cero": true,
+  "espera_fallan_tests": [
+    "SR7: sembrar() con un nodo fuera del catálogo responde 2"
+  ]
+}

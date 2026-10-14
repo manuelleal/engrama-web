@@ -1,0 +1,16 @@
+{
+  "descripcion": "SR8: la explicación viaja como `explicacion` (el nombre del banco) y no como `explanation`: el backend (extra=\"forbid\") responde 422",
+  "archivos": {
+    "herramientas/sembrar/mapeo.mjs": "mapeo.mjs"
+  },
+  "comando": [
+    "node",
+    "--test",
+    "--test-reporter=tap",
+    "tests/contrato/sembrar_contrato.test.mjs"
+  ],
+  "espera_codigo_no_cero": true,
+  "espera_fallan_tests": [
+    "SR8: los cuerpos de las 20 unidades reales A1 y A2 calzan"
+  ]
+}
