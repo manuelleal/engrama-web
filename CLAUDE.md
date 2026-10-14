@@ -149,7 +149,19 @@ Reglas que no se rompen:
 
 Asistencia (adenda 17.8 de la espec del anillo, adelanta W45): **el backend ya trae el desglose en la respuesta del check-in** (`engrama-backend` `1696a37`, `src/engrama_core/schemas.py`: `base`, `puntualidad`, `puntual` y `ya_cobrada_hoy`, los cuatro con valor por defecto; `base + puntualidad == coins_awarded`; con `ya_cobrada_hoy` los otros van en 0/falso), pero **la web todavía usa el camino viejo**: pide aparte `GET /core/coins/history?limit=5` y `GET /core/attendance/history` y lo dice **solo si el dato cuadra** (`ui/desglose.js`: `desgloseDeAsistencia` exige un asiento `attendance` con `base` + `puntualidad` enteros que sumen el monto; `haySegundaMarcaDelDia` exige otra marca de hoy que sí pagó); si no, queda "+N monedas" o "Asistencia marcada. Constancia: R." (nunca "+0"; un 402 sale con ℹ). La web nunca resta para sacar una parte. El cambio a los campos del check-in es **W45b** (`docs/ESPEC_juego_oleada1.md` §17.1.6): los usa si vienen y cuadran, y conserva las dos peticiones como respaldo si no vienen ("ausente" no es "0"). El mock aún paga 50 y no los emite (W42).
 
-Defecto conocido, sin arreglar (W45a, §17.1.5 de esa espec): el chip de la celebración de la asistencia cuenta de 0 al número del servidor durante más de un segundo (`ui/sello.js`), así que una captura temprana muestra "+2 monedas" sobre "+10 monedas".
+Ningún número de un premio cuenta desde 0: el chip de la asistencia (W45a, U71, `ui/sello.js`) y el puntaje y la medalla del fin de reto (U72, `ui/celebracion.js`) NACEN con el número del servidor y no cambian; su paso de la celebración solo los mueve (golpe de oro, fichas que vuelan). Antes se leía "+2 monedas" sobre "+10 monedas" y «0 / 2» bajo «¡Reto perfecto!».
+
+## Sistema visual único en el estudiante (2026-10-13, `docs/ESPEC_visual_sistema1.md`)
+
+Fuente de cómo se ve: `..\..\diseno\sistema\` (`sistema.css`, `LEEME.md`). Reglas que no se rompen:
+
+- **`publico/diseno/sistema.css` es una copia byte a byte** (R1; se trae con `node herramientas/sincronizar_diseno.mjs`, nunca se edita aquí). Se enlaza tras `tokens.css` y **no va en `PRECARGA`** (46 KB): va en la lista `APARTE` de `sw.js`, que se guarda al activar junto con las fuentes.
+- **Las clases `sx-` reemplazan, no se suman:** donde una regla vieja por etiqueta o por atributo le gana a una `sx-`, la vieja se borra o deja fuera a la nueva (`#vista a[data-testid]:where(:not(.sx-btn))`). No se escribe una tercera regla "puente".
+- **Íconos: `ui/iconos.js`** (datos + `createElementNS`, trazo 2,2, `currentColor`). Ningún emoji del sistema como ícono (cambia de dibujo en cada teléfono). Sin SVG en el entorno devuelve `null`: ninguna pantalla depende de su ícono.
+- **La barra de abajo es `sx-barra`**: conserva `nav.nav-inferior` (su sitio fijo y lo que miran las pruebas) y su registro sale del rol (`registroDeLaBarra`): juego, el valor por defecto, SOLO para el estudiante; `sx-sereno` para el profe y el admin.
+- **Una sola cabecera para el estudiante: `ui/cabecera.js`** (`header.barra-superior`, la franja navy del sistema) en todas sus pantallas. El volver y el título siguen saliendo de `ui/encabezado.js` (V8). El profe y el admin no llevan franja. El sonido es un botón-ícono con `aria-label`, `aria-pressed` y `title`, solo en las pantallas de juego. La mascota no va en la franja.
+- **El aviso de constancia va en el flujo de la pantalla** (`crearAvisoDeRacha`, U73): lo pone la vista en su sitio (Inicio, después de "Ahora"; la asistencia, en la zona del sello); nunca cuelga del `body` ni tiene posición propia.
+- **Peso:** `PRECARGA` no pasa de 830.000 bytes en disco (hoy 829.686, con 300 de margen): lo nuevo entra borrando lo viejo. Se mide sumando en disco los archivos de la lista.
 
 Capa de juego, oleada 1 (W41 a W60, sin empezar): se reparte con `docs/ESPEC_juego_oleada1.md` **más su adenda 1 (§17.1)**, que dice qué cambió tras la navegación (la tabla de estado, el orden de reparto, el techo de peso del shell y las insignias como SVG generado a código).
 

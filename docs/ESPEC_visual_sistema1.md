@@ -10,16 +10,17 @@
 `node herramientas/sincronizar_diseno.mjs`). Desde ahí sus dos `url('../fuentes/…')` resuelven solas a `publico/fuentes/`: no se reescribe nada.
 Se enlaza después de `tokens.css`. **No va en `PRECARGA`** (pesa 46.357 bytes y el techo es 830.000): va en la lista `APARTE` de `sw.js`, que se
 guarda al activar, en segundo plano, igual que las fuentes. Sin red y sin haberla guardado, la app abre y se lee; se ve sin el cromo del sistema.
-Las clases `sx-` conviven con las hojas viejas: donde una regla vieja por etiqueta o por atributo le gana a una `sx-`, la vieja se **borra**
-(no se suma una tercera). Lo que queda de puente vive al final de `estilos/cara.css`.
+Las clases `sx-` conviven con las hojas viejas: donde una regla vieja por etiqueta o por atributo le gana a una `sx-`, la vieja se **borra** o
+deja fuera a la nueva (`#vista a[data-testid]:where(:not(.sx-btn))`); no se suma una tercera regla "puente".
 
 ## 1. Íconos propios (hallazgo 2)
 
 - Qué cambia: los emoji de la barra de abajo (tres roles), del sonido y de las filas de "Mis monedas" pasan a ser SVG de trazo armados por
   código. Módulo `src/ui/iconos.js`: datos (formas en una caja de 24) + `createElementNS`. Trazo 2,2, puntas redondas, `currentColor`.
   Los dibujos son los de la guía del sistema (`guia.html`), más `silencio` y `moneda`.
-- La barra: `nav.nav-inferior.sx-barra` con `a.sx-barra__pestana`. Estudiante `sx-juego` (píldora suave con borde); profe y admin `sx-sereno`
-  (marca arriba, sin píldora). Activo = color de acción + peso 800 + trazo más grueso. Fuera `filter: grayscale`.
+- La barra: `nav.nav-inferior.sx-barra` con `a.sx-barra__pestana`. Estudiante: el registro de juego, que es el valor por defecto del sistema
+  (sin clase: píldora suave con borde); profe y admin `sx-sereno` (marca arriba, sin píldora). Activo = color de acción + peso 800 + trazo
+  más grueso. Fuera `filter: grayscale`.
 - Único momento animado: el rebote del ícono activo que ya existía (solo `.juego`).
 - No se toca: `navegacion.js`, las entradas, los textos, `aria-current`, la posición fija ni el espacio que la barra reserva.
 
@@ -68,7 +69,7 @@ Las clases `sx-` conviven con las hojas viejas: donde una regla vieja por etique
 
 ```
 ┌───────────────────────────────────┐   ┌───────────────────────────────────┐
-│ ● 30 monedas      ▲ Constancia: 3 🔈│   │ ‹ Inicio                          │
+│ ● 30 monedas   ▲ Constancia: 3  ◁)) │   │ ‹ Inicio                          │
 └───────────────────────────────────┘   │ Mis monedas                       │
   Hola, Ana                             └───────────────────────────────────┘
 ```
@@ -77,6 +78,16 @@ Las clases `sx-` conviven con las hojas viejas: donde una regla vieja por etique
 
 `iconos.js` y `cabecera.js` entran a `PRECARGA`; se compensan borrando las reglas viejas de la barra, de las tres cabeceras y del aviso flotante.
 El número medido va en el mensaje de cada commit y en el informe. `VERSION` sube en cada commit que toque `sw.js` o la lista.
+
+Medido al cerrar (2026-10-13, `f44fd34`): `PRECARGA` 117 entradas y 829.686 bytes en disco (antes 115 y 828.324); `APARTE` 46.357; fuentes
+64.264; `VERSION` `engrama-shell-v47`.
+
+## 4.1 Lo que quedó sin hacer en esta tanda (para después)
+
+- Los estados de error de Inicio, Retos y el reto conservan su título suelto (sin la franja).
+- La franja no se pega arriba al desplazar (`position: static`); el sistema la trae `sticky`.
+- El `button` de `componentes.css` sigue animando `border-bottom-width` (hallazgo 3) y su `:active` le gana al de `sx-btn-icono`.
+- El profe y el admin siguen con su título suelto: su cabecera serena (`sx-cabecera` blanca) es otro paso.
 
 ## 5. Fotos de regresión que cambian (se declaran en su commit)
 
