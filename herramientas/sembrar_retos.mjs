@@ -21,7 +21,8 @@ import { fileURLToPath } from 'node:url';
 import {
   bloquesDePiensalo, retosDeLectura, verificarFirma, esApiLocal, challengeCreate,
 } from './sembrar/mapeo.mjs';
-import { nodosPorFamilia as leerNodosPorFamilia } from './sembrar/curriculo.mjs';
+import { nodosPorFamilia as leerNodosPorFamilia, nodosVigentes } from './sembrar/curriculo.mjs';
+import { revisarCuerpos } from './sembrar/revision.mjs';
 
 const AQUI = fileURLToPath(new URL('.', import.meta.url));
 const RAIZ = resolve(AQUI, '..');
@@ -73,12 +74,19 @@ export function armarCuerpos(unidad, { groupId, borrador, nodosPorFamilia = {} }
   return [...bloques, ...lecturas];
 }
 
-async function sembrar({ unidad, apiUrl, token, grupoId, borrador, nodosPorFamilia = {} }) {
+/** ESPEC_sembrador_refuerzo §1.4: con un error en CUALQUIER cuerpo no se manda ninguno (código 2). `vigentes`: los ids del catálogo
+ * (sin ellos no se miran los ids de los nodos). Las faltas no bloquean: van a la salida. */
+async function sembrar({ unidad, apiUrl, token, grupoId, borrador, nodosPorFamilia = {}, vigentes }) {
   const veredicto = verificarFirma(unidad, { borrador, apiEsLocal: esApiLocal(apiUrl) });
   if (!veredicto.ok) { console.error(`sembrar_retos: ${veredicto.motivo}`); return { codigo: 2 }; }
+  const cuerpos = armarCuerpos(unidad, { groupId: grupoId, borrador: veredicto.borrador, nodosPorFamilia });
+  const revision = revisarCuerpos(cuerpos.map((c) => c.cuerpo), { vigentes });
+  if (revision.errores.length) {
+    for (const e of revision.errores) console.error(`sembrar_retos: ${e}`);
+    return { codigo: 2, errores: revision.errores };
+  }
 
   await exigirGrupoVisible(apiUrl, token, grupoId);
-  const cuerpos = armarCuerpos(unidad, { groupId: grupoId, borrador: veredicto.borrador, nodosPorFamilia });
 
   const creados = [];
   for (const item of cuerpos) {
@@ -89,12 +97,21 @@ async function sembrar({ unidad, apiUrl, token, grupoId, borrador, nodosPorFamil
     });
   }
 
-  const salida = { unidad: unidad.id, grupo: grupoId, borrador: veredicto.borrador, retos: creados };
+  const salida = { unidad: unidad.id, grupo: grupoId, borrador: veredicto.borrador, retos: creados, faltas: revision.faltas };
   const rutaSalida = join(RAIZ, 'salida', 'retos_sembrados.json');
   mkdirSync(join(RAIZ, 'salida'), { recursive: true });
   writeFileSync(rutaSalida, JSON.stringify(salida, null, 2));
   console.log(`sembrar_retos: ${creados.length} reto(s) sembrado(s) en el grupo ${grupoId} -> ${rutaSalida}`);
   return { codigo: 0, salida };
+}
+
+/** Las etiquetas (nodos por familia) y el catálogo (ids vigentes) de `dir`; null (y el porqué en la consola) si falta alguno. */
+function leerCurriculo(dir) {
+  const rutas = { etiquetas: join(dir, 'etiquetas_unidades.json'), catalogo: join(dir, 'nodos.json') };
+  const falta = Object.values(rutas).find((r) => !existsSync(r));
+  if (falta) { console.error(`sembrar_retos: falta ${falta} (usa --curriculo <dir>)`); return null; }
+  const leer = (r) => JSON.parse(readFileSync(r, 'utf8'));
+  return { nodosPorFamilia: leerNodosPorFamilia(leer(rutas.etiquetas)), vigentes: nodosVigentes(leer(rutas.catalogo)) };
 }
 
 async function main() {
@@ -103,15 +120,14 @@ async function main() {
     console.error('uso: node herramientas/sembrar_retos.mjs <ruta_unidad.json> --grupo <gid> [--borrador] [--curriculo <dir>]');
     process.exit(2);
   }
-  const rutaEtiquetas = join(curriculo, 'etiquetas_unidades.json');
-  if (!existsSync(rutaEtiquetas)) { console.error(`sembrar_retos: falta ${rutaEtiquetas} (usa --curriculo <dir>)`); process.exit(2); }
-  const nodosPorFamilia = leerNodosPorFamilia(JSON.parse(readFileSync(rutaEtiquetas, 'utf8')));
+  const delCurriculo = leerCurriculo(curriculo);
+  if (!delCurriculo) process.exit(2);
   const token = process.env.ENGRAMA_TOKEN_PROFE;
   if (!token) { console.error('sembrar_retos: falta ENGRAMA_TOKEN_PROFE'); process.exit(2); }
   const apiUrl = process.env.ENGRAMA_API_URL || 'http://127.0.0.1:8090';
   const unidad = leerUnidad(rutaUnidad);
   try {
-    const { codigo } = await sembrar({ unidad, apiUrl, token, grupoId: grupo, borrador, nodosPorFamilia });
+    const { codigo } = await sembrar({ unidad, apiUrl, token, grupoId: grupo, borrador, ...delCurriculo });
     process.exit(codigo);
   } catch (e) {
     console.error('sembrar_retos: falló contra la API', e.message);

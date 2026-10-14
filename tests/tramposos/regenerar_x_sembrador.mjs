@@ -22,6 +22,7 @@ function cambiar(texto, de, a) {
 const MAPEO = 'herramientas/sembrar/mapeo.mjs';
 const IDENTIDAD = 'tests/unit/sembrar_identidad.test.mjs';
 const REFUERZO = 'tests/unit/sembrar_refuerzo.test.mjs';
+const REVISION = 'tests/unit/sembrar_revision.test.mjs';
 const SR2 = 'SR2: solo_refuerzo true en exactamente los retos de gemelas y repasos';
 const SOLO_REFUERZO_BUENO = "export const ROLES_SOLO_REFUERZO = ['gemela', 'repaso'];";
 const tap = (prueba) => ['node', '--test', '--test-reporter=tap', prueba];
@@ -60,6 +61,16 @@ export const TRAMPOSOS = {
     archivo: MAPEO, comando: tap(REFUERZO), tests: ['SR4: la lectura lleva la explicación'],
     descripcion: 'SR4: la lectura sale con rol original (PEDIDO_sembrador §2: las lecturas van sin rol y sin familia)',
     cambios: [['  return afirmacion.explicacion ? { ...pregunta, explanation:', "  return afirmacion.explicacion ? { ...pregunta, rol: 'original', explanation:"]],
+  },
+  x_sembrador_revision_ciega: {
+    archivo: 'herramientas/sembrar/revision.mjs', comando: tap(REVISION), tests: ['SR6: revisarCuerpo encuentra cada error de la espec'],
+    descripcion: 'SR6: la revisión no mira el catálogo: un nodo que el backend no conoce pasa, y la siembra se corta a la mitad con 422 nodo_desconocido',
+    cambios: [['    else if (vigentes && !vigentes.has(n))', '    else if (vigentes && false)']],
+  },
+  x_sembrador_sin_revision: {
+    archivo: 'herramientas/sembrar_retos.mjs', comando: tap(REVISION), tests: ['SR7: sembrar() con un nodo fuera del catálogo responde 2'],
+    descripcion: 'SR7: sembrar() arma la revisión pero no la usa: manda los cuerpos con errores (en el backend real, 422 a la mitad de la siembra)',
+    cambios: [['  if (revision.errores.length) {', '  if (false) {']],
   },
   // Los dos que ya existían sobre mapeo.mjs eran copias del mapeo VIEJO: se rehacen con su misma rotura sobre el bueno de hoy.
   x15_mapeo_incumple_contrato: {

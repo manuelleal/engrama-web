@@ -1,0 +1,16 @@
+{
+  "descripcion": "SR6: la revisión no mira el catálogo: un nodo que el backend no conoce pasa, y la siembra se corta a la mitad con 422 nodo_desconocido",
+  "archivos": {
+    "herramientas/sembrar/revision.mjs": "revision.mjs"
+  },
+  "comando": [
+    "node",
+    "--test",
+    "--test-reporter=tap",
+    "tests/unit/sembrar_revision.test.mjs"
+  ],
+  "espera_codigo_no_cero": true,
+  "espera_fallan_tests": [
+    "SR6: revisarCuerpo encuentra cada error de la espec"
+  ]
+}
