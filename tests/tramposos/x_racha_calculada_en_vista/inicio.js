@@ -8,7 +8,7 @@
 import { h, montar } from '../../ui/dom.js';
 import { crearEscudo } from '../../ui/escudo.js';
 import { crearDrako } from '../../ui/drako.js';
-import { crearLlama, celebrarRacha, planDeRacha, crearDeNuevo } from '../../ui/racha.js';
+import { crearLlama, celebrarRacha, planDeRacha, crearDeNuevo, crearAvisoDeRacha } from '../../ui/racha.js';
 import { crearBotonSonido } from '../../ui/boton_sonido.js';
 import { senal } from '../../ui/sonido.js';
 import { lanzarConfeti } from '../../ui/confeti.js';
@@ -268,12 +268,14 @@ function pintarContenido(raiz, ctx, datos) {
     seccionAhora(datos.pendiente, ctx),
     // W48: la racha bajó (desde 3 o más): una línea neutra, una vez. Va DESPUÉS de "Ahora": arriba empujaba el tercer botón bajo la barra en 360 × 640.
     racha.neutro ? crearDeNuevo(datos.mejorConstancia) : null,
+    // Si subió, su aviso va en ese mismo sitio, en el flujo: flotando tapaba el saludo y el enlace a Mis monedas (ESPEC_visual_sistema1 §2b).
+    racha.celebrar ? crearAvisoDeRacha(datos.constancia, racha) : null,
     crearSemana(semana), // W51: los 7 puntos de la semana de calendario y, si se completó, su sello
     crearNavInferior('/inicio', ctx.sesion?.rol), // W68: la ÚNICA navegación de Inicio (salió la fila de enlaces repetidos; "Cerrar sesión" vive en Perfil)
   );
   montar(raiz, nodo);
   animarSaldo(nodoSaldo, datos.balance, ctx);
-  if (racha.celebrar) celebrarRacha({ contador: constancia, valor: datos.constancia, plan: racha });
+  if (racha.celebrar) celebrarRacha({ contador: constancia, plan: racha });
   if (semana.celebrar) celebrarSemana(drako, ctx, semana);
   escucharVueltaDeOtroOrigen(raiz, ctx);
   document.body.dataset.listo = '1';

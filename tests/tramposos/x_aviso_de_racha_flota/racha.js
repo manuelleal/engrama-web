@@ -16,8 +16,6 @@ import { compararConUltimo } from './ultimo_visto.js';
 import { lanzarConfeti } from './confeti.js';
 import { registrarCelebracion } from './celebraciones.js';
 
-/** Cuánto se queda el aviso "¡Constancia N!" en pantalla (no es una animación: se puede leer). */
-const VISIBLE_MS = 2600;
 const SALTO_MS = 1100;
 /** A2: lo que dura que la llama crezca al cruzar un umbral. */
 const CRUCE_MS = 900;
@@ -56,7 +54,6 @@ export function planDeRacha(previo, actual, reducido = reducirMovimiento()) {
     sonido: celebrar ? 'racha' : null, // bajar no suena: ni fallo ni "ups"
     fichas: 0,
     animacionMs: celebrar ? duracionEfectiva(cruce ? CRUCE_MS : SALTO_MS, reducido) : 0,
-    visibleMs: celebrar ? VISIBLE_MS : 0,
   };
 }
 
@@ -101,24 +98,24 @@ export function crearDeNuevo(mejor) {
   return h('p', { class: 'racha-de-nuevo', role: 'status', 'data-testid': 'racha-de-nuevo' }, textoDeNuevo(mejor));
 }
 
-// El aviso se retira solo a los `ms`; si el estudiante cambia de pantalla antes, se va de inmediato (ui/celebraciones.js): antes
-// seguía varios segundos encima de la pantalla nueva y tapaba, p. ej., "PREGUNTA N DE 3".
-function retirarCon(nodo, ms) {
-  const relojes = [];
-  const quitar = () => { relojes.forEach(clearTimeout); nodo.remove(); };
-  const terminar = () => {}; // el aviso no se registra: nadie lo cancela al navegar
-  relojes.push(setTimeout(() => {
-    nodo.classList.add('saliendo');
-    relojes.push(setTimeout(() => { terminar(); quitar(); }, 450));
-  }, ms));
+/**
+ * El aviso "¡Constancia N!" (o "… Tu llama creció." si cruzó un umbral): la llama y el texto, con el número que dijo el servidor. La PANTALLA lo
+ * pone en su sitio, dentro de su flujo (Inicio: después de "Ahora"; la asistencia: en la zona del sello). Nunca flota ni cuelga del `body`
+ * (flotando tapaba el saludo y el enlace a Mis monedas) y se queda mientras dure la pantalla (irse haría saltar lo de abajo).
+ * @param {number} valor @param {ReturnType<typeof planDeRacha>} [plan]
+ */
+export function crearAvisoDeRacha(valor, plan) {
+  const cruce = plan?.cruce ?? null;
+  return h('div', { class: 'celebra-racha', role: 'status', 'data-testid': 'celebra-racha', 'data-cruce': cruce ? String(cruce) : null },
+    crearLlama(valor), h('span', {}, plan?.texto ?? textoDeRacha(valor)));
 }
 
 /**
- * El momento de premio: la insignia salta (o la llama crece, si cruzó un umbral), aparece el aviso, suena el arpegio y vibra.
- * @param {{contador: HTMLElement|null, valor: number, plan?: ReturnType<typeof planDeRacha>}} o `valor` es el que dijo el servidor, tal cual;
- *   sin `plan` es una subida sin cruce (como siempre)
+ * El momento de premio: la insignia salta (o la llama crece, si cruzó un umbral), suena el arpegio y vibra. El aviso NO lo pone esta función:
+ * lo pone la pantalla, en su flujo (`crearAvisoDeRacha`).
+ * @param {{contador: HTMLElement|null, plan?: ReturnType<typeof planDeRacha>}} o sin `plan` es una subida sin cruce (como siempre)
  */
-export function celebrarRacha({ contador, valor, plan }) {
+export function celebrarRacha({ contador, plan }) {
   const cruce = plan?.cruce ?? null;
   if (contador) {
     const clase = cruce ? 'constancia-crece' : 'constancia-sube';
@@ -127,10 +124,7 @@ export function celebrarRacha({ contador, valor, plan }) {
     const reloj = setTimeout(() => { terminar(); quitarClase(); }, duracionEfectiva(cruce ? CRUCE_MS : SALTO_MS) + 100);
     const terminar = registrarCelebracion(() => { clearTimeout(reloj); quitarClase(); });
   }
-  const aviso = h('div', { class: `celebra-racha${cruce ? ' celebra-racha-cruce' : ''}`, role: 'status', 'data-testid': 'celebra-racha', 'data-cruce': cruce ? String(cruce) : null },
-    crearLlama(valor), h('span', {}, plan?.texto ?? textoDeRacha(valor)));
-  document.body.appendChild(aviso);
-  retirarCon(aviso, VISIBLE_MS);
+  document.body.appendChild(crearAvisoDeRacha(plan?.etapa ?? 0, plan)); // TRAMPOSO: el aviso vuelve a flotar sobre la pantalla, colgado del body
   senal(plan?.sonido ?? 'racha');
   if (!plan) lanzarConfeti('suave');
   else if (plan.confeti) lanzarConfeti(plan.confeti); // con "reducir movimiento" el plan no trae confeti

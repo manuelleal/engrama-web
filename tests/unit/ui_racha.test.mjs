@@ -18,7 +18,7 @@ test('racha: solo se celebra cuando el valor del servidor sube, y no en la prime
 test('racha: el salto con reduced-motion no pasa del mínimo, y con movimiento pleno se luce', () => {
   assert.ok(planDeRacha(1, 2, true).animacionMs <= MINIMO_MS);
   assert.ok(planDeRacha(1, 2, false).animacionMs >= 800);
-  assert.ok(planDeRacha(1, 2, true).visibleMs >= 2000, 'el aviso se puede leer aunque no se mueva');
+  assert.equal('visibleMs' in planDeRacha(1, 2, true), false, 'el aviso ya no tiene reloj: va en el flujo y se queda mientras dure la pantalla (U73)');
 });
 
 test('racha: el texto muestra el número del servidor tal cual, sin sumarle nada', () => {

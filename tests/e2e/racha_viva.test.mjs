@@ -23,7 +23,15 @@ const VISITAR_INICIO = `(async () => {
     visto.fichas = Math.max(visto.fichas, contar('.ficha-moneda'));
     visto.avisos = Math.max(visto.avisos, contar('[data-testid="celebra-racha"]'));
     const aviso = document.querySelector('[data-testid="celebra-racha"]');
-    if (aviso) { visto.aviso = aviso.textContent; visto.cruce = aviso.getAttribute('data-cruce'); }
+    if (aviso) {
+      visto.aviso = aviso.textContent; visto.cruce = aviso.getAttribute('data-cruce');
+      // U73: el aviso va en el flujo de Inicio. No toca la caja del saludo ni la del enlace a Mis monedas, y lo que está en el centro de cada una es ella misma.
+      const a = aviso.getBoundingClientRect();
+      const toca = (el) => { const r = el.getBoundingClientRect(); return a.top < r.bottom - 1 && a.bottom > r.top + 1 && a.left < r.right - 1 && a.right > r.left + 1; };
+      const libre = (el) => { const r = el.getBoundingClientRect(); const e = document.elementFromPoint(r.left + r.width / 2, r.top + r.height / 2); return e === el || el.contains(e); };
+      const saludo = document.querySelector('[data-testid="vista-inicio"] h1'); const enlace = document.querySelector('[data-testid="ir-a-monedas"]');
+      visto.lugar = { posicion: getComputedStyle(aviso).position, dentro: !!aviso.closest('[data-testid="vista-inicio"]'), tocaSaludo: toca(saludo), tocaEnlace: toca(enlace), saludoLibre: libre(saludo), enlaceLibre: libre(enlace) };
+    }
     await esperar(50);
   }
   const constancia = document.querySelector('[data-testid="constancia"]');
@@ -50,6 +58,7 @@ test('E22: la llama crece al cruzar 3 (aviso, etapa 1 y confeti); con el mismo v
       const crece = await salirYVolver();
       assert.equal(crece.aviso, '¡Constancia 3! Tu llama creció.');
       assert.equal(crece.cruce, '3');
+      assert.deepEqual(crece.lugar, { posicion: 'static', dentro: true, tocaSaludo: false, tocaEnlace: false, saludoLibre: true, enlaceLibre: true }, 'U73: el aviso va en el flujo de Inicio; no tapa el saludo ni el enlace a Mis monedas');
       assert.equal(crece.etapa, '1', 'la llama está en su etapa 1');
       assert.match(crece.constancia, /Constancia: 3$/, 'y el número va aparte, en texto');
       assert.ok(crece.confeti >= 1, 'hubo confeti');

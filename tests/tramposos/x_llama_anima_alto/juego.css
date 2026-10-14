@@ -153,39 +153,35 @@
   100% { transform: scale(1); }
 }
 
-/* Aviso "¡Constancia N!": baja desde arriba con rebote y se queda legible (no depende de la animación). */
+/* Aviso "¡Constancia N!": un renglón en el FLUJO de la pantalla, en oro suave (racha = logro). No flota (flotando tapaba el saludo) y se queda
+   mientras dure la pantalla. Entra con opacidad y escala; sin movimiento, está puesto. */
 .celebra-racha {
-  position: fixed;
-  top: 76px;
-  left: 50%;
-  translate: -50% 0;
-  z-index: 45;
-  display: inline-flex;
+  display: flex;
   align-items: center;
   gap: 8px;
-  background: var(--primario);
-  color: var(--oro);
+  width: fit-content;
+  max-width: 100%;
+  margin: 8px 0 12px;
+  padding: 8px 14px;
+  background: var(--sx-oro-suave);
+  color: var(--sx-sobre-oro-suave);
+  box-shadow: inset 0 0 0 2px color-mix(in srgb, var(--oro) 45%, transparent);
+  border-radius: var(--radio-sm);
   font-family: var(--fuente-titulos);
   font-weight: 800;
-  font-size: 1.25rem;
-  padding: 10px 22px;
-  border-radius: var(--radio-lg);
-  border-bottom: 4px solid var(--primario-oscuro);
-  box-shadow: 0 0 0 3px var(--oro);
-  pointer-events: none;
-  animation: racha-baja 700ms cubic-bezier(0.2, 1.6, 0.4, 1) 1 backwards;
-  transition: opacity 400ms ease;
+  font-size: 1.05rem;
+  line-height: 1.25;
+  animation: racha-entra 400ms cubic-bezier(0.22, 1, 0.36, 1) backwards;
 }
 .celebra-racha .llama {
+  flex: none;
   font-size: 1.4rem;
 }
-.celebra-racha.saliendo {
-  opacity: 0;
+.sello-zona .celebra-racha {
+  margin: 0;
 }
-@keyframes racha-baja {
-  0% { transform: translateY(-90px) scale(0.6); opacity: 0; }
-  60% { transform: translateY(8px) scale(1.12); opacity: 1; }
-  100% { transform: translateY(0) scale(1); opacity: 1; }
+@keyframes racha-entra {
+  from { opacity: 0; transform: scale(0.9); }
 }
 
 /* ---------- Entrada de las pantallas del estudiante: los bloques entran escalonados con rebote, nunca
@@ -853,12 +849,9 @@ body {
   from { opacity: 0; transform: scale(0.3); }
 }
 
-/* El botón de silencio y el aviso de constancia nunca parten su texto en dos renglones. */
-.boton-sonido,
-.celebra-racha {
-  white-space: nowrap;
-}
+/* El botón de silencio nunca parte su texto en dos renglones. */
 .boton-sonido {
+  white-space: nowrap;
   flex: none;
 }
 
@@ -1064,7 +1057,7 @@ body {
   0%, 100% { transform: scale(1); opacity: 0.25; }
   50% { transform: scale(1.12); opacity: 0.6; }
 }
-/* A2: al cruzar 3, 7 o 14 la llama crece (900 ms, con rebote) y el aviso lo dice. El aviso del cruce es más largo: puede partir en dos renglones. */
+/* A2: al cruzar 3, 7 o 14 la llama crece (900 ms, con rebote) y el aviso lo dice. */
 .constancia-crece .llama {
   animation: llama-crece 900ms cubic-bezier(0.2, 1.6, 0.4, 1) 1;
 }
@@ -1072,13 +1065,6 @@ body {
   0% { height: 0.9em; }
   55% { transform: scale(1.25); }
   100% { transform: scale(1); }
-}
-.celebra-racha-cruce {
-  white-space: normal;
-  width: max-content;
-  max-width: calc(100vw - 24px);
-  font-size: 1.1rem;
-  line-height: 1.2;
 }
 /* A3: la racha bajó. Una línea neutra, en el sitio: entra con opacidad y nada más (ni rojo, ni temblor, ni sonido). */
 .racha-de-nuevo {

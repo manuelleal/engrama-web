@@ -13,7 +13,7 @@ import { registrarCelebracion } from './celebraciones.js';
 import { lanzarConfeti } from './confeti.js';
 import { celebrarMonedas, planDeMonedas, duracionTotal } from './monedas.js';
 import { animarConteo } from './conteo.js';
-import { crearLlama, celebrarRacha, planDeRacha, crearDeNuevo } from './racha.js';
+import { crearLlama, celebrarRacha, planDeRacha, crearDeNuevo, crearAvisoDeRacha } from './racha.js';
 import { leerUltimo, guardarUltimo } from './ultimo_visto.js';
 
 /** Qué momentos tiene la asistencia — pura. @param {number} monedas @param {number} racha */
@@ -43,7 +43,11 @@ function pintarYDisparar({ zona, monedas, racha, quien, mejorConstancia }) {
   // W45a: el chip NACE con el número del servidor y no cambia nunca (antes contaba desde 0 y, durante más de un segundo, decía "+2" sobre el "+10" del resultado).
   const num = plan.monedas ? h('span', { class: 'chip-num' }, '+0') : null;
   const chip = num ? h('p', { class: 'chip-monedas', 'aria-hidden': 'true', 'data-testid': 'chip-monedas' }, num, ` ${textos.inicio.monedas}`) : null;
-  const llama = plan.llama ? h('p', { class: 'constancia-asistencia', 'aria-hidden': 'true' }, crearLlama(racha), `${textos.inicio.constanciaPrefijo}: ${racha}`) : null;
+  // La racha es la del servidor: solo se compara con lo último visto. Si subió, su renglón ES el aviso ("¡Constancia N!"), en el flujo de la zona:
+  // no flota sobre la pantalla ni dice el número en dos renglones (docs/ESPEC_visual_sistema1.md §2b).
+  const queHacer = planParaLaRacha(quien, racha);
+  const llama = queHacer?.celebrar ? crearAvisoDeRacha(racha, queHacer)
+    : plan.llama ? h('p', { class: 'constancia-asistencia', 'aria-hidden': 'true' }, crearLlama(racha), `${textos.inicio.constanciaPrefijo}: ${racha}`) : null;
   // Drako presenta el momento (nunca califica) y salta; el sello, las monedas y la llama son lo que dijo el servidor.
   const drako = crearDrako('celebra', textos.asistencia.drako, { desde: 'reposo', sinCiclo: true });
   const caja = h('div', { class: 'sello-zona', 'data-testid': 'sello-zona' }, drako, sello, chip, llama);
@@ -55,18 +59,17 @@ function pintarYDisparar({ zona, monedas, racha, quien, mejorConstancia }) {
     animarConteo(num, { desde: 0, hasta: monedas, formato: (n) => `+${n}`, golpe: false, duracionMs: 380 + Math.max(900, duracionTotal(planDeMonedas(monedas))) });
     lanzarConfeti('suave');
   }
-  reaccionarALaRacha({ quien, racha, llama, caja, mejorConstancia });
+  if (queHacer?.celebrar) despues(900, () => celebrarRacha({ contador: llama, plan: queHacer }));
+  if (queHacer?.neutro) decirDeNuevo(caja, mejorConstancia);
 }
 
-// La racha es la del servidor: solo se compara con lo último visto para saber si subió (se celebra; si cruzó 3, 7 o 14, la llama crece) o si
-// bajó desde 3 o más (una línea neutra, sin sonido ni confeti, con la mejor constancia que diga el servidor).
-function reaccionarALaRacha({ quien, racha, llama, caja, mejorConstancia }) {
-  if (!quien) return;
+// Qué hacer con la racha que llegó: si subió se celebra (y si cruzó 3, 7 o 14, la llama crece); si bajó desde 3 o más, una línea neutra, sin
+// sonido ni confeti, con la mejor constancia que diga el servidor. Sin saber quién es, nada (no hay con qué comparar). Anota lo último visto.
+function planParaLaRacha(quien, racha) {
+  if (!quien) return null;
   const previo = leerUltimo('constancia', quien);
   guardarUltimo('constancia', quien, racha);
-  const plan = planDeRacha(previo, racha);
-  if (plan.celebrar) despues(900, () => celebrarRacha({ contador: llama, valor: racha, plan }));
-  if (plan.neutro) decirDeNuevo(caja, mejorConstancia);
+  return planDeRacha(previo, racha);
 }
 
 // "Empezamos de nuevo. Tu mejor constancia: M.": M se le pregunta al servidor SOLO en este caso; si no responde, la línea va sin número.

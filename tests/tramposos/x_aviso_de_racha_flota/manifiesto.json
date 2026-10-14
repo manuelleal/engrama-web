@@ -1,0 +1,16 @@
+{
+  "descripcion": "U73 (compuerta visual, hallazgo 5): el aviso \"¡Constancia N!\" vuelve a colgarse del body (el cartel flotante de antes), encima del saludo y del enlace a Mis monedas",
+  "archivos": {
+    "src/ui/racha.js": "racha.js"
+  },
+  "comando": [
+    "node",
+    "--test",
+    "--test-reporter=tap",
+    "tests/unit/ui_aviso_de_racha.test.mjs"
+  ],
+  "espera_codigo_no_cero": true,
+  "espera_fallan_tests": [
+    "U73: en Inicio, cuando la constancia sube, el aviso va DENTRO de la pantalla"
+  ]
+}

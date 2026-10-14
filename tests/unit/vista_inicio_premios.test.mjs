@@ -2,11 +2,12 @@
 // U51 (docs/ESPEC_juego_oleada1.md §4.6 y §9.3, W49): nada se celebra por abrir la app. Una celebración necesita un hecho que el servidor confirma en
 // esa visita: abrir Inicio sin cambios, la primera visita en un equipo (aunque haya saldo) y cambiar de institución NO lanzan fichas ni confeti ni
 // avisos, y el plan del saldo no pide premio (que es lo único que hace sonar la moneda).
-// Se pinta Inicio de verdad, con movimiento PLENO y un `body` que anota todo lo que se le cuelga (las fichas, el confeti y los avisos viven ahí).
+// Se pinta Inicio de verdad, con movimiento PLENO y un `body` que anota todo lo que se le cuelga (las fichas y el confeti viven ahí). Los avisos de
+// constancia se cuentan además DENTRO de la vista: desde U73 van en su flujo, no colgados del body.
 // Tramposos (src/vistas/estudiante/inicio.js): x_premio_por_abrir y x_saldo_cruza_instituciones.
 import test from 'node:test';
 import assert from 'node:assert/strict';
-import { entornoDeFotos, crearRaiz, buscar, textoDe } from './foto_vistas.mjs';
+import { entornoDeFotos, crearRaiz, buscar, textoDe, elementos } from './foto_vistas.mjs';
 import { NodoFalso } from './dom_falso.mjs';
 import { RUTAS, sesionDeEstudiante, TENANT_A, TENANT_B } from './fotos_de_las_vistas.mjs';
 import { renderInicio, planDeSaldo, quienVe } from '../../src/vistas/estudiante/inicio.js';
@@ -43,7 +44,8 @@ function navegador() {
       await asentar();
       const despues = contar();
       cancelarCelebraciones();
-      return { fichas: despues.fichas - antes.fichas, confeti: despues.confeti - antes.confeti, avisos: despues.avisos - antes.avisos, saldo: textoDe(buscar(raiz, 'saldo')) };
+      const enLaVista = elementos(raiz).filter((n) => /celebra-racha/.test(n.className || '')).length;
+      return { fichas: despues.fichas - antes.fichas, confeti: despues.confeti - antes.confeti, avisos: despues.avisos - antes.avisos + enLaVista, saldo: textoDe(buscar(raiz, 'saldo')) };
     },
     guardado: (clave) => g.localStorage.getItem(clave),
     cerrar() { cancelarCelebraciones(); Object.assign(console, consola); entorno.restaurar(); },
