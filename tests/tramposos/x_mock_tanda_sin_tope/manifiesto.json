@@ -1,0 +1,16 @@
+{
+  "descripcion": "R10: el doble no tiene tope de tandas al día (siempre arma otra)",
+  "archivos": {
+    "herramientas/mock/practica.mjs": "practica.mjs"
+  },
+  "comando": [
+    "node",
+    "--test",
+    "--test-reporter=tap",
+    "tests/contrato/mock_practica.test.mjs"
+  ],
+  "espera_codigo_no_cero": true,
+  "espera_fallan_tests": [
+    "R10: completar la tanda deja pedir la segunda"
+  ]
+}

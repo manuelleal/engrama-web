@@ -25,6 +25,7 @@ import {
 import { listarChallenges, listarTodosLosChallenges, verChallenge, cambiarEstado, crearChallenge } from './mock/rutas_challenges.mjs';
 import { arrancarIntento, enviarIntento, historialDeIntentos } from './mock/rutas_intentos.mjs';
 import { responderPregunta, retomarIntento, terminarIntento } from './mock/por_pregunta.mjs';
+import { verTanda, pedirTanda, responderRepaso } from './mock/practica.mjs';
 import { registrarse, crearCodigo, leerCodigo, apagarCodigo, listarSolicitudes, aprobarSolicitud, rechazarSolicitud } from './mock/rutas_registro.mjs';
 import { crearSolicitudDatos, misSolicitudesDatos, solicitudesDeLaInstitucion, responderSolicitudDatos } from './mock/rutas_datos.mjs';
 import {
@@ -62,12 +63,28 @@ function rutasDelAnillo(r) {
   ];
 }
 
+/** La práctica del día (backend f7f7aeb, docs/ESPEC_practica_del_dia.md §W82): L1 (mock/por_pregunta.mjs), la tanda y el repaso (mock/practica.mjs).
+ * Van antes de `/challenges/:challenge_id`, como en el backend (si no, `GET /challenges/tanda` caería en el detalle). */
+function rutasDeLaPractica(r) {
+  return [
+    // L1 (backend f7f7aeb): pregunta por pregunta, retomar y cerrar con lo guardado (mock/por_pregunta.mjs).
+    r('POST', '/challenges/attempts/:attempt_id/answers', (estado, req, p, body) => responderPregunta(estado, req, p.attempt_id, body)),
+    r('GET', '/challenges/attempts/:attempt_id/answers', (estado, req, p) => retomarIntento(estado, req, p.attempt_id)),
+    r('POST', '/challenges/attempts/:attempt_id/finish', (estado, req, p) => terminarIntento(estado, req, p.attempt_id)),
+    // La tanda de hoy y el repaso (backend f7f7aeb, mock/practica.mjs). Antes de `/challenges/:challenge_id`, como en el backend.
+    r('GET', '/challenges/tanda', (estado, req) => verTanda(estado, req)),
+    r('POST', '/challenges/tanda', (estado, req) => pedirTanda(estado, req)),
+    r('POST', '/challenges/refuerzo/:entrada_id/respuestas', (estado, req, p, body) => responderRepaso(estado, req, p.entrada_id, body)),
+  ];
+}
+
 function construirRutas() {
   const r = (metodo, patron, manejador, { textoCrudo = false } = {}) => ({ metodo, patron: compilar(patron), manejador, textoCrudo });
   return [
     r('GET', '/health', () => ({ status: 200, cuerpo: { status: 'ok' } })),
     ...rutasDeAuth(r),
     ...rutasDelAnillo(r),
+    ...rutasDeLaPractica(r),
 
     r('POST', '/admin/groups', (estado, req, p, body) => crearGrupo(estado, req, body)),
     r('POST', '/admin/groups/:gid/teachers', (estado, req, p, body) => asignarDocente(estado, req, p.gid, body)),
@@ -87,10 +104,6 @@ function construirRutas() {
     r('GET', '/challenges/', (estado, req) => listarChallenges(estado, req)),
     r('POST', '/challenges/', (estado, req, p, body) => crearChallenge(estado, req, body)),
     r('POST', '/challenges/attempts/:attempt_id/submit', (estado, req, p, body) => enviarIntento(estado, req, p.attempt_id, body)),
-    // L1 (backend f7f7aeb): pregunta por pregunta, retomar y cerrar con lo guardado (mock/por_pregunta.mjs).
-    r('POST', '/challenges/attempts/:attempt_id/answers', (estado, req, p, body) => responderPregunta(estado, req, p.attempt_id, body)),
-    r('GET', '/challenges/attempts/:attempt_id/answers', (estado, req, p) => retomarIntento(estado, req, p.attempt_id)),
-    r('POST', '/challenges/attempts/:attempt_id/finish', (estado, req, p) => terminarIntento(estado, req, p.attempt_id)),
     r('PATCH', '/challenges/:challenge_id/status', (estado, req, p, body) => cambiarEstado(estado, req, p.challenge_id, body)),
     r('POST', '/challenges/:challenge_id/attempt', (estado, req, p) => arrancarIntento(estado, req, p.challenge_id)),
     r('GET', '/challenges/:challenge_id', (estado, req, p) => verChallenge(estado, req, p.challenge_id)),

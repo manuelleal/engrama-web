@@ -46,7 +46,15 @@ function economiaYReloj() {
  * 422): así se prueba el respaldo de la web. `l1`: /answers y /finish; `tanda`: /challenges/tanda; `racha`: /core/racha.
  */
 function backendQueImita() {
-  return { backend: { l1: true, tanda: true, racha: true } };
+  return { backend: { l1: true, tanda: true, racha: true }, ...practicaDelDoble() };
+}
+
+/** Los valores por defecto de la tanda en el backend (ESPEC_practica_y_tanda §1.4), como configuración del doble (mock/practica.mjs). */
+export const PRACTICA_POR_DEFECTO = Object.freeze({ nivelInicial: 'A2', repasosMax: 3, preguntasMin: 6, retosMax: 4, maxAlDia: 2, diasRepaso: 7 });
+
+/** La práctica del día en el doble: su configuración, las tandas pedidas y la cola de repaso (entradas y respuestas). */
+function practicaDelDoble() {
+  return { practica: { ...PRACTICA_POR_DEFECTO }, tandas: [], repaso: { entradas: [], respuestas: [], secuencia: 0 } };
 }
 
 /** Crea el estado inicial: un tenant "UIS (demo)", un admin y un docente de arranque. */

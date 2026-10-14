@@ -20,6 +20,7 @@ function cambiar(texto, de, a) {
 }
 
 const L1 = 'tests/unit/practica_l1.test.mjs';
+const R10 = 'tests/contrato/mock_practica.test.mjs';
 /** @type {[string, string]} */
 const SIN_SALIDA_L1 = ["    estado.encabezado = crearCabecera({ piezas: [estado.salir, h('h1', { class: 'titulo-reto' }, tituloLegible(challenge.title))], sonido: true }),",
   "    estado.encabezado = crearCabecera({ piezas: [/* TRAMPOSO: sin salida */ h('h1', { class: 'titulo-reto' }, tituloLegible(challenge.title))], sonido: true }),"];
@@ -29,6 +30,17 @@ const SIN_SALIDA_L1 = ["    estado.encabezado = crearCabecera({ piezas: [estado.
  * @type {Record<string, {archivo: string, prueba: string, tests: string[], descripcion: string, cambios: Array<[string, string]>, otros?: Array<{archivo: string, cambios: Array<[string, string]>}>}>}
  */
 export const TRAMPOSOS = {
+  x_mock_repaso_paga: {
+    archivo: 'herramientas/mock/practica.mjs', prueba: R10, tests: ['R10: lo fallado vuelve al día siguiente como repaso'],
+    descripcion: 'R10: el repaso del doble paga monedas por respuesta (invita a fallar a propósito: dictamen 04 §1.4)',
+    cambios: [['      estado: entrada.estado, proxima_fecha: entrada.toca === null ? null : new Date(entrada.toca).toISOString(), repetida, coins_earned: 0,',
+      '      estado: entrada.estado, proxima_fecha: entrada.toca === null ? null : new Date(entrada.toca).toISOString(), repetida, coins_earned: acierto ? 2 : 0,']],
+  },
+  x_mock_tanda_sin_tope: {
+    archivo: 'herramientas/mock/practica.mjs', prueba: R10, tests: ['R10: completar la tanda deja pedir la segunda'],
+    descripcion: 'R10: el doble no tiene tope de tandas al día (siempre arma otra)',
+    cambios: [['  if (terminada && hechas.length < estado.practica.maxAlDia) crearTanda(estado, auth, hoy, hechas);', '  if (terminada) crearTanda(estado, auth, hoy, hechas);']],
+  },
   x_api_l1_sin_validar: {
     archivo: 'src/api/practica.js', prueba: L1, tests: ['U77: responderPregunta manda la label'],
     descripcion: 'U77: la respuesta de /answers se usa sin validar (ausente pasa por cero y la banda pinta "undefined")',

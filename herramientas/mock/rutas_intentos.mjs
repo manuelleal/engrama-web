@@ -7,6 +7,7 @@ import { fallar } from './errores.mjs';
 import { buscarChallengeVisible, challengeOutPublico } from './rutas_challenges.mjs';
 import { recompensaDelReto } from './economia.mjs';
 import { otorgarMonedas } from './monedas.mjs';
+import { anotarFallos } from './practica.mjs';
 
 /** El 409 de /submit sobre un intento con respuestas guardadas por /answers (backend f7f7aeb, `attempts.CON_RESPUESTAS`). */
 export const CON_RESPUESTAS = 'intento_con_respuestas';
@@ -72,6 +73,7 @@ export function cerrarIntento(estado, auth, intento, challenge, respuestas) {
   const pago = pagarSiCorresponde(estado, auth, challenge, is_correct);
 
   Object.assign(intento, { status: 'completed', completed_at: new Date(estado.reloj.ahora()).toISOString(), is_correct, score_percent, answers: dadas, coins_earned: pago.coins_earned, xp_earned: pago.xp_earned });
+  anotarFallos(estado, auth, challenge, dadas); // lo fallado entra a la cola de repaso (mock/practica.mjs), como el gancho del refuerzo del backend
 
   const usados = intentosDe(estado, auth.profileId, challenge.id).filter((a) => a.status === 'completed').length;
   return {
