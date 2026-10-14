@@ -176,6 +176,11 @@
   flex: none;
   font-size: 1.4rem;
 }
+/* La llama del aviso va quieta: parpadea solo la de la cabecera (medido con fluidez). */
+.celebra-racha .llama,
+.celebra-racha .llama * {
+  animation: none;
+}
 .sello-zona .celebra-racha {
   margin: 0;
 }
