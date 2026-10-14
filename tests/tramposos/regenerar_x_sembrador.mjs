@@ -62,6 +62,11 @@ export const TRAMPOSOS = {
     descripcion: 'SR4: la lectura sale con rol original (PEDIDO_sembrador §2: las lecturas van sin rol y sin familia)',
     cambios: [['  return afirmacion.explicacion ? { ...pregunta, explanation:', "  return afirmacion.explicacion ? { ...pregunta, rol: 'original', explanation:"]],
   },
+  x_sembrador_campo_en_espanol: {
+    archivo: MAPEO, comando: tap('tests/contrato/sembrar_contrato.test.mjs'), tests: ['SR8: los cuerpos de las 20 unidades reales A1 y A2 calzan'],
+    descripcion: 'SR8: la explicación viaja como `explicacion` (el nombre del banco) y no como `explanation`: el backend (extra="forbid") responde 422',
+    cambios: [['  if (item.explicacion) marcas.explanation = item.explicacion;', '  if (item.explicacion) marcas.explicacion = item.explicacion;']],
+  },
   x_sembrador_revision_ciega: {
     archivo: 'herramientas/sembrar/revision.mjs', comando: tap(REVISION), tests: ['SR6: revisarCuerpo encuentra cada error de la espec'],
     descripcion: 'SR6: la revisión no mira el catálogo: un nodo que el backend no conoce pasa, y la siembra se corta a la mitad con 422 nodo_desconocido',
