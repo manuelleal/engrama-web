@@ -1,6 +1,6 @@
 #!/usr/bin/env node
 // @ts-check
-// regenerar_x_sw.mjs · Rehace las cuatro copias rotas de sw.js que derivan del archivo BUENO de hoy (copia rota = sw.js de ahora + SU defecto).
+// regenerar_x_sw.mjs · Rehace las copias rotas de sw.js que derivan del archivo BUENO de hoy (copia rota = sw.js de ahora + SU defecto).
 // Córrelo cada vez que cambie sw.js (la lista de precarga o VERSION) y después confirma, por nombre y uno a la vez, que cada tramposo sigue
 // rojo en su prueba: `node tests/correr_tramposos.mjs x_sw_cachea_api`. No toca los manifiestos. x9_sin_precarga NO deriva de sw.js (es un
 // service worker entero, de cuatro líneas): no se rehace.
@@ -44,6 +44,8 @@ const TRAMPOSOS = {
     "  // Animación (vendor/PROCEDENCIA.md, autorizada por Christiam el 2026-10-06): anime.js mueve a Drako por partes y la\n  // línea de tiempo del fin de reto; canvas-confetti dibuja el confeti. Mismo origen, sin tocar la CSP.\n  '/vendor/animejs@4.5.0/anime.esm.min.js',\n  '/vendor/canvas-confetti@1.9.4/confetti.module.mjs',\n",
     '',
   ),
+  // U59 (docs/ESPEC_practica_del_dia.md §0): el sistema visual (46 KB) entra a PRECARGA y el shell pasa su techo de 830.000.
+  x_precarga_engorda: cambiar(sw, "  '/publico/diseno/tokens.css',\n", "  '/publico/diseno/tokens.css',\n  '/publico/diseno/sistema.css',\n"),
 };
 
 for (const [nombre, contenido] of Object.entries(TRAMPOSOS)) {

@@ -1,0 +1,7 @@
+{
+  "descripcion": "U59: el sistema visual (46 KB) entra a PRECARGA y el shell pasa su techo de 830.000 bytes sin que nada lo vea",
+  "archivos": { "sw.js": "sw.js" },
+  "comando": ["node", "--test", "--test-reporter=tap", "tests/unit/sw_peso.test.mjs"],
+  "espera_codigo_no_cero": true,
+  "espera_fallan_tests": ["U59: la precarga del shell (sw.js PRECARGA, con fin de línea LF) no pasa de 830.000 bytes"]
+}
