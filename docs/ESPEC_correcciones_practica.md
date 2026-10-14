@@ -131,6 +131,24 @@ El 409 genérico de `/submit` en el flujo de siempre (`reto_flujo.js:152`) tambi
 - **E38 tiene su propio tramposo de cruce** (`x_l1_transitorio_degrada_e38`, el defecto de `x_l1_transitorio_degrada` medido en el navegador). Ojo:
   el corredor elige por subcadena, así que `node tests/correr_tramposos.mjs x_l1_transitorio_degrada` corre los dos, uno tras otro.
 
+## 6c. Adenda 2 (2026-10-14, auditoría 06 `investigacion/producto/06-auditoria-correcciones-web-bf9db10.md`: los dos "DEBE ARREGLARSE")
+- **H-A, "Comprobar" en oro.** `estilos/juego.css` pinta de oro todo `.barra-accion .boton-principal:not(:disabled)`. Ese selector alcanza hoy a:
+  (1) "Comprobar" del reto L1 (`reto_l1.js`, `boton-comprobar`) y el "Siguiente" / "Ver resultado" de la barra de la pregunta no contestable
+  (H-3), ambos del reto por pregunta; (2) "Siguiente" / "Terminar" del flujo de siempre (`reto_flujo.js`, sin L1); (3) el botón de la banda
+  (`.barra-accion.con-banda`), que `practica.css` ya pasó a navy. El repaso no lo usa (su barra es `.repaso-accion`). Ninguno de los alcanzados
+  es un logro, una moneda ni una racha. **Decisión:** el botón del reto por pregunta pasa a `--sx-accion` (el navy del sistema, como el de la banda)
+  con un override en `practica.css` acotado a `.juego[data-modo="por-pregunta"]`; el flujo de siempre y `juego.css` no se tocan (el flujo de
+  siempre queda en oro: su "oro" se declara EXCEPCIÓN heredada de Lingo Coins, para después). Solo se cambia el color de fondo, el de la tinta y
+  el del labio (`border-bottom-color`), no el ancho: el efecto de pulsar (`:active`, labio de 1px) sigue. Así el cambio vive en un archivo
+  DIFERIDO (`practica.css`) y no engorda la precarga; sí cambia la VERSION de `sw.js` (como 25d3f7c) para que el navegador guarde lo de hoy.
+  El comentario de `practica.css` que decía "el oro de la barra de acción es solo para logros" se corrige: era falso para el resto de la barra.
+  **U94:** el CSS del reto por pregunta no usa `--oro` y sí `--sx-accion`. Tramposo: `x_comprobar_en_oro` (`practica.css` con ese bloque en oro).
+  Capturas antes / después a 375 y 1280 en `despliegue/salida/web_ha/`.
+- **H-B, `porPregunta` sin prueba.** Solo un `import()` que falla es "como siempre"; un error de `intentarL1` sube y se muestra (nunca se toma por
+  backend viejo). **U95:** un `intentarL1` que lanza algo inesperado (aquí: la lectura de `ctx` falla justo después de `arrancarIntento`) deja
+  "No se pudo cargar el reto." con su salida, ni una pregunta del flujo de siempre ni un `/submit`. Tramposo: `x_l1_error_inesperado_es_viejo`
+  (`reto_flujo.js` con el bloque viejo: `try { return await (await import(…)).intentarL1(…) } catch { return false }`).
+
 ## 7. Medido al cerrar (2026-10-14)
 - **Commits** (sobre `3c81fe3`): `cb620dd` espec · `3e5747f` H-1 · `12ebf97` H-2 · `95147b5` H-5 · `5de77c1` H-4 · `194660e` H-6 · `590561c` H-7 ·
   `abe91ff` H-3 · `a111df2` H-9 · `6554be0` el oro · `25d3f7c` shell v54 · `a4c0918` W83 humo · `7523c2b` E38 (y E35, adenda 1) · `6fe527c`
