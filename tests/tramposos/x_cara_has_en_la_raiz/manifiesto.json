@@ -1,0 +1,16 @@
+{
+  "descripcion": "Tanda \"sistema 1\": vuelve la regla que bajo la celebracion de Inicio de 58,9 a 55,5 fps: :has() sobre #vista con un descendiente detras, activa en el celular (recalcula el estilo de toda la app en cada cambio del DOM)",
+  "archivos": {
+    "estilos/cara.css": "cara.css"
+  },
+  "comando": [
+    "node",
+    "--test",
+    "--test-reporter=tap",
+    "tests/unit/css_cara.test.mjs"
+  ],
+  "espera_codigo_no_cero": true,
+  "espera_fallan_tests": [
+    "cara: rendimiento. Fuera de un @media de escritorio, ninguna regla usa :has() sobre la raiz de la app (la vista, body, html, main o .juego) seguida de un descendiente"
+  ]
+}

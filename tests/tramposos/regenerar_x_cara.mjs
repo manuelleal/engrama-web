@@ -51,6 +51,12 @@ const TRAMPOSOS = [
     falla: 'cara: contraste. Toda regla de cara.css que declara color y background da 4,5:1 o mas',
   },
   {
+    nombre: 'x_cara_has_en_la_raiz', destino: 'estilos/cara.css', archivo: 'cara.css',
+    descripcion: 'Tanda "sistema 1": vuelve la regla que bajo la celebracion de Inicio de 58,9 a 55,5 fps: :has() sobre #vista con un descendiente detras, activa en el celular (recalcula el estilo de toda la app en cada cambio del DOM)',
+    contenido: cambiar(cara, '.barra-superior ~ form button[type="submit"],', '#vista:has(.nav-inferior a[href="#/inicio"]) form button[type="submit"],\n.barra-superior ~ form button[type="submit"],'),
+    falla: 'cara: rendimiento. Fuera de un @media de escritorio, ninguna regla usa :has() sobre la raiz de la app (la vista, body, html, main o .juego) seguida de un descendiente',
+  },
+  {
     nombre: 'x_fuente_rango_supuesto', destino: 'estilos/tipografia.css', archivo: 'tipografia.css',
     descripcion: 'Fuentes de marca: el font-face de Baloo 2 declara el rango de pesos "de siempre" (100 a 900) en vez del que el archivo trae (400 a 800): el navegador sintetiza pesos que la fuente no tiene',
     contenido: cambiar(tipografia, 'font-weight: 400 800;', 'font-weight: 100 900;'),

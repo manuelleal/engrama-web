@@ -59,6 +59,37 @@ test('cara: sobriedad. El fondo de marca (y cualquier pestana rellena) es solo d
 
 const HOJAS = ['estilos/tipografia.css', 'estilos/base.css', 'estilos/componentes.css', 'estilos/formularios.css', 'estilos/juego.css', CARA];
 
+// Medido con `npm run fluidez` (tanda "sistema 1"): UNA regla `#vista:has(.nav-inferior a[href="#/inicio"]) form button[type="submit"]`, activa en el
+// celular, bajó la celebración de Inicio de 58,9 a 55,5 fps (18 a 20 fotogramas perdidos): con `:has()` en la RAÍZ de la app y un descendiente
+// detrás, cada nodo que entra o sale (el saldo que cuenta, las fichas) obliga a recalcular el estilo de todo el árbol. En el celular, `:has()`
+// sobre la raíz solo puede pintar a la raíz misma (o a su seudoelemento). Las de escritorio (`min-width`) no se miden aquí.
+// Tramposo: x_cara_has_en_la_raiz (estilos/cara.css).
+test('cara: rendimiento. Fuera de un @media de escritorio, ninguna regla usa :has() sobre la raiz de la app (la vista, body, html, main o .juego) seguida de un descendiente', () => {
+  const RAIZ_CON_HAS = /^(#vista|body|html|main|\.juego)(?![\w-])[^\s>+~,]*:has\(/;
+  let vigiladas = 0;
+  for (const hoja of HOJAS) {
+    const css = sinComentarios(leer(hoja));
+    let i = 0; let enEscritorio = 0; let hondo = 0;
+    while (i < css.length) {
+      const abre = css.indexOf('{', i); const cierra = css.indexOf('}', i);
+      if (cierra >= 0 && (abre < 0 || cierra < abre)) { hondo -= 1; if (hondo < enEscritorio) enEscritorio = 0; i = cierra + 1; continue; }
+      if (abre < 0) break;
+      const preludio = css.slice(i, abre).trim();
+      hondo += 1; i = abre + 1;
+      if (/^@media[^{]*min-width/.test(preludio)) { enEscritorio = hondo; continue; }
+      if (preludio.startsWith('@') || enEscritorio) continue;
+      for (const selector of preludio.split(/,(?![^(]*\))/).map((s) => s.trim())) {
+        if (!RAIZ_CON_HAS.test(selector)) continue;
+        vigiladas += 1;
+        let p = selector.indexOf(':has(') + 5; let abiertos = 1;
+        while (p < selector.length && abiertos > 0) { if (selector[p] === '(') abiertos += 1; if (selector[p] === ')') abiertos -= 1; p += 1; }
+        assert.doesNotMatch(selector.slice(p), /[\s>+~]/, `${hoja} "${selector}": :has() en la raiz con un descendiente detras recalcula el estilo de toda la app en cada cambio del DOM`);
+      }
+    }
+  }
+  assert.ok(vigiladas >= 1, `se esperaba al menos una regla con :has() sobre la raiz que vigilar (la que reserva el espacio de la barra); hay ${vigiladas}`);
+});
+
 test('cara: tipografia. La pila empieza por las fuentes de marca y ninguna hoja pide un archivo que no sea de este origen y exista', () => {
   const raiz = reglas(leer('estilos/tipografia.css')).find((r) => r.selector === ':root');
   assert.ok(raiz, 'tipografia.css define las dos variables de fuente en :root');

@@ -356,8 +356,10 @@ button.boton-secundario {
   min-height: 52px;
   font-size: 1.1rem;
 }
-/* El botón principal de un formulario del estudiante va siempre a todo el ancho (antes, unos sí y otros no). */
-#vista:has(.nav-inferior a[href="#/inicio"]) form button[type="submit"] {
+/* El botón principal de un formulario del estudiante va a todo el ancho (antes, unos sí y otros no). Por hermanos de su cabecera, sin `:has()`
+   sobre la raíz: esa forma bajó la fluidez de Inicio (css_cara.test.mjs). */
+.barra-superior ~ form button[type="submit"],
+.barra-superior ~ section form button[type="submit"] {
   width: 100%;
 }
 #vista [data-testid="form-asistencia"] [data-testid="asistencia-sin-red"]:empty {
