@@ -175,11 +175,22 @@ Fuente de cómo se ve: `..\..\diseno\sistema\` (`sistema.css`, `LEEME.md`). Regl
   **Cómo exportar para servir:** `git -c core.autocrlf=false archive --format=tar <commit>` (desde H-5 da lo mismo con `true`: `.gitattributes` fija
   `eol=lf`). Hasta `3c81fe3` lo servido salía en CRLF y pesaba unos 12 KB más que lo medido (839.282 en `8ef6298`, 841.241 en `3c81fe3`: sobre el
   techo, sin que nada lo viera). `node herramientas/peso_servido.mjs [commit] [--autocrlf true|false]` exporta ese commit como el despliegue, suma
-  `PRECARGA` del tar y escribe `salida/peso_servido.json`: debe dar lo mismo que U59 (sale en 1 si pasa el techo). El script del despliegue (otro repo)
+  `PRECARGA` del tar y escribe `salida/peso_servido.json`: debe dar lo mismo que U59 (sale en 1 si pasa el techo). Al cerrar W83: **829.698 bytes, margen 302,
+  `engrama-shell-v54`**, el mismo número por los dos caminos. El script del despliegue (otro repo)
   todavía no mide el árbol exportado: va a "Después".
-- **Respaldo = backend viejo:** cada ruta nueva (`/answers`, `/finish`, `/challenges/tanda`, `/core/racha`) que responde 404, 405 o 422 (o falla, o llega
-  mal formada) deja la pantalla como antes. El mock lo imita con `estado.backend = {l1, tanda, racha}` en `false`. El 409 `intento_con_respuestas` de
+- **Respaldo = backend viejo:** cada ruta nueva (`/answers`, `/finish`, `/challenges/tanda`, `/core/racha`) que responde 404, 405 o 422 (o llega mal
+  formada) deja la pantalla como antes. El mock lo imita con `estado.backend = {l1, tanda, racha}` en `false`. El 409 `intento_con_respuestas` de
   `/submit` reabre el reto pregunta por pregunta (una vez).
+- **Sin red NO es backend viejo** (H-1, `docs/ESPEC_correcciones_practica.md`): `claseDeError` en `api/practica.js` separa `sin_ruta` (404/405/422),
+  `transitorio` (sin red = 0, 408, 429, 5xx, o un cuerpo que no es JSON) y `otro`. Ante un transitorio, UN reintento inmediato; si sigue,
+  `retomarIntento` lanza `ErrorTransitorio` y el reto pinta "Reintentar" y "✕ Salir" (nunca el flujo viejo); la tanda y la racha quedan en lo de
+  siempre, pero registrado (`degradacionesDePractica()`). En el DOM de mentira una ruta no declarada LANZA (= sin red): un servidor fijo de un backend
+  viejo debe DECIR 404 (`sinLaRuta` de `tests/unit/fotos_de_navegacion.mjs`). Un 409 en `/finish` o al Comprobar repinta un aviso neutro propio con
+  "Volver a Retos" (H-2); nunca el texto del servidor. De una respuesta mal formada la consola recibe solo los nombres de los campos (H-7).
+- **El doble con fallas:** `estado.fallas` (cola en `mock_api.mjs`: `{metodo, ruta: RegExp, status?, cuerpo?, cortar?}`, cada una UNA vez, antes de la
+  ruta de verdad). Lo usan `node herramientas/humo_correcciones.mjs --contra mock [--replica]` (U93, `salida/humo_correcciones.{mock,replica}.json`),
+  E38 (`tests/e2e/practica_correcciones.test.mjs`) y `node herramientas/capturas_correcciones.mjs [carpeta]`. Las pruebas de W83 están en
+  `tests/unit/practica_correcciones.test.mjs` (U86 a U92).
 - **L1 (`vistas/estudiante/reto_l1.js`):** pinta las preguntas de `/attempt` (nunca el detalle); elegir es neutro; "Comprobar" manda la label, una vez;
   la banda (`ui/explicacion.js`, `sx-banda`) dice veredicto con ícono y texto, oración, regla, "por qué no la tuya" SOLO si falló y ejemplo, con rótulos
   y `lang` por idioma (`es` A1/A2, `en` desde B1); retoma con `GET …/answers`; cierra con `/finish`. Nada de una pregunta aparece antes de comprobarla.
@@ -196,7 +207,9 @@ Fuente de cómo se ve: `..\..\diseno\sistema\` (`sistema.css`, `LEEME.md`). Regl
 - **No hecho (va a "Después"):** el sembrador (`herramientas/sembrar/`) todavía no manda `explanation`, `solo_refuerzo`, `item_ref`, `familia` ni `nodos`
   (`engrama-backend/docs/PEDIDO_sembrador.md`): sin eso, en el piloto la banda dice veredicto y oración, sin regla ni ejemplo, y las gemelas siguen en el
   feed. Los guiones del despliegue que juegan un reto con clics (`e2e_piloto`, `capturas_juego`, `capturas_sistema`, `medir_desborde_reto`,
-  `recorrido_registro`) no conocen "Comprobar".
+  `recorrido_registro`) no conocen "Comprobar". De la auditoría 05 quedan (W83, §6 de su espec): el 409 genérico de `/submit` en el flujo de siempre
+  (`reto_flujo.js`, en el shell) aún deja "Enviando…"; `fill_blank`/`listening` solo dicen "aún no se puede contestar aquí" (sin campo de texto ni
+  `pistas`); el script del despliegue todavía no mide el árbol exportado contra el techo.
 
 Capa de juego, oleada 1 (W41 a W60, sin empezar): se reparte con `docs/ESPEC_juego_oleada1.md` **más su adenda 1 (§17.1)**, que dice qué cambió tras la navegación (la tabla de estado, el orden de reparto, el techo de peso del shell y las insignias como SVG generado a código).
 

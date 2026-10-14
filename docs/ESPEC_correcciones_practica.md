@@ -130,3 +130,27 @@ El 409 genérico de `/submit` en el flujo de siempre (`reto_flujo.js:152`) tambi
   atributo); va un patrón por línea, con el mismo efecto.
 - **E38 tiene su propio tramposo de cruce** (`x_l1_transitorio_degrada_e38`, el defecto de `x_l1_transitorio_degrada` medido en el navegador). Ojo:
   el corredor elige por subcadena, así que `node tests/correr_tramposos.mjs x_l1_transitorio_degrada` corre los dos, uno tras otro.
+
+## 7. Medido al cerrar (2026-10-14)
+- **Commits** (sobre `3c81fe3`): `cb620dd` espec · `3e5747f` H-1 · `12ebf97` H-2 · `95147b5` H-5 · `5de77c1` H-4 · `194660e` H-6 · `590561c` H-7 ·
+  `abe91ff` H-3 · `a111df2` H-9 · `6554be0` el oro · `25d3f7c` shell v54 · `a4c0918` W83 humo · `7523c2b` E38 (y E35, adenda 1) · `6fe527c`
+  capturas · este, docs. H-5: `git add --renormalize .` no cambió nada (predicho): no hubo commit de renormalización; las 58 copias de trabajo en
+  CRLF se rehicieron en LF desde el índice.
+- **`verificar.mjs`:** sin violaciones. **Unit + contrato:** 720 en verde (base 699: +21). **E2E:** 45 archivos (los 44 de antes + E38, menos
+  `e2e_real`), uno a uno: 45 en verde, 131 pruebas, 0 rojas.
+- **Tramposos:** 19 nuevos, todos rojos por su razón (U86 2, E38 1, U87 2, U59 1, U78 1, U88 2, U89 2, U90 3, U91 3, U92 1, U93 1). Copias rehechas:
+  las de `regenerar_x_practica.mjs` en cada commit (y corridas una a una), 8 de `reto_flujo.js` por mezcla, 6 de `sw.js` (`regenerar_x_sw.mjs`),
+  1 de `componentes.css` por mezcla, y `x2_fuga_de_clave` A MANO (era de W6: la mezcla chocó). `x5_color_fuera_de_tokens` y `x_nav_inferior_no_fija`
+  son copias mínimas a propósito (no derivan del archivo) y `x9_sin_precarga` es un SW de cuatro líneas: no cambian; los tres siguen rojos.
+  En la pasada final, los 43 del generador de la práctica más `x_reto_sin_salida(_e30)`, `x_nav_inferior_no_fija`, `x9_sin_precarga`, los 6 de
+  `sw.js`, `x2_fuga_de_clave`, `x5` y `x_barra_tapa_contenido`: todos rojos.
+- **Peso:** `PRECARGA` 117 entradas, **829.698 bytes**, margen 302, `engrama-shell-v54`. Medido dos veces: U59 sobre la copia de trabajo (LF) y
+  `node herramientas/peso_servido.mjs HEAD` (`git archive` con `core.autocrlf=true`, como el despliegue): **el mismo número**. Antes de H-5 lo
+  servido era 841.241 en `3c81fe3` y 839.282 en `8ef6298` (la herramienta reproduce las cifras de la auditoría).
+- **Humo** (`humo_correcciones`, dos corridas iguales): desarrollo `b662936cd0971a1a06ae302e51ed846ccfe0829ec6329a9a2d6a8f23096c1976`, réplica
+  `56daed5ff09ae629b85b3c3e2366ed05cd60c933908819e7db7701d681855055`. El humo de la práctica (W82) no cambió: `2d8cad40…` y `1adbcb71…`.
+- **Capturas** (`node herramientas/capturas_correcciones.mjs`): 10, en `salida/correcciones/` y `despliegue/salida/web_correcciones/`, miradas.
+- **No probado:** contra el backend real `f7f7aeb` (todo contra el doble); un corte de red de verdad en el teléfono (el doble lo imita con 5xx y con
+  una conexión cerrada que el proxy convierte en 502; el 0 de "sin red" solo en el DOM de mentira); un `fill_blank` real del backend en la pantalla
+  (solo en el DOM de mentira: el sembrador siembra opción múltiple); lectores de pantalla de verdad (solo el `lang` en el DOM); la fluidez
+  (`npm run fluidez`) con los cambios; el 409 de `/submit` del flujo de siempre (fuera de alcance, §6).
