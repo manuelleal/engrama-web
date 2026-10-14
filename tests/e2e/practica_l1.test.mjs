@@ -56,6 +56,13 @@ test('E35: un reto A2 pregunta por pregunta: nada antes de Comprobar, la banda e
       assert.equal(await sesion.evaluar('document.querySelector(\'[data-testid="vista-reto-flujo"]\').dataset.modo'), 'por-pregunta');
       await clic(sesion, 'opcion-A');
       await esperar(150);
+      // H-A (auditoría 06, U94): "Comprobar" es la acción del sistema (navy), nunca oro: se mide el color que pinta el navegador, no el CSS.
+      const colores = await sesion.evaluar(`(() => {
+        const pintado = (v) => { const n = document.createElement('i'); n.style.background = v; document.body.append(n); const c = getComputedStyle(n).backgroundColor; n.remove(); return c; };
+        return { boton: getComputedStyle(document.querySelector('[data-testid="boton-comprobar"]')).backgroundColor, navy: pintado('var(--sx-accion)'), oro: pintado('var(--oro)') };
+      })()`);
+      assert.equal(colores.boton, colores.navy, '"Comprobar" en el navy del sistema');
+      assert.notEqual(colores.boton, colores.oro, '"Comprobar" no va en oro');
       const antes = await sesion.evaluar('document.body.textContent');
       for (const clave of ['She goes to school every day.', 'Con he, she o it', 'Esta vez no']) assert.ok(!antes.includes(clave), `antes de comprobar se ve "${clave}"`);
 

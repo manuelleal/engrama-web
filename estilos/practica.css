@@ -20,11 +20,20 @@
 .banda-explicacion .sx-banda__accion .boton-principal {
   width: 100%;
 }
-/* El botón que sigue (Siguiente / Ver resultado) va en navy, la acción del sistema: el oro de la barra de acción (juego.css) es solo para logros. */
+/* El botón que sigue (Siguiente / Ver resultado) va en navy, la acción del sistema. OJO: el oro es solo para logro, monedas y racha, y `.barra-accion
+   .boton-principal` de juego.css lo pone en oro en TODA la barra (también en el flujo de siempre, sin L1: excepción heredada de Lingo Coins, anotada
+   en docs/ESPEC_correcciones_practica.md §6c); en el reto por pregunta se corrige aquí, no en juego.css (precarga). */
 .banda-explicacion .sx-banda__accion .boton-principal:not(:disabled) {
   background: var(--sx-accion);
   color: var(--sx-sobre-accion);
   border-bottom: 4px solid var(--sx-accion-labio);
+}
+/* H-A (auditoría 06): lo mismo para "Comprobar" y para el botón de la barra de la pregunta no contestable, del reto por pregunta (`data-modo`, reto_l1.js):
+   una acción, no un logro. Solo color: el ancho del labio no se toca, para que `:active` (juego.css) siga hundiéndolo. */
+.juego[data-modo="por-pregunta"] .barra-accion .boton-principal:not(:disabled) {
+  background: var(--sx-accion);
+  color: var(--sx-sobre-accion);
+  border-bottom-color: var(--sx-accion-labio);
 }
 
 /* W79: "Tu práctica de hoy", la protagonista de "Ahora" (sx-prota de marca). Compacta: el texto a la izquierda y "Jugar" a la derecha, como las demás

@@ -365,3 +365,32 @@ test('U92: los avisos cortos ("no suma monedas", "No sumaste monedas") no van en
   assert.match(boton, /background:\s*var\(--sx-accion\)/, 'el botón de la banda, navy');
   assert.doesNotMatch(boton, /--oro/);
 });
+
+// ---------- U94 (H-A de la auditoría 06): "Comprobar" no va en oro ----------
+// Tramposos: x_comprobar_en_oro (estilos/practica.css sin el override: vuelve el oro de juego.css) y, medido en el navegador, x_comprobar_en_oro_e35.
+
+test('U94: "Comprobar" del reto por pregunta va en navy (--sx-accion), sin oro y sin tocar el ancho del labio (el :active sigue hundiéndolo); el reto lo marca con data-modo', async () => {
+  const { readFileSync } = await import('node:fs');
+  const sinComentarios = (/** @type {string} */ r) => readFileSync(new URL(`../../${r}`, import.meta.url), 'utf8').replace(/\/\*[\s\S]*?\*\//g, '');
+  const selector = '.juego[data-modo="por-pregunta"] .barra-accion .boton-principal:not(:disabled)';
+  const css = sinComentarios('estilos/practica.css');
+  const i = css.indexOf(`${selector} {`);
+  assert.ok(i >= 0, `falta la regla ${selector}`);
+  const regla = css.slice(i, css.indexOf('}', i));
+  assert.match(regla, /background:\s*var\(--sx-accion\)/, 'el fondo, navy');
+  assert.match(regla, /color:\s*var\(--sx-sobre-accion\)/, 'la tinta del sistema');
+  assert.match(regla, /border-bottom-color:\s*var\(--sx-accion-labio\)/, 'el labio del sistema');
+  assert.doesNotMatch(regla, /--oro/, 'sin oro');
+  assert.doesNotMatch(regla, /border-bottom:/, 'solo el color del labio: con el atajo se pierde el ancho de :active');
+  // El oro de la barra sigue donde estaba (el flujo de siempre): este cambio no lo toca.
+  assert.match(sinComentarios('estilos/juego.css'), /\.barra-accion \.boton-principal:not\(:disabled\) \{\s*background: var\(--oro\);/, 'juego.css no cambia');
+  // Y el reto por pregunta lleva esa marca, con "Comprobar" dentro de `.barra-accion`.
+  const { raiz, cerrar } = await abrirReto(servidorReto(ESTADO([])));
+  try {
+    assert.equal(buscar(raiz, 'vista-reto-flujo')?.getAttribute('data-modo'), 'por-pregunta');
+    const boton = buscar(raiz, 'boton-comprobar');
+    assert.ok(boton, 'Comprobar');
+    assert.ok(String(boton.className ?? boton.getAttribute('class')).split(/\s+/).includes('boton-principal'), 'Comprobar es un .boton-principal');
+    assert.ok(buscar(raiz, 'vista-reto-flujo').children.some((n) => String(n.className ?? n.getAttribute?.('class')).split(/\s+/).includes('barra-accion')), 'dentro de la barra de acción');
+  } finally { cerrar(); }
+});

@@ -1,0 +1,16 @@
+{
+  "descripcion": "U94 (H-A, auditoría 06): se quita el override de practica.css y \"Comprobar\" vuelve al oro de la barra de acción (juego.css): el oro es solo logro, monedas y racha",
+  "archivos": {
+    "estilos/practica.css": "practica.css"
+  },
+  "comando": [
+    "node",
+    "--test",
+    "--test-reporter=tap",
+    "tests/unit/practica_correcciones.test.mjs"
+  ],
+  "espera_codigo_no_cero": true,
+  "espera_fallan_tests": [
+    "U94: \"Comprobar\" del reto por pregunta va en navy"
+  ]
+}

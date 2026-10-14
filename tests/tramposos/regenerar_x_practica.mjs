@@ -25,6 +25,8 @@ const TANDA = 'tests/unit/practica_tanda.test.mjs';
 const REPASO = 'tests/unit/practica_repaso.test.mjs';
 const RACHA = 'tests/unit/practica_racha.test.mjs';
 const CORR = 'tests/unit/practica_correcciones.test.mjs'; // W83: docs/ESPEC_correcciones_practica.md
+/** El override de H-A en estilos/practica.css (el defecto lo quita). */
+const ORO_COMPROBAR = '.juego[data-modo="por-pregunta"] .barra-accion .boton-principal:not(:disabled) {\n  background: var(--sx-accion);\n  color: var(--sx-sobre-accion);\n  border-bottom-color: var(--sx-accion-labio);\n}\n';
 /** @type {[string, string]} */
 const SIN_SALIDA_L1 = ["    estado.encabezado = crearCabecera({ piezas: [estado.salir, h('h1', { class: 'titulo-reto' }, tituloLegible(challenge.title))], sonido: true }),",
   "    estado.encabezado = crearCabecera({ piezas: [/* TRAMPOSO: sin salida */ h('h1', { class: 'titulo-reto' }, tituloLegible(challenge.title))], sonido: true }),"];
@@ -255,6 +257,16 @@ export const TRAMPOSOS = {
     archivo: 'estilos/componentes.css', prueba: CORR, tests: ['U92: los avisos cortos'],
     descripcion: 'U92: el aviso "Repaso: no suma monedas" vuelve a ser un chip de oro (el oro es solo logro, monedas y racha)',
     cambios: [['  background: color-mix(in srgb, var(--primario) 10%, white);\n  color: var(--primario);\n  font-weight: 800;', '  background: var(--oro);\n  color: var(--oro-texto);\n  font-weight: 800;']],
+  },
+  x_comprobar_en_oro: {
+    archivo: 'estilos/practica.css', prueba: CORR, tests: ['U94: "Comprobar" del reto por pregunta va en navy'],
+    descripcion: 'U94 (H-A, auditoría 06): se quita el override de practica.css y "Comprobar" vuelve al oro de la barra de acción (juego.css): el oro es solo logro, monedas y racha',
+    cambios: [[ORO_COMPROBAR, '']],
+  },
+  x_comprobar_en_oro_e35: {
+    archivo: 'estilos/practica.css', prueba: 'tests/e2e/practica_l1.test.mjs', tests: ['E35: un reto A2 pregunta por pregunta'],
+    descripcion: 'U94 cruce (H-A): el mismo defecto medido en el navegador: el color que pinta "Comprobar" es el oro, no el navy del sistema',
+    cambios: [[ORO_COMPROBAR, '']],
   },
   x_humo_correcciones_500_viejo: {
     archivo: 'src/api/practica.js', prueba: 'tests/unit/humo_correcciones.test.mjs', tests: ['U93: el humo de las correcciones (desarrollo)', 'U93: la réplica'],

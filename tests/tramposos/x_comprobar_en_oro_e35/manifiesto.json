@@ -1,0 +1,16 @@
+{
+  "descripcion": "U94 cruce (H-A): el mismo defecto medido en el navegador: el color que pinta \"Comprobar\" es el oro, no el navy del sistema",
+  "archivos": {
+    "estilos/practica.css": "practica.css"
+  },
+  "comando": [
+    "node",
+    "--test",
+    "--test-reporter=tap",
+    "tests/e2e/practica_l1.test.mjs"
+  ],
+  "espera_codigo_no_cero": true,
+  "espera_fallan_tests": [
+    "E35: un reto A2 pregunta por pregunta"
+  ]
+}
