@@ -1,0 +1,16 @@
+{
+  "descripcion": "U83: cualquier respuesta de /core/racha se usa (con 6 días o números como texto, \"ausente\" pasa por \"0\")",
+  "archivos": {
+    "src/ui/racha_semanal.js": "racha_semanal.js"
+  },
+  "comando": [
+    "node",
+    "--test",
+    "--test-reporter=tap",
+    "tests/unit/practica_racha.test.mjs"
+  ],
+  "espera_codigo_no_cero": true,
+  "espera_fallan_tests": [
+    "U83: rachaValida rechaza 6 días"
+  ]
+}

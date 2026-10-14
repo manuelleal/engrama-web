@@ -1,0 +1,16 @@
+{
+  "descripcion": "U83: la web cuenta los puntos llenos en vez de usar dias_activos del servidor (y se equivoca cuando un día cuenta por algo que no ve)",
+  "archivos": {
+    "src/ui/racha_semanal.js": "racha_semanal.js"
+  },
+  "comando": [
+    "node",
+    "--test",
+    "--test-reporter=tap",
+    "tests/unit/practica_racha.test.mjs"
+  ],
+  "espera_codigo_no_cero": true,
+  "espera_fallan_tests": [
+    "U83: los 7 puntos son los del servidor"
+  ]
+}

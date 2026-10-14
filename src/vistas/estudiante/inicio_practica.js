@@ -1,6 +1,6 @@
 // @ts-check
-// vistas/estudiante/inicio_practica.js · Lo que Inicio suma de la práctica del día (docs/ESPEC_practica_del_dia.md §W79): "Tu práctica de hoy", la
-// protagonista de "Ahora". Módulo DIFERIDO: inicio.js lo carga con `import()`; si no carga, o el backend no arma tandas, Inicio queda como antes.
+// vistas/estudiante/inicio_practica.js · Lo que Inicio suma de la práctica del día (docs/ESPEC_practica_del_dia.md §W79 y §W81): "Tu práctica de hoy",
+// la protagonista de "Ahora", y la racha semanal (la llama y "Tu semana"). Módulo DIFERIDO: inicio.js lo carga con `import()`; si no carga, o el backend no arma tandas, Inicio queda como antes.
 // Reglas:
 //   - 0 `POST /challenges/tanda` al pintar: la tanda se PIDE solo con un toque (gasta el tope del día), una vez por toque (regla 5);
 //   - la tarjeta conserva lo que medían "Tu reto de hoy", los humos y E31 (`tarjeta-reto-hoy`, `jugar-reto-hoy`, `fila-ahora`, la única que late):
@@ -13,7 +13,10 @@ import { crearIcono } from '../../ui/iconos.js';
 import { tituloLegible } from '../../ui/titulo.js';
 import { marcarCargando } from '../../ui/boton.js';
 import { accionUnica } from '../../api/cliente.js';
-import { verTanda, pedirTanda } from '../../api/practica.js';
+import { verTanda, pedirTanda, leerRacha } from '../../api/practica.js';
+import { planDeSemanaServidor, planDeRachaSemanal, crearTarjetaRacha, esSemanaNueva, crearSemanaNueva } from '../../ui/racha_semanal.js';
+import { leerUltimo, guardarUltimo } from '../../ui/ultimo_visto.js';
+import { leerSemanaCelebrada } from '../../ui/semana.js';
 import { planDePractica, destinoDelPaso } from '../../ui/practica.js';
 import { textosPractica } from '../../textos_practica.js';
 
@@ -33,9 +36,11 @@ const claveDeHoy = (/** @type {any} */ ctx, /** @type {string} */ fecha) => `${c
  * @param {any} ctx
  */
 export async function cargar(ctx) {
-  const tanda = await verTanda(ctx);
+  const [tanda, racha] = await Promise.all([verTanda(ctx), leerRacha(ctx)]);
   const practica = {
     tanda,
+    /** W81: la racha semanal para Inicio, o null (la constancia y la semana de siempre). */
+    racha: racha ? rachaParaInicio(racha) : null,
     /**
      * La protagonista de "Ahora", o null (respaldo: "Tu reto de hoy" de siempre). Con ella, `aviso` pasa a ser el nivel de práctica, que Inicio pone
      * DESPUÉS de las tarjetas de "Ahora" (así los tres botones siguen sobre la barra sin desplazar: E31).
@@ -52,6 +57,27 @@ export async function cargar(ctx) {
     aviso: tanda && !tanda.tanda && tanda.racha_protegida ? h('p', { class: 'aviso-corto', role: 'status', 'data-testid': 'practica-protegida' }, T.protegida) : null,
   };
   return practica;
+}
+
+/**
+ * Lo que Inicio usa de la racha semanal: la llama ("N semanas"), qué celebrar (solo si SUBIÓ desde lo último visto por esta persona en esta
+ * institución), la tarjeta de la semana y la línea de la semana nueva. @param {any} r una respuesta que pasó `rachaValida`
+ */
+function rachaParaInicio(r) {
+  return {
+    valor: r.racha_semanas,
+    texto: textosPractica.racha.semanas(r.racha_semanas),
+    /** @param {string} quien */
+    plan: (quien) => {
+      const previo = leerUltimo('racha_semanas', quien);
+      guardarUltimo('racha_semanas', quien, r.racha_semanas);
+      return planDeRachaSemanal(previo, r.racha_semanas);
+    },
+    /** @param {string} quien */
+    semana: (quien) => planDeSemanaServidor(r, { yaCelebrada: leerSemanaCelebrada(quien) }),
+    tarjeta: crearTarjetaRacha,
+    nueva: esSemanaNueva(r) ? crearSemanaNueva(r) : null,
+  };
 }
 
 /** El plan con lo que la página ya supo hoy. */

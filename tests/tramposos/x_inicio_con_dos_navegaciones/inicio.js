@@ -114,7 +114,7 @@ async function sesionFresca(ctx) {
   }
 }
 
-// W79 (docs/ESPEC_practica_del_dia.md): la práctica de hoy viene de un módulo diferido; si no carga, null e Inicio como antes.
+// W79 y W81 (docs/ESPEC_practica_del_dia.md): la práctica de hoy y la racha semanal, de un módulo diferido; si no carga, null e Inicio como antes.
 const cargarPractica = (ctx) => import('./inicio_practica.js').then((m) => m.cargar(ctx)).catch((e) => { console.warn('inicio: sin práctica', e); return null; });
 
 async function cargarDatos(ctx) {
@@ -244,21 +244,22 @@ function seccionAhora({ pendiente, numRetos, practica: p }, ctx) {
   );
 }
 
-function barraSuperior(datos) {
+function barraSuperior(datos, rs) {
   const nodoSaldo = h('p', { class: 'saldo', 'data-testid': 'saldo' }, `0 ${textos.inicio.monedas}`);
   const constancia = h(
     'p', { class: 'constancia', 'data-testid': 'constancia' },
-    crearLlama(datos.constancia), // W48: la etapa de la llama sale del número del servidor; el número va aparte, en texto
-    `${textos.inicio.constanciaPrefijo}: ${datos.constancia}`,
+    crearLlama(rs?.valor ?? datos.constancia), // W48: la etapa de la llama sale del número del servidor; el número va aparte, en texto
+    rs?.texto ?? `${textos.inicio.constanciaPrefijo}: ${datos.constancia}`, // W81: "N semanas"
   );
   return { barra: crearCabecera({ piezas: [nodoSaldo, constancia], sonido: true }), nodoSaldo, constancia };
 }
 
 function pintarContenido(raiz, ctx, datos) {
-  const { barra, nodoSaldo, constancia } = barraSuperior(datos);
-  const racha = planDeConstancia(ctx.sesion.profileId, datos.constancia);
+  const rs = datos.practica?.racha; // W81: la racha semanal del servidor (diferida); sin ella, la constancia y la semana de siempre
+  const { barra, nodoSaldo, constancia } = barraSuperior(datos, rs);
+  const racha = rs ? rs.plan(quienVe(ctx.sesion)) : planDeConstancia(ctx.sesion.profileId, datos.constancia);
   const nivel = prepararNivel(ctx, datos.nivelConfirmado);
-  const semana = semanaDe(ctx, datos);
+  const semana = rs ? rs.semana(quienVe(ctx.sesion)) : semanaDe(ctx, datos);
   const drako = crearDrako('presenta', textos.inicio.drakoBienvenida, { saludar: true, desde: 'reposo' });
   const nodo = h(
     'div', { 'data-testid': 'vista-inicio', class: 'juego' },
@@ -272,10 +273,10 @@ function pintarContenido(raiz, ctx, datos) {
     nivel.aviso,
     seccionAhora(datos, ctx),
     // W48: la racha bajó (desde 3 o más): una línea neutra, una vez. Va DESPUÉS de "Ahora": arriba empujaba el tercer botón bajo la barra en 360 × 640.
-    racha.neutro ? crearDeNuevo(datos.mejorConstancia) : null,
+    racha.neutro ? crearDeNuevo(datos.mejorConstancia) : rs?.nueva,
     // Si subió, su aviso va en ese mismo sitio, en el flujo: flotando tapaba el saludo y el enlace a Mis monedas (ESPEC_visual_sistema1 §2b).
-    racha.celebrar ? crearAvisoDeRacha(datos.constancia, racha) : null,
-    crearSemana(semana), // W51: los 7 puntos de la semana de calendario y, si se completó, su sello
+    racha.celebrar ? crearAvisoDeRacha(rs?.valor ?? datos.constancia, racha) : null,
+    (rs?.tarjeta ?? crearSemana)(semana), // W51: los 7 puntos de la semana de calendario y, si se completó, su sello
     h('nav', {}, h('a', { href: '#/asistencia', 'data-testid': 'ir-a-asistencia' }, textos.asistencia.titulo), h('a', { href: '#/retos', 'data-testid': 'ir-a-retos' }, textos.retos.titulo)), // TRAMPOSO: vuelve la fila repetida
     crearNavInferior('/inicio', ctx.sesion?.rol), // W68: la ÚNICA navegación de Inicio (salió la fila de enlaces repetidos; "Cerrar sesión" vive en Perfil)
   );

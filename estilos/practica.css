@@ -55,3 +55,18 @@
 .practica-nivel {
   margin: 4px 2px 0;
 }
+
+/* W81: "Tu semana" con la racha semanal (sx-racha y sx-semana del sistema). La llama es la de siempre (juego.css), grande y QUIETA: solo parpadea la
+   de la cabecera (como el aviso de constancia, por fluidez). */
+.racha-semanal .sx-racha__llama {
+  display: grid;
+  place-items: end center;
+  font-size: 40px;
+}
+.racha-semanal .sx-racha__llama .llama {
+  margin: 0;
+  animation: none;
+}
+.racha-semanal > .sx-t-apoyo {
+  margin: 0;
+}

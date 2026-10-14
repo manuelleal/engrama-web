@@ -1,0 +1,16 @@
+{
+  "descripcion": "U85: la semana nueva dice \"Perdiste tu racha\" (dictamen 04 §1.1: prohibido; informa sin culpa)",
+  "archivos": {
+    "src/textos_practica.js": "textos_practica.js"
+  },
+  "comando": [
+    "node",
+    "--test",
+    "--test-reporter=tap",
+    "tests/unit/practica_racha.test.mjs"
+  ],
+  "espera_codigo_no_cero": true,
+  "espera_fallan_tests": [
+    "U85: ningún texto de la práctica del día trae una palabra prohibida"
+  ]
+}

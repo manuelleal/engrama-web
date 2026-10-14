@@ -1,8 +1,8 @@
 #!/usr/bin/env node
 // @ts-check
 // capturas_practica.mjs · Las pantallas de la práctica del día (docs/ESPEC_practica_del_dia.md) contra el mock, a 375 × 812 y a 1280 × 800, para
-// MIRARLAS: Inicio con "Tu práctica de hoy" (para empezar, a mitad, terminada, listo por hoy y con nivel de SET) y el reto con su explicación
-// (fallo y acierto; A2 en español y B1 en inglés). Cada ancho arranca con su mock recién sembrado
+// MIRARLAS: Inicio con "Tu práctica de hoy" (para empezar, a mitad, terminada, listo por hoy y con nivel de SET), el reto con su explicación
+// (fallo y acierto; A2 en español y B1 en inglés) y la racha semanal. Cada ancho arranca con su mock recién sembrado
 // (herramientas/humo/entradas_practica.mjs, en el grupo de `est-1`). Nada toca el piloto ni un puerto fijo.
 // Uso: node herramientas/capturas_practica.mjs [carpeta]   (por defecto: salida/practica/)
 import { mkdirSync, writeFileSync } from 'node:fs';
@@ -85,6 +85,22 @@ async function faseInicio({ sesion, url, retos, foto, estado }) {
   await foto('inicio-05-con-nivel-de-set');
 }
 
+/** La racha semanal: dos semanas cumplidas por asistencia, el lunes y el martes de esta semana activos y hoy 3 respuestas. @param {any} c */
+async function faseRacha({ sesion, url, retos, foto, estado }) {
+  const miercoles = Date.parse('2026-10-14T15:00:00Z');
+  estado.reloj.ahora = () => miercoles;
+  estado.tandas.length = 0;
+  const yo = estado.tokens.get('est-1');
+  for (const f of ['2026-09-28', '2026-09-29', '2026-09-30', '2026-10-05', '2026-10-06', '2026-10-07', '2026-10-12', '2026-10-13']) {
+    estado.attendanceRecords.push({ id: `asis-${f}`, tenant_id: estado.tenantDemoId, session_id: 'sesion-sintetica', student_id: yo, attendance_date: f, coins_awarded: 10, geo_status: 'sin_ubicacion', created_at: `${f}T15:00:00.000Z` });
+  }
+  jugarEnElDoble(estado, retos.find((r) => r.title === 'Trabajo · Gramática 1').id, ['B', 'B']);
+  await sesion.navegar(`${url}#/retos`); await sesion.navegar(`${url}#/inicio`); await esperar(1800);
+  await foto('inicio-06-racha-semanal');
+  await sesion.evaluar("document.querySelector('[data-testid=\"progreso-semana\"]').scrollIntoView({ block: 'center' })"); await esperar(400);
+  await foto('inicio-07-racha-semanal-tarjeta');
+}
+
 /** @param {{ancho: number, alto: number}} ventana @param {string} carpeta @param {string[]} hechas */
 async function serie(ventana, carpeta, hechas) {
   await conAppCompleta(async (url, estado) => {
@@ -100,6 +116,7 @@ async function serie(ventana, carpeta, hechas) {
       await sesion.evaluar("localStorage.setItem('engrama_actor_sintetico', 'est-1')");
       await faseInicio({ sesion, url, retos, foto, estado });
       await faseExplicacion({ sesion, url, retos, foto, estado });
+      await faseRacha({ sesion, url, retos, foto, estado });
     } finally { await sesion.cerrar(); }
   });
 }

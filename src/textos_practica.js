@@ -63,4 +63,37 @@ export const textosPractica = {
     seguir: 'Seguir con tu práctica',
     noSePudo: 'No se pudo comprobar tu respuesta. Toca Comprobar otra vez.',
   },
+  // W81: la racha SEMANAL (dictamen 04 §1.1: "N semanas", "2 de 3 días esta semana" y la semana nueva, literales). Nunca una pérdida ni una cuenta
+  // regresiva; el bono solo se dice si se pagó y vale algo (nunca "+0").
+  racha: {
+    /** La píldora de la cabecera. @param {number} n */
+    semanas: (n) => `${n} ${n === 1 ? 'semana' : 'semanas'}`,
+    /** @param {number} n */
+    semanasSeguidas: (n) => (n === 1 ? 'semana seguida' : 'semanas seguidas'),
+    /** @param {number} n */
+    sube: (n) => `¡${n} ${n === 1 ? 'semana seguida' : 'semanas seguidas'}!`,
+    /** @param {number} n */
+    crece: (n) => `¡${n} semanas seguidas! Tu llama creció.`,
+    /** @param {number} dias @param {number} meta */
+    resumen: (dias, meta) => `${dias} de ${meta} días esta semana`,
+    /** @param {number} dias @param {number} meta */
+    cumplida: (dias, meta) => `Semana cumplida: ${dias} de ${meta} días`,
+    /** Cuánto lleva hoy para que el día cuente por respuestas. @param {number} respuestas @param {number} meta @param {number} correctas */
+    hoyFalta: (respuestas, meta, correctas) => `Hoy: ${respuestas} de ${meta} respuestas. Con ${meta} respuestas y ${correctas} correctas, el día cuenta.`,
+    hoyCuenta: 'Hoy ya cuenta.',
+    /** @param {number} n @param {number} tope */
+    protector: (n, tope) => `Protector de racha: ${n} de ${tope}`,
+    /** Se pinta solo con el bono pagado y mayor que 0; aun así, con 0 nunca dice "+0". @param {number} n */
+    bono: (n) => (n > 0 ? `Semana cumplida: +${n} monedas de bono.` : 'Semana cumplida.'),
+    /** @param {number} mejor @param {number} total */
+    semanaNueva: (mejor, total) => `Semana nueva. Tu mejor racha: ${mejor}. Semanas cumplidas: ${total}.`,
+    /** @param {string} dia */
+    diaActivo: (dia) => `${dia}: día activo`,
+    /** @param {string} dia */
+    diaConAsistencia: (dia) => `${dia}: día activo, con asistencia`,
+    /** @param {string} dia */
+    diaSin: (dia) => `${dia}: sin actividad`,
+    /** @param {string} texto */
+    esHoy: (texto) => `${texto} (hoy)`,
+  },
 };

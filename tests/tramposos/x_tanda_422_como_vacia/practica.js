@@ -7,6 +7,7 @@
 import { pedirJson, ErrorApi } from './cliente.js';
 import { filtrarFugaDeClave } from './retos.js';
 import { tandaValida } from '../ui/practica.js';
+import { rachaValida } from '../ui/racha_semanal.js';
 
 export class RespuestaMalFormada extends Error {}
 
@@ -132,4 +133,22 @@ export async function responderRepaso(entradaId, questionId, label, { token, ten
   const datos = await pedirJson(`/challenges/refuerzo/${entradaId}/respuestas`, { metodo: 'POST', token, tenantId, cuerpo: { question_id: questionId, answer: label } });
   if (!respuestaDeRepasoValida(datos)) throw new RespuestaMalFormada('api/practica: la respuesta del repaso llegó mal formada');
   return datos;
+}
+
+// ---------- W81: la racha semanal ----------
+
+/**
+ * GET /core/racha — la racha semanal de esta persona en esta institución, o null si el backend no la tiene (404), falla o llega mal formada: Inicio
+ * queda con la constancia de siempre. Nunca lanza.
+ * @param {{token: string, tenantId?: string}} ctx
+ */
+export async function leerRacha({ token, tenantId }) {
+  try {
+    const datos = await pedirJson('/core/racha', { token, tenantId });
+    if (rachaValida(datos)) return datos;
+    console.warn('api/practica: la racha llegó mal formada; Inicio queda como antes', datos);
+  } catch (e) {
+    console.warn(e instanceof ErrorApi && SIN_LA_RUTA.has(e.status) ? 'api/practica: este backend no tiene la racha semanal' : 'api/practica: no se pudo leer la racha', e);
+  }
+  return null;
 }

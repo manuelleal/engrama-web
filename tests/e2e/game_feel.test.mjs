@@ -62,7 +62,8 @@ test('game feel: sin visita anterior (o sin que suba) Inicio no lanza fichas', {
 });
 
 test('game feel: si la constancia del servidor subió, Inicio la celebra (llama, aviso y confeti) mostrando el número tal cual', { skip: SKIP }, async () => {
-  await conAppCompleta(async (url) => {
+  await conAppCompleta(async (url, estado) => {
+    estado.backend.racha = false; // W81: mide la constancia de siempre (el respaldo); la racha semanal la mide E37 (docs/ESPEC_practica_del_dia.md §3)
     const r = await revisarPagina({
       url, ancho: 375, alto: 812, espera_ms: 5000,
       pre: `${YA_ENTRO}; localStorage.setItem('engrama_ultimo_constancia_est-1', '1')`,
@@ -86,7 +87,8 @@ test('game feel: si la constancia del servidor subió, Inicio la celebra (llama,
 });
 
 test('game feel: con la misma constancia que la última vez, Inicio no celebra', { skip: SKIP }, async () => {
-  await conAppCompleta(async (url) => {
+  await conAppCompleta(async (url, estado) => {
+    estado.backend.racha = false; // W81: mide la constancia de siempre (el respaldo); la racha semanal la mide E37 (docs/ESPEC_practica_del_dia.md §3)
     const r = await revisarPagina({
       url, ancho: 375, alto: 812, espera_ms: 5000,
       pre: `${YA_ENTRO}; localStorage.setItem('engrama_ultimo_constancia_est-1', '3')`,

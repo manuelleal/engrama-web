@@ -1,0 +1,16 @@
+{
+  "descripcion": "U84: Inicio no usa la racha del servidor: la llama sigue en días y \"Tu semana\" sale de las asistencias del historial",
+  "archivos": {
+    "src/vistas/estudiante/inicio_practica.js": "inicio_practica.js"
+  },
+  "comando": [
+    "node",
+    "--test",
+    "--test-reporter=tap",
+    "tests/unit/practica_racha.test.mjs"
+  ],
+  "espera_codigo_no_cero": true,
+  "espera_fallan_tests": [
+    "U84: con /core/racha, la llama dice \"2 semanas\""
+  ]
+}

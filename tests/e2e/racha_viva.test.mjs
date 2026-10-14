@@ -46,6 +46,7 @@ const VISITAR_INICIO = `(async () => {
 
 test('E22: la llama crece al cruzar 3 (aviso, etapa 1 y confeti); con el mismo valor, nada; si baja desde 5, "Empezamos de nuevo" con la mejor constancia del servidor, sin confeti ni aviso; y abrir Inicio sin cambios no celebra nada', { skip: OMITIR, timeout: 120_000 }, async () => {
   await conNavegacion(async (url, estado) => {
+    estado.backend.racha = false; // W81: mide la constancia de siempre (el respaldo); la racha semanal la mide E37 (docs/ESPEC_practica_del_dia.md §3)
     const profileId = estado.cuentas.get(CORREOS.student).profileId;
     const perfil = estado.profiles.get(profileId);
     Object.assign(perfil, { current_streak: 3, longest_streak: 5 });

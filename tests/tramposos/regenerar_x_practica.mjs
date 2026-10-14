@@ -23,6 +23,7 @@ const L1 = 'tests/unit/practica_l1.test.mjs';
 const R10 = 'tests/contrato/mock_practica.test.mjs';
 const TANDA = 'tests/unit/practica_tanda.test.mjs';
 const REPASO = 'tests/unit/practica_repaso.test.mjs';
+const RACHA = 'tests/unit/practica_racha.test.mjs';
 /** @type {[string, string]} */
 const SIN_SALIDA_L1 = ["    estado.encabezado = crearCabecera({ piezas: [estado.salir, h('h1', { class: 'titulo-reto' }, tituloLegible(challenge.title))], sonido: true }),",
   "    estado.encabezado = crearCabecera({ piezas: [/* TRAMPOSO: sin salida */ h('h1', { class: 'titulo-reto' }, tituloLegible(challenge.title))], sonido: true }),"];
@@ -64,7 +65,7 @@ export const TRAMPOSOS = {
   x_tanda_se_pide_al_pintar: {
     archivo: 'src/vistas/estudiante/inicio_practica.js', prueba: TANDA, tests: ['U81: sin tanda pedida, la protagonista es la primera'],
     descripcion: 'U81: Inicio PIDE la tanda al pintar (POST): abrir la app gasta el tope del día y marca días "sin contenido" que nadie pidió',
-    cambios: [['  const tanda = await verTanda(ctx);', '  const tanda = await pedirTanda(ctx);']],
+    cambios: [['  const [tanda, racha] = await Promise.all([verTanda(ctx), leerRacha(ctx)]);', '  const [tanda, racha] = await Promise.all([pedirTanda(ctx), leerRacha(ctx)]);']],
   },
   x_practica_aviso_de_nivel_mudo: {
     archivo: 'src/vistas/estudiante/inicio_practica.js', prueba: TANDA, tests: ['U81: sin tanda pedida, la protagonista es la primera'],
@@ -85,6 +86,28 @@ export const TRAMPOSOS = {
     archivo: 'herramientas/mock/racha.mjs', prueba: R10, tests: ['R10: GET /core/racha responde RachaOut'],
     descripcion: 'R10: la semana del doble tiene 6 días (se pierde el domingo): los puntos de "Tu semana" no son los del backend',
     cambios: [['export const diasDeSemana = (lunes) => Array.from({ length: 7 }, (_, i) => sumarDias(lunes, i));', 'export const diasDeSemana = (lunes) => Array.from({ length: 6 }, (_, i) => sumarDias(lunes, i));']],
+  },
+  x_semana_cuenta_los_puntos: {
+    archivo: 'src/ui/racha_semanal.js', prueba: RACHA, tests: ['U83: los 7 puntos son los del servidor'],
+    descripcion: 'U83: la web cuenta los puntos llenos en vez de usar dias_activos del servidor (y se equivoca cuando un día cuenta por algo que no ve)',
+    cambios: [['    resumen: completa ? T.cumplida(semana.dias_activos, semana.meta_dias) : T.resumen(semana.dias_activos, semana.meta_dias), // los del servidor',
+      '    resumen: completa ? T.cumplida(puntos.filter((p) => p.lleno).length, semana.meta_dias) : T.resumen(puntos.filter((p) => p.lleno).length, semana.meta_dias),']],
+  },
+  x_racha_valida_todo: {
+    archivo: 'src/ui/racha_semanal.js', prueba: RACHA, tests: ['U83: rachaValida rechaza 6 días'],
+    descripcion: 'U83: cualquier respuesta de /core/racha se usa (con 6 días o números como texto, "ausente" pasa por "0")',
+    cambios: [['export function rachaValida(r) {\n', 'export function rachaValida(r) {\n  return esObjeto(r);\n']],
+  },
+  x_semana_desde_el_historial: {
+    archivo: 'src/vistas/estudiante/inicio_practica.js', prueba: RACHA, tests: ['U84: con /core/racha, la llama dice "2 semanas"'],
+    descripcion: 'U84: Inicio no usa la racha del servidor: la llama sigue en días y "Tu semana" sale de las asistencias del historial',
+    cambios: [['    racha: racha ? rachaParaInicio(racha) : null,', '    racha: null,']],
+  },
+  x_textos_practica_perderas: {
+    archivo: 'src/textos_practica.js', prueba: RACHA, tests: ['U85: ningún texto de la práctica del día trae una palabra prohibida'],
+    descripcion: 'U85: la semana nueva dice "Perdiste tu racha" (dictamen 04 §1.1: prohibido; informa sin culpa)',
+    cambios: [['    semanaNueva: (mejor, total) => `Semana nueva. Tu mejor racha: ${mejor}. Semanas cumplidas: ${total}.`,',
+      '    semanaNueva: (mejor, total) => `Perdiste tu racha. Tu mejor racha: ${mejor}. Semanas cumplidas: ${total}.`,']],
   },
   x_api_l1_sin_validar: {
     archivo: 'src/api/practica.js', prueba: L1, tests: ['U77: responderPregunta manda la label'],
