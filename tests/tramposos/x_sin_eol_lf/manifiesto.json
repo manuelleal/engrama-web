@@ -1,0 +1,16 @@
+{
+  "descripcion": "U59 (H-5): sin `*.js text eol=lf`, git archive con core.autocrlf=true sirve el shell en CRLF (más pesado que lo que mide U59) y nada lo ve",
+  "archivos": {
+    ".gitattributes": "gitattributes.txt"
+  },
+  "comando": [
+    "node",
+    "--test",
+    "--test-reporter=tap",
+    "tests/unit/sw_peso.test.mjs"
+  ],
+  "espera_codigo_no_cero": true,
+  "espera_fallan_tests": [
+    "U59: cada archivo de PRECARGA sale de git archive"
+  ]
+}

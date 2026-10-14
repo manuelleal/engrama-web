@@ -1,3 +1,14 @@
+# H-5 (docs/ESPEC_correcciones_practica.md): lo que se sirve sale con fin de línea LF en cualquier máquina, también por `git archive` con
+# core.autocrlf=true. Es lo que mide U59 (tests/unit/sw_peso.test.mjs). Un patrón por línea (en una sola línea, git leería los demás patrones
+# como nombres de atributo). *.mjs y *.svg van porque PRECARGA (sw.js) trae de los dos.
+*.js text eol=lf
+*.mjs text eol=lf
+*.css text eol=lf
+*.html text eol=lf
+*.json text eol=lf
+*.webmanifest text eol=lf
+*.svg text eol=lf
+# Copias tal cual (sha256 en sus PROCEDENCIA.md): sin conversión. Van DESPUÉS: la última línea gana.
 vendor/** -text
 publico/fuentes/** -text
 publico/diseno/sistema.css -text

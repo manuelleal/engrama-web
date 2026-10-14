@@ -161,7 +161,7 @@ Fuente de cómo se ve: `..\..\diseno\sistema\` (`sistema.css`, `LEEME.md`). Regl
 - **La barra de abajo es `sx-barra`**: conserva `nav.nav-inferior` (su sitio fijo y lo que miran las pruebas) y su registro sale del rol (`registroDeLaBarra`): juego, el valor por defecto, SOLO para el estudiante; `sx-sereno` para el profe y el admin.
 - **Una sola cabecera para el estudiante: `ui/cabecera.js`** (`header.barra-superior`, la franja navy del sistema) en todas sus pantallas. El volver y el título siguen saliendo de `ui/encabezado.js` (V8). El profe y el admin no llevan franja. El sonido es un botón-ícono con `aria-label`, `aria-pressed` y `title`, solo en las pantallas de juego. La mascota no va en la franja.
 - **El aviso de constancia va en el flujo de la pantalla** (`crearAvisoDeRacha`, U73): lo pone la vista en su sitio (Inicio, después de "Ahora"; la asistencia, en la zona del sello); nunca cuelga del `body` ni tiene posición propia.
-- **Peso:** `PRECARGA` no pasa de 830.000 bytes en disco (hoy 829.902, con 98 de margen; 827.312 con fin de línea LF, que es lo que guarda git): lo nuevo entra borrando lo viejo. Se mide sumando en disco los archivos de la lista. Ojo: un `git checkout` de un archivo en esta máquina lo deja en CRLF y engorda la medida en disco.
+- **Peso:** `PRECARGA` no pasa de 830.000 bytes **como se sirve** (U59, `tests/unit/sw_peso.test.mjs`; la cifra de hoy, en "La práctica del día" más abajo): lo nuevo entra borrando lo viejo. Desde H-5 (`docs/ESPEC_correcciones_practica.md`) `.gitattributes` fija `text eol=lf` en `*.js *.mjs *.css *.html *.json *.webmanifest *.svg` (un patrón por línea; los `-text` de `vendor/`, las fuentes y `sistema.css` van después y ganan): un checkout o un `git archive` sale en LF aunque la máquina tenga `core.autocrlf=true`, y U59 exige que cada archivo de `PRECARGA` salga así.
 - **Nada de `:has()` sobre la raíz de la app con un descendiente detrás** (`#vista:has(…) form button`), fuera de un `@media` de escritorio: recalcula el estilo de todo el árbol en cada cambio del DOM y bajó la celebración de Inicio de 59 a 55,5 fps (lo vigila `css_cara.test.mjs`; se midió con `npm run fluidez`, varias corridas: una sola engaña, el ruido es de 1 fps).
 
 ## La práctica del día sin profe (2026-10-14, `docs/ESPEC_practica_del_dia.md`, W78 a W82; backend `f7f7aeb`)
@@ -170,8 +170,11 @@ Fuente de cómo se ve: `..\..\diseno\sistema\` (`sistema.css`, `LEEME.md`). Regl
   nunca en `PRECARGA`. **U59** (`tests/unit/sw_peso.test.mjs`) vigila el techo (830.000 bytes LF) y que todo `import()` y lo que importa un diferido estén
   guardados. Lo que crece dentro del shell son solo los enchufes (`reto_flujo.js`, `inicio.js`, `app.js`, `navegacion.js`). Si un diferido no carga, la
   app es la de antes. Los textos nuevos viven en `src/textos_practica.js` (no se esparcen en `textos.js`: los importa solo lo diferido).
-  Ojo: el despliegue exporta con `git archive` y esta máquina tiene `core.autocrlf=true`: lo servido lleva CRLF y pesa unos 12 KB más que lo que mide U59
-  (841.241 al cerrar W82; ya pasaba el techo en `8ef6298`). Para servir lo que mide U59: `git -c core.autocrlf=false archive`.
+  **Cómo exportar para servir:** `git -c core.autocrlf=false archive --format=tar <commit>` (desde H-5 da lo mismo con `true`: `.gitattributes` fija
+  `eol=lf`). Hasta `3c81fe3` lo servido salía en CRLF y pesaba unos 12 KB más que lo medido (839.282 en `8ef6298`, 841.241 en `3c81fe3`: sobre el
+  techo, sin que nada lo viera). `node herramientas/peso_servido.mjs [commit] [--autocrlf true|false]` exporta ese commit como el despliegue, suma
+  `PRECARGA` del tar y escribe `salida/peso_servido.json`: debe dar lo mismo que U59 (sale en 1 si pasa el techo). El script del despliegue (otro repo)
+  todavía no mide el árbol exportado: va a "Después".
 - **Respaldo = backend viejo:** cada ruta nueva (`/answers`, `/finish`, `/challenges/tanda`, `/core/racha`) que responde 404, 405 o 422 (o falla, o llega
   mal formada) deja la pantalla como antes. El mock lo imita con `estado.backend = {l1, tanda, racha}` en `false`. El 409 `intento_con_respuestas` de
   `/submit` reabre el reto pregunta por pregunta (una vez).

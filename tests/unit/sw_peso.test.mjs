@@ -5,8 +5,13 @@
 // nada lo viera (candidato a ERR anotado en la adenda §17.1.7). Lo nuevo entra fuera de la precarga; el techo no se sube para que algo quepa.
 // Lo nuevo de la práctica del día va en `DIFERIDOS` (módulos con `import()`, guardados al activar).
 // Tramposos: x_precarga_engorda (sw.js con sistema.css dentro de PRECARGA) y x_diferido_suelto (sw.js sin reto_l1.js en DIFERIDOS).
+// H-5 (docs/ESPEC_correcciones_practica.md): lo que se SIRVE es lo que mide U59. El despliegue exporta con `git archive` y esta máquina tiene
+// core.autocrlf=true: sin `eol=lf` en .gitattributes, lo servido salía en CRLF (841.241 bytes al cerrar W82, sobre el techo) sin que nada lo viera.
+// Ahora una prueba exige que cada archivo de PRECARGA salga de git como se mide aquí: `eol=lf` (LF), o `-text` (tal cual) y sin CRLF.
+// Tramposo: x_sin_eol_lf (.gitattributes sin la línea de *.js).
 import test from 'node:test';
 import assert from 'node:assert/strict';
+import { spawnSync } from 'node:child_process';
 import { existsSync, readdirSync, readFileSync } from 'node:fs';
 import { join } from 'node:path';
 import { fileURLToPath } from 'node:url';
@@ -22,10 +27,38 @@ export function listaDeSw(texto, nombre) {
 
 /** Bytes de un archivo del shell con fin de línea LF. @param {string} ruta como la pide el navegador ("/src/app.js", "/") */
 export function bytesLf(ruta) {
-  const archivo = join(RAIZ, ruta === '/' ? 'index.html' : ruta.slice(1));
-  const crudo = readFileSync(archivo);
+  const crudo = readFileSync(join(RAIZ, archivoDe(ruta)));
   return Buffer.from(crudo.toString('latin1').replace(/\r\n/g, '\n'), 'latin1').length;
 }
+
+/** El archivo del repo que sirve una ruta del navegador ("/" es index.html). @param {string} ruta */
+export const archivoDe = (ruta) => (ruta === '/' ? 'index.html' : ruta.slice(1));
+
+/**
+ * H-5: lo que git dice de cada archivo (`git check-attr text eol`), leyendo el .gitattributes de la copia de trabajo.
+ * @param {string[]} archivos rutas del repo @returns {Map<string, {text: string, eol: string}>}
+ */
+export function atributosDeGit(archivos) {
+  const r = spawnSync('git', ['check-attr', 'text', 'eol', '--', ...archivos], { cwd: RAIZ, encoding: 'utf8' });
+  assert.equal(r.status, 0, `git check-attr falló: ${r.stderr}`);
+  const salida = new Map(archivos.map((a) => [a, { text: 'unspecified', eol: 'unspecified' }]));
+  for (const linea of r.stdout.split('\n')) {
+    const m = /^(.*): (text|eol): (.*)$/.exec(linea.trim());
+    if (m && salida.has(m[1])) /** @type {any} */ (salida.get(m[1]))[m[2]] = m[3];
+  }
+  return salida;
+}
+
+test('U59: cada archivo de PRECARGA sale de git archive como lo mide U59 (eol=lf, o -text y sin CRLF), aunque la máquina tenga core.autocrlf=true', () => {
+  const archivos = listaDeSw(readFileSync(join(RAIZ, 'sw.js'), 'utf8'), 'PRECARGA').map(archivoDe);
+  const attrs = atributosDeGit(archivos);
+  const mal = archivos.filter((a) => {
+    const { text, eol } = /** @type {{text: string, eol: string}} */ (attrs.get(a));
+    if (text === 'unset') return readFileSync(join(RAIZ, a)).includes('\r\n'); // tal cual: se sirve crudo; con CRLF, U59 lo mediría de menos
+    return eol !== 'lf';
+  });
+  assert.deepEqual(mal, [], 'estos archivos saldrían de `git archive` con CRLF (o distintos de lo medido): fíjales `text eol=lf` en .gitattributes');
+});
 
 test('U59: la precarga del shell (sw.js PRECARGA, con fin de línea LF) no pasa de 830.000 bytes', (t) => {
   const precarga = listaDeSw(readFileSync(join(RAIZ, 'sw.js'), 'utf8'), 'PRECARGA');

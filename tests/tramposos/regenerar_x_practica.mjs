@@ -31,7 +31,7 @@ const SIN_SALIDA_L1 = ["    estado.encabezado = crearCabecera({ piezas: [estado.
 
 /**
  * nombre → {archivo, prueba, tests (los que deben quedar rojos), descripcion, cambios}; `otros`: más archivos del mismo defecto (con sus cambios).
- * @type {Record<string, {archivo: string, prueba: string, tests: string[], descripcion: string, cambios: Array<[string, string]>, otros?: Array<{archivo: string, cambios: Array<[string, string]>}>}>}
+ * @type {Record<string, {archivo: string, copia?: string, prueba: string, tests: string[], descripcion: string, cambios: Array<[string, string]>, otros?: Array<{archivo: string, cambios: Array<[string, string]>}>}>}
  */
 export const TRAMPOSOS = {
   x_mock_repaso_paga: {
@@ -189,6 +189,11 @@ export const TRAMPOSOS = {
     cambios: [['    if (e instanceof ErrorApi && e.status === 409) { avisoDeCierre(raiz, estado); return; } // H-2: el intento ya no admite respuestas\n    if (e instanceof ErrorApi && e.status === 404) { avisoDeCierre(raiz, estado, T.noDisponible); return; }',
       '    if (e instanceof ErrorApi && [404, 409].includes(e.status)) { pintarErrorFlujo(raiz, e.mensaje); return; }']],
   },
+  x_sin_eol_lf: {
+    archivo: '.gitattributes', copia: 'gitattributes.txt', prueba: 'tests/unit/sw_peso.test.mjs', tests: ['U59: cada archivo de PRECARGA sale de git archive'],
+    descripcion: 'U59 (H-5): sin `*.js text eol=lf`, git archive con core.autocrlf=true sirve el shell en CRLF (más pesado que lo que mide U59) y nada lo ve',
+    cambios: [['*.js text eol=lf\n', '']],
+  },
   x_l1_409_mudo: {
     archivo: 'src/vistas/estudiante/reto_flujo.js', prueba: L1, tests: ['U79: si /submit responde 409 intento_con_respuestas'],
     descripcion: 'U79: el 409 intento_con_respuestas se calla: el estudiante queda en un reto que no se puede enviar',
@@ -205,8 +210,10 @@ function main() {
     for (const { archivo, cambios } of [{ archivo: t.archivo, cambios: t.cambios }, ...(t.otros || [])]) {
       let texto = readFileSync(`${RAIZ}${archivo}`, 'utf8').replace(/\r\n/g, '\n');
       for (const [de, a] of cambios) texto = cambiar(texto, de, a);
-      writeFileSync(`${AQUI}${nombre}/${basename(archivo)}`, texto);
-      archivos[archivo] = basename(archivo);
+      // `copia`: otro nombre para la copia (un `.gitattributes` copiado tal cual valdría como atributos de su carpeta).
+      const copia = archivo === t.archivo && t.copia ? t.copia : basename(archivo);
+      writeFileSync(`${AQUI}${nombre}/${copia}`, texto);
+      archivos[archivo] = copia;
     }
     const manifiesto = {
       descripcion: t.descripcion, archivos,
