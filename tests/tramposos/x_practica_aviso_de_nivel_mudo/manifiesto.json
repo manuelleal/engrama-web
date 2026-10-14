@@ -1,0 +1,16 @@
+{
+  "descripcion": "U81: \"Practicas en: A2\" sin el \"Todavía no es tu nivel\" cuando no hay SET (se lee como el nivel: riesgo 6 del dictamen)",
+  "archivos": {
+    "src/vistas/estudiante/inicio_practica.js": "inicio_practica.js"
+  },
+  "comando": [
+    "node",
+    "--test",
+    "--test-reporter=tap",
+    "tests/unit/practica_tanda.test.mjs"
+  ],
+  "espera_codigo_no_cero": true,
+  "espera_fallan_tests": [
+    "U81: sin tanda pedida, la protagonista es la primera"
+  ]
+}

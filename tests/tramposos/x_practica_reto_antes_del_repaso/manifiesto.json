@@ -1,0 +1,16 @@
+{
+  "descripcion": "U80: el primer reto pendiente va antes que el repaso (el repaso, que no paga, queda para nunca)",
+  "archivos": {
+    "src/ui/practica.js": "practica.js"
+  },
+  "comando": [
+    "node",
+    "--test",
+    "--test-reporter=tap",
+    "tests/unit/practica_tanda.test.mjs"
+  ],
+  "espera_codigo_no_cero": true,
+  "espera_fallan_tests": [
+    "U80: el repaso va antes que cualquier reto"
+  ]
+}

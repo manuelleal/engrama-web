@@ -5,6 +5,8 @@
 //   - la opción múltiple manda la LABEL ("A", "B"…), nunca el `value` (regla 4): quien llama ya la trae así;
 //   - la clave nunca llega a una vista antes de responder (regla 3): lo que sirve una pregunta SIN responder pasa por el filtro de api/retos.js.
 import { pedirJson, ErrorApi } from './cliente.js';
+import { filtrarFugaDeClave } from './retos.js';
+import { tandaValida } from '../ui/practica.js';
 
 export class RespuestaMalFormada extends Error {}
 
@@ -59,9 +61,73 @@ export async function responderPregunta(attemptId, questionId, label, { token, t
 }
 
 /**
- * POST /challenges/attempts/{id}/finish — cierra con lo guardado; responde lo mismo que /submit (AttemptSubmitOut).
- * @param {string} attemptId @param {{token: string, tenantId?: string}} ctx
+ * POST /challenges/attempts/{id}/finish — cierra con lo guardado; responde lo mismo que /submit (AttemptSubmitOut). * @param {string} attemptId @param {{token: string, tenantId?: string}} ctx
  */
 export async function terminarIntento(attemptId, { token, tenantId }) {
   return pedirJson(`/challenges/attempts/${attemptId}/finish`, { metodo: 'POST', token, tenantId });
+}
+
+// ---------- W79 y W80: la tanda de hoy y el repaso ----------
+
+let fugas = 0;
+/** Las claves que llegaron antes de tiempo en la tanda (y se descartaron): para el humo y las pruebas. */
+export const fugasDePractica = () => fugas;
+
+/**
+ * La tanda sin nada de la clave: cada reto pasa por el filtro de api/retos.js y cada pregunta de repaso también (regla 3 del cliente). Una fuga se
+ * cuenta y se registra; el resto llega igual. Pura salvo el contador. @param {any} t
+ */
+export function tandaSinClave(t) {
+  if (!t?.tanda) return t;
+  const vistas = [];
+  const retos = t.tanda.retos.map((/** @type {any} */ r) => { const f = filtrarFugaDeClave(r.reto); vistas.push(...f.fugas); return { ...r, reto: f.limpio }; });
+  const repaso = t.tanda.repaso.map((/** @type {any} */ e) => {
+    const f = filtrarFugaDeClave({ questions: [e.pregunta] });
+    vistas.push(...f.fugas);
+    return { ...e, pregunta: f.limpio.questions[0] };
+  });
+  if (vistas.length) { fugas += vistas.length; console.error('api/practica: fuga_de_clave en la tanda', vistas); }
+  return { ...t, tanda: { ...t.tanda, retos, repaso } };
+}
+
+/**
+ * GET /challenges/tanda — la tanda de hoy (no escribe), o null si el backend no la ofrece (404, 405, 422: uno anterior a la tanda), si falla o si
+ * llega mal formada: Inicio queda como antes. Nunca lanza.
+ * @param {{token: string, tenantId?: string}} ctx
+ */
+export async function verTanda({ token, tenantId }) {
+  try {
+    const datos = await pedirJson('/challenges/tanda', { token, tenantId });
+    if (tandaValida(datos)) return tandaSinClave(datos);
+    console.warn('api/practica: la tanda llegó mal formada; Inicio queda como antes', datos);
+  } catch (e) {
+    console.warn(e instanceof ErrorApi && SIN_LA_RUTA.has(e.status) ? 'api/practica: este backend no arma tandas' : 'api/practica: no se pudo leer la tanda', e);
+  }
+  return null;
+}
+
+/**
+ * POST /challenges/tanda — "dame la tanda de hoy" (gasta el tope del día si crea una: solo sale por un toque). Lanza `ErrorApi` o `RespuestaMalFormada`.
+ * @param {{token: string, tenantId?: string}} ctx
+ */
+export async function pedirTanda({ token, tenantId }) {
+  const datos = await pedirJson('/challenges/tanda', { metodo: 'POST', token, tenantId });
+  if (!tandaValida(datos)) throw new RespuestaMalFormada('api/practica: la tanda pedida llegó mal formada');
+  return tandaSinClave(datos);
+}
+
+/** ¿Una respuesta del repaso (RespuestaOut) trae lo que la banda usa? Pura. @param {any} r */
+export function respuestaDeRepasoValida(r) {
+  return esObjeto(r) && Number.isInteger(r.entrada_id) && typeof r.is_correct === 'boolean' && esTexto(r.correct_answer)
+    && textoONulo(r.oracion_correcta) && (r.explanation === null || r.explanation === undefined || esObjeto(r.explanation));
+}
+
+/**
+ * POST /challenges/refuerzo/{entrada_id}/respuestas — responde la forma vigente del repaso (0 monedas). Manda la LABEL. Lanza si falla.
+ * @param {number} entradaId @param {string} questionId @param {string} label @param {{token: string, tenantId?: string}} ctx
+ */
+export async function responderRepaso(entradaId, questionId, label, { token, tenantId }) {
+  const datos = await pedirJson(`/challenges/refuerzo/${entradaId}/respuestas`, { metodo: 'POST', token, tenantId, cuerpo: { question_id: questionId, answer: label } });
+  if (!respuestaDeRepasoValida(datos)) throw new RespuestaMalFormada('api/practica: la respuesta del repaso llegó mal formada');
+  return datos;
 }

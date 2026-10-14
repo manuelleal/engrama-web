@@ -1,0 +1,16 @@
+{
+  "descripcion": "U81: Inicio PIDE la tanda al pintar (POST): abrir la app gasta el tope del día y marca días \"sin contenido\" que nadie pidió",
+  "archivos": {
+    "src/vistas/estudiante/inicio_practica.js": "inicio_practica.js"
+  },
+  "comando": [
+    "node",
+    "--test",
+    "--test-reporter=tap",
+    "tests/unit/practica_tanda.test.mjs"
+  ],
+  "espera_codigo_no_cero": true,
+  "espera_fallan_tests": [
+    "U81: sin tanda pedida, la protagonista es la primera"
+  ]
+}

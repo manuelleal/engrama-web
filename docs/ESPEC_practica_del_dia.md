@@ -142,8 +142,7 @@ Contrato (solo lectura) de `engrama-backend` `f7f7aeb`: `docs/ESPEC_l1_correccio
   - `reto_flujo`, `game_feel`, `linea_fin_reto`, `celebraciones_ruta`: miden el flujo de HOY; corren con `estado.backend.l1 = false` (el respaldo).
     El flujo nuevo lo mide E35.
   - `racha_viva` (E22): mide la constancia de HOY; corre con `estado.backend.racha = false`. La racha semanal la mide E37.
-  - `inicio_ahora` (E31 de Inicio) y `nav_medidas` (E31): los botones de "Ahora" se cuentan como `a, button`; con la protagonista, el primero es
-    "Jugar" (un `button` en el paso `empezar`) y laten 0 tarjetas (la protagonista no late); todo lo demás igual.
+  - ~~`inicio_ahora` y `nav_medidas` cambian de criterio~~ (Adenda 1, §6b: ya no cambian; "Jugar" sigue siendo un enlace y la protagonista late).
   - `humo_navegacion` (W75): su sha256 cambia (Inicio pide dos rutas más y "Jugar" pasa por la tanda); se re-mide y se declara aquí al cerrar.
     Sus tablas de criterio no cambian.
 - `herramientas/capturas_estudiante.mjs` juega el reto pregunta por pregunta (Comprobar); `galeria*.mjs`, `fluidez.mjs` y `largos_fin_reto.mjs`
@@ -164,6 +163,17 @@ la pantalla de asistencia · el panel del profe y del admin · `diseno/` y `publ
 La asistencia sigue celebrando la constancia diaria del check-in mientras Inicio habla de semanas · celebrar el día que pasa a activo al volver del
 reto · "días activos esta semana" en la lista del profe · la escalera y las gemelas reales en el mock · el aviso "(40 min)" · las pistas (`pistas`)
 cuando el pedagogo las firme · un reintento que ofrezca la forma gemela desde la revisión.
+
+## 6b. Adenda 1 (2026-10-14, ANTES de escribir W79; manda sobre §W79 y §3 donde choquen)
+Al leer los humos y E31 antes de tocar Inicio se vio que la protagonista, tal como estaba escrita, cambiaba criterios que no hacía falta cambiar:
+- La protagonista **conserva** `data-testid="tarjeta-reto-hoy"`, la clase `fila-ahora` y es **la única que late** (`fila-invitacion`); su botón sigue
+  siendo `jugar-reto-hoy` y es un **enlace**: en el paso `empezar` (y en `otra`) apunta al reto pendiente del feed y, tocado, hace el `POST`
+  (bloqueado mientras vuela) y va al primer paso de la tanda; sin tanda, sigue a ese reto. Así E31 (`inicio_ahora`, `nav_medidas`: "Jugar" primero,
+  una sola invitación) y la réplica del humo de navegación (`ahora`, `invitacion`) **no cambian de criterio**; se borra de §3 la línea que los cambiaba.
+- Con el feed vacío (`GET /challenges/` sin retos) no se invita a `empezar`: no hay con qué armar una tanda nueva (queda lo de siempre).
+- Sin tanda y con `racha_protegida` (el día ya quedó sin contenido) también es respaldo: la línea "Hoy no hay práctica nueva…" va sola.
+- El botón del sistema dentro de la protagonista (`sx-btn sx-btn--claro`) perdía su color por la regla vieja de `cara.css` sobre
+  `a[data-testid="jugar-reto-hoy"]`: esa regla deja fuera a `.sx-btn` (`:where(:not(.sx-btn))`), como manda el CLAUDE.md (la vieja deja fuera a la nueva).
 
 ## 7. Medido al cerrar
 (Se llena al cerrar: commits, cifras de `verificar.mjs` y de la suite, peso LF y `VERSION`, tabla de E2E, sha256 del humo y de la réplica, y lo que

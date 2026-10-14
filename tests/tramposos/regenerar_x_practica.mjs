@@ -21,6 +21,7 @@ function cambiar(texto, de, a) {
 
 const L1 = 'tests/unit/practica_l1.test.mjs';
 const R10 = 'tests/contrato/mock_practica.test.mjs';
+const TANDA = 'tests/unit/practica_tanda.test.mjs';
 /** @type {[string, string]} */
 const SIN_SALIDA_L1 = ["    estado.encabezado = crearCabecera({ piezas: [estado.salir, h('h1', { class: 'titulo-reto' }, tituloLegible(challenge.title))], sonido: true }),",
   "    estado.encabezado = crearCabecera({ piezas: [/* TRAMPOSO: sin salida */ h('h1', { class: 'titulo-reto' }, tituloLegible(challenge.title))], sonido: true }),"];
@@ -40,6 +41,34 @@ export const TRAMPOSOS = {
     archivo: 'herramientas/mock/practica.mjs', prueba: R10, tests: ['R10: completar la tanda deja pedir la segunda'],
     descripcion: 'R10: el doble no tiene tope de tandas al día (siempre arma otra)',
     cambios: [['  if (terminada && hechas.length < estado.practica.maxAlDia) crearTanda(estado, auth, hoy, hechas);', '  if (terminada) crearTanda(estado, auth, hoy, hechas);']],
+  },
+  x_api_practica_sin_filtro: {
+    archivo: 'src/api/practica.js', prueba: TANDA, tests: ['U77: la tanda llega sin la clave'],
+    descripcion: 'U77: la tanda pasa tal cual: si el servidor manda la clave de un reto o de una pregunta de repaso, llega a la vista (regla 3)',
+    cambios: [['  if (!t?.tanda) return t;\n', '  return t;\n']],
+  },
+  x_tanda_422_como_vacia: {
+    archivo: 'src/api/practica.js', prueba: TANDA, tests: ['U81: con un backend sin la tanda'],
+    descripcion: 'U81: el 422 de un backend viejo se toma como "tanda vacía": Inicio invita a una práctica que no existe en vez de quedar como antes',
+    cambios: [["  } catch (e) {\n    console.warn(e instanceof ErrorApi && SIN_LA_RUTA.has(e.status) ? 'api/practica: este backend no arma tandas'",
+      "  } catch (e) {\n    if (e instanceof ErrorApi && SIN_LA_RUTA.has(e.status)) return { fecha: '', practica: { nivel: 'A2', con_nivel_de_set: false }, tanda: null, tandas_hoy: 0, tope_al_dia: 2, puede_pedir_otra: true, listo_por_hoy: false, sin_contenido_nuevo: false };\n    console.warn(e instanceof ErrorApi && SIN_LA_RUTA.has(e.status) ? 'api/practica: este backend no arma tandas'"]],
+  },
+  x_practica_reto_antes_del_repaso: {
+    archivo: 'src/ui/practica.js', prueba: TANDA, tests: ['U80: el repaso va antes que cualquier reto'],
+    descripcion: 'U80: el primer reto pendiente va antes que el repaso (el repaso, que no paga, queda para nunca)',
+    cambios: [["  if (repaso.length > 0) return { tipo: 'repaso', nivel, cuantas: repaso.length, hechos, pasos: retos.length }; // el repaso, primero\n", ''],
+      ["  return { tipo: t.puede_pedir_otra && !sinMasHoy ? 'otra' : 'listo', nivel, hechos, pasos: retos.length };",
+        "  if (repaso.length > 0) return { tipo: 'repaso', nivel, cuantas: repaso.length, hechos, pasos: retos.length };\n  return { tipo: t.puede_pedir_otra && !sinMasHoy ? 'otra' : 'listo', nivel, hechos, pasos: retos.length };"]],
+  },
+  x_tanda_se_pide_al_pintar: {
+    archivo: 'src/vistas/estudiante/inicio_practica.js', prueba: TANDA, tests: ['U81: sin tanda pedida, la protagonista es la primera'],
+    descripcion: 'U81: Inicio PIDE la tanda al pintar (POST): abrir la app gasta el tope del día y marca días "sin contenido" que nadie pidió',
+    cambios: [['  const tanda = await verTanda(ctx);', '  const tanda = await pedirTanda(ctx);']],
+  },
+  x_practica_aviso_de_nivel_mudo: {
+    archivo: 'src/vistas/estudiante/inicio_practica.js', prueba: TANDA, tests: ['U81: sin tanda pedida, la protagonista es la primera'],
+    descripcion: 'U81: "Practicas en: A2" sin el "Todavía no es tu nivel" cuando no hay SET (se lee como el nivel: riesgo 6 del dictamen)',
+    cambios: [["    plan.nivel.conSet ? null : h('p', { class: 'sx-t-apoyo', 'data-testid': 'practica-sin-set' }, T.sinSet));", '    null);']],
   },
   x_api_l1_sin_validar: {
     archivo: 'src/api/practica.js', prueba: L1, tests: ['U77: responderPregunta manda la label'],

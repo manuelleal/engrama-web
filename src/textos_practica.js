@@ -22,4 +22,34 @@ export const textosPractica = {
     /** La que guardó el servidor (gana la primera) cuando no es la que se ve elegida. @param {string} label @param {string} texto */
     quedoGuardada: (label, texto) => `Quedó guardada tu primera respuesta: ${label}: ${texto}`,
   },
+  // W79: "Tu práctica de hoy", la protagonista de "Ahora". El nivel y "Listo por hoy" son del dictamen 04 §1.3 (sin "(40 min)": la duración no sale
+  // de ningún dato).
+  practica: {
+    rotulo: 'Tu práctica de hoy',
+    empezarTitulo: 'Repaso y retos de tu nivel',
+    empezarApoyo: 'Unos 6 a 10 minutos',
+    jugar: 'Jugar',
+    repasar: 'Repasar',
+    masPractica: 'Practicar más',
+    pidiendo: 'Armando tu práctica…',
+    noSePudo: 'No se pudo armar tu práctica. Toca otra vez.',
+    repasoTitulo: 'Repaso primero',
+    /** @param {number} n */
+    repasoApoyo: (n) => `${n} ${n === 1 ? 'pregunta' : 'preguntas'} · no suma monedas, sí cuenta para tu racha`,
+    /** @param {number} i @param {number} n */
+    paso: (i, n) => `Paso ${i} de ${n}`,
+    /** @param {number} n */
+    hasta: (n) => `Hasta ${n} ${n === 1 ? 'moneda' : 'monedas'}`,
+    segundaVuelta: 'Segunda vuelta',
+    otraTitulo: 'Terminaste tu práctica',
+    otraApoyo: 'Puedes hacer una más hoy.',
+    listoTitulo: 'Listo por hoy.',
+    listoApoyo: 'Lo que se estudia en días distintos se recuerda más. Mañana hay más.',
+    /** @param {string} nivel */
+    nivel: (nivel) => `Practicas en: ${nivel}`,
+    sinSet: 'Todavía no es tu nivel. Confírmalo con el examen.',
+    protegida: 'Hoy no hay práctica nueva de tu nivel. Esta semana tu racha queda como está.',
+    /** @param {number} hechos @param {number} total */
+    avance: (hechos, total) => `Llevas ${hechos} de ${total} retos de hoy`,
+  },
 };

@@ -1,0 +1,16 @@
+{
+  "descripcion": "U77: la tanda pasa tal cual: si el servidor manda la clave de un reto o de una pregunta de repaso, llega a la vista (regla 3)",
+  "archivos": {
+    "src/api/practica.js": "practica.js"
+  },
+  "comando": [
+    "node",
+    "--test",
+    "--test-reporter=tap",
+    "tests/unit/practica_tanda.test.mjs"
+  ],
+  "espera_codigo_no_cero": true,
+  "espera_fallan_tests": [
+    "U77: la tanda llega sin la clave"
+  ]
+}

@@ -132,8 +132,8 @@ button.boton-secundario {
   border-bottom-color: color-mix(in srgb, var(--primario) 45%, white);
 }
 
-/* "Jugar": el reto de hoy y cada reto pendiente de la lista. "Repasar" (ya ganado, no suma) queda secundario. */
-#vista .juego a[data-testid="jugar-reto-hoy"]:not(.volver),
+/* "Jugar": el reto de hoy y cada reto pendiente de la lista. "Repasar" (ya ganado, no suma) queda secundario. El de la práctica de hoy es del sistema (sx-btn). */
+#vista .juego a[data-testid="jugar-reto-hoy"]:not(.volver):where(:not(.sx-btn)),
 #vista .juego a[data-testid$="-jugar"]:not(.volver) {
   background: var(--primario);
   color: var(--superficie);
@@ -142,7 +142,7 @@ button.boton-secundario {
   font-size: 1rem;
   padding: 9px 20px;
 }
-#vista .juego a[data-testid="jugar-reto-hoy"]:not(.volver):hover,
+#vista .juego a[data-testid="jugar-reto-hoy"]:not(.volver):where(:not(.sx-btn)):hover,
 #vista .juego a[data-testid$="-jugar"]:not(.volver):hover {
   border-color: var(--primario);
   border-bottom-color: var(--primario-oscuro);

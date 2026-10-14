@@ -1,0 +1,16 @@
+{
+  "descripcion": "U81: el 422 de un backend viejo se toma como \"tanda vacía\": Inicio invita a una práctica que no existe en vez de quedar como antes",
+  "archivos": {
+    "src/api/practica.js": "practica.js"
+  },
+  "comando": [
+    "node",
+    "--test",
+    "--test-reporter=tap",
+    "tests/unit/practica_tanda.test.mjs"
+  ],
+  "espera_codigo_no_cero": true,
+  "espera_fallan_tests": [
+    "U81: con un backend sin la tanda"
+  ]
+}

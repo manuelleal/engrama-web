@@ -115,9 +115,12 @@ async function sesionFresca(ctx) {
   }
 }
 
+// W79 (docs/ESPEC_practica_del_dia.md): la práctica de hoy viene de un módulo diferido; si no carga, null e Inicio como antes.
+const cargarPractica = (ctx) => import('./inicio_practica.js').then((m) => m.cargar(ctx)).catch((e) => { console.warn('inicio: sin práctica', e); return null; });
+
 async function cargarDatos(ctx) {
-  const [saldo, retos, historialRetos, historialAsistencia, sesion] = await Promise.all([
-    leerSaldo(ctx), listarRetos(ctx), historialDeIntentos(ctx), leerHistorialAsistencia(ctx), sesionFresca(ctx),
+  const [saldo, retos, historialRetos, historialAsistencia, sesion, practica] = await Promise.all([
+    leerSaldo(ctx), listarRetos(ctx), historialDeIntentos(ctx), leerHistorialAsistencia(ctx), sesionFresca(ctx), cargarPractica(ctx),
   ]);
   return {
     balance: saldo.balance,
@@ -127,6 +130,7 @@ async function cargarDatos(ctx) {
     pendiente: primerRetoPendiente(retos, historialRetos),
     intentos: historialRetos, asistencias: historialAsistencia, // W51: "Tu semana" se arma con esto mismo, sin pedir nada más
     nivelConfirmado: sesion.nivelConfirmado ?? null, // el que dice el servidor, nunca derivado de level, xp ni monedas (X7)
+    practica,
   };
 }
 
@@ -230,12 +234,14 @@ function tarjetasDelAnillo(ctx, invitaLaPrimera) {
 }
 
 /** "Ahora": lo que se hace en cada clase, en orden fijo (reto, clase en vivo, examen de nivel), antes que el resumen de la semana. */
-function seccionAhora(pendiente, ctx) {
+function seccionAhora({ pendiente, numRetos, practica: p }, ctx) {
+  const hoy = p?.tarjeta({ pendiente, numRetos, respaldo: () => tarjetaRetoDeHoy(pendiente) }); // W79: la práctica de hoy es la primera
   return h(
     'section', { class: 'ahora', 'data-testid': 'ahora', 'aria-labelledby': 'ahora-titulo' },
     h('h2', { id: 'ahora-titulo' }, textos.ahora.titulo),
-    tarjetaRetoDeHoy(pendiente),
-    tarjetasDelAnillo(ctx, !pendiente),
+    hoy || tarjetaRetoDeHoy(pendiente),
+    p?.aviso,
+    tarjetasDelAnillo(ctx, !pendiente && !hoy),
   );
 }
 
@@ -265,7 +271,7 @@ function pintarContenido(raiz, ctx, datos) {
     crearSelectorColegio(ctx), // login piloto (B): solo si el estudiante está en más de una institución
     crearEscudo({ nivelConfirmado: datos.nivelConfirmado, animar: nivel.animar || Boolean(nivel.aviso) }), // W30: el de /auth/me; sin él, "Por confirmar"
     nivel.aviso,
-    seccionAhora(datos.pendiente, ctx),
+    seccionAhora(datos, ctx),
     // W48: la racha bajó (desde 3 o más): una línea neutra, una vez. Va DESPUÉS de "Ahora": arriba empujaba el tercer botón bajo la barra en 360 × 640.
     racha.neutro ? crearDeNuevo(datos.mejorConstancia) : null,
     // Si subió, su aviso va en ese mismo sitio, en el flujo: flotando tapaba el saludo y el enlace a Mis monedas (ESPEC_visual_sistema1 §2b).
