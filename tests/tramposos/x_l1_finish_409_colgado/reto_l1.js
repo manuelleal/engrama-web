@@ -231,6 +231,6 @@ async function terminar(raiz, estado, boton) {
   } catch (e) {
     if (e instanceof ErrorApi && e.status === 409) { if (estado.salir) estado.encabezado?.prepend(estado.salir); return; }
     console.warn('reto_l1: no se pudo cerrar el intento', e);
-    pintarErrorFlujo(raiz, e instanceof ErrorApi ? e.mensaje : 'No se pudo enviar tu reto.');
+    pintarErrorFlujo(raiz, e instanceof ErrorApi ? e.mensaje : T.noSeEnvio);
   }
 }

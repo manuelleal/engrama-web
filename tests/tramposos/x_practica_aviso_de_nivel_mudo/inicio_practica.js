@@ -143,8 +143,9 @@ function crearBoton(ctx, plan, texto, o, tarjeta) {
   boton.addEventListener('click', (ev) => {
     ev.preventDefault();
     marcarCargando(boton, true); boton.setAttribute('aria-disabled', 'true'); boton.textContent = T.pidiendo;
-    pedir().then((t) => irAlPrimerPaso(ctx, t, { o, fallback, tarjeta, antes: plan.tipo }), (e) => {
-      console.warn('inicio_practica: no se pudo pedir la tanda', e);
+    // H-9: .then().catch(): también un error DESPUÉS del POST (al ir al primer paso) devuelve el botón, nunca un rechazo sin manejar.
+    pedir().then((t) => irAlPrimerPaso(ctx, t, { o, fallback, tarjeta, antes: plan.tipo })).catch((e) => {
+      console.warn('inicio_practica: no se pudo pedir la tanda o ir a su primer paso', e);
       marcarCargando(boton, false); boton.setAttribute('aria-disabled', 'false'); boton.textContent = T.noSePudo;
     });
   });

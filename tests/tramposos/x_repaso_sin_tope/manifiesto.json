@@ -1,0 +1,16 @@
+{
+  "descripcion": "U91 (H-9): tras un 409 el repaso vuelve a pedir la tanda y, si el servidor sigue listando esa entrada, muestra la misma pregunta en bucle",
+  "archivos": {
+    "src/vistas/estudiante/repaso.js": "repaso.js"
+  },
+  "comando": [
+    "node",
+    "--test",
+    "--test-reporter=tap",
+    "tests/unit/practica_correcciones.test.mjs"
+  ],
+  "espera_codigo_no_cero": true,
+  "espera_fallan_tests": [
+    "U91: el repaso no repite en bucle"
+  ]
+}

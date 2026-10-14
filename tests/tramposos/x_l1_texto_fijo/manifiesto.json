@@ -1,0 +1,16 @@
+{
+  "descripcion": "U91 (H-9): \"No se pudo enviar tu reto.\" vuelve a estar fijo en la vista (regla 6 del cliente: las cadenas, en su archivo de textos)",
+  "archivos": {
+    "src/vistas/estudiante/reto_l1.js": "reto_l1.js"
+  },
+  "comando": [
+    "node",
+    "--test",
+    "--test-reporter=tap",
+    "tests/unit/practica_correcciones.test.mjs"
+  ],
+  "espera_codigo_no_cero": true,
+  "espera_fallan_tests": [
+    "U91: \"No se pudo enviar tu reto.\" sale de textos_practica.js"
+  ]
+}

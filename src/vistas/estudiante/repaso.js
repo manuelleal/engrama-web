@@ -45,14 +45,17 @@ function finDelRepaso(texto, testid) {
 /**
  * @param {HTMLElement} raiz
  * @param {any} ctx
+ * @param {Set<number>} [saltadas] H-9: las entradas que en ESTA visita dieron 404/409/422 al responder: si el servidor las sigue listando, se saltan
+ *   (en memoria, nunca en un almacenamiento): nunca la misma pregunta en bucle.
  */
-export async function renderRepaso(raiz, ctx) {
+export async function renderRepaso(raiz, ctx, saltadas = new Set()) {
   pintar(raiz, ctx, h('p', { class: 'sx-t-apoyo', role: 'status', 'data-testid': 'cargando' }, T.cargando));
   const tanda = await verTanda(ctx); // nunca lanza: sin la ruta o con un error, null
   if (!tanda?.tanda) { pintar(raiz, ctx, finDelRepaso(T.nada, 'repaso-vacio')); return; }
   const entradas = tanda.tanda.repaso.filter((/** @type {any} */ e) => preguntaContestable(e.pregunta)); // H-3: lo que no se puede contestar aquí, se salta
-  if (entradas.length === 0) { pintar(raiz, ctx, finDelRepaso(T.alDia, 'repaso-al-dia')); return; }
-  const estado = { ctx, entrada: entradas[0], quedan: entradas.length, elegida: /** @type {string|null} */ (null), respuesta: null, error: null };
+  const quedan = entradas.filter((/** @type {any} */ e) => !saltadas.has(e.entrada_id));
+  if (quedan.length === 0) { pintar(raiz, ctx, finDelRepaso(T.alDia, 'repaso-al-dia')); return; }
+  const estado = { ctx, saltadas, entrada: quedan[0], quedan: quedan.length, elegida: /** @type {string|null} */ (null), respuesta: null, error: null };
   estado.enviar = accionUnica((label) => responderRepaso(estado.entrada.entrada_id, estado.entrada.pregunta.id, label, ctx));
   pintarPregunta(raiz, estado);
 }
@@ -66,7 +69,7 @@ function quietas(lista) {
 function accion(raiz, estado) {
   const pregunta = estado.entrada.pregunta;
   if (estado.respuesta) {
-    const siguiente = h('button', { type: 'button', class: 'boton-principal', 'data-testid': 'boton-siguiente', onClick: () => renderRepaso(raiz, estado.ctx) }, textosPractica.l1.siguiente);
+    const siguiente = h('button', { type: 'button', class: 'boton-principal', 'data-testid': 'boton-siguiente', onClick: () => renderRepaso(raiz, estado.ctx, estado.saltadas) }, textosPractica.l1.siguiente);
     return crearBanda(planDeExplicacion(estado.respuesta), { accion: siguiente });
   }
   const boton = h('button', { type: 'button', class: 'boton-principal', 'data-testid': 'boton-comprobar', disabled: !estado.elegida, onClick: () => comprobar(raiz, estado, boton) }, textosPractica.l1.comprobar);
@@ -109,7 +112,11 @@ async function comprobar(raiz, estado, boton) {
     senal(estado.respuesta.is_correct ? 'acierto' : 'fallo');
   } catch (e) {
     console.warn('repaso: no se pudo comprobar', e);
-    if (e instanceof ErrorApi && [404, 409, 422].includes(e.status)) { renderRepaso(raiz, estado.ctx); return; } // la forma cambió o ya no toca: se vuelve a pedir
+    if (e instanceof ErrorApi && [404, 409, 422].includes(e.status)) { // la forma cambió o ya no toca: se vuelve a pedir, sin ESTA entrada (H-9: tope)
+      estado.saltadas.add(estado.entrada.entrada_id);
+      renderRepaso(raiz, estado.ctx, estado.saltadas);
+      return;
+    }
     estado.error = T.noSePudo;
   }
   estado.enVuelo = false;

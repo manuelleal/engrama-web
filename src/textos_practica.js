@@ -18,6 +18,7 @@ export const textosPractica = {
     sinConexion: 'No pudimos abrir tu reto: la conexión falló. Lo que ya respondiste sigue guardado.',
     reintentar: 'Reintentar',
     noSePudoAbrir: 'No se pudo abrir tu reto. Sal y vuelve a entrar en un momento.',
+    noSeEnvio: 'No se pudo enviar tu reto.', // H-9: antes, fijo en reto_l1.js
     // H-2: el servidor ya no admite nada en este intento (409/404). Textos propios: el del servidor viene en inglés.
     yaCerrado: 'Este reto ya quedó cerrado, quizá desde otra pestaña o en otro equipo. Tu resultado quedó guardado.',
     noSeCerro: 'Este reto no se pudo cerrar ahora. Lo que respondiste sigue guardado.',

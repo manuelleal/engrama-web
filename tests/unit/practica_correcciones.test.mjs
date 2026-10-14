@@ -299,3 +299,52 @@ test('U90: el repaso salta lo que no se puede contestar, y "Tu práctica de hoy"
   t.tanda.retos = [reto];
   assert.equal(planDePractica(t).tipo, 'reto', 'con solo un repaso que no se puede contestar, el primer reto');
 });
+
+// ---------- U91 (H-9): menores ----------
+// Tramposos: x_tanda_then_sin_catch (inicio_practica.js), x_repaso_sin_tope (repaso.js) y x_l1_texto_fijo (reto_l1.js).
+
+test('U91: si algo falla DESPUÉS del POST de la tanda (al ir al primer paso), el botón vuelve con "No se pudo armar tu práctica." (sin rechazo sin manejar)', async () => {
+  const { cargar, olvidarPracticaDeHoy } = await import('../../src/vistas/estudiante/inicio_practica.js');
+  olvidarPracticaDeHoy();
+  const SIN_TANDA = { fecha: '2026-10-14', practica: { nivel: 'A2', con_nivel_de_set: false }, tandas_hoy: 0, tope_al_dia: 2, puede_pedir_otra: true, listo_por_hoy: false, sin_contenido_nuevo: false, racha_protegida: false, tanda: null };
+  const { raiz, cerrar } = await pintar({ 'GET /challenges/tanda': json(200, SIN_TANDA), 'GET /core/racha': json(404, { detail: 'Not Found' }), 'POST /challenges/tanda': json(200, SIN_TANDA) }, async (r) => {
+    const p = await cargar(ctxEstudiante());
+    r.appendChild(p.tarjeta({ pendiente: null, numRetos: 1, respaldo: () => { throw new Error('falla sintética después del POST'); } }));
+  });
+  try {
+    await new Promise((ok) => setTimeout(ok, 20)); await asentar();
+    const boton = buscar(raiz, 'jugar-reto-hoy');
+    assert.ok(boton, 'la protagonista con "Jugar"');
+    await Promise.all(boton.disparar('click', { preventDefault() {} }));
+    await new Promise((ok) => setTimeout(ok, 30)); await asentar();
+    assert.equal(boton.textContent, textosPractica.practica.noSePudo, 'el botón dice que no se pudo');
+    assert.equal(boton.getAttribute('aria-disabled'), 'false', 'y se puede volver a tocar');
+  } finally { olvidarPracticaDeHoy(); cerrar(); }
+});
+
+test('U91: el repaso no repite en bucle una entrada que dio 409 aunque el servidor la siga listando', async () => {
+  const posts = [];
+  const { raiz, cerrar } = await abrirRepaso({
+    'GET /challenges/tanda': json(200, tandaCon([entrada(12), entrada(13, { ...PREGUNTA_REPASO, id: 'p2', question_text: 'He ___ TV.' })])),
+    'POST /challenges/refuerzo/12/respuestas': ({ init }) => { posts.push(JSON.parse(init.body)); return json(409, { detail: 'forma_no_vigente' })(); },
+  });
+  try {
+    assert.equal(textoDe(buscar(raiz, 'enunciado')), PREGUNTA_REPASO.question_text);
+    await tocar(raiz, 'opcion-A');
+    await tocar(raiz, 'boton-comprobar');
+    await new Promise((ok) => setTimeout(ok, 20)); await asentar();
+    assert.equal(textoDe(buscar(raiz, 'enunciado')), 'He ___ TV.', 'la siguiente, no la misma otra vez');
+    assert.equal(posts.length, 1);
+  } finally { cerrar(); }
+});
+
+test('U91: "No se pudo enviar tu reto." sale de textos_practica.js (un /finish que no responde JSON) y reto_l1.js no trae textos de error fijos', async () => {
+  const { readFileSync } = await import('node:fs');
+  const codigo = readFileSync(new URL('../../src/vistas/estudiante/reto_l1.js', import.meta.url), 'utf8').replace(/\/\*[\s\S]*?\*\//g, '').replace(/\/\/.*$/gm, '');
+  assert.ok(!/['"`]No se pudo/.test(codigo), 'un texto fijo en la vista (regla 6 del cliente)');
+  const { raiz, cerrar } = await abrirReto(servidorReto(ESTADO([R1, R2]), { 'POST /challenges/attempts/int-1/finish': () => new Response('<html>', { status: 200 }) }));
+  try {
+    await tocar(raiz, 'boton-terminar');
+    assert.ok(textoDe(raiz).includes(textosPractica.l1.noSeEnvio), 'el texto del archivo de textos');
+  } finally { cerrar(); }
+});

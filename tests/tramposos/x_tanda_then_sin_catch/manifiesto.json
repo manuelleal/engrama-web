@@ -1,0 +1,16 @@
+{
+  "descripcion": "U91 (H-9): .then(ir, manejar): un error al ir al primer paso queda sin manejar y el botón se queda en \"Armando tu práctica…\"",
+  "archivos": {
+    "src/vistas/estudiante/inicio_practica.js": "inicio_practica.js"
+  },
+  "comando": [
+    "node",
+    "--test",
+    "--test-reporter=tap",
+    "tests/unit/practica_correcciones.test.mjs"
+  ],
+  "espera_codigo_no_cero": true,
+  "espera_fallan_tests": [
+    "U91: si algo falla DESPUÉS del POST de la tanda"
+  ]
+}

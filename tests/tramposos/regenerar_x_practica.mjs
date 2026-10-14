@@ -230,6 +230,21 @@ export const TRAMPOSOS = {
     descripcion: 'U90 (H-3): "Tu práctica de hoy" cuenta como repaso lo que no se puede contestar: manda a "Repaso primero" para siempre',
     cambios: [['  const repaso = t.tanda.repaso.filter((/** @type {any} */ e) => preguntaContestable(e.pregunta));', '  const repaso = t.tanda.repaso;']],
   },
+  x_tanda_then_sin_catch: {
+    archivo: 'src/vistas/estudiante/inicio_practica.js', prueba: CORR, tests: ['U91: si algo falla DESPUÉS del POST de la tanda'],
+    descripcion: 'U91 (H-9): .then(ir, manejar): un error al ir al primer paso queda sin manejar y el botón se queda en "Armando tu práctica…"',
+    cambios: [['    pedir().then((t) => irAlPrimerPaso(ctx, t, { o, fallback, tarjeta, antes: plan.tipo })).catch((e) => {', '    pedir().then((t) => irAlPrimerPaso(ctx, t, { o, fallback, tarjeta, antes: plan.tipo }), (e) => {']],
+  },
+  x_repaso_sin_tope: {
+    archivo: 'src/vistas/estudiante/repaso.js', prueba: CORR, tests: ['U91: el repaso no repite en bucle'],
+    descripcion: 'U91 (H-9): tras un 409 el repaso vuelve a pedir la tanda y, si el servidor sigue listando esa entrada, muestra la misma pregunta en bucle',
+    cambios: [['      estado.saltadas.add(estado.entrada.entrada_id);\n', '']],
+  },
+  x_l1_texto_fijo: {
+    archivo: 'src/vistas/estudiante/reto_l1.js', prueba: CORR, tests: ['U91: "No se pudo enviar tu reto." sale de textos_practica.js'],
+    descripcion: 'U91 (H-9): "No se pudo enviar tu reto." vuelve a estar fijo en la vista (regla 6 del cliente: las cadenas, en su archivo de textos)',
+    cambios: [["    pintarErrorFlujo(raiz, e instanceof ErrorApi ? e.mensaje : T.noSeEnvio);", "    pintarErrorFlujo(raiz, e instanceof ErrorApi ? e.mensaje : 'No se pudo enviar tu reto.');"]],
+  },
   x_sin_eol_lf: {
     archivo: '.gitattributes', copia: 'gitattributes.txt', prueba: 'tests/unit/sw_peso.test.mjs', tests: ['U59: cada archivo de PRECARGA sale de git archive'],
     descripcion: 'U59 (H-5): sin `*.js text eol=lf`, git archive con core.autocrlf=true sirve el shell en CRLF (más pesado que lo que mide U59) y nada lo ve',
