@@ -18,6 +18,7 @@ import { senalDeSeleccion } from '../../ui/progreso.js';
 import { accionUnica, ErrorApi } from '../../api/cliente.js';
 import { verTanda, responderRepaso } from '../../api/practica.js';
 import { planDeExplicacion, crearBanda } from '../../ui/explicacion.js';
+import { preguntaContestable } from '../../ui/practica.js';
 import { textoDeOpcion } from './revision.js';
 import { nodoOpciones } from './reto_flujo.js';
 
@@ -49,7 +50,7 @@ export async function renderRepaso(raiz, ctx) {
   pintar(raiz, ctx, h('p', { class: 'sx-t-apoyo', role: 'status', 'data-testid': 'cargando' }, T.cargando));
   const tanda = await verTanda(ctx); // nunca lanza: sin la ruta o con un error, null
   if (!tanda?.tanda) { pintar(raiz, ctx, finDelRepaso(T.nada, 'repaso-vacio')); return; }
-  const entradas = tanda.tanda.repaso;
+  const entradas = tanda.tanda.repaso.filter((/** @type {any} */ e) => preguntaContestable(e.pregunta)); // H-3: lo que no se puede contestar aquí, se salta
   if (entradas.length === 0) { pintar(raiz, ctx, finDelRepaso(T.alDia, 'repaso-al-dia')); return; }
   const estado = { ctx, entrada: entradas[0], quedan: entradas.length, elegida: /** @type {string|null} */ (null), respuesta: null, error: null };
   estado.enviar = accionUnica((label) => responderRepaso(estado.entrada.entrada_id, estado.entrada.pregunta.id, label, ctx));

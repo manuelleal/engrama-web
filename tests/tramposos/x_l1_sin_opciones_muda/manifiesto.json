@@ -1,0 +1,16 @@
+{
+  "descripcion": "U90 (H-3): una pregunta que no es de opción múltiple se pinta sin opciones y con un Comprobar muerto: el estudiante queda atascado",
+  "archivos": {
+    "src/vistas/estudiante/reto_l1.js": "reto_l1.js"
+  },
+  "comando": [
+    "node",
+    "--test",
+    "--test-reporter=tap",
+    "tests/unit/practica_correcciones.test.mjs"
+  ],
+  "espera_codigo_no_cero": true,
+  "espera_fallan_tests": [
+    "U90: en el reto, una pregunta fill_blank"
+  ]
+}

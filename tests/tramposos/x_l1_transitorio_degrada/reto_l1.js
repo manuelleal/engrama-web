@@ -21,6 +21,7 @@ import { senal } from '../../ui/sonido.js';
 import { accionUnica, ErrorApi } from '../../api/cliente.js';
 import { retomarIntento, responderPregunta, terminarIntento, ErrorTransitorio } from '../../api/practica.js';
 import { planDeExplicacion, crearBanda } from '../../ui/explicacion.js';
+import { preguntaContestable } from '../../ui/practica.js';
 import { renderRevision, textoDeOpcion } from './revision.js';
 import { crearSalir, nodoOpciones, pintarErrorFlujo, nodoRevisando } from './reto_flujo.js';
 
@@ -118,13 +119,30 @@ function barraComprobar(raiz, estado, pregunta, recien) {
   return h('div', { class: 'barra-accion' }, panel, boton);
 }
 
-/** Ya respondida: la banda con el veredicto y la explicación, y el botón que sigue dentro de ella. */
-function barraRespondida(raiz, estado, pregunta, respuesta) {
+/** El botón que sigue: "Siguiente" o, en la última, "Ver resultado". */
+function botonQueSigue(raiz, estado) {
   const ultima = estado.indice === estado.challenge.questions.length - 1;
   const boton = h('button', {
     'data-testid': ultima ? 'boton-terminar' : 'boton-siguiente', class: 'boton-principal',
     onClick: () => (ultima ? terminar(raiz, estado, boton) : siguiente(raiz, estado)),
   }, ultima ? T.verResultado : T.siguiente);
+  return boton;
+}
+
+/**
+ * H-3: una pregunta que la web todavía no sabe contestar (no es de opción múltiple, o llegó sin opciones): lo dice, sin un "Comprobar" muerto, y deja
+ * seguir. Al cerrar, lo no respondido el servidor lo cuenta como no acertado (como siempre con /finish). La salida ("✕ Salir") sigue arriba.
+ */
+function barraNoContestable(raiz, estado) {
+  return h('div', { class: 'barra-accion' },
+    h('section', { class: 'sx-vacio', role: 'status', 'data-testid': 'pregunta-no-contestable' },
+      h('p', { class: 'sx-t-tarjeta' }, T.noContestable), h('p', { class: 'sx-t-apoyo' }, T.noContestableApoyo)),
+    botonQueSigue(raiz, estado));
+}
+
+/** Ya respondida: la banda con el veredicto y la explicación, y el botón que sigue dentro de ella. */
+function barraRespondida(raiz, estado, pregunta, respuesta) {
+  const boton = botonQueSigue(raiz, estado);
   const elegida = estado.elegidas[pregunta.id];
   const nota = elegida && elegida !== respuesta.answer ? T.quedoGuardada(respuesta.answer, textoDeOpcion(pregunta, respuesta.answer)) : null;
   return h('div', { class: 'barra-accion con-banda' }, crearBanda(planDeExplicacion(respuesta), { accion: boton, nota }));
@@ -148,8 +166,8 @@ function pintar(raiz, estado, entrada = 'desliza', recien = null) {
       crearDrako('presenta', textos.retoFlujo.drakoPresenta, { estatico: true }),
       h('p', { class: 'texto-apoyo', 'data-testid': 'contador-pregunta' }, textos.retoFlujo.pregunta(indice + 1, total))),
     h('p', { class: 'enunciado', 'data-testid': 'enunciado' }, pregunta.question_text),
-    opcionesDe(raiz, estado, pregunta, respuesta),
-    respuesta ? barraRespondida(raiz, estado, pregunta, respuesta) : barraComprobar(raiz, estado, pregunta, recien),
+    ...(respuesta || preguntaContestable(pregunta) ? [opcionesDe(raiz, estado, pregunta, respuesta),
+      respuesta ? barraRespondida(raiz, estado, pregunta, respuesta) : barraComprobar(raiz, estado, pregunta, recien)] : [barraNoContestable(raiz, estado)]),
   );
   montar(raiz, nodo);
   document.body.dataset.listo = '1';

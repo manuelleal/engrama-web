@@ -215,6 +215,21 @@ export const TRAMPOSOS = {
     descripcion: 'U89 (H-7): la tanda mal formada se vuelca entera en la consola (con la clave, si la trae)',
     cambios: [["console.warn('api/practica: la tanda llegó mal formada; Inicio queda como antes', camposDe(datos));", "console.warn('api/practica: la tanda llegó mal formada; Inicio queda como antes', datos);"]],
   },
+  x_l1_sin_opciones_muda: {
+    archivo: 'src/vistas/estudiante/reto_l1.js', prueba: CORR, tests: ['U90: en el reto, una pregunta fill_blank'],
+    descripcion: 'U90 (H-3): una pregunta que no es de opción múltiple se pinta sin opciones y con un Comprobar muerto: el estudiante queda atascado',
+    cambios: [['    ...(respuesta || preguntaContestable(pregunta) ? [', '    ...(true ? [']],
+  },
+  x_repaso_no_salta: {
+    archivo: 'src/vistas/estudiante/repaso.js', prueba: CORR, tests: ['U90: el repaso salta lo que no se puede contestar'],
+    descripcion: 'U90 (H-3): el repaso muestra primero una pregunta que no se puede contestar y bloquea la tanda (el repaso va siempre primero)',
+    cambios: [['  const entradas = tanda.tanda.repaso.filter((/** @type {any} */ e) => preguntaContestable(e.pregunta));', '  const entradas = tanda.tanda.repaso;']],
+  },
+  x_practica_cuenta_no_contestables: {
+    archivo: 'src/ui/practica.js', prueba: CORR, tests: ['U90: el repaso salta lo que no se puede contestar'],
+    descripcion: 'U90 (H-3): "Tu práctica de hoy" cuenta como repaso lo que no se puede contestar: manda a "Repaso primero" para siempre',
+    cambios: [['  const repaso = t.tanda.repaso.filter((/** @type {any} */ e) => preguntaContestable(e.pregunta));', '  const repaso = t.tanda.repaso;']],
+  },
   x_sin_eol_lf: {
     archivo: '.gitattributes', copia: 'gitattributes.txt', prueba: 'tests/unit/sw_peso.test.mjs', tests: ['U59: cada archivo de PRECARGA sale de git archive'],
     descripcion: 'U59 (H-5): sin `*.js text eol=lf`, git archive con core.autocrlf=true sirve el shell en CRLF (más pesado que lo que mide U59) y nada lo ve',

@@ -16,6 +16,16 @@ const retoValido = (r) => esObjeto(r) && typeof r.estado === 'string' && Number.
 const repasoValido = (e) => esObjeto(e) && Number.isInteger(e.entrada_id) && esObjeto(e.pregunta) && typeof e.pregunta.id === 'string';
 
 /**
+ * H-3 (docs/ESPEC_correcciones_practica.md): ¿la web sabe contestar esta pregunta? Hoy solo la opción múltiple: `question_type` ausente o
+ * `multiple_choice`, y `options_json` con al menos una opción con su `label`. Un `fill_blank` o un `listening` (no hay campo de texto todavía) no
+ * debe dejar un "Comprobar" muerto ni bloquear la tanda. Pura; nunca lanza. @param {any} q
+ */
+export function preguntaContestable(q) {
+  if (!esObjeto(q) || (q.question_type != null && q.question_type !== 'multiple_choice')) return false;
+  return Array.isArray(q.options_json) && q.options_json.length > 0 && q.options_json.every((/** @type {any} */ o) => esObjeto(o) && typeof o.label === 'string');
+}
+
+/**
  * ¿La respuesta de `/challenges/tanda` (TandaDeHoyOut) trae lo que la tarjeta usa, con su tipo? Nunca lanza. Pura.
  * @param {any} t
  */
@@ -45,7 +55,8 @@ export function planDePractica(t, { sinNadaHoy = false, sinMasHoy = false } = {}
   if (t.listo_por_hoy) return { tipo: 'listo', nivel };
   // Sin tanda: si el servidor ya dijo que hoy no hay nada (`sin_contenido_nuevo`, o el día quedó protegido), o esta página lo supo, el respaldo.
   if (!t.tanda) return t.sin_contenido_nuevo || t.racha_protegida === true || sinNadaHoy ? { tipo: 'respaldo', protegida: t.racha_protegida === true } : { tipo: 'empezar', nivel };
-  const { repaso, retos, modo } = t.tanda;
+  const { retos, modo } = t.tanda;
+  const repaso = t.tanda.repaso.filter((/** @type {any} */ e) => preguntaContestable(e.pregunta)); // H-3: lo que no se puede contestar aquí no detiene la tanda
   const hechos = retos.filter((/** @type {any} */ r) => r.estado !== 'pendiente').length;
   if (repaso.length > 0) return { tipo: 'repaso', nivel, cuantas: repaso.length, hechos, pasos: retos.length }; // el repaso, primero
   const i = retos.findIndex((/** @type {any} */ r) => r.estado === 'pendiente');

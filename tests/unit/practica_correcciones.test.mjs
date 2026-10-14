@@ -256,3 +256,46 @@ test('U89: con una respuesta mal formada (la tanda, el intento o la racha) la co
     assert.ok(todo.includes('["practica","tanda"]'), 'y dice los nombres de los campos de la tanda');
   } finally { entorno.restaurar(); }
 });
+
+// ---------- U90 (H-3): lo que no es de opción múltiple no deja un "Comprobar" muerto ni bloquea la tanda ----------
+// Tramposos: x_l1_sin_opciones_muda (reto_l1.js), x_repaso_no_salta (repaso.js) y x_practica_cuenta_no_contestables (ui/practica.js).
+
+const LLENAR = { id: 'q1', question_type: 'fill_blank', question_text: 'She ___ (go) to school.', options_json: null };
+
+test('U90: preguntaContestable: solo la opción múltiple con opciones (question_type ausente o multiple_choice)', async () => {
+  const { preguntaContestable } = await import('../../src/ui/practica.js');
+  assert.equal(preguntaContestable(RETO.questions[0]), true);
+  assert.equal(preguntaContestable({ ...RETO.questions[0], question_type: undefined }), true, 'sin question_type (un doble viejo): por sus opciones');
+  for (const q of [LLENAR, { ...RETO.questions[0], question_type: 'listening' }, { ...RETO.questions[0], options_json: [] }, { ...RETO.questions[0], options_json: [{ value: 'go' }] }, null]) {
+    assert.equal(preguntaContestable(q), false, JSON.stringify(q));
+  }
+});
+
+test('U90: en el reto, una pregunta fill_blank dice "aún no se puede contestar aquí", con su salida y el botón que sigue (sin Comprobar)', async () => {
+  const reto = { ...RETO, questions: [LLENAR, RETO.questions[1]] };
+  const { raiz, llamadas, cerrar } = await abrirReto(servidorReto(ESTADO(), { 'POST /challenges/reto-1/attempt': { attempt_id: 'int-1', attempt_number: 1, challenge: reto } }));
+  try {
+    assert.equal(textoDe(buscar(raiz, 'enunciado')), LLENAR.question_text);
+    assert.match(textoDe(buscar(raiz, 'pregunta-no-contestable')), /aún no se puede contestar aquí/);
+    assert.equal(buscar(raiz, 'boton-comprobar'), null, 'sin un Comprobar muerto');
+    assert.equal(buscar(raiz, 'reto-salir')?.getAttribute('href'), '#/retos', 'con su salida');
+    await tocar(raiz, 'boton-siguiente');
+    assert.equal(textoDe(buscar(raiz, 'enunciado')), RETO.questions[1].question_text, 'sigue con la próxima');
+    assert.ok(buscar(raiz, 'boton-comprobar'), 'que sí se contesta');
+    assert.equal(contar(llamadas, 'POST', '/answers'), 0);
+  } finally { cerrar(); }
+});
+
+test('U90: el repaso salta lo que no se puede contestar, y "Tu práctica de hoy" no manda a un repaso que no se puede hacer', async () => {
+  const { planDePractica } = await import('../../src/ui/practica.js');
+  const llenar = { ...PREGUNTA_REPASO, id: 'p0', question_type: 'fill_blank', options_json: null, question_text: 'He ___ (play).' };
+  const { raiz, cerrar } = await abrirRepaso({ 'GET /challenges/tanda': json(200, tandaCon([entrada(11, llenar), entrada(12)])) });
+  try {
+    assert.equal(textoDe(buscar(raiz, 'enunciado')), PREGUNTA_REPASO.question_text, 'la que sí se contesta');
+    assert.equal(textoDe(buscar(raiz, 'repaso-quedan')), 'Te queda 1 pregunta de repaso');
+  } finally { cerrar(); }
+  const reto = { estado: 'pendiente', paga: 5, reto: { id: 'r1', title: 'rutina_diaria' } };
+  const t = tandaCon([entrada(11, llenar)]);
+  t.tanda.retos = [reto];
+  assert.equal(planDePractica(t).tipo, 'reto', 'con solo un repaso que no se puede contestar, el primer reto');
+});
