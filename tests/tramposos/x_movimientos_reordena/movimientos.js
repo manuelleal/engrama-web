@@ -13,7 +13,7 @@ import { duracionEfectiva, reducirMovimiento } from './movimiento.js';
 
 /** @typedef {{tipo: 'asistencia'|'reto'|'vivo'|'otro', icono: string, etiqueta: string, detalle: string|null, fecha: string, monto: string, montoAccesible: string, entra: boolean}} FilaDeMovimiento */
 
-const ICONOS = { asistencia: '📍', reto: '🎯', vivo: '📡', otro: '🪙' };
+const ICONOS = { asistencia: 'asistencia', reto: 'retos', vivo: 'vivo', otro: 'moneda' }; // nombres de ui/iconos.js
 const TIPO_DE_ACCION = { attendance: 'asistencia', challenge: 'reto', live: 'vivo' };
 
 /** "20 oct" (día y mes del equipo); una fecha ilegible es ''. Pura. @param {unknown} iso */

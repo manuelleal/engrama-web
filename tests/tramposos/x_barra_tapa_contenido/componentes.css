@@ -524,26 +524,15 @@ nav {
   color: var(--superficie);
 }
 
-/* Segunda pasada de diseño (2026-09-28): antes flotaba a mitad de pantalla (`margin` en vez de
-   `position: fixed`, la galería lo mostraba pegado justo debajo del contenido corto). Ahora
-   queda FIJA abajo con `env(safe-area-inset-bottom)` para no meterse bajo la barra del sistema en
-   un celular con gesto/notch; `#vista:has(.nav-inferior)` (más abajo) reserva el espacio para que
-   el contenido nunca quede tapado detrás. */
+/* La barra de abajo queda FIJA abajo (antes flotaba a mitad de pantalla); `#vista:has(.nav-inferior)` reserva su espacio para que nada quede
+   tapado detrás. Acá vive SOLO su sitio: su cara es la del sistema (`sx-barra` y `sx-barra__pestana`, publico/diseno/sistema.css). */
 .nav-inferior {
-  display: flex;
-  justify-content: space-around;
-  align-items: center;
-  gap: 4px;
   position: fixed;
   left: 50%;
   bottom: 0;
   transform: translateX(-50%);
   width: 100%;
   max-width: 480px;
-  background: var(--superficie);
-  border-top: 2px solid var(--borde);
-  border-radius: var(--radio-md) var(--radio-md) 0 0;
-  padding: 8px 4px calc(8px + env(safe-area-inset-bottom));
   margin: 0;
   z-index: 10;
 }
@@ -552,31 +541,10 @@ nav {
 #vista:has(.nav-inferior) {
   padding-bottom: 0; /* TRAMPOSO: sin el espacio reservado, la barra fija tapa lo último de cada pantalla */
 }
-/* W68 (docs/ESPEC_navegacion.md §5.6): con "Perfil" son hasta 4 entradas. Todas del mismo ancho (`flex: 1 1 0`), para que quepan en 360 px
-   sin partir ningún texto, y de al menos 44 px de alto (el toque mínimo). */
+/* W68 (docs/ESPEC_navegacion.md §5.6): con "Perfil" son hasta 4 entradas, del mismo ancho (la rejilla del sistema), sin partir ningún texto. */
 .nav-inferior a {
-  flex: 1 1 0;
   min-width: 0;
-  min-height: 44px;
-  justify-content: center;
   white-space: nowrap;
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  gap: 2px;
-  font-family: var(--fuente-titulos);
-  font-weight: 700;
-  font-size: 0.72rem;
-  color: color-mix(in srgb, var(--texto) 55%, white);
-  text-decoration: none;
-  padding: 6px 4px;
-  border-radius: var(--radio-sm);
-  background: none;
-  border: none;
-}
-.nav-inferior a[aria-current="page"] {
-  color: var(--primario);
-  background: color-mix(in srgb, var(--primario) 10%, white);
 }
 
 /* ---------- Segunda pasada de diseño (2026-09-28): panel del profe y del admin en portátil.

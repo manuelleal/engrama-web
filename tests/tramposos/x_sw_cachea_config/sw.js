@@ -10,7 +10,7 @@
 //
 // Súbelo un número cada vez que cambie la lista de precarga o la estrategia; la `activate`
 // borra cualquier caché con otro nombre.
-const VERSION = 'engrama-shell-v42';
+const VERSION = 'engrama-shell-v43';
 
 // Cada encargo agrega los suyos en su propio commit (W7: Inicio + api/cliente,core,retos + los
 // SVG de Drako que usa el estudiante; W10: profe/grupos,grupo,sesion_asistencia + api/profe). El
@@ -52,6 +52,7 @@ const PRECARGA = [
   '/src/ui/encabezado.js',
   '/src/bloqueos.js', // las pantallas obligatorias salen de app.js (espera, suspendida, ya no está...)
   '/src/ui/dom.js',
+  '/src/ui/iconos.js', // los íconos de la casa, en SVG por código (barra, sonido, Mis monedas)
   '/src/ui/red.js',
   '/src/ui/escudo.js',
   '/src/ui/drako.js',

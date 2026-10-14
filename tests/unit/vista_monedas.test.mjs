@@ -21,7 +21,7 @@ const TRES = [asiento(10, 'attendance', { base: 5, puntualidad: 5, puntual: true
 const RETOS = [{ id: 'reto-1', title: 'At the Airport', status: 'active' }];
 const sinRed = () => { throw new TypeError('fetch failed'); };
 const filasDe = (raiz) => elementos(raiz).filter((e) => e.getAttribute('data-testid') === 'movimiento');
-const barraDe = (raiz) => elementos(raiz).find((e) => e.tagName === 'nav' && e.className === 'nav-inferior');
+const barraDe = (raiz) => elementos(raiz).find((e) => e.tagName === 'nav' && String(e.className).split(/\s+/).includes('nav-inferior'));
 const callado = async (fn) => { const previo = { ...console }; for (const n of ['log', 'info', 'warn', 'error']) console[n] = () => {}; try { return await fn(); } finally { Object.assign(console, previo); } };
 const ver = (rutas) => callado(() => pintar(rutas, (r) => renderMonedas(r, CTX)));
 

@@ -129,6 +129,9 @@ export function conTextos(lineas, pares) {
   });
 }
 
+/** La línea de la foto que abre la barra de abajo: `nav` con la clase `nav-inferior`, sola (la línea base) o con las del sistema (`sx-barra`, hoy). */
+export const ES_LA_BARRA = / class="nav-inferior[ "]/;
+
 /** ¿Esta línea de la foto es el nodo que se excluye? Por `data-testid`, o por etiqueta Y clase (las dos). @param {string} linea @param {string|{etiqueta: string, clase?: string}} e */
 function calzaExclusion(linea, e) {
   if (typeof e === 'string') return linea.includes(`data-testid="${e}"`);

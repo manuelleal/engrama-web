@@ -1,0 +1,16 @@
+{
+  "descripcion": "Tanda \"sistema 1\": la barra de abajo del profe y del admin recibe el registro de juego (sx-juego: píldora en la pestaña activa) en vez del sereno: dejan de ser sobrios",
+  "archivos": {
+    "src/ui/nav_inferior.js": "nav_inferior.js"
+  },
+  "comando": [
+    "node",
+    "--test",
+    "--test-reporter=tap",
+    "tests/unit/ui_iconos.test.mjs"
+  ],
+  "espera_codigo_no_cero": true,
+  "espera_fallan_tests": [
+    "íconos: la barra es la del sistema (sx-barra): cada pestaña con su SVG decorativo y su palabra; sereno para el profe y el admin, juego SOLO para el estudiante"
+  ]
+}

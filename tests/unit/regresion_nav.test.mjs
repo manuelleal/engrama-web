@@ -8,7 +8,7 @@ import assert from 'node:assert/strict';
 import { readFileSync } from 'node:fs';
 import { fileURLToPath } from 'node:url';
 import { tomarFotosNav } from './fotos_de_navegacion.mjs';
-import { sinSubarboles, conTextos } from './foto_vistas.mjs';
+import { sinSubarboles, conTextos, ES_LA_BARRA } from './foto_vistas.mjs';
 
 const CRUDA = JSON.parse(readFileSync(fileURLToPath(new URL('../snapshots/vistas_nav_2cba0b8.json', import.meta.url)), 'utf8'));
 
@@ -111,7 +111,11 @@ const VOLVER_W71 = {
 // W73 (cambio 9): el reto en curso gana su salida, "✕ Salir" (un nodo y su texto), en la pregunta y en su pantalla de error. Nada más.
 const SALIR_W73 = { reto_en_curso: ['reto-salir'], reto_en_curso_error: ['reto-salir'] };
 
-const CAPAS = [HASTA_W70, VOLVER_W71, SALIR_W73];
+// Tanda "sistema 1" (docs/ESPEC_visual_sistema1.md §1 y §5): el ícono del botón del sonido deja de ser un emoji (un nodo de texto) y pasa a ser un SVG de
+// ui/iconos.js. Cambia SOLO ese botón, en las escenas del estudiante que lo llevan.
+const SONIDO_S1 = { retos: ['boton-sonido'], retos_vacio: ['boton-sonido'], asistencia: ['boton-sonido'], reto_en_curso: ['boton-sonido'], revision: ['boton-sonido'] };
+
+const CAPAS = [HASTA_W70, VOLVER_W71, SALIR_W73, SONIDO_S1];
 /** @type {Record<string, Array<string|{etiqueta: string, clase?: string}>>} */
 export const DECLARADAS_NAV = Object.fromEntries([...new Set(CAPAS.flatMap((c) => Object.keys(c)))].map((nombre) => [nombre, [...new Set(CAPAS.flatMap((c) => c[nombre] || []))]]));
 
@@ -124,7 +128,7 @@ test('R9: lo que W73 declara cambió de verdad: el reto en curso y su error gana
     assert.ok(!CRUDA.vistas[nombre].some((l) => l.includes('reto-salir') || l.includes('Salir')), `${nombre}: la línea base no tenía salida (H10)`);
     assert.equal(hoy[nombre].length, CRUDA.vistas[nombre].length + 2, `${nombre}: un nodo de más y su texto`);
     assert.ok(!hoy[nombre].some((l) => l.includes('nav-inferior')), `${nombre}: sigue sin barra`);
-    assert.deepEqual(sinSubarboles(hoy[nombre], SALIR_W73[nombre]), CRUDA.vistas[nombre], `${nombre}: fuera de la salida, idéntica a la línea base`);
+    assert.deepEqual(sinSubarboles(hoy[nombre], DECLARADAS_NAV[nombre]), sinSubarboles(CRUDA.vistas[nombre], DECLARADAS_NAV[nombre]), `${nombre}: fuera de la salida (y de lo que declaró la tanda "sistema 1"), idéntica a la línea base`);
   }
 });
 
@@ -167,7 +171,7 @@ test('R9: lo que W71 declara cambió de verdad: cada escena que no es pestaña t
 
 test('R9: lo que W68 declara cambió de verdad: cada escena del estudiante trae UNA barra con "Perfil"; el reto en curso, ninguna; y fuera de la barra nada cambió', async () => {
   const hoy = await tomarFotosNav();
-  const barras = (lineas) => lineas.filter((l) => l.trimStart().startsWith('nav ') && l.includes('class="nav-inferior"'));
+  const barras = (lineas) => lineas.filter((l) => l.trimStart().startsWith('nav ') && ES_LA_BARRA.test(l));
   for (const nombre of ESCENAS_CON_BARRA_W68) {
     assert.equal(barras(hoy[nombre]).length, 1, `${nombre}: una barra`);
     assert.ok(hoy[nombre].some((l) => l.trim() === '"Perfil"'), `${nombre}: la barra dice "Perfil"`);
@@ -194,8 +198,8 @@ test('R9: lo que W63 declaró sigue ahí: la asistencia abierta trae la vuelta a
 
 test('R9: lo que W70 declara cambió de verdad: cada escena del profe y del admin trae UNA barra con las entradas de su rol; del inicio del admin salió la barra de arriba; fuera de eso, nada', async () => {
   const hoy = await tomarFotosNav();
-  const barras = (lineas) => lineas.filter((l) => l.trimStart().startsWith('nav ') && l.includes('class="nav-inferior"'));
-  const entradas = (lineas) => { const i = lineas.findIndex((l) => l.includes('class="nav-inferior"')); return lineas.slice(i).filter((l) => l.trimStart().startsWith('a ')).map((l) => /href="([^"]*)"/.exec(l)?.[1]); };
+  const barras = (lineas) => lineas.filter((l) => l.trimStart().startsWith('nav ') && ES_LA_BARRA.test(l));
+  const entradas = (lineas) => { const i = lineas.findIndex((l) => ES_LA_BARRA.test(l)); return lineas.slice(i).filter((l) => l.trimStart().startsWith('a ')).map((l) => /href="([^"]*)"/.exec(l)?.[1]); };
   const escenas = Object.keys(BASE.vistas).filter((n) => n.startsWith('profe_') || n.startsWith('admin_'));
   assert.equal(escenas.length, 19, 'las 14 escenas del profe y las 5 del admin');
   for (const nombre of escenas) {
@@ -231,6 +235,30 @@ test('R9: las fotos de navegación son idénticas a las de 2cba0b8 (salvo el nod
     assert.ok(quedan.length > 2 && quedan[0] === hoy[nombre][0], `${nombre}: la exclusión declarada no puede tragarse la vista`);
     assert.deepEqual(quedan, sinSubarboles(base, declaradas), `cambió la foto de "${nombre}" fuera de lo declarado`);
   }
+});
+
+// Tanda "sistema 1" (docs/ESPEC_visual_sistema1.md §1 y §5): la barra, que ya estaba declarada en todas las escenas, cambia POR DENTRO: es la del
+// sistema (`sx-barra`, con el registro del rol), cada pestaña es `sx-barra__pestana` y su ícono deja de ser un emoji (en la foto, sin SVG, queda vacío).
+test('R9: lo que la tanda "sistema 1" declara cambió de verdad: la barra es sx-barra (sx-sereno para el profe y el admin; el estudiante, el registro de juego por defecto), sin emoji; sus entradas, su orden y su pestaña activa no cambiaron', async () => {
+  const hoy = await tomarFotosNav();
+  const EMOJI = /\p{Emoji_Presentation}/u;
+  const barra = (lineas) => { const i = lineas.findIndex((l) => ES_LA_BARRA.test(l)); if (i < 0) return []; const s = lineas[i].length - lineas[i].trimStart().length; const fin = lineas.findIndex((l, n) => n > i && l.length - l.trimStart().length <= s); return lineas.slice(i, fin < 0 ? undefined : fin); };
+  const enlaces = (b) => b.filter((l) => l.trimStart().startsWith('a ')).map((l) => [/href="([^"]*)"/.exec(l)?.[1], l.includes('aria-current="page"')]);
+  let conBarra = 0;
+  for (const [nombre, lineas] of Object.entries(hoy)) {
+    const b = barra(lineas);
+    if (b.length === 0) continue;
+    conBarra += 1;
+    const delEstudiante = !nombre.startsWith('profe_') && !nombre.startsWith('admin_');
+    assert.ok(b[0].includes(delEstudiante ? 'class="nav-inferior sx-barra"' : 'class="nav-inferior sx-barra sx-sereno"'), `${nombre}: la barra del sistema con su registro (${b[0].trim()})`);
+    assert.ok(b.filter((l) => l.trimStart().startsWith('a ')).every((l) => l.includes('class="sx-barra__pestana"')), `${nombre}: cada entrada es una pestaña del sistema`);
+    assert.ok(!b.some((l) => EMOJI.test(l)), `${nombre}: ningún emoji en la barra`);
+    assert.equal(b.filter((l) => l.includes('class="nav-icono"')).length, enlaces(b).length, `${nombre}: cada pestaña conserva el hueco de su ícono`);
+    const base = barra(CRUDA.vistas[nombre]);
+    if (base.length) assert.ok(base.some((l) => EMOJI.test(l)), `${nombre}: la línea base traía emoji`);
+    if (base.length) assert.deepEqual(enlaces(b).slice(0, enlaces(base).length), enlaces(base), `${nombre}: las entradas que ya había, en su orden y con la misma activa`);
+  }
+  assert.equal(conBarra, Object.keys(hoy).length - 2, 'todas las escenas menos el reto en curso y su error');
 });
 
 test('R9: dos tomas seguidas dan lo mismo (la foto no depende del reloj ni del azar)', async () => {

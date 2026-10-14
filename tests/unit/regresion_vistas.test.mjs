@@ -8,7 +8,7 @@ import assert from 'node:assert/strict';
 import { readFileSync } from 'node:fs';
 import { fileURLToPath } from 'node:url';
 import { tomarFotos, sesionDeEstudiante } from './fotos_de_las_vistas.mjs';
-import { sinSubarboles, conTextos } from './foto_vistas.mjs';
+import { sinSubarboles, conTextos, ES_LA_BARRA } from './foto_vistas.mjs';
 
 const CRUDA = JSON.parse(readFileSync(fileURLToPath(new URL('../snapshots/vistas_595fd98.json', import.meta.url)), 'utf8'));
 
@@ -70,7 +70,8 @@ export const DECLARADAS = {
   // W48 (docs/ESPEC_juego_oleada1.md §12): el nodo `constancia` cambia: la llama lleva su etapa (con constancia 3, la etapa 1, con su lengua lateral).
   // W51 (docs/ESPEC_juego_oleada1.md §17.1.4): `progreso-semana` cambia por dentro ("Esta semana" con dos contadores → "Tu semana" con sus 7 puntos);
   // conserva su `data-testid` y su sitio (después de "Ahora").
-  inicio: ['ahora', 'tarjeta-reto-hoy', { etiqueta: 'nav' }, 'ir-a-monedas', 'constancia', 'progreso-semana'],
+  // Tanda "sistema 1" (docs/ESPEC_visual_sistema1.md §1 y §5): el ícono del botón del sonido (`boton-sonido`) pasa de emoji a SVG de ui/iconos.js.
+  inicio: ['ahora', 'tarjeta-reto-hoy', { etiqueta: 'nav' }, 'ir-a-monedas', 'constancia', 'progreso-semana', 'boton-sonido'],
 };
 
 test('R4: lo que W51 declara cambió de verdad: "Esta semana" pasa a "Tu semana" con sus 7 puntos de lunes a domingo, en el mismo sitio; lo demás no cambió', async () => {
@@ -124,12 +125,12 @@ test('R4: lo que W68 declara cambió de verdad: Inicio ya no trae la fila de enl
   const navs = (lineas) => lineas.filter((l) => l.trimStart().split(' ')[0] === 'nav');
   assert.equal(navs(base).length, 2, 'la línea base traía DOS navegaciones (la fila de enlaces y la barra)');
   assert.equal(navs(hoy).length, 1, 'hoy, una sola');
-  assert.ok(navs(hoy)[0].includes('class="nav-inferior"'), 'y es la barra de abajo');
+  assert.ok(ES_LA_BARRA.test(navs(hoy)[0]), 'y es la barra de abajo');
   for (const testid of ['ir-a-asistencia', 'ir-a-retos', 'ir-a-perfil', 'boton-cerrar-sesion']) {
     assert.ok(base.some((l) => l.includes(`data-testid="${testid}"`)), `la línea base traía ${testid}`);
     assert.ok(!hoy.some((l) => l.includes(`data-testid="${testid}"`)), `hoy Inicio ya no trae ${testid}`);
   }
-  const barra = hoy.slice(hoy.findIndex((l) => l.includes('class="nav-inferior"')));
+  const barra = hoy.slice(hoy.findIndex((l) => ES_LA_BARRA.test(l)));
   assert.deepEqual(barra.filter((l) => l.trimStart().startsWith('a ')).map((l) => /href="([^"]*)"/.exec(l)?.[1]), ['#/inicio', '#/retos', '#/asistencia', '#/perfil']);
   assert.ok(barra.some((l) => l.trim() === '"Perfil"'), 'la barra dice "Perfil"');
   assert.ok(!base.some((l) => l.trim() === '"Perfil"'), 'la línea base no lo decía');
@@ -163,7 +164,7 @@ test('R4: lo que W64 declara cambió de verdad: profe/grupos trae una tarjeta po
 test('R4: lo que W70 declara cambió de verdad: del inicio del profe sale la barra de arriba y entra la de abajo (Mis grupos · Retos · Perfil); el grupo gana la misma barra', async () => {
   const hoy = await tomarFotos();
   const base = BASE.vistas;
-  const entradas = (lineas) => { const i = lineas.findIndex((l) => l.includes('class="nav-inferior"')); return i < 0 ? [] : lineas.slice(i).filter((l) => l.trimStart().startsWith('a ')).map((l) => /href="([^"]*)"/.exec(l)?.[1]); };
+  const entradas = (lineas) => { const i = lineas.findIndex((l) => ES_LA_BARRA.test(l)); return i < 0 ? [] : lineas.slice(i).filter((l) => l.trimStart().startsWith('a ')).map((l) => /href="([^"]*)"/.exec(l)?.[1]); };
   for (const nombre of ['profe_grupos', 'profe_grupo']) {
     assert.deepEqual(entradas(base[nombre]), [], `${nombre}: la línea base no traía barra de abajo`);
     assert.deepEqual(entradas(hoy[nombre]), ['#/profe/grupos', '#/profe/retos', '#/perfil'], `${nombre}: hoy trae la del profe`);
@@ -238,8 +239,8 @@ test('R4: lo que W69 declara cambió de verdad: Perfil es otra pantalla ("Tu per
     assert.ok(!dice(BASE.vistas[nombre], 'Tu perfil') || nombre === 'perfil_sin_soporte', `${nombre}: la línea base no se titulaba así`);
     assert.ok(BASE.vistas[nombre].some((l) => l.includes('data-testid="perfil-volver"')), `${nombre}: la línea base traía su propio volver`);
     assert.ok(!hoy[nombre].some((l) => l.includes('volver')), `${nombre}: hoy es una pestaña, sin volver`);
-    assert.ok(hoy[nombre].some((l) => l.includes('class="nav-inferior"')), `${nombre}: hoy lleva la barra`);
-    assert.ok(!BASE.vistas[nombre].some((l) => l.includes('class="nav-inferior"')), `${nombre}: la línea base no la llevaba`);
+    assert.ok(hoy[nombre].some((l) => ES_LA_BARRA.test(l)), `${nombre}: hoy lleva la barra`);
+    assert.ok(!BASE.vistas[nombre].some((l) => ES_LA_BARRA.test(l)), `${nombre}: la línea base no la llevaba`);
     assert.ok(hoy[nombre].some((l) => l.includes('data-testid="boton-cerrar-sesion"')), `${nombre}: "Cerrar sesión" sigue ahí`);
   }
   assert.ok(dice(BASE.vistas.perfil, 'Cambia tu contraseña') && !dice(hoy.perfil, 'Cambia tu contraseña'), 'el título viejo salió');
@@ -310,6 +311,19 @@ test('R4: sinSubarboles quita SOLO el subárbol declarado (por data-testid, o po
     if (VISTAS_ENTERAS.includes(nombre)) continue; // W69: Perfil se declaró entero, a propósito (lo cubre U67); es la única excepción
     assert.ok(quedan.length >= 4 && quedan[0] === lineas[0] && quedan[1] === lineas[1], `${nombre}: tras excluir lo declarado y la barra, la vista sigue ahí`);
   }
+});
+
+// Tanda "sistema 1" (docs/ESPEC_visual_sistema1.md §1 y §5): la barra de abajo (ya declarada en Inicio, Perfil y las dos del profe) cambia por dentro.
+test('R4: lo que la tanda "sistema 1" declara cambió de verdad: la barra es la del sistema (sx-barra) con el registro del rol y sin emoji; la línea base los traía', async () => {
+  const hoy = await tomarFotos();
+  const EMOJI = /\p{Emoji_Presentation}/u;
+  const desdeLaBarra = (lineas) => { const i = lineas.findIndex((l) => ES_LA_BARRA.test(l)); return i < 0 ? [] : lineas.slice(i); };
+  for (const [nombre, registro] of [['inicio', ''], ['perfil', ''], ['profe_grupos', ' sx-sereno'], ['profe_grupo', ' sx-sereno']]) {
+    const b = desdeLaBarra(hoy[nombre]);
+    assert.ok(b[0]?.includes(`class="nav-inferior sx-barra${registro}"`), `${nombre}: la barra del sistema${registro}`);
+    assert.ok(!b.some((l) => EMOJI.test(l)), `${nombre}: ningún emoji en la barra`);
+  }
+  assert.ok(desdeLaBarra(BASE.vistas.inicio).some((l) => EMOJI.test(l)), 'la línea base de Inicio traía emoji en la barra');
 });
 
 test('R4: dos tomas seguidas dan lo mismo (la foto no depende del reloj ni del azar)', async () => {

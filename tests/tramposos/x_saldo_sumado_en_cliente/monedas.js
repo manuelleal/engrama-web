@@ -10,6 +10,7 @@ import { crearCargando, crearVacio } from '../../ui/estados.js';
 import { crearNavInferior } from '../../ui/nav_inferior.js';
 import { crearEncabezado } from '../../ui/encabezado.js';
 import { filasDeMovimientos, planDeMovimientos } from '../../ui/movimientos.js';
+import { crearIcono } from '../../ui/iconos.js';
 import { textos } from '../../textos.js';
 import { leerHistorialMonedas } from '../../api/core.js';
 import { listarRetos } from '../../api/retos.js';
@@ -49,7 +50,7 @@ function tarjetaDeSaldo(balance) {
 function filaDeMovimiento(fila, i, animadas) {
   const nodo = h(
     'li', { class: `fila movimiento${i < animadas ? ' movimiento-entra' : ''}`, 'data-testid': 'movimiento', 'data-tipo': fila.tipo },
-    h('span', { class: 'movimiento-icono', 'aria-hidden': 'true' }, fila.icono),
+    h('span', { class: 'movimiento-icono', 'aria-hidden': 'true' }, crearIcono(fila.icono)),
     h('div', { class: 'fila-texto' },
       h('span', { class: 'fila-titulo' }, fila.etiqueta),
       fila.detalle ? h('span', { class: 'movimiento-detalle' }, fila.detalle) : null,

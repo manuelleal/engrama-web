@@ -1,0 +1,16 @@
+{
+  "descripcion": "Tanda visual 1: el fondo de marca (el lienzo navy claro de escritorio) pierde su ancla en .juego y en la barra del estudiante y le cae tambien al profe y al admin (dejan de ser sobrios)",
+  "archivos": {
+    "estilos/cara.css": "cara.css"
+  },
+  "comando": [
+    "node",
+    "--test",
+    "--test-reporter=tap",
+    "tests/unit/css_cara.test.mjs"
+  ],
+  "espera_codigo_no_cero": true,
+  "espera_fallan_tests": [
+    "cara: sobriedad. El fondo de marca (y cualquier pestana rellena) es solo del estudiante: el profe y el admin no lo reciben"
+  ]
+}

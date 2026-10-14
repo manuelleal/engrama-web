@@ -41,7 +41,9 @@ test('cara: movimiento. cara.css no declara animaciones y sus transiciones solo 
   }
 });
 
-test('cara: sobriedad. El fondo de marca y la pestana rellena son solo del estudiante (el profe y el admin no los reciben)', () => {
+// Tanda "sistema 1": la pestana rellena salio de cara.css (la barra es `sx-barra` y su registro lo pone ui/nav_inferior.js por rol: lo vigila
+// ui_iconos.test.mjs con x_barra_del_profe_con_juego). Aca sigue el fondo de marca; si alguien vuelve a rellenar la pestana en esta hoja, tambien cae aqui.
+test('cara: sobriedad. El fondo de marca (y cualquier pestana rellena) es solo del estudiante: el profe y el admin no lo reciben', () => {
   let vigiladas = 0;
   for (const r of reglas(leer(CARA))) {
     for (const selector of r.selector.split(',').map((s) => s.trim())) {
@@ -52,7 +54,7 @@ test('cara: sobriedad. El fondo de marca y la pestana rellena son solo del estud
       assert.match(selector, SOLO_ESTUDIANTE, `"${selector}" es adorno de juego y no cuelga de .juego ni de la barra del estudiante: lo recibirian el profe y el admin`);
     }
   }
-  assert.ok(vigiladas >= 2, `se esperaban el fondo de marca y la pestana rellena en cara.css; hay ${vigiladas} reglas vigiladas`);
+  assert.ok(vigiladas >= 2, `se esperaba el fondo de marca en cara.css (el lienzo y sus dos formas); hay ${vigiladas} selectores vigilados`);
 });
 
 const HOJAS = ['estilos/tipografia.css', 'estilos/base.css', 'estilos/componentes.css', 'estilos/formularios.css', 'estilos/juego.css', CARA];

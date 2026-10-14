@@ -6,8 +6,8 @@
    - el labio (borde o sombra SÓLIDA abajo) es de lo que se toca o se gana; lo que solo informa queda plano. Sin sombras difusas ni degradados;
    - oro = logro, monedas y racha; navy = acción y marca; nada se dice solo con color;
    - ningún texto en `content:` (las cadenas viven en src/textos*.js): los seudoelementos solo dibujan formas;
-   - el fondo de marca y los rellenos de juego cuelgan de .juego o de la barra del estudiante (`a[href="#/inicio"]`, la entrada que solo
-     tiene su barra): el profe y el admin quedan sobrios. */
+   - el fondo de marca cuelga de .juego o de la barra del estudiante (`a[href="#/inicio"]`, la entrada que solo tiene su barra): el profe y
+     el admin quedan sobrios. */
 
 /* ---------- Mezclas de la casa. NO son tokens nuevos: son los tokens de tokens.css aclarados u oscurecidos, con nombre para no repetir la
    cuenta en cada regla. Llevan el prefijo --cara- para que nadie los confunda con un token de diseno/tokens.json. ---------- */
@@ -250,50 +250,11 @@ button.boton-secundario {
 }
 
 /* ====================================================================================================================================
-   4. LA BARRA DE ABAJO. Los íconos siguen siendo los emoji del DOM (cambiarlos por SVG propios es otra tanda): acá los que NO están
-      activos se apagan a gris para que el rojo, el rosa y el morado del sistema no peleen con el navy, y solo el de la pestaña activa
-      conserva su color. La pestaña activa se marca con texto navy, un filo arriba y más peso; nunca solo con color: lleva aria-current.
-      En el estudiante, además, va rellena de navy con su labio (la tecla hundida de "estás acá"). Nada de esto anima.
+   4. LA BARRA DE ABAJO es la del sistema (`sx-barra`): íconos propios en SVG (ui/iconos.js) y el registro puesto por rol en la barra misma
+      (ui/nav_inferior.js). La pestaña activa se dice con color, peso y, acá, un trazo más grueso; nunca solo con color: lleva aria-current.
    ==================================================================================================================================== */
-.nav-inferior {
-  gap: 6px;
-  padding: 6px 8px calc(8px + env(safe-area-inset-bottom));
-  border-top-color: var(--cara-linea);
-}
-.nav-inferior a {
-  color: var(--cara-tinta-suave);
-  font-size: 0.74rem;
-  line-height: 1.2;
-  padding: 6px 4px 5px;
-}
-.nav-inferior a .nav-icono {
-  filter: grayscale(1);
-  opacity: 0.75;
-}
-.nav-inferior a[aria-current="page"] {
-  color: var(--primario);
-  background: color-mix(in srgb, var(--primario) 12%, white);
-  box-shadow: inset 0 3px 0 var(--primario);
-  font-weight: 800;
-}
-.nav-inferior a[aria-current="page"] .nav-icono {
-  filter: none;
-  opacity: 1;
-}
-.nav-inferior:has(a[href="#/inicio"]) a[aria-current="page"] {
-  background: var(--primario);
-  color: var(--superficie);
-  box-shadow: 0 3px 0 var(--primario-oscuro);
-}
-/* Sobre el relleno navy, el emoji de la pestaña activa va en un disco blanco: el busto morado de "Perfil" no se veía sobre navy. */
-.nav-inferior:has(a[href="#/inicio"]) a[aria-current="page"] .nav-icono {
-  display: inline-grid;
-  place-items: center;
-  width: 1.5em;
-  height: 1.5em;
-  font-size: 1.15rem;
-  background: var(--superficie);
-  border-radius: 50%;
+.sx-barra__pestana[aria-current="page"] .sx-icono {
+  stroke-width: 2.7;
 }
 
 /* ====================================================================================================================================

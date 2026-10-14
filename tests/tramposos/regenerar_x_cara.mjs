@@ -38,10 +38,11 @@ const TRAMPOSOS = [
     falla: 'cara: movimiento. cara.css no declara animaciones y sus transiciones solo mueven transform u opacity',
   },
   {
-    nombre: 'x_cara_barra_del_profe_rellena', destino: 'estilos/cara.css', archivo: 'cara.css',
-    descripcion: 'Tanda visual 1: la pestana rellena de navy pierde su ancla en la barra del estudiante y le cae tambien al profe y al admin (dejan de ser sobrios)',
-    contenido: cambiar(cara, '.nav-inferior:has(a[href="#/inicio"]) a[aria-current="page"] {\n  background: var(--primario);', '.nav-inferior a[aria-current="page"] {\n  background: var(--primario);'),
-    falla: 'cara: sobriedad. El fondo de marca y la pestana rellena son solo del estudiante (el profe y el admin no los reciben)',
+    // El fondo de marca pierde su ancla en el estudiante (x_cara_barra_del_profe_rellena salio con la tanda "sistema 1": la pestana rellena ya no vive en cara.css).
+    nombre: 'x_cara_fondo_de_marca_para_todos', destino: 'estilos/cara.css', archivo: 'cara.css',
+    descripcion: 'Tanda visual 1: el fondo de marca (el lienzo navy claro de escritorio) pierde su ancla en .juego y en la barra del estudiante y le cae tambien al profe y al admin (dejan de ser sobrios)',
+    contenido: cambiar(cara, '  body:has(.juego),\n  body:has(.nav-inferior a[href="#/inicio"]) {\n    background:', '  body {\n    background:'),
+    falla: 'cara: sobriedad. El fondo de marca (y cualquier pestana rellena) es solo del estudiante: el profe y el admin no lo reciben',
   },
   {
     nombre: 'x_cara_texto_ilegible', destino: 'estilos/cara.css', archivo: 'cara.css',
