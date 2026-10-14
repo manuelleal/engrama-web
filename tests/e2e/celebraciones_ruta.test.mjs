@@ -10,9 +10,9 @@ import { conAppCompleta } from './ayudante_servidor.mjs';
 import { crearChallenge } from '../../herramientas/mock/rutas_challenges.mjs';
 import { DOCENTE_BOOTSTRAP_TOKEN } from '../../herramientas/mock/estado.mjs';
 
-// W78 (docs/ESPEC_practica_del_dia.md §3): con el backend viejo (estado.backend.l1 = false) la web pregunta una vez por intento si hay L1
-// (GET …/answers) y recibe 404, que es la señal del respaldo. Ese 404 esperado no es un error de la página.
-const sinSondeoL1 = (errores) => errores.filter((e) => !/\/challenges\/attempts\/[^/]+\/answers$/.test(e));
+// W78 y W81 (docs/ESPEC_practica_del_dia.md §3): con el backend viejo (estado.backend.l1 o .racha = false) la web pregunta si hay L1 (GET …/answers)
+// o racha semanal (GET /core/racha) y recibe 404, que es la señal del respaldo. Ese 404 esperado no es un error de la página.
+const sinSondeoL1 = (errores) => errores.filter((e) => !/(\/challenges\/attempts\/[^/]+\/answers|\/core\/racha)$/.test(e));
 const HAY_NAVEGADOR = [
   process.env.EDGE_PATH,
   'C:/Program Files (x86)/Microsoft/Edge/Application/msedge.exe',
@@ -31,7 +31,8 @@ const RESTOS = `({
 })`;
 
 test('celebraciones: al navegar desde Inicio, el aviso de constancia y el confeti desaparecen (no tapan la pantalla nueva)', { skip: SKIP }, async () => {
-  await conAppCompleta(async (url) => {
+  await conAppCompleta(async (url, estado) => {
+    estado.backend.racha = false; // W81: mide el aviso de la constancia de siempre (el respaldo); la racha semanal la mide E37
     const r = await revisarPagina({
       url, ancho: 375, alto: 812, espera_ms: 5000,
       pre: `${YA_ENTRO}; localStorage.setItem('engrama_ultimo_constancia_est-1', '1'); localStorage.setItem('engrama_ultimo_saldo_est-1_demo', '-30')`,
