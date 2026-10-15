@@ -1,0 +1,150 @@
+/* entrada.css · La entrada con marca (docs/ESPEC_visual_entrada.md; hallazgo 5 de la compuerta visual b718885). Antes: un título, dos
+   campos, "Entrar" como chip de 85 px, dos chips blancos pegados y ~330 px vacíos a 375; a 1280, fondo plano.
+   Ahora: la franja navy con el nombre y la frase abre la pantalla; "Entrar" va a todo el ancho; los enlaces secundarios, discretos, al
+   final. A 1280, la pantalla es una tarjeta sobre el fondo de marca de Inicio.
+   Reglas: solo var(--token) o color-mix() con white/transparent; nada se anima (la entrada es serena); los seudoelementos solo dibujan
+   formas, sin texto. La entrada es la puerta de TODOS los roles antes de saber cuál es: por eso lleva su propia copia del fondo de marca
+   (el de cara.css sigue siendo solo del estudiante). Va en DIFERIDOS de sw.js, no en PRECARGA: sin ella, la entrada se ve como antes. */
+
+[data-testid="vista-entrada"] {
+  display: flex;
+  flex-direction: column;
+  min-height: calc(100vh - 32px);
+  min-height: calc(100dvh - 32px);
+}
+
+/* La franja de marca: de borde a borde en el celular (se come el relleno de #vista), con dos formas planas de afiche dentro. */
+.entrada-marca {
+  position: relative;
+  isolation: isolate;
+  overflow: hidden;
+  margin: -16px -16px 28px;
+  padding: max(44px, 9vh) 24px max(32px, 6vh);
+  background: var(--primario);
+}
+.entrada-marca > p {
+  margin: 0;
+  max-width: 17rem;
+}
+.entrada-marca .entrada-nombre {
+  font: 800 2.75rem/1 var(--fuente-titulos);
+  letter-spacing: 0.03em;
+  margin-bottom: 12px;
+}
+/* El aro (blanco muy tenue, arriba a la derecha) y el triángulo verde azulado (abajo a la derecha): las formas del fondo de escritorio. */
+.entrada-marca::before,
+.entrada-marca::after {
+  content: "";
+  position: absolute;
+  z-index: -1;
+  pointer-events: none;
+}
+.entrada-marca::before {
+  top: -56px;
+  right: -48px;
+  width: 168px;
+  height: 168px;
+  border-radius: 50%;
+  border: 24px solid color-mix(in srgb, white 10%, transparent);
+}
+.entrada-marca::after {
+  right: 30px;
+  bottom: 26px;
+  width: 46px;
+  height: 46px;
+  background: var(--secundario);
+  clip-path: polygon(50% 0, 100% 100%, 0 100%);
+  transform: rotate(16deg);
+}
+
+[data-testid="vista-entrada"] > h1 {
+  font-size: var(--sx-t-sub);
+  font-weight: 700;
+  margin: 0;
+}
+[data-testid="vista-entrada"] form {
+  margin: 12px 0 0;
+}
+[data-testid="vista-entrada"] form input {
+  min-height: 48px;
+}
+[data-testid="vista-entrada"] form .sx-btn {
+  margin-top: 12px;
+}
+/* La zona del error casi no ocupa sitio mientras está vacía (sigue en el árbol: es la región que avisa). */
+[data-testid="entrada-error"] {
+  margin: 4px 0 0;
+  font-weight: 700;
+}
+
+/* Los secundarios, centrados y uno debajo del otro: crear cuenta justo después de la acción, el aviso de datos al pie de la columna (en el
+   celular el espacio que sobra queda entre los dos, no debajo de todo). El toque sigue siendo de 44 px. */
+.entrada-enlaces {
+  flex: 1;
+  padding-top: 16px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 4px;
+}
+.entrada-enlaces .sx-btn {
+  min-height: 44px;
+}
+.entrada-enlaces .entrada-aviso {
+  margin-top: auto;
+  color: var(--sx-tinta-2);
+  font-weight: 700;
+}
+
+/* Escritorio: el fondo de marca de Inicio (cara.css §5) y la entrada como una tarjeta, centrada, con la franja como tapa. */
+@media (min-width: 900px) {
+  body:has([data-testid="vista-entrada"]) {
+    background: color-mix(in srgb, var(--primario) 11%, white);
+  }
+  body:has([data-testid="vista-entrada"])::before {
+    content: "";
+    position: fixed;
+    z-index: -1;
+    left: -16vmin;
+    bottom: -22vmin;
+    width: 70vmin;
+    height: 70vmin;
+    border-radius: 50%;
+    border: 9vmin solid color-mix(in srgb, var(--primario) 10%, transparent);
+    pointer-events: none;
+  }
+  body:has([data-testid="vista-entrada"])::after {
+    content: "";
+    position: fixed;
+    z-index: -1;
+    right: 7vw;
+    top: 9vh;
+    width: 24vmin;
+    height: 24vmin;
+    background: color-mix(in srgb, var(--secundario) 30%, transparent);
+    clip-path: polygon(50% 0, 100% 100%, 0 100%);
+    transform: rotate(16deg);
+    pointer-events: none;
+  }
+  [data-testid="vista-entrada"] {
+    min-height: 0;
+    margin-top: max(16px, 7vh);
+    padding: 0 32px 20px;
+    overflow: hidden;
+    background: var(--superficie);
+    border-radius: var(--sx-radio-caja);
+    box-shadow: var(--sx-elev-2);
+  }
+  .entrada-marca {
+    margin: 0 -32px 28px;
+    padding: 40px 32px 30px;
+  }
+  /* La entrada de los actores de prueba (modo mock) no tiene franja: su título no va pegado al borde de la tarjeta. */
+  [data-testid="vista-entrada"] > h1:first-child {
+    padding-top: 28px;
+  }
+  /* El triángulo ya está en el fondo: en la tapa queda solo el aro (un adorno menos). */
+  .entrada-marca::after {
+    content: none;
+  }
+}
