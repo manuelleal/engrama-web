@@ -183,6 +183,7 @@ const DIFERIDOS = [
   '/src/vistas/admin/importar_csv.js',
   '/src/api/profe.js',
   '/src/api/admin.js',
+  '/estilos/entrada.css', // la entrada con marca (docs/ESPEC_visual_entrada.md): sin ella, la entrada se ve como antes
 ];
 
 // Cuánto se espera a CADA recurso de la precarga. Antes era `cache.addAll(PRECARGA)`: todo o nada, sin límite de tiempo. Un solo recurso

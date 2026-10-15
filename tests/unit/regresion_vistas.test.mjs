@@ -22,6 +22,8 @@ export const TEXTOS_DECLARADOS = {
   profe_grupo: [['Abrir sesión de asistencia', 'Abrir asistencia'],
     // Adenda 4 (docs/ESPEC_practica_del_dia.md §6e): la columna del roster era "Constancia" (los días de asistencia seguidos); la racha de Inicio es la semanal.
     ['Constancia', 'Clases seguidas']],
+  // La entrada con marca (docs/ESPEC_visual_entrada.md): el nombre pasa a la franja, así que el título dice qué hacer.
+  entrada_supabase: [['Entrar a ENGRAMA', 'Entra con tu correo']],
 };
 
 /** La línea base con los textos declarados puestos al día (el archivo de la foto no se regenera). */
@@ -76,7 +78,38 @@ export const DECLARADAS = {
   // Tanda "sistema 1" (§3): la barra del saldo (`div.barra-superior`) pasa a ser la cabecera única (`header.barra-superior`, con las clases del sistema) y
   // recibe el interruptor del sonido, que sale de junto al saludo. Se declaran el nodo viejo y el nuevo; el saludo (`div.encabezado-reto`) no cambia.
   inicio: ['ahora', 'tarjeta-reto-hoy', { etiqueta: 'nav' }, 'ir-a-monedas', 'constancia', 'progreso-semana', 'boton-sonido', { etiqueta: 'div', clase: 'barra-superior' }, { etiqueta: 'header', clase: 'barra-superior' }],
+  // La entrada con marca (docs/ESPEC_visual_entrada.md): entra la franja (`entrada-marca`, primer hijo); "Entrar" gana las clases del sistema; los
+  // dos secundarios dejan de ser chips (`boton-secundario`) y van juntos en `div.entrada-enlaces`. La raíz, el título (su texto, en
+  // TEXTOS_DECLARADOS), el formulario, los campos, sus etiquetas y la zona del error no cambian.
+  entrada_supabase: ['entrada-marca', 'boton-entrar', 'entrada-ver-aviso', 'entrada-crear-cuenta', { etiqueta: 'div', clase: 'entrada-enlaces' }],
 };
+
+test('R4: lo que declara la entrada con marca cambió de verdad: la franja con el nombre y la frase abre la pantalla, "Entrar" es el botón del sistema a todo el ancho, los secundarios son discretos y van juntos al final; el formulario no cambió', async () => {
+  const hoy = (await tomarFotos({ crearCuenta: true })).entrada_supabase;
+  const base = BASE.vistas.entrada_supabase;
+  const t = hoy.map((l) => l.trim());
+  assert.equal(t[2], 'div class="entrada-marca sx-sobre-marca" data-testid="entrada-marca"', 'la franja es el primer hijo de la vista');
+  assert.deepEqual(t.slice(3, 7), ['p class="entrada-nombre"', '"ENGRAMA"', 'p class="sx-t-apoyo"', '"Practica inglés con retos cortos y gana monedas por lo que aciertas."'], 'el nombre y la frase, en texto');
+  assert.equal(t[7], 'h1', 'después, el título');
+  assert.ok(t.includes('button class="sx-btn sx-btn--ancho sx-sereno" data-testid="boton-entrar" type="submit"'), '"Entrar": el botón del sistema, a todo el ancho, sereno, y sigue siendo el submit');
+  assert.equal(t[t.indexOf('button class="sx-btn sx-btn--ancho sx-sereno" data-testid="boton-entrar" type="submit"') + 1], '"Entrar"');
+  const enlaces = t.indexOf('div class="entrada-enlaces"');
+  assert.ok(enlaces > t.indexOf('form data-testid="form-entrada"'), 'los secundarios van después del formulario');
+  assert.deepEqual(t.slice(enlaces + 1), [
+    'button class="sx-btn sx-btn--fantasma sx-btn--chico" data-testid="entrada-crear-cuenta" type="button"', '"Crear cuenta con código de grupo"',
+    'button class="sx-btn sx-btn--fantasma sx-btn--chico entrada-aviso" data-testid="entrada-ver-aviso" type="button"', '"Tratamiento de tus datos"',
+  ], 'crear cuenta y el aviso de datos: discretos, con sus textos de siempre, y nada más al final');
+  assert.ok(!t.some((l) => l.includes('boton-secundario')), 'ya no hay chips blancos');
+  assert.ok(base.some((l) => l.includes('class="boton-secundario" data-testid="entrada-ver-aviso"')), 'la línea base traía el chip');
+  const sangria = (l) => l.length - l.trimStart().length;
+  const formulario = (lineas) => {
+    const i = lineas.findIndex((l) => l.includes('data-testid="form-entrada"'));
+    const fin = lineas.findIndex((l, n) => n > i && sangria(l) <= sangria(lineas[i]));
+    return sinSubarboles(lineas.slice(i, fin < 0 ? undefined : fin), ['boton-entrar']);
+  };
+  assert.deepEqual(formulario(hoy), formulario(base), 'el formulario (etiquetas, campos y zona del error) es idéntico');
+  assert.deepEqual(sinSubarboles(hoy, DECLARADAS.entrada_supabase), sinSubarboles(base, DECLARADAS.entrada_supabase), 'fuera de lo declarado, la entrada es idéntica');
+});
 
 test('R4: lo que W51 declara cambió de verdad: "Esta semana" pasa a "Tu semana" con sus 7 puntos de lunes a domingo, en el mismo sitio; lo demás no cambió', async () => {
   const hoy = (await tomarFotos()).inicio;
@@ -275,14 +308,19 @@ test('R4: con las claves del anillo, Inicio cambia SOLO el bloque anillo-tarjeta
   }
 });
 
-// W31 (adenda 17.7): la entrada gana UN botón, y solo si app.js se lo pasa (modo supabase). La foto de siempre no lo pasa, así que es idéntica.
+// W31 (adenda 17.7): la entrada gana UN botón, y solo si app.js se lo pasa (modo supabase). La foto de siempre no lo pasa.
+// Desde la entrada con marca (docs/ESPEC_visual_entrada.md) el botón vive en `div.entrada-enlaces`, que está declarado: lo de W31 se mira
+// comparando la foto con y sin el botón (la misma vista de hoy), y la vista contra la línea base, fuera de lo declarado.
 test('R4: la entrada con "Crear cuenta con código de grupo" cambia SOLO el nodo del botón (lo declara W31) y las demás vistas no se enteran', async () => {
   const hoy = await tomarFotos({ crearCuenta: true });
-  assert.deepEqual(sinSubarboles(hoy.entrada_supabase, ['entrada-crear-cuenta']), sinSubarboles(BASE.vistas.entrada_supabase, []), 'fuera del botón, la entrada es idéntica');
+  const sinBoton = (await tomarFotos()).entrada_supabase;
+  assert.deepEqual(sinSubarboles(hoy.entrada_supabase, ['entrada-crear-cuenta']), sinBoton, 'fuera del botón, la entrada con y sin él es idéntica');
+  assert.deepEqual(sinSubarboles(hoy.entrada_supabase, DECLARADAS.entrada_supabase), sinSubarboles(BASE.vistas.entrada_supabase, DECLARADAS.entrada_supabase), 'y fuera de lo declarado, igual a la línea base');
   const i = hoy.entrada_supabase.findIndex((l) => l.includes('data-testid="entrada-crear-cuenta"'));
   assert.ok(i >= 0 && hoy.entrada_supabase[i + 1].trim() === '"Crear cuenta con código de grupo"', 'el botón está, con su texto');
   assert.ok(!BASE.vistas.entrada_supabase.some((l) => l.includes('entrada-crear-cuenta')), 'la línea base no lo tenía');
-  assert.equal(hoy.entrada_supabase.length, BASE.vistas.entrada_supabase.length + 2, 'un nodo de más (el botón y su texto), nada más');
+  assert.ok(!sinBoton.some((l) => l.includes('entrada-crear-cuenta')), 'sin crearCuenta no se pinta');
+  assert.equal(hoy.entrada_supabase.length, sinBoton.length + 2, 'un nodo de más (el botón y su texto), nada más');
   for (const nombre of Object.keys(BASE.vistas).filter((n) => n !== 'entrada_supabase')) {
     const declaradas = DECLARADAS[nombre] || [];
     assert.deepEqual(sinSubarboles(hoy[nombre], declaradas), sinSubarboles(BASE.vistas[nombre], declaradas), nombre);

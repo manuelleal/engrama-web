@@ -49,7 +49,8 @@ async function manejarEntrarReal(alEntrar, campoCorreo, campoContrasena, boton, 
 function vistaReal(alEntrar, alVerAviso, alCrearCuenta) {
   const campoCorreo = h('input', { type: 'email', id: 'entrada-correo', 'data-testid': 'campo-correo', autocomplete: 'username' });
   const campoContrasena = h('input', { type: 'password', id: 'entrada-contrasena', 'data-testid': 'campo-contrasena', autocomplete: 'current-password' });
-  const boton = h('button', { type: 'submit', 'data-testid': 'boton-entrar' }, textos.entrada.entrar);
+  // Sereno: la entrada no es juego (sin labio).
+  const boton = h('button', { type: 'submit', class: 'sx-btn sx-btn--ancho sx-sereno', 'data-testid': 'boton-entrar' }, textos.entrada.entrar);
   const zonaError = h('p', { role: 'alert', 'data-testid': 'entrada-error' });
   const form = h(
     'form', { 'data-testid': 'form-entrada' },
@@ -59,12 +60,18 @@ function vistaReal(alEntrar, alVerAviso, alCrearCuenta) {
   );
   form.addEventListener('submit', (ev) => { ev.preventDefault(); manejarEntrarReal(alEntrar, campoCorreo, campoContrasena, boton, zonaError); });
   // El aviso de datos se puede leer SIEMPRE, también antes de entrar (Ley 1581).
-  const verAviso = h('button', { type: 'button', class: 'boton-secundario', 'data-testid': 'entrada-ver-aviso' }, textos.aviso.enlace);
+  // Secundarios discretos, aparte de la acción (docs/ESPEC_visual_entrada.md).
+  const SECUNDARIO = 'sx-btn sx-btn--fantasma sx-btn--chico';
+  const verAviso = h('button', { type: 'button', class: `${SECUNDARIO} entrada-aviso`, 'data-testid': 'entrada-ver-aviso' }, textos.aviso.enlace);
   verAviso.addEventListener('click', alVerAviso);
   // W31: crear cuenta con código de grupo; solo si app.js lo ofrece (modo supabase). Lleva a "Todavía no está abierto" si el despliegue no lo abrió.
-  const crearCuenta = alCrearCuenta ? h('button', { type: 'button', class: 'boton-secundario', 'data-testid': 'entrada-crear-cuenta' }, textos.registro.crearCuenta) : null;
+  const crearCuenta = alCrearCuenta ? h('button', { type: 'button', class: SECUNDARIO, 'data-testid': 'entrada-crear-cuenta' }, textos.registro.crearCuenta) : null;
   if (crearCuenta) crearCuenta.addEventListener('click', () => alCrearCuenta());
-  return h('div', { 'data-testid': 'vista-entrada' }, h('h1', {}, textos.entrada.tituloReal), form, crearCuenta, verAviso);
+  // La marca abre: nombre y frase en la franja navy (las formas, en entrada.css).
+  const marca = h('div', { class: 'entrada-marca sx-sobre-marca', 'data-testid': 'entrada-marca' },
+    h('p', { class: 'entrada-nombre' }, textos.entrada.marca), h('p', { class: 'sx-t-apoyo' }, textos.entrada.frase));
+  return h('div', { 'data-testid': 'vista-entrada' }, marca, h('h1', {}, textos.entrada.tituloReal), form,
+    h('div', { class: 'entrada-enlaces' }, crearCuenta, verAviso));
 }
 
 /**

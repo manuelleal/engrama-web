@@ -71,7 +71,10 @@ export const textos = {
     titulo: 'Entrar (demo)',
     ayuda: 'Elige un actor de prueba. Datos sintéticos, rotulado "demo" (H0).',
     // W22 (encargo A): la pantalla de entrada real (ENGRAMA_AUTH=supabase) — correo y contraseña.
-    tituloReal: 'Entrar a ENGRAMA',
+    // Entrada con marca (ESPEC_visual_entrada, PROVISIONALES).
+    marca: 'ENGRAMA',
+    frase: 'Practica inglés con retos cortos y gana monedas por lo que aciertas.',
+    tituloReal: 'Entra con tu correo',
     etiquetaCorreo: 'Correo',
     etiquetaContrasena: 'Contraseña',
     entrar: 'Entrar',
