@@ -1,0 +1,16 @@
+{
+  "descripcion": "U97 (W84): sin la memoria por reto, elegir una opción (que repinta la pantalla) vuelve a abrir el texto que el estudiante plegó",
+  "archivos": {
+    "src/ui/lectura.js": "lectura.js"
+  },
+  "comando": [
+    "node",
+    "--test",
+    "--test-reporter=tap",
+    "tests/unit/practica_lectura.test.mjs"
+  ],
+  "espera_codigo_no_cero": true,
+  "espera_fallan_tests": [
+    "U97: plegar el texto y elegir una opción"
+  ]
+}

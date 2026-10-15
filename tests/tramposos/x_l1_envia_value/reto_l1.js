@@ -22,6 +22,7 @@ import { accionUnica, ErrorApi } from '../../api/cliente.js';
 import { retomarIntento, responderPregunta, terminarIntento, ErrorTransitorio } from '../../api/practica.js';
 import { planDeExplicacion, crearBanda } from '../../ui/explicacion.js';
 import { preguntaContestable } from '../../ui/practica.js';
+import { crearLectura } from '../../ui/lectura.js';
 import { renderRevision, textoDeOpcion } from './revision.js';
 import { crearSalir, nodoOpciones, pintarErrorFlujo, nodoRevisando } from './reto_flujo.js';
 
@@ -41,9 +42,11 @@ export function indiceInicial(preguntas, respondidas) {
  * mal formado: el reto se juega como antes. H-1: si la red o el servidor fallan (ya con un reintento), NO es "backend viejo": pinta el error con
  * "Reintentar" y "✕ Salir" y devuelve true (lo respondido sigue en el servidor; nunca se juega con /submit por un corte).
  * @param {HTMLElement} raiz
- * @param {{attemptId: string, challenge: any, esRepaso: boolean, historialPrevio: unknown, ctx: any}} datos
+ * @param {{attemptId: string, challenge: any, esRepaso: boolean, historialPrevio: unknown, ctx: any, lectura?: Function}} datos
  */
 export async function intentarL1(raiz, datos) {
+  // W84: el texto de un reto de Lectura también en el flujo de siempre (backend sin L1): reto_flujo.js lo pinta con esto, sin cargar nada más.
+  datos.lectura = crearLectura;
   let retomado;
   try {
     retomado = await retomarIntento(datos.attemptId, datos.ctx);
@@ -163,6 +166,7 @@ function pintar(raiz, estado, entrada = 'desliza', recien = null) {
     estado.encabezado = crearCabecera({ piezas: [estado.salir, h('h1', { class: 'titulo-reto' }, tituloLegible(challenge.title))], sonido: true }),
     barra,
     estado.esRepaso ? h('p', { role: 'status', class: 'aviso-corto', 'data-testid': 'banner-repaso' }, textos.retoFlujo.bannerRepaso) : null,
+    crearLectura(challenge), // W84: el texto de un reto de Lectura, arriba de la afirmación (null si no es de Lectura)
     h('div', { class: 'presenta-pregunta' },
       crearDrako('presenta', textos.retoFlujo.drakoPresenta, { estatico: true }),
       h('p', { class: 'texto-apoyo', 'data-testid': 'contador-pregunta' }, textos.retoFlujo.pregunta(indice + 1, total))),
@@ -227,7 +231,8 @@ async function terminar(raiz, estado, boton) {
   try {
     const resultado = await estado.terminar();
     const respuestasDadas = Object.fromEntries([...estado.respondidas].map(([qid, r]) => [qid, r.answer]));
-    renderRevision(raiz, { challenge: estado.challenge, resultado, respuestasDadas, rol: estado.rol, esRepaso: estado.esRepaso, historialPrevio: estado.historialPrevio });
+    renderRevision(raiz, { challenge: estado.challenge, resultado, respuestasDadas, rol: estado.rol, esRepaso: estado.esRepaso, historialPrevio: estado.historialPrevio,
+      lectura: crearLectura(estado.challenge, true) });
   } catch (e) {
     if (e instanceof ErrorApi && e.status === 409) { avisoDeCierre(raiz, estado); return; } // H-2: ya estaba cerrado (nunca se cobra dos veces)
     console.warn('reto_l1: no se pudo cerrar el intento', e);

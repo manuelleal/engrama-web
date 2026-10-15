@@ -108,3 +108,44 @@ export function sembrarRetosPractica(estado, grupoId) {
     questions: preguntas.map(pregunta),
   }).cuerpo);
 }
+
+// W84 (docs/ESPEC_lectura_texto.md §4): un reto de LECTURA como los del sembrador (`herramientas/sembrar/mapeo.mjs` `retosDeLectura`): el texto va en
+// la `description` del reto y cada afirmación es una pregunta V/F/ND con su explicación como `regla`. Va APARTE de RETOS_PRACTICA: no cambia la tanda
+// ni los humos de hoy. Textos inventados (inglés sencillo, B1): nunca se usan con estudiantes reales.
+const OPCIONES_LO_DICE = [{ label: 'V', value: 'True' }, { label: 'F', value: 'False' }, { label: 'ND', value: 'Not given' }];
+
+/** [título, nivel, unidad, texto, afirmaciones [texto, clave, regla]] */
+export const RETO_LECTURA = ['Un día en la panadería · Lectura 1', 'B1', 'sint-b1-u03',
+  'Camila works at a small bakery on Carrera 27 in Bucaramanga. She starts work at six in the morning, so she gets up at five and takes the first bus. '
+  + 'Her favourite part of the job is decorating birthday cakes. Last Saturday a customer ordered a cake with a dragon on it, and Camila spent three '
+  + 'hours on it. The customer was very happy and took photos of it. On Sundays the bakery is closed, and Camila visits her grandmother in '
+  + 'Floridablanca. Next year she wants to take a course in French pastry.',
+  [
+    ['Camila starts work at five in the morning.', 'F', "False. The text says she starts work 'at six in the morning'; she gets up at five."],
+    ['Camila decorated a cake with a dragon on it.', 'V', "True. The text says a customer 'ordered a cake with a dragon on it'."],
+    ['The customer paid for the cake with a credit card.', 'ND', 'Not given. The text does not say how the customer paid.'],
+    ['The bakery is open on Sundays.', 'F', "False. The text says 'On Sundays the bakery is closed'."],
+  ]];
+
+/** La réplica: otro texto que NO se usa al desarrollar. */
+export const RETO_LECTURA_REPLICA = ['La biblioteca del barrio · Lectura 1', 'B1', 'sint-b1-u04',
+  'Mateo is a volunteer at the library in his neighbourhood. Every Wednesday afternoon he reads stories to a group of children. The library is small, '
+  + 'but it has a garden with two old mango trees, and in good weather the children sit under them. Mateo started two years ago, when he was still '
+  + 'at school.\nNow he studies to be a teacher, and he says the library taught him to be patient.',
+  [
+    ['Mateo reads stories to children on Wednesdays.', 'V', "True. The text says 'Every Wednesday afternoon he reads stories'."],
+    ['The library garden has three mango trees.', 'F', "False. The text says the garden has 'two old mango trees'."],
+    ['Mateo wants to work in a library when he finishes.', 'ND', 'Not given. The text says he studies to be a teacher, not where he wants to work.'],
+  ]];
+
+/**
+ * Siembra un reto de lectura en un grupo que ya existe (las pruebas en el navegador lo ponen en el de `est-1`).
+ * @param {any} estado @param {string} grupoId @param {any[]} [reto] RETO_LECTURA (por defecto) o RETO_LECTURA_REPLICA
+ */
+export function sembrarRetoLectura(estado, grupoId, reto = RETO_LECTURA) {
+  const [title, cefr_level, topic, description, afirmaciones] = reto;
+  return crearChallenge(estado, req(DOCENTE_BOOTSTRAP_TOKEN), {
+    title, description, group_id: grupoId, cefr_level, topic, skill: 'reading', coins_reward: 10, xp_reward: 3,
+    questions: afirmaciones.map(([question_text, correct_answer, regla]) => ({ question_text, correct_answer, options_json: OPCIONES_LO_DICE, explanation: { regla } })),
+  }).cuerpo;
+}

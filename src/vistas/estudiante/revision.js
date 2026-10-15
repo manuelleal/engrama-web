@@ -40,7 +40,7 @@ function filaDeRevision(pregunta, respuestasDadas, correctAnswers, i) {
 
 /**
  * @param {HTMLElement} raiz
- * @param {{challenge: object, resultado: object, respuestasDadas: Record<string,string>, rol?: string, esRepaso?: boolean, historialPrevio?: unknown}} datos
+ * @param {{challenge: object, resultado: object, respuestasDadas: Record<string,string>, rol?: string, esRepaso?: boolean, historialPrevio?: unknown, lectura?: Node|null}} datos
  *   `rol`: el de la sesión, para la barra; `esRepaso` e `historialPrevio` (W50): lo que se sabía ANTES de jugar, para el sello de mérito
  */
 export function renderRevision(raiz, datos) {
@@ -67,6 +67,7 @@ export function renderRevision(raiz, datos) {
     hero.nodo,
     banner,
     h('h2', { class: 'subtitulo-revision' }, textos.revision.titulo),
+    datos.lectura, // W84
     h('ul', {}, ...filas),
     volver,
     crearNavInferior('/retos', datos.rol), // la revisión es de la pestaña Retos (§5.6)

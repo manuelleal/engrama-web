@@ -25,6 +25,9 @@ const TANDA = 'tests/unit/practica_tanda.test.mjs';
 const REPASO = 'tests/unit/practica_repaso.test.mjs';
 const RACHA = 'tests/unit/practica_racha.test.mjs';
 const CORR = 'tests/unit/practica_correcciones.test.mjs'; // W83: docs/ESPEC_correcciones_practica.md
+const LECT = 'tests/unit/practica_lectura.test.mjs'; // W84: docs/ESPEC_lectura_texto.md
+/** @type {[string, string]} W84: el reto de Lectura sin su texto (como antes de W84). */
+const LECTURA_CIEGA = ['  return texto || null;\n', '  return null; // TRAMPOSO: el reto de Lectura sin su texto, como antes de W84\n'];
 /** El override de H-A en estilos/practica.css (el defecto lo quita). */
 const ORO_COMPROBAR = '.juego[data-modo="por-pregunta"] .barra-accion .boton-principal:not(:disabled) {\n  background: var(--sx-accion);\n  color: var(--sx-sobre-accion);\n  border-bottom-color: var(--sx-accion-labio);\n}\n';
 /** @type {[string, string]} */
@@ -166,7 +169,8 @@ export const TRAMPOSOS = {
   x_l1_sin_respaldo: {
     archivo: 'src/vistas/estudiante/reto_flujo.js', prueba: L1, tests: ['U79: con un backend sin L1'],
     descripcion: 'U79: con un backend sin /answers el reto muestra un error en vez de jugarse como hoy',
-    cambios: [['ctx })) return;', "ctx })) return;\n    pintarErrorFlujo(raiz, 'No se pudo cargar el reto.'); return;"]],
+    // W84: el ancla era `ctx })) return;`; desde W84 la llamada es `porPregunta(raiz, datos)` (mismo defecto, otra línea).
+    cambios: [['if (await porPregunta(raiz, datos)) return;', "if (await porPregunta(raiz, datos)) return;\n    pintarErrorFlujo(raiz, 'No se pudo cargar el reto.'); return;"]],
   },
   // ---------- W83: las correcciones de la auditoría 05 (docs/ESPEC_correcciones_practica.md) ----------
   x_l1_500_es_viejo: {
@@ -288,6 +292,28 @@ export const TRAMPOSOS = {
     archivo: 'src/vistas/estudiante/reto_flujo.js', prueba: L1, tests: ['U79: si /submit responde 409 intento_con_respuestas'],
     descripcion: 'U79: el 409 intento_con_respuestas se calla: el estudiante queda en un reto que no se puede enviar',
     cambios: [["    if (!query.reabierto) estado.reabrir = () => renderRetoFlujo(raiz, params, { ...query, reabierto: '1' }, ctx);\n", '']],
+  },
+  // W84 (docs/ESPEC_lectura_texto.md §2): los retos de Lectura muestran su texto.
+  x_lectura_ciega: {
+    archivo: 'src/ui/lectura.js', prueba: LECT,
+    tests: ['U96: textoDeLectura da el pasaje', 'U97: reto por pregunta', 'U97: la revisión del final', 'U97: con un backend sin L1'],
+    descripcion: 'U96/U97 (W84): ui/lectura.js nunca halla el texto: los retos de Lectura se juegan a ciegas, como en la compuerta 18 (hallazgo Alta 1)',
+    cambios: [LECTURA_CIEGA],
+  },
+  x_lectura_flujo_viejo_ciego: {
+    archivo: 'src/vistas/estudiante/reto_flujo.js', prueba: LECT, tests: ['U97: con un backend sin L1'],
+    descripcion: 'U97 (W84): el flujo de siempre (backend sin L1) no pinta el texto: con un backend viejo la Lectura se juega a ciegas',
+    cambios: [['    estado.lectura?.(challenge),\n', '']],
+  },
+  x_lectura_olvida_plegado: {
+    archivo: 'src/ui/lectura.js', prueba: LECT, tests: ['U97: plegar el texto y elegir una opción'],
+    descripcion: 'U97 (W84): sin la memoria por reto, elegir una opción (que repinta la pantalla) vuelve a abrir el texto que el estudiante plegó',
+    cambios: [['(memoria.get(clave) ?? { abierta: true, desplazado: 0 })', '{ abierta: true, desplazado: 0 }']],
+  },
+  x_e39_lectura_ciega: {
+    archivo: 'src/ui/lectura.js', prueba: 'tests/e2e/practica_lectura.test.mjs', tests: ['E39: a 375 × 667', 'E39: a 1280 × 800'],
+    descripcion: 'E39 (W84): el defecto de x_lectura_ciega medido en el navegador: el reto de Lectura sin su texto, a 375 y a 1280',
+    cambios: [LECTURA_CIEGA],
   },
 };
 
