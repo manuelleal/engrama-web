@@ -134,7 +134,11 @@ const CABECERA_S1 = {
   ...Object.fromEntries(['vivo', 'vivo_no_disponible', 'nivel', 'nivel_no_disponible', 'aviso_leer', 'solicitudes', 'solicitudes_vacio', 'solicitudes_error'].map((nombre) => [nombre, [CABECERA, TITULO_SUELTO]])),
 };
 
-const CAPAS = [HASTA_W70, VOLVER_W71, SALIR_W73, SONIDO_S1, NUMEROS_S1, CABECERA_S1];
+// Tanda visual 2 del reto (docs/ESPEC_visual_reto_tanda2.md; compuerta 18): el ícono del panel de la pregunta deja de ser el glifo "✎" (un nodo de texto)
+// y pasa a ser un SVG de ui/iconos.js (en la foto, sin SVG, el hueco queda vacío) (B1). Nada más.
+const RETO_T2 = { reto_en_curso: [{ etiqueta: 'span', clase: 'panel-icono' }] };
+
+const CAPAS = [HASTA_W70, VOLVER_W71, SALIR_W73, SONIDO_S1, NUMEROS_S1, CABECERA_S1, RETO_T2];
 /** @type {Record<string, Array<string|{etiqueta: string, clase?: string}>>} */
 export const DECLARADAS_NAV = Object.fromEntries([...new Set(CAPAS.flatMap((c) => Object.keys(c)))].map((nombre) => [nombre, [...new Set(CAPAS.flatMap((c) => c[nombre] || []))]]));
 
@@ -315,6 +319,13 @@ test('R9: lo que la tanda "sistema 1" declara de la cabecera cambió de verdad: 
   assert.equal(reto.filter((l) => l.includes('data-testid="drako-presenta"')).length, 1, 'una sola vez, como antes');
   for (const nombre of ['retos_error', 'reto_en_curso_error']) assert.equal(cabeceras(hoy[nombre]).length, 0, `${nombre}: el estado de error no cambió`);
   for (const nombre of Object.keys(hoy).filter((n) => n.startsWith('profe_') || n.startsWith('admin_'))) assert.ok(!hoy[nombre].some((l) => l.trimStart().startsWith('header ')), `${nombre}: sobrio, sin cabecera`);
+});
+
+test('R9: lo que la tanda visual 2 del reto declara cambió de verdad: el panel de la pregunta sin el glifo "✎"; nada más', async () => {
+  const hoy = await tomarFotosNav({ solo: ['reto_en_curso'] });
+  const dice = (lineas, texto) => lineas.some((l) => l.trim() === JSON.stringify(texto));
+  assert.ok(dice(CRUDA.vistas.reto_en_curso, '✎') && !dice(hoy.reto_en_curso, '✎'), 'el lápiz de texto salió del panel');
+  assert.ok(hoy.reto_en_curso.some((l) => l.includes('class="panel-icono"') && l.includes('aria-hidden="true"')), 'queda el hueco del ícono, decorativo');
 });
 
 test('R9: dos tomas seguidas dan lo mismo (la foto no depende del reloj ni del azar)', async () => {
