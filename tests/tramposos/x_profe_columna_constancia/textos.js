@@ -71,7 +71,10 @@ export const textos = {
     titulo: 'Entrar (demo)',
     ayuda: 'Elige un actor de prueba. Datos sintéticos, rotulado "demo" (H0).',
     // W22 (encargo A): la pantalla de entrada real (ENGRAMA_AUTH=supabase) — correo y contraseña.
-    tituloReal: 'Entrar a ENGRAMA',
+    // Entrada con marca (ESPEC_visual_entrada, PROVISIONALES).
+    marca: 'ENGRAMA',
+    frase: 'Practica inglés con retos cortos y gana monedas por lo que aciertas.',
+    tituloReal: 'Entra con tu correo',
     etiquetaCorreo: 'Correo',
     etiquetaContrasena: 'Contraseña',
     entrar: 'Entrar',
@@ -237,6 +240,9 @@ export const textos = {
     yaCobrada: (racha) => `Asistencia marcada. La de hoy ya la cobraste: las monedas de asistencia son una vez por día. Clases seguidas: ${racha}.`,
     /** @param {number} racha */
     sinMonedas: (racha) => `Asistencia marcada. Clases seguidas: ${racha}.`,
+    clasesSeguidas: 'Clases seguidas',
+    /** @param {number} n */
+    deNuevo: (n) => `Empezamos de nuevo. Tu mejor marca de clases seguidas: ${n}.`,
     bolsaAgotada: 'No pudimos registrar tu asistencia: la bolsa de monedas de tu institución se agotó. No es por ti. Avísale a tu profe.',
   },
   profe: {
