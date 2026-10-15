@@ -410,7 +410,7 @@ nav {
 
 /* ---------- Ficha de opción de respuesta (reto_flujo.js): antes era un <button> desnudo dentro
    de una viñeta. Ahora una tarjeta blanca con el mismo lenguaje "chunky" y la letra en un escudo
-   navy claro (el oro es solo logro; referencia: investigacion/evagame/pantallas-modo-en-vivo.html). ---------- */
+   navy (referencia: investigacion/evagame/pantallas-modo-en-vivo.html, .opt/.let). ---------- */
 #vista [data-testid="opciones"] {
   display: flex;
   flex-direction: column;

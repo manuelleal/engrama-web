@@ -2,8 +2,8 @@
 // ui/panel_resultado.js · El panel que SUBE desde abajo junto al botón de acción: confirma lo que el
 // estudiante hizo. Tres tipos:
 //   - 'neutro'    (hoy, en la pregunta): "Elegiste B: …" — no dice si está bien, la clave no sale
-//     antes de enviar (regla #3 del cliente) y la corrección pregunta a pregunta es L1/W18.
-//   - 'correcto' / 'incorrecto' (listos para W18 y para la revisión): SIEMPRE ícono + texto, nunca
+//     antes de enviar (regla #3 del cliente). Tras comprobar va la banda (ui/explicacion.js).
+//   - 'correcto' / 'incorrecto' (hoy sin uso): SIEMPRE ícono + texto, nunca
 //     solo color ni solo sonido (regla de la casa). Drako no va aquí: presenta, no califica (010).
 import { h } from './dom.js';
 import { crearIcono } from './iconos.js';

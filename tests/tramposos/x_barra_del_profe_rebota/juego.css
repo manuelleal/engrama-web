@@ -335,8 +335,7 @@ body {
 }
 .panel-icono {
   flex: none;
-  font-size: 1.3rem;
-  line-height: 1.2;
+  display: flex;
 }
 .panel-neutro {
   background: color-mix(in srgb, var(--primario) 8%, white);
