@@ -10,7 +10,7 @@
 //
 // Súbelo un número cada vez que cambie la lista de precarga o la estrategia; la `activate`
 // borra cualquier caché con otro nombre.
-const VERSION = 'engrama-shell-v60';
+const VERSION = 'engrama-shell-v61';
 
 // Cada encargo agrega los suyos en su propio commit (W7: Inicio + api/cliente,core,retos + los
 // SVG de Drako que usa el estudiante; W10: profe/grupos,grupo,sesion_asistencia + api/profe). El
@@ -48,6 +48,7 @@ const PRECARGA = [
   '/src/textos_nav.js', // las cadenas de la navegación (textos.js las esparce)
   '/src/textos_juego.js', // las cadenas de la capa de juego (textos.js las esparce)
   '/src/navegacion.js', // la tabla de la navegación (docs/ESPEC_navegacion.md): la barra y el "volver" salen de ahí
+  '/src/panel_diferido.js', // carga aparte las pantallas del profe y del admin (docs/ESPEC_margen_precarga.md): ellas van en DIFERIDOS
   '/src/ui/encabezado.js',
   '/src/ui/cabecera.js', // la cabecera única del estudiante
   '/src/bloqueos.js', // las pantallas obligatorias salen de app.js (espera, suspendida, ya no está...)
@@ -112,11 +113,6 @@ const PRECARGA = [
   '/src/vistas/estudiante/vivo.js', // W35: #/vivo (clase en vivo de EVA)
   '/src/vistas/estudiante/nivel.js', // W35: #/nivel (examen de SET)
   '/src/vistas/estudiante/salida_codigo.js', // W35: el formulario que comparten
-  '/src/vistas/profe/herramientas_clase.js', // W35: tablero, Escamas y calificar escritura
-  '/src/vistas/profe/inscripcion.js', // W32: el panel de inscripciones del grupo
-  '/src/vistas/profe/inscripcion_codigo.js', // W32: su sección del código
-  '/src/vistas/profe/inscripcion_pendientes.js', // W32: su lista de pendientes
-  '/src/vistas/profe/inscripcion_red.js', // W32: la red de sus botones
   '/src/api/datos.js', // W33
   '/src/ui/estado_etiqueta.js', // W29: ícono + texto de cada estado
   '/src/ui/contacto.js', // W29: el contacto del aviso como texto seleccionable
@@ -131,17 +127,6 @@ const PRECARGA = [
   '/src/api/cliente.js',
   '/src/api/core.js',
   '/src/api/retos.js',
-  '/src/api/profe.js',
-  '/src/vistas/profe/grupos.js',
-  '/src/vistas/profe/grupo.js',
-  '/src/vistas/profe/sesion_asistencia.js',
-  '/src/vistas/profe/logro.js',
-  '/src/vistas/profe/errores.js',
-  '/src/vistas/profe/retos.js',
-  '/src/api/admin.js',
-  '/src/vistas/admin/crear_grupo.js',
-  '/src/vistas/admin/asignar_docente.js',
-  '/src/vistas/admin/importar_csv.js',
 ];
 
 // Las fuentes de marca (publico/fuentes/PROCEDENCIA.md) NO van en PRECARGA: son 64.264 bytes y con ellas el shell pasaría su techo de 830.000
@@ -162,7 +147,7 @@ const APARTE = [
 
 // La práctica del día (docs/ESPEC_practica_del_dia.md §0): la explicación tras cada respuesta, la tanda, el repaso y la racha semanal. Son módulos
 // DIFERIDOS: la app los carga con `import()` solo cuando el backend los ofrece, y si no cargan (sin red y sin haberlos guardado) funciona como antes.
-// No van en PRECARGA (el shell está a menos de 3 KB de su techo de 830.000; U59 lo vigila): se guardan al activar, como las fuentes y el sistema.
+// No van en PRECARGA (el shell tiene techo de 830.000 bytes; U59 lo vigila): se guardan al activar, como las fuentes y el sistema.
 // U59 exige además que todo lo que un diferido importa de forma estática esté aquí o en PRECARGA.
 const DIFERIDOS = [
   '/estilos/practica.css',
@@ -175,6 +160,26 @@ const DIFERIDOS = [
   '/src/vistas/estudiante/repaso.js',
   '/src/ui/racha_semanal.js',
   '/src/ui/lectura.js', // W84: el texto de un reto de Lectura (docs/ESPEC_lectura_texto.md)
+  // El panel del profe y del admin (docs/ESPEC_margen_precarga.md): 91.513 bytes que el estudiante descargaba en el shell sin pintarlos nunca.
+  // app.js lo pide con UN import() (src/panel_diferido.js) en cuanto entra alguien que no es estudiante, así que sus pantallas quedan en memoria
+  // como antes. Sin red, recargar no llega a ninguna pantalla con rol (config.json va siempre a la red, H-6): lo de aquí se guarda para abrir rápido.
+  '/src/vistas/panel_docente.js',
+  '/src/vistas/profe/grupos.js',
+  '/src/vistas/profe/grupo.js',
+  '/src/vistas/profe/sesion_asistencia.js',
+  '/src/vistas/profe/inscripcion.js', // W32: el panel de inscripciones del grupo
+  '/src/vistas/profe/inscripcion_codigo.js', // W32: su sección del código
+  '/src/vistas/profe/inscripcion_pendientes.js', // W32: su lista de pendientes
+  '/src/vistas/profe/inscripcion_red.js', // W32: la red de sus botones
+  '/src/vistas/profe/logro.js',
+  '/src/vistas/profe/errores.js',
+  '/src/vistas/profe/retos.js',
+  '/src/vistas/profe/herramientas_clase.js', // W35: tablero, Escamas y calificar escritura
+  '/src/vistas/admin/crear_grupo.js',
+  '/src/vistas/admin/asignar_docente.js',
+  '/src/vistas/admin/importar_csv.js',
+  '/src/api/profe.js',
+  '/src/api/admin.js',
 ];
 
 // Cuánto se espera a CADA recurso de la precarga. Antes era `cache.addAll(PRECARGA)`: todo o nada, sin límite de tiempo. Un solo recurso

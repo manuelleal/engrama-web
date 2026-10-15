@@ -45,9 +45,13 @@ const TRAMPOSOS = {
     '',
   ),
   // U59 (docs/ESPEC_practica_del_dia.md §0): el sistema visual (46 KB) entra a PRECARGA y el shell pasa su techo de 830.000.
-  x_precarga_engorda: cambiar(sw, "  '/publico/diseno/tokens.css',\n", "  '/publico/diseno/tokens.css',\n  '/publico/diseno/sistema.css',\n"),
+  // Desde docs/ESPEC_margen_precarga.md el shell tiene ~86 KB de margen y el sistema solo ya cabría (el tramposo quedaba VERDE): entran también
+  // las dos fuentes de marca (64.264 bytes), lo que sw.js dice que no cabe. 110.621 bytes en total.
+  x_precarga_engorda: cambiar(sw, "  '/publico/diseno/tokens.css',\n", "  '/publico/diseno/tokens.css',\n  '/publico/diseno/sistema.css',\n  '/publico/fuentes/baloo-2-latin-wght-normal.woff2',\n  '/publico/fuentes/nunito-sans-latin-wght-normal.woff2',\n"),
   // U59: un módulo diferido (el reto pregunta por pregunta) no está en DIFERIDOS: nunca se guarda y, sin red, el reto no abre por ahí.
   x_diferido_suelto: cambiar(sw, "  '/src/vistas/estudiante/reto_l1.js',\n", ''),
+  // docs/ESPEC_margen_precarga.md: lo que importa el panel del profe (api/profe.js) no está en DIFERIDOS: nunca se guarda.
+  x_panel_suelto: cambiar(sw, "  '/src/api/profe.js',\n", ''),
 };
 
 for (const [nombre, contenido] of Object.entries(TRAMPOSOS)) {
