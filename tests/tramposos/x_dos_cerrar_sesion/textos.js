@@ -257,7 +257,7 @@ export const textos = {
       noEncontrado: 'No encontrado.',
       sinEstudiantes: 'Este grupo no tiene estudiantes inscritos todavía.',
       columnaNombre: 'Nombre',
-      columnaConstancia: 'Constancia',
+      columnaClases: 'Clases seguidas',
       columnaUltimaAsistencia: 'Última asistencia',
       sinAsistencia: 'Sin registro',
       abrirSesion: 'Abrir asistencia',

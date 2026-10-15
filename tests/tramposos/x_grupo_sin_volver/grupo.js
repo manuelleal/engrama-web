@@ -1,5 +1,5 @@
 // @ts-check
-// vistas/profe/grupo.js · W10 (T2): el roster del grupo — nombre, constancia y última asistencia,
+// vistas/profe/grupo.js · W10 (T2): el roster del grupo — nombre, clases seguidas y última asistencia,
 // sin saldo (grupos §2.2). Un grupo ajeno da 404 en el servidor y esta vista SOLO muestra "No
 // encontrado": nunca pinta un nombre de un roster que no le pertenece (X4, la garantía real vive
 // en las 48 celdas prohibidas de F4 — el E2E, no el cliente, es quien detecta la fuga).
@@ -61,7 +61,7 @@ function tablaRoster(estudiantes) {
     'table', { 'data-testid': 'roster' },
     h('thead', {}, h('tr', {},
       h('th', {}, textos.profe.grupo.columnaNombre),
-      h('th', {}, textos.profe.grupo.columnaConstancia),
+      h('th', {}, textos.profe.grupo.columnaClases),
       h('th', {}, textos.profe.grupo.columnaUltimaAsistencia),
     )),
     h('tbody', {}, ...estudiantes.map(filaDeEstudiante)),
