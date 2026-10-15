@@ -210,6 +210,17 @@ así que se arregla en la web, sin pedir nada al backend ni resembrar.
 - **Dónde:** `src/textos_practica.js`, `src/ui/explicacion.js` (`planDeExplicacion(r, contexto)`; el plan suma `tipo`) y los dos llamadores diferidos
   (`reto_l1.js`, `repaso.js`). Todos fuera de `PRECARGA`. Prueba nueva: la siguiente U libre, con su tramposo (los rótulos viejos en V/F → rojo).
 
+## 6e. Adenda 4 (2026-10-14, ANTES del código; manda sobre `ESPEC_juego_oleada1.md` §4.2, §4.4 y la tabla de textos donde choque; compuerta visual 18, hallazgo 4 [Alta])
+La web mostraba dos rachas con dos nombres para la misma cuenta: Asistencia "Constancia: 1" con llama; Inicio "0 semanas · 1 de 3 días". Son dos métricas distintas del backend: `streak` del check-in / `current_streak` de `/auth/me` (días de asistencia seguidos) y `/core/racha` (racha SEMANAL de práctica, W81). **Decisión provisional del arquitecto (vetable por Christiam):**
+- **La llama y las palabras "racha" y "semanas" son SOLO de la racha semanal de práctica** (`GET /core/racha`). Nada de eso cambia.
+- **La asistencia se llama "Clases seguidas".** Sin llama y sin la palabra "constancia", con su propio ícono de asistencia (`crearIcono('asistencia')`, el calendario con visto que ya existe: SVG, `currentColor`, `aria-hidden`; cero bytes nuevos en `iconos.js`).
+  - Textos: `exito` = "Asistencia marcada · +N monedas · clases seguidas R"; `yaCobrada` y `sinMonedas` terminan en "Clases seguidas: R."; la columna del profe, "Clases seguidas".
+  - El renglón del sello (`constancia-asistencia`) = ícono + "Clases seguidas: R", siempre (con R > 0). Ya no hay `crearLlama` ni el aviso "¡Constancia R!" en la asistencia: el número se dice en el renglón y en el resultado, como hoy.
+  - Lo que NO cambia: cómo se calcula nada (el servidor manda, la web no cuenta). Se conserva la lógica de lo último visto: si el número subió se hace el sonido y el confeti de siempre (`cruce` → `normal`), y si bajó desde 3 o más una línea neutra, una vez, que ahora dice "Empezamos de nuevo. Tu mejor marca: M clases seguidas." (M = `longest_streak` del servidor; sin M, "Empezamos de nuevo.").
+- **Fuera de este cambio (a "Después", declarado):** el RESPALDO de Inicio (solo cuando `/core/racha` falta o llega mal: llama y "Constancia: N" en la cabecera, con su aviso "¡Constancia N!"), `textos.llama`, `textos.racha`, `textos.insignias` y "Incluye +N por tu constancia" del fin de reto. En el respaldo la misma métrica de asistencia sigue llamándose "Constancia"; unificarlo toca la foto R4 de Inicio y seis pruebas, y se espera a que el arquitecto confirme el nombre.
+- **Peso:** `textos.js`, `sello.js` y `grupo.js` están en `PRECARGA` (margen 40 B al empezar); se mide con `peso_servido.mjs HEAD` y se reporta lo que suma. `sw.js` sube a `engrama-shell-v62`.
+- **Pruebas:** U73 (asistencia) y `vista_asistencia_pago` fijan los textos nuevos; U85 nueva: en Asistencia no hay llama, ni la palabra "constancia", y el renglón lleva el ícono `asistencia`; el profe ve "Clases seguidas". Tramposos: "Constancia" o una llama en Asistencia → rojo.
+
 ## 7. Medido al cerrar (2026-10-14)
 - **Commits** (sobre `8ef6298`): `75b71d3` espec · `37e067e` U59 · `bf08b06` W78 mock · `176d90c` W78 · `bb4a2c1` W79 mock · `a33b7d8` W79 · `cb2fd84` W80 ·
   `3e65199` W79 corrección por E31 (adenda 2) y E36 · `48de093` W81 mock · `4fb17aa` W81 · `f4b4e32` W81 E2E · `309a9bc` W82 humo · `c3c639b` capturas ·
