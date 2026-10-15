@@ -51,6 +51,12 @@ const AYUDANTES_JS = `
   };
 `;
 
+/** ERR-27: el E2E real juega contra el piloto VIVO, así que solo corre con la bandera explícita `E2E_REAL=1`
+ * (estricto: ni "true" ni "yes"). Sin ella, `node --test` nunca debe ni sondear el puerto. Pura, para probarla aparte. */
+export function e2eRealActivado(env = process.env) {
+  return env.E2E_REAL === '1';
+}
+
 /** ¿Responde el backend real por Caddy? (A6 de la espec del despliegue: GET /api/health = 200). */
 export async function stackArriba(urlBase = URL_POR_DEFECTO) {
   try {

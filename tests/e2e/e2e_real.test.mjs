@@ -1,13 +1,14 @@
 // @ts-check
-// Encargo C (W22): el mismo flujo de herramientas/e2e_real.mjs, como prueba OPCIONAL — se salta
-// sola (no falla) si el stack de ENGRAMA/despliegue/ no responde, así la suite normal
-// (`npm test`, sin Docker) nunca se rompe por esto. Para correrla de verdad: levanta el stack
-// (LEEME_piloto.md) y corre `node --test tests/e2e/e2e_real.test.mjs`, o directo
-// `node herramientas/e2e_real.mjs`.
+// Encargo C (W22): el mismo flujo de herramientas/e2e_real.mjs, como prueba OPCIONAL contra el piloto VIVO.
+// ERR-27: solo corre con la bandera explícita `E2E_REAL=1`. Sin ella se salta SIN sondear nada (ni siquiera
+// `GET /api/health`), así `node --test` (la suite completa) nunca toca el piloto, tenga o no las credenciales.
+// Para correrla de verdad: levanta el stack (LEEME_piloto.md) y corre
+//   E2E_REAL=1 node --test tests/e2e/e2e_real.test.mjs      (o directo: node herramientas/e2e_real.mjs)
+// La bandera y el no-sondeo los fija tests/unit/e2e_real_bandera.test.mjs (tramposo: tests/tramposos/err27_e2e_real_sin_bandera).
 import test from 'node:test';
 import assert from 'node:assert/strict';
 import { existsSync } from 'node:fs';
-import { stackArriba, correrE2eReal } from '../../herramientas/e2e_real.mjs';
+import { e2eRealActivado, stackArriba, correrE2eReal } from '../../herramientas/e2e_real.mjs';
 
 const HAY_NAVEGADOR = [
   process.env.EDGE_PATH,
@@ -17,11 +18,17 @@ const HAY_NAVEGADOR = [
   'C:/Program Files/Google/Chrome/Application/chrome.exe',
 ].filter(Boolean).some((r) => existsSync(r));
 
-const ARRIBA = HAY_NAVEGADOR && (await stackArriba());
+const ACTIVADO = e2eRealActivado();
+// El sondeo SOLO se intenta con la bandera: `&&` en cortocircuito, sin bandera `stackArriba` ni se llama.
+const ARRIBA = ACTIVADO && (await stackArriba()) && HAY_NAVEGADOR;
+
+const MOTIVO_SALTO = !ACTIVADO
+  ? 'e2e_real juega contra el piloto VIVO y solo corre con la bandera explícita: levanta el stack (docker compose up -d --build en despliegue/) y corre E2E_REAL=1 node --test tests/e2e/e2e_real.test.mjs'
+  : 'E2E_REAL=1 está puesta, pero el stack de despliegue/ no responde en http://localhost:8088 (docker compose up -d --build) o no hay navegador';
 
 test(
   'E2E real: profe abre asistencia, estudiante entra de verdad, marca, juega y revisa; el profe ve el logro',
-  { skip: !ARRIBA && 'el stack de despliegue/ no responde en http://localhost:8088 (docker compose up -d --build) o no hay navegador' },
+  { skip: !ARRIBA && MOTIVO_SALTO },
   async () => {
     const { carpeta, registro } = await correrE2eReal();
     assert.ok(registro.length >= 4, 'al menos 4 capturas del flujo real');

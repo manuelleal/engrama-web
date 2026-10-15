@@ -253,6 +253,7 @@ Cómo se prueba (en esta máquina):
   CPU cargada, repetir una vez. Los tramposos, **por nombre y uno a la vez** (`node tests/correr_tramposos.mjs x_nombre`); nunca sin argumento. Tras correr tramposos,
   `git status --short`. Si se edita un archivo que tiene copias rotas en `tests/tramposos/`, se regeneran (la copia rota = el archivo bueno de ahora + SU defecto)
   y se confirma que siguen rojas en su mismo test; una copia vieja se regenera desde la versión de la historia de la que salió, no desde el último commit.
+- `tests/e2e/e2e_real.test.mjs` juega contra el piloto VIVO (:8088) y **solo corre con `E2E_REAL=1`** (ERR-27); sin la bandera se salta sin sondear nada, así que `node --test` ya no lo toca. Para correrlo: stack arriba y `E2E_REAL=1 node --test tests/e2e/e2e_real.test.mjs`. Lo fija `tests/unit/e2e_real_bandera.test.mjs` (tramposo `err27_e2e_real_sin_bandera`).
 - `node herramientas/humo_pantallas.mjs --contra mock` (semilla 20261006) y `... --replica` (semilla 7) escriben `salida/humo_pantallas_anillo.{mock,replica}.json`
   e imprimen su sha256 (idéntico en dos corridas); `tests/unit/humo_pantallas.test.mjs` fija las tablas de §9.1 y §9.4. R4 (`tests/unit/regresion_vistas.test.mjs`) fotografía
   las vistas existentes; R5 (`tests/unit/regresion_humo.test.mjs`) vigila que el humo anterior no cambie.

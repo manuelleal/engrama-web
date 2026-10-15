@@ -1,0 +1,16 @@
+{
+  "descripcion": "ERR-27: e2e_real.test.mjs ignora E2E_REAL y sondea /api/health siempre (suite completa contra el piloto vivo)",
+  "archivos": {
+    "tests/e2e/e2e_real.test.mjs": "e2e_real.test.mjs"
+  },
+  "comando": [
+    "node",
+    "--test",
+    "--test-reporter=tap",
+    "tests/unit/e2e_real_bandera.test.mjs"
+  ],
+  "espera_codigo_no_cero": true,
+  "espera_fallan_tests": [
+    "e2e_real_bandera: sin E2E_REAL la prueba se salta con el cómo correrla y no sondea el piloto"
+  ]
+}
