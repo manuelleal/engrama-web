@@ -1,0 +1,19 @@
+{
+  "descripcion": "U99: la lectura V/F/ND sale con los rotulos de la gramatica (The right answer: True / The rule: True…): el defecto que vio la revision pedagogica 05",
+  "archivos": {
+    "src/ui/explicacion.js": "explicacion.js"
+  },
+  "comando": [
+    "node",
+    "--test",
+    "--test-reporter=tap",
+    "tests/unit/practica_rotulos.test.mjs"
+  ],
+  "espera_codigo_no_cero": true,
+  "espera_fallan_tests": [
+    "U99: tipoDeRotulos",
+    "U99: la banda de una lectura V/F/ND dice",
+    "U99: en el reto de Lectura",
+    "U99: en el repaso"
+  ]
+}

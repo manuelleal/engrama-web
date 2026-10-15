@@ -1,0 +1,17 @@
+{
+  "descripcion": "U99: el reto pregunta por pregunta no le pasa a la banda las opciones ni el skill: lectura y vocabulario salen con los rotulos de la gramatica",
+  "archivos": {
+    "src/vistas/estudiante/reto_l1.js": "reto_l1.js"
+  },
+  "comando": [
+    "node",
+    "--test",
+    "--test-reporter=tap",
+    "tests/unit/practica_rotulos.test.mjs"
+  ],
+  "espera_codigo_no_cero": true,
+  "espera_fallan_tests": [
+    "U99: en el reto de Lectura",
+    "U99: en el reto de Vocabulario"
+  ]
+}

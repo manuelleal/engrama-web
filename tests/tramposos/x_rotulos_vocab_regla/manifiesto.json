@@ -1,0 +1,18 @@
+{
+  "descripcion": "U99: el vocabulario sale con \"The rule\" / \"La regla\" (no dice Meaning / Significado)",
+  "archivos": {
+    "src/ui/explicacion.js": "explicacion.js"
+  },
+  "comando": [
+    "node",
+    "--test",
+    "--test-reporter=tap",
+    "tests/unit/practica_rotulos.test.mjs"
+  ],
+  "espera_codigo_no_cero": true,
+  "espera_fallan_tests": [
+    "U99: tipoDeRotulos",
+    "U99: la banda de Vocabulario dice",
+    "U99: en el reto de Vocabulario"
+  ]
+}

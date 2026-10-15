@@ -70,7 +70,7 @@ function accion(raiz, estado) {
   const pregunta = estado.entrada.pregunta;
   if (estado.respuesta) {
     const siguiente = h('button', { type: 'button', class: 'boton-principal', 'data-testid': 'boton-siguiente', onClick: () => renderRepaso(raiz, estado.ctx, estado.saltadas) }, textosPractica.l1.siguiente);
-    return crearBanda(planDeExplicacion(estado.respuesta), { accion: siguiente });
+    return crearBanda(planDeExplicacion(estado.respuesta, { opciones: pregunta.options_json }), { accion: siguiente });
   }
   const boton = h('button', { type: 'button', class: 'boton-principal', 'data-testid': 'boton-comprobar', disabled: !estado.elegida, onClick: () => comprobar(raiz, estado, boton) }, textosPractica.l1.comprobar);
   const panel = crearPanelResultado({
