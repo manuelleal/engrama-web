@@ -234,6 +234,7 @@ test('game feel: marcar asistencia estampa el sello, cuenta las monedas del serv
         return {
           temprano, alNacer, alos150,
           resultado: document.querySelector('[data-testid="asistencia-resultado"] [data-testid="resultado"]').textContent,
+          iconoResultado: document.querySelector('[data-testid="asistencia-resultado"] [data-testid="resultado"] [data-icono]')?.dataset.icono ?? null,
           chip: document.querySelector('[data-testid="chip-monedas"]')?.textContent ?? null,
           fichasQuedan: document.querySelectorAll('.ficha-moneda').length,
         };
@@ -242,7 +243,7 @@ test('game feel: marcar asistencia estampa el sello, cuenta las monedas del serv
     assert.deepEqual(sinSondeoL1(r.errores), []);
     assert.equal(r.eval.temprano.sello, true, 'el sello aparece al instante');
     assert.equal(r.eval.temprano.sonido, true);
-    assert.match(r.eval.resultado, /✓/);
+    assert.equal(r.eval.iconoResultado, 'visto', 'el resultado con su ícono SVG (B1: antes, el glifo ✓)');
     const m = r.eval.resultado.match(/\+(\d+) monedas/);
     assert.ok(m, 'el resultado dice cuántas monedas dio el servidor');
     if (Number(m[1]) > 0) assert.equal(r.eval.chip, `+${m[1]} monedas`, 'el chip cuenta hasta lo que dio el servidor, ni una más');

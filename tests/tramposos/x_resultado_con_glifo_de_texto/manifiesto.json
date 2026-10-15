@@ -1,0 +1,19 @@
+{
+  "descripcion": "B1 (heredado): ui/retro.js vuelve a dibujar el resultado con el glifo de texto ✓ / ✗ en vez del SVG de ui/iconos.js (el glifo cambia de dibujo en cada teléfono)",
+  "archivos": {
+    "src/ui/retro.js": "retro.js"
+  },
+  "comando": [
+    "node",
+    "--test",
+    "--test-reporter=tap",
+    "tests/unit/ui_retro.test.mjs",
+    "tests/unit/regresion_nav.test.mjs"
+  ],
+  "espera_codigo_no_cero": true,
+  "espera_fallan_tests": [
+    "U7: correcto trae el ícono `visto` y el texto pedido (nunca vacíos)",
+    "U7: incorrecto trae el ícono `equis` y el texto pedido (nunca vacíos)",
+    "R9: lo que B1 declara en la revisión cambió de verdad"
+  ]
+}

@@ -1,5 +1,5 @@
 // @ts-check
-// W73 (docs/ESPEC_navegacion.md §5.9, U70 en el navegador de verdad): del reto en curso se sale con "✕ Salir", que lleva a Retos sin enviar el
+// W73 (docs/ESPEC_navegacion.md §5.9, U70 en el navegador de verdad): del reto en curso se sale con "Salir" (ícono equis), que lleva a Retos sin enviar el
 // intento ni pedir nada del reto, y sin borrar las respuestas guardadas en el equipo. El reto sigue sin barra; al salir, la barra vuelve.
 // De paso MIDE (sin exigirlo: la espec lo dejó como "no verificado", §16) si al volver a entrar al mismo reto se retoman las respuestas.
 import test from 'node:test';
@@ -8,7 +8,7 @@ import { OMITIR, conNavegacion, abrirComo, tocar, esperarVista, MEDIR_NAV } from
 
 const respuestasGuardadas = (sesion) => sesion.evaluar(`Object.keys(localStorage).filter((k) => k.startsWith('engrama_respuestas_')).map((k) => k + '=' + localStorage.getItem(k))`);
 
-test('U70 (navegador): "✕ Salir" lleva del reto en curso a Retos sin enviar el intento, sin pedir nada del reto y sin borrar las respuestas guardadas', { skip: OMITIR, timeout: 180_000 }, async (t) => {
+test('U70 (navegador): "Salir" lleva del reto en curso a Retos sin enviar el intento, sin pedir nada del reto y sin borrar las respuestas guardadas', { skip: OMITIR, timeout: 180_000 }, async (t) => {
   await conNavegacion(async (url, estado) => {
     estado.backend.l1 = false; // W78: mide el reto de siempre (las respuestas en el equipo); con L1 no se guarda nada en el equipo (E35, U79)
     const sesion = await abrirComo(url, 'student');
@@ -17,9 +17,10 @@ test('U70 (navegador): "✕ Salir" lleva del reto en curso a Retos sin enviar el
       assert.ok(await esperarVista(sesion, 'enunciado'), 'un toque desde Inicio: la primera pregunta');
       const enReto = await sesion.evaluar(MEDIR_NAV);
       assert.equal(enReto.barra, null, 'el reto en curso no lleva barra');
-      const salir = await sesion.evaluar(`(() => { const a = document.querySelector('[data-testid="reto-salir"]'); if (!a) return null; const r = a.getBoundingClientRect(); const h1 = document.querySelector('h1').getBoundingClientRect(); return { texto: a.textContent, nombre: a.getAttribute('aria-label'), href: a.getAttribute('href'), alto: Math.round(r.height), arriba: Math.round(r.top), tituloArriba: Math.round(h1.top), derecha: Math.round(r.right), cuantos: document.querySelectorAll('[data-testid="reto-salir"]').length }; })()`);
+      const salir = await sesion.evaluar(`(() => { const a = document.querySelector('[data-testid="reto-salir"]'); if (!a) return null; const r = a.getBoundingClientRect(); const h1 = document.querySelector('h1').getBoundingClientRect(); return { texto: a.textContent, icono: a.querySelector('[data-icono]')?.dataset.icono ?? null, nombre: a.getAttribute('aria-label'), href: a.getAttribute('href'), alto: Math.round(r.height), arriba: Math.round(r.top), tituloArriba: Math.round(h1.top), derecha: Math.round(r.right), cuantos: document.querySelectorAll('[data-testid="reto-salir"]').length }; })()`);
       assert.ok(salir, 'la pregunta trae la salida');
-      assert.deepEqual([salir.texto, salir.nombre, salir.href, salir.cuantos], ['✕ Salir', 'Salir del reto', '#/retos', 1]);
+      assert.deepEqual([salir.texto, salir.nombre, salir.href, salir.cuantos], ['Salir', 'Salir del reto', '#/retos', 1]);
+      assert.equal(salir.icono, 'equis', 'su ícono es el SVG equis (B1: antes, el glifo ✕ en el texto)');
       assert.ok(salir.alto >= 44, `"Salir" mide ${salir.alto} px de alto (mínimo 44)`);
       assert.ok(salir.derecha <= 375 && enReto.scrollAncho <= enReto.ancho, 'cabe en 375 px, sin desplazamiento horizontal');
 

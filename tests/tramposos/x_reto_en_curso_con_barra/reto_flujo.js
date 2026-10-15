@@ -7,6 +7,7 @@
 import { h, montar } from '../../ui/dom.js';
 import { textos } from '../../textos.js';
 import { crearDrako } from '../../ui/drako.js';
+import { crearIcono } from '../../ui/iconos.js';
 import { tituloLegible } from '../../ui/titulo.js';
 import { arrancarIntento, enviarIntento, historialDeIntentos } from '../../api/retos.js';
 import { accionUnica, ErrorApi } from '../../api/cliente.js';
@@ -21,12 +22,11 @@ import { leerRespuestasGuardadas, guardarRespuestas, borrarRespuestasGuardadas }
 import { crearNavInferior } from '../../ui/nav_inferior.js'; // TRAMPOSO
 
 /**
- * W73 (docs/ESPEC_navegacion.md §5.9, H10): "✕ Salir" lleva a Retos. Es un ENLACE interno (un hash): tocarlo no envía el intento ni hace ninguna
- * petición, y las respuestas ya guardadas en el equipo no se borran. El reto sigue sin barra de abajo (una tarea por pantalla): esta es su
- * única salida. No aparece mientras se revisa el envío.
+ * W73 (docs/ESPEC_navegacion.md §5.9, H10): "Salir" (ícono equis) lleva a Retos. Es un ENLACE interno (un hash): no envía el intento, no pide nada
+ * y no borra las respuestas guardadas. El reto no lleva barra de abajo (una tarea por pantalla): es su única salida. No sale al revisar el envío.
  */
 export function crearSalir() {
-  return h('a', { href: '#/retos', class: 'salir-reto', 'data-testid': 'reto-salir', 'aria-label': textos.salirDelReto.nombre }, textos.salirDelReto.texto);
+  return h('a', { href: '#/retos', class: 'salir-reto', 'data-testid': 'reto-salir', 'aria-label': textos.salirDelReto.nombre }, crearIcono('equis'), textos.salirDelReto.texto);
 }
 
 /**

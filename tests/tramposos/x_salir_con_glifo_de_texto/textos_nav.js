@@ -1,0 +1,59 @@
+// @ts-check
+// textos_nav.js · Las cadenas de la navegación (docs/ESPEC_navegacion.md §5.10): la barra de abajo, el "volver" y lo que nombra a dónde se va.
+// `textos.js` las esparce (está al tope de su tamaño), así que cada vista sigue importando solo `textos`. PROVISIONALES: las revisan Christiam
+// y el pedagogo (ERR-16); donde choquen con el dictamen pedagógico 03, manda el dictamen.
+export const textosNav = {
+  nav: {
+    // Los nombres de las pestañas son los títulos de sus pantallas (Retos y Asistencia reusan textos.retos.titulo y textos.asistencia.titulo).
+    inicio: 'Inicio',
+    repaso: 'Repaso', // W80: el repaso de la tanda
+    // W68 (§5.6): la entrada de la barra que lleva a "mi cuenta" (el aviso, las solicitudes y "Cerrar sesión" viven ahí).
+    perfil: 'Perfil',
+    // W70 (§5.6): las entradas de la barra del profe y del admin. Cada una dice lo mismo que el título de su pantalla.
+    misGrupos: 'Mis grupos',
+    grupos: 'Grupos',
+    retos: 'Retos',
+    barra: 'Navegación principal', // el nombre accesible de la barra de abajo
+    // "Sesión" es SOLO la cuenta (§5.5): este es el único "Cerrar sesión" de la app.
+    cerrarSesion: 'Cerrar sesión',
+    cerrandoSesion: 'Cerrando…',
+    // Un solo "volver": "‹ <nombre de la pantalla a la que vuelve>", con su nombre accesible completo (ui/encabezado.js).
+    /** @param {string} nombre */
+    volver: (nombre) => `‹ ${nombre}`,
+    /** @param {string} nombre */
+    volverAccesible: (nombre) => `Volver a ${nombre}`,
+    // W71 (§5.7): la pestaña del navegador dice dónde estoy.
+    /** @param {string} titulo */
+    pestana: (titulo) => `${titulo} · ENGRAMA`,
+  },
+  // W71 (§5.7): el título de una pantalla de un grupo dice de qué grupo es ("Logro por eje · SINT-B1-01"). Si el código no llega, queda el
+  // título solo: nunca el identificador interno.
+  titulos: {
+    /** @param {string} titulo @param {string} codigo */
+    conGrupo: (titulo, codigo) => `${titulo} · ${codigo}`,
+    inscripciones: 'Inscripciones',
+  },
+  // W73 (§5.9): se puede salir del reto en curso. PROVISIONAL (C7: sin confirmar). El nombre accesible dice de qué se sale.
+  salirDelReto: { texto: '✕ Salir', nombre: 'Salir del reto' },
+  // W69 (§5.6): Perfil es "mi cuenta" para los tres roles. Su título sigue en textos.perfil.titulo ("Tu perfil"); lo nuevo va aquí, en una clave
+  // propia de primer nivel (un spread no mezcla claves anidadas de textos.js).
+  cuenta: {
+    quienSoy: 'Tu cuenta',
+    seccionContrasena: 'Cambiar tu contraseña',
+    roles: { student: 'Estudiante', teacher: 'Docente', admin: 'Administración' },
+    /** @param {string} nombre */
+    institucion: (nombre) => `Institución: ${nombre}`,
+  },
+  // W65 (§5.4): el bloque de Inicio del estudiante que dice qué hacer primero. PROVISIONAL (pedagogo, ERR-16).
+  ahora: {
+    titulo: 'Ahora',
+  },
+  // W64 (§5.3): la tarjeta de cada grupo en el inicio del profe. Las tres acciones, la de cada clase primero.
+  tarjetaGrupo: {
+    asistencia: 'Abrir asistencia',
+    inscripciones: 'Inscripciones',
+    ver: 'Ver el grupo',
+    /** Cuántos esperan que el profe apruebe su inscripción: solo el número, nunca un nombre. @param {number} n */
+    esperan: (n) => (n === 1 ? '1 espera aprobación' : `${n} esperan aprobación`),
+  },
+};

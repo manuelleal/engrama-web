@@ -1,0 +1,16 @@
+{
+  "descripcion": "B1 (heredado): textos_nav.js vuelve a poner el glifo de texto ✕ delante de \"Salir\" (junto al ícono SVG: doble equis, y el glifo cambia de dibujo en cada teléfono)",
+  "archivos": {
+    "src/textos_nav.js": "textos_nav.js"
+  },
+  "comando": [
+    "node",
+    "--test",
+    "--test-reporter=tap",
+    "tests/unit/vista_reto_salir.test.mjs"
+  ],
+  "espera_codigo_no_cero": true,
+  "espera_fallan_tests": [
+    "U70: la pregunta del reto trae UNA salida, \"Salir\" (con su ícono equis en SVG)"
+  ]
+}

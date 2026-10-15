@@ -48,10 +48,10 @@ test(
       const { cuerpo: sesion } = abrirSesion(estado, { headers: { authorization: `Bearer ${DOCENTE_BOOTSTRAP_TOKEN}` } }, [...estado.groups.values()][0].id, {});
       const r = await revisarPagina({
         url: `${url}#/asistencia?codigo=${sesion.session_code}`, ancho: 375, alto: 812, espera_ms: 5000, pre: YA_ENTRO,
-        eval: '(async () => { await new Promise((r) => setTimeout(r, 600)); return document.querySelector(\'[data-testid="asistencia-resultado"]\').textContent; })()',
+        eval: '(async () => { await new Promise((r) => setTimeout(r, 600)); const el = document.querySelector(\'[data-testid="asistencia-resultado"]\'); return [...el.querySelectorAll(\'[data-icono]\')].map((i) => i.dataset.icono).join() + \'|\' + el.textContent; })()',
       });
       assert.deepEqual(r.errores, []);
-      assert.match(r.eval, /✓/);
+      assert.match(r.eval, /^visto\|/, 'el ícono visto (SVG, B1) y el texto');
       assert.match(r.eval, /monedas/);
     });
   },
@@ -64,9 +64,9 @@ test(
     await conAppCompleta(async (url) => {
       const r = await revisarPagina({
         url: `${url}#/asistencia?codigo=000000`, ancho: 375, alto: 812, espera_ms: 5000, pre: YA_ENTRO,
-        eval: '(async () => { await new Promise((r) => setTimeout(r, 600)); return document.querySelector(\'[data-testid="asistencia-resultado"]\').textContent; })()',
+        eval: '(async () => { await new Promise((r) => setTimeout(r, 600)); const el = document.querySelector(\'[data-testid="asistencia-resultado"]\'); return [...el.querySelectorAll(\'[data-icono]\')].map((i) => i.dataset.icono).join() + \'|\' + el.textContent; })()',
       });
-      assert.match(r.eval, /✗/);
+      assert.match(r.eval, /^equis\|/, 'el ícono equis (SVG, B1) y el texto');
       assert.match(r.eval, /Código no válido/);
     });
   },
@@ -84,6 +84,8 @@ const LEER_ASISTENCIA = `(async () => {
   return {
     temprano,
     resultado: q('resultado')?.textContent ?? null,
+    iconoResultado: q('resultado')?.querySelector('[data-icono]')?.dataset.icono ?? null,
+    equis: document.querySelectorAll('[data-icono="equis"]').length,
     desglose: q('asistencia-desglose')?.textContent ?? null,
     chip: q('chip-monedas')?.textContent ?? null,
     sello: !!q('sello'),
@@ -112,13 +114,15 @@ test(
       const { cuerpo: primera } = abrirSesion(estado, docente, grupoId, { duration_minutes: 30 });
       const puntual = await marcar(primera.session_code, 'est-1');
       assert.deepEqual(puntual.errores, []);
-      assert.match(puntual.eval.resultado, /✓ Asistencia marcada · \+10 monedas/);
+      assert.match(puntual.eval.resultado, /^ Asistencia marcada · \+10 monedas/);
+      assert.equal(puntual.eval.iconoResultado, 'visto', 'el resultado con su ícono SVG (B1: antes, el glifo ✓)');
       assert.equal(puntual.eval.desglose, '5 por asistir + 5 por llegar a tiempo');
       assert.equal(puntual.eval.chip, '+10 monedas');
 
       extra = 6 * 60_000; // el segundo llega a los 6 minutos
       const aLosSeis = await marcar(primera.session_code, 'est-2');
-      assert.match(aLosSeis.eval.resultado, /✓ Asistencia marcada · \+5 monedas/);
+      assert.match(aLosSeis.eval.resultado, /^ Asistencia marcada · \+5 monedas/);
+      assert.equal(aLosSeis.eval.iconoResultado, 'visto');
       assert.equal(aLosSeis.eval.desglose, '5 por asistir');
       assert.equal(aLosSeis.eval.chip, '+5 monedas');
       assert.doesNotMatch(aLosSeis.eval.pagina, /tarde/i, 'a quien no llegó a tiempo no se le dice nada');
@@ -126,12 +130,14 @@ test(
       extra = 90 * 60_000; // el profe abre otra sesión el mismo día, a las 7:30 p. m.
       const { cuerpo: segunda } = abrirSesion(estado, docente, grupoId, { duration_minutes: 30 });
       const otraVez = await marcar(segunda.session_code, 'est-1');
-      assert.match(otraVez.eval.resultado, /✓ Asistencia marcada\. La de hoy ya la cobraste/);
+      assert.match(otraVez.eval.resultado, /^ Asistencia marcada\. La de hoy ya la cobraste/);
+      assert.equal(otraVez.eval.iconoResultado, 'visto');
       assert.equal(otraVez.eval.sello, true, 'asistió: el sello se estampa');
       assert.equal(otraVez.eval.chip, null);
       assert.equal(otraVez.eval.desglose, null);
       assert.deepEqual([otraVez.eval.temprano.fichas, otraVez.eval.fichas, otraVez.eval.confeti], [0, 0, 0], '0 fichas voladoras y 0 lienzos de confeti');
-      assert.doesNotMatch(otraVez.eval.pagina, /\+0|✗/);
+      assert.doesNotMatch(otraVez.eval.pagina, /\+0/);
+      assert.equal(otraVez.eval.equis, 0, 'ninguna equis: no es una respuesta incorrecta');
 
       for (const [nombre, r] of [['puntual', puntual], ['a los 6 minutos', aLosSeis], ['segunda del día', otraVez]]) {
         assert.deepEqual([deLaVista(r, '/core/coins/history'), deLaVista(r, '/core/attendance/history')], [0, 0], `${nombre}: la asistencia no pide el libro ni el historial`);

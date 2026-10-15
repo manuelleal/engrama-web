@@ -1,0 +1,17 @@
+{
+  "descripcion": "B1 (heredado): la salida del reto pierde su ícono equis (SVG): el chip queda solo con texto en el navegador de verdad",
+  "archivos": {
+    "src/vistas/estudiante/reto_flujo.js": "reto_flujo.js"
+  },
+  "comando": [
+    "node",
+    "--test",
+    "--test-concurrency=1",
+    "--test-reporter=tap",
+    "tests/e2e/nav_reto_salir.test.mjs"
+  ],
+  "espera_codigo_no_cero": true,
+  "espera_fallan_tests": [
+    "U70 (navegador): \"Salir\" lleva del reto en curso a Retos"
+  ]
+}

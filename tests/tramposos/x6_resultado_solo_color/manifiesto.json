@@ -3,5 +3,5 @@
   "archivos": { "src/ui/retro.js": "retro.js" },
   "comando": ["node", "--test", "--test-reporter=tap", "tests/unit/ui_retro.test.mjs"],
   "espera_codigo_no_cero": true,
-  "espera_fallan_tests": ["U7: correcto trae ícono ✓ y el texto pedido (nunca vacíos)"]
+  "espera_fallan_tests": ["U7: correcto trae el ícono `visto` y el texto pedido (nunca vacíos)"]
 }

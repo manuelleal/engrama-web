@@ -11,6 +11,6 @@
   ],
   "espera_codigo_no_cero": true,
   "espera_fallan_tests": [
-    "U70: la pregunta del reto trae UNA salida, \"✕ Salir\", arriba y antes del título, que lleva a Retos y cuyo nombre dice de qué se sale; el reto sigue sin barra y sin volver"
+    "U70: la pregunta del reto trae UNA salida, \"Salir\" (con su ícono equis en SVG), arriba y antes del título, que lleva a Retos y cuyo nombre dice de qué se sale; el reto sigue sin barra y sin volver"
   ]
 }

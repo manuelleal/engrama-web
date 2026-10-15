@@ -108,7 +108,7 @@ const VOLVER_W71 = {
   admin_asignar_docente: ['volver', 'volver-a-admin'], admin_importar_csv: ['volver', 'volver-a-admin'],
 };
 
-// W73 (cambio 9): el reto en curso gana su salida, "✕ Salir" (un nodo y su texto), en la pregunta y en su pantalla de error. Nada más.
+// W73 (cambio 9): el reto en curso gana su salida, "Salir" (antes "✕ Salir"; el glifo pasó a un SVG en la tanda B1) (un nodo y su texto), en la pregunta y en su pantalla de error. Nada más.
 const SALIR_W73 = { reto_en_curso: ['reto-salir'], reto_en_curso_error: ['reto-salir'] };
 
 // Tanda "sistema 1" (docs/ESPEC_visual_sistema1.md §1 y §5): el ícono del botón del sonido deja de ser un emoji (un nodo de texto) y pasa a ser un SVG de
@@ -139,16 +139,20 @@ const CABECERA_S1 = {
 // correcta era: …" (nit 23): sale ese nodo y su texto. Nada más.
 const RETO_T2 = { reto_en_curso: [{ etiqueta: 'span', clase: 'panel-icono' }], revision: ['revision-q1-correcta'] };
 
-const CAPAS = [HASTA_W70, VOLVER_W71, SALIR_W73, SONIDO_S1, NUMEROS_S1, CABECERA_S1, RETO_T2];
+// B1 en el reto (heredado): el resultado de cada fila de la revisión ("✓ Correcta" / "✗ Esta vez no") deja el glifo de texto y dibuja su ícono como SVG de
+// ui/iconos.js (en la foto, sin SVG, el hueco queda vacío); el texto de cada fila no cambia. La salida "Salir" pierde su "✕" por la misma razón (SALIR_W73).
+const RESULTADO_B1 = { revision: ['revision-q1-resultado', 'revision-q2-resultado'] };
+
+const CAPAS = [HASTA_W70, VOLVER_W71, SALIR_W73, SONIDO_S1, NUMEROS_S1, CABECERA_S1, RETO_T2, RESULTADO_B1];
 /** @type {Record<string, Array<string|{etiqueta: string, clase?: string}>>} */
 export const DECLARADAS_NAV = Object.fromEntries([...new Set(CAPAS.flatMap((c) => Object.keys(c)))].map((nombre) => [nombre, [...new Set(CAPAS.flatMap((c) => c[nombre] || []))]]));
 
-test('R9: lo que W73 declara cambió de verdad: el reto en curso y su error ganan "✕ Salir" hacia Retos (un nodo y su texto), siguen sin barra, y nada más cambió', async () => {
+test('R9: lo que W73 declara cambió de verdad: el reto en curso y su error ganan "Salir" hacia Retos (un nodo y su texto), siguen sin barra, y nada más cambió', async () => {
   const hoy = await tomarFotosNav({ solo: ['reto_en_curso', 'reto_en_curso_error'] });
   for (const nombre of ['reto_en_curso', 'reto_en_curso_error']) {
     const i = hoy[nombre].findIndex((l) => l.includes('data-testid="reto-salir"'));
     assert.ok(i > 0 && hoy[nombre][i].trimStart().startsWith('a ') && hoy[nombre][i].includes('href="#/retos"') && hoy[nombre][i].includes('aria-label="Salir del reto"'), `${nombre}: falta la salida`);
-    assert.equal(hoy[nombre][i + 1].trim(), '"✕ Salir"', `${nombre}: dice "✕ Salir"`);
+    assert.equal(hoy[nombre][i + 1].trim(), '"Salir"', `${nombre}: dice "Salir" (su ícono equis es un SVG; la foto no lo dibuja)`);
     assert.ok(!CRUDA.vistas[nombre].some((l) => l.includes('reto-salir') || l.includes('Salir')), `${nombre}: la línea base no tenía salida (H10)`);
     // Desde la tanda "sistema 1" la pregunta trae además la cabecera nueva (declarada): la cuenta exacta de nodos vale para la pantalla de error, que no cambió.
     if (nombre === 'reto_en_curso_error') assert.equal(hoy[nombre].length, CRUDA.vistas[nombre].length + 2, `${nombre}: un nodo de más y su texto`);
@@ -333,4 +337,17 @@ test('R9: lo que la tanda visual 2 del reto declara cambió de verdad: el panel 
 
 test('R9: dos tomas seguidas dan lo mismo (la foto no depende del reloj ni del azar)', async () => {
   assert.deepEqual(await tomarFotosNav(), await tomarFotosNav());
+});
+
+test('R9: lo que B1 declara en la revisión cambió de verdad: el glifo ✓ / ✗ de cada fila salió (el hueco del ícono SVG queda, aria-hidden y vacío en la foto) y el texto de la fila sigue siendo el mismo', async () => {
+  const hoy = (await tomarFotosNav({ solo: ['revision'] })).revision;
+  for (const [id, glifo, texto] of [['revision-q1-resultado', '✓', ' Correcta'], ['revision-q2-resultado', '✗', ' Esta vez no']]) {
+    const hoyFila = hoy.slice(hoy.findIndex((l) => l.includes(`data-testid="${id}"`))).slice(0, 3);
+    const base = CRUDA.vistas.revision;
+    const baseFila = base.slice(base.findIndex((l) => l.includes(`data-testid="${id}"`))).slice(0, 4);
+    assert.deepEqual(baseFila.slice(2).map((l) => l.trim()), [JSON.stringify(glifo), JSON.stringify(texto)], `${id}: la línea base traía el glifo ${glifo} y su texto`);
+    assert.ok(hoyFila[1].includes('span aria-hidden="true"'), `${id}: el hueco del ícono sigue ahí, oculto al lector`);
+    assert.equal(hoyFila[2].trim(), JSON.stringify(texto), `${id}: sin glifo, el texto de la fila es el mismo`);
+  }
+  assert.ok(!hoy.some((l) => /"[✓✗]"/.test(l)), 'ningún glifo ✓ / ✗ suelto en la revisión');
 });

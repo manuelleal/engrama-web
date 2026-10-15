@@ -1,9 +1,7 @@
-/* componentes.css · Sistema visual base del pulido para el piloto UIS (encargo de Christiam,
-   2026-09-28): botones chunky, fichas de opción con escudo de letra, tarjetas, filas de lista,
-   barra superior, navegación inferior y el resultado con ícono+texto+color. Solo var(--token) de
-   tokens.css o color-mix() con transparent/white/black (§6.2, V3). Nada de esto cambia
-   comportamiento: son clases nuevas que las vistas agregan de forma aditiva (ver ARQUITECTURA del
-   encargo), y selectores por atributo (data-testid, que ya existía) para no tocar cada vista. */
+/* componentes.css · Sistema visual base del pulido para el piloto UIS (2026-09-28): botones chunky, fichas
+   de opción con escudo de letra, tarjetas, filas, barra superior, navegación inferior y el resultado con
+   ícono+texto+color. Solo var(--token) de tokens.css o color-mix() con transparent/white/black (§6.2, V3).
+   No cambia comportamiento: clases aditivas y selectores por data-testid, sin tocar cada vista. */
 
 /* ---------- Listas: sin viñetas en ningún lado de la app (antes: <li> con bullet por defecto,
    el bug más visible de "opciones de respuesta con viñetas") ---------- */
@@ -374,6 +372,13 @@ nav {
   font-size: 1.25em;
   line-height: 1;
   flex: none;
+}
+/* El ícono SVG (ui/iconos.js) del resultado y de "Salir". */
+.resultado .sx-icono,
+.salir-reto .sx-icono {
+  display: block;
+  width: 18px;
+  height: 18px;
 }
 #vista .resultado-ok {
   background: var(--correcto-fondo);

@@ -68,6 +68,7 @@ function scriptJugar(idPregunta1) {
       testids: [...document.querySelectorAll('[data-testid]')].map((e) => e.dataset.testid),
       monedas: document.querySelector('[data-testid="revision-monedas"]')?.textContent ?? null,
       q1Resultado: document.querySelector('[data-testid="revision-' + idQ1 + '-resultado"]')?.textContent ?? null,
+      q1Icono: document.querySelector('[data-testid="revision-' + idQ1 + '-resultado"] [data-icono]')?.dataset.icono ?? null,
       // Toda la fila (el <li data-testid="revision-<id>">), no solo el <p> del ícono+texto:
       // Drako no debe vivir en ningún punto del bloque de resultado de ESTA pregunta.
       q1TieneDrako: !!document.querySelector('[data-testid="revision-' + idQ1 + '"] img, [data-testid="revision-' + idQ1 + '"] [data-testid^="drako-"]'),
@@ -98,7 +99,7 @@ test(
       assert.equal(r.eval.fuePwned, false, 'el onerror del enunciado malicioso nunca debió ejecutar');
 
       // E6: el resultado tiene ícono Y texto en el DOM real (no solo una clase de color).
-      assert.match(r.eval.q1Resultado, /✓/);
+      assert.equal(r.eval.q1Icono, 'visto', 'el ícono SVG visto (B1: antes, el glifo ✓)');
       assert.match(r.eval.q1Resultado, /Correcta/);
 
       // U10 / X11: Drako nunca vive dentro del bloque de resultado de una pregunta.

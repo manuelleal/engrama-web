@@ -80,10 +80,11 @@ test(
           document.querySelector('[data-testid="campo-documento-docente"]').value = 'DOCENTE-DEMO';
           document.querySelector('[data-testid="form-asignar-docente"]').requestSubmit();
           await esperar(400);
-          return document.querySelector('[data-testid="asignar-docente-resultado"]').textContent;
+          const el = document.querySelector('[data-testid="asignar-docente-resultado"]');
+          return (el.querySelector('[data-icono]')?.dataset.icono ?? '') + '|' + el.textContent;
         })()`,
       });
-      assert.match(rDocente.eval, /✓/);
+      assert.match(rDocente.eval, /^visto\|/, 'el ícono visto (SVG, B1) y el texto');
       assert.match(rDocente.eval, /[Dd]ocente asignado/);
 
       // Paso 3: importar el CSV — vista previa tal cual, y el resultado con los conteos del servidor.

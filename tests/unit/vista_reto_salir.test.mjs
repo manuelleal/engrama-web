@@ -20,7 +20,7 @@ const tocar = async (raiz, testid) => { const n = buscar(raiz, testid); assert.o
 const salidas = (raiz) => enOrden(raiz).filter((e) => e.getAttribute?.('data-testid') === 'reto-salir');
 const guardadas = () => localStorage.getItem(claveLocal('int-1'));
 
-test('U70: la pregunta del reto trae UNA salida, "✕ Salir", arriba y antes del título, que lleva a Retos y cuyo nombre dice de qué se sale; el reto sigue sin barra y sin volver', async () => {
+test('U70: la pregunta del reto trae UNA salida, "Salir" (con su ícono equis en SVG), arriba y antes del título, que lleva a Retos y cuyo nombre dice de qué se sale; el reto sigue sin barra y sin volver', async () => {
   const { raiz, cerrar } = await abrir({});
   try {
     assert.ok(buscar(raiz, 'enunciado'), 'la pregunta está en pantalla');
@@ -29,7 +29,7 @@ test('U70: la pregunta del reto trae UNA salida, "✕ Salir", arriba y antes del
     const salir = todas[0];
     assert.equal(salir.tagName, 'a', 'es un enlace interno: funciona sin red y no pide nada');
     assert.equal(salir.getAttribute('href'), '#/retos');
-    assert.equal(textoDe(salir), '✕ Salir');
+    assert.equal(textoDe(salir), 'Salir');
     assert.equal(salir.getAttribute('aria-label'), 'Salir del reto');
     assert.ok(vaAntes(raiz, salir, primero(raiz, 'h1')), 'va antes del título del reto');
     assert.ok(vaAntes(raiz, salir, buscar(raiz, 'enunciado')), 'y antes de la pregunta');
