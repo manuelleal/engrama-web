@@ -59,7 +59,7 @@ test('U100c: en Asistencia no hay llama ni "constancia", suba, se quede o baje e
     assert.equal(elementos(caja).filter((n) => /llama|llama-/.test(String(n.className))).length, 0, `${caso}: ningún nodo de llama`);
     assert.doesNotMatch(textoDe(caja), /constancia|llama|semana/i, `${caso}: ni una palabra de la racha semanal`);
     const renglon = elementos(caja).find((n) => n.className === 'constancia-asistencia');
-    assert.equal(textoDe(renglon), `Clases seguidas: ${racha}`, caso);
+    assert.equal(textoDe(renglon).trim(), `Clases seguidas: ${racha}`, caso); // el espacio de adelante separa el ícono del texto, como el chip de monedas
     assert.equal(renglon.getAttribute('aria-hidden'), 'true', 'decorativo: el resultado con ícono y texto es el que lee el lector de pantalla');
     const icono = renglon.children.find((n) => n.tagName === 'svg');
     assert.ok(icono, `${caso}: lleva un SVG`);

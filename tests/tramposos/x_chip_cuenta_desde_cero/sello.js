@@ -46,7 +46,7 @@ function pintarYDisparar({ zona, monedas, racha, quien, mejorConstancia }) {
   const chip = num ? h('p', { class: 'chip-monedas', 'aria-hidden': 'true', 'data-testid': 'chip-monedas' }, num, ` ${textos.inicio.monedas}`) : null;
   // Clases seguidas = `streak` del servidor, con el ícono de asistencia y SIN llama (la llama es de la racha semanal, adenda 4). Sube → suena y confeti.
   const queHacer = planParaLaRacha(quien, racha);
-  const llama = plan.clases ? h('p', { class: 'constancia-asistencia', 'aria-hidden': 'true' }, crearIcono('asistencia'), `${textos.asistencia.clasesSeguidas}: ${racha}`) : null;
+  const llama = plan.clases ? h('p', { class: 'constancia-asistencia', 'aria-hidden': 'true' }, crearIcono('asistencia'), ` ${textos.asistencia.clasesSeguidas}: ${racha}`) : null;
   // Drako presenta el momento (nunca califica) y salta; el sello, las monedas y la llama son lo que dijo el servidor.
   const drako = crearDrako('celebra', textos.asistencia.drako, { desde: 'reposo', sinCiclo: true });
   const caja = h('div', { class: 'sello-zona', 'data-testid': 'sello-zona' }, drako, sello, chip, llama);

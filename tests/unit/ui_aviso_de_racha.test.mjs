@@ -82,7 +82,7 @@ test('U73 (adenda 4): en la asistencia, si el número sube NO hay aviso "¡Const
     const renglones = elementos(caja).filter((n) => n.className === 'constancia-asistencia');
     assert.equal(renglones.length, 1);
     assert.equal(renglones[0].parentNode, caja, 'dentro de la zona del sello, desde el primer pintado');
-    assert.equal(textoDe(renglones[0]), 'Clases seguidas: 2');
+    assert.equal(textoDe(renglones[0]).trim(), 'Clases seguidas: 2');
     assert.equal((textoDe(caja).match(/Clases seguidas/g) || []).length, 1, 'el número se dice una sola vez en la zona');
     await asentar();
     assert.equal(e.colgados.filter(esAviso).length, 0, 'nada flota sobre la pantalla');
@@ -93,7 +93,7 @@ test('U73 (adenda 4): en la asistencia, si el número sube NO hay aviso "¡Const
     const zona = crearRaiz();
     celebrarAsistencia({ zona, monedas: 0, racha: 2, quien: 'prof-u73d' });
     assert.equal(elementos(zona).filter(esAviso).length, 0, 'sin subir no hay aviso');
-    assert.equal(textoDe(elementos(zona).find((n) => n.className === 'constancia-asistencia')), 'Clases seguidas: 2', 'queda el renglón de siempre');
+    assert.equal(textoDe(elementos(zona).find((n) => n.className === 'constancia-asistencia')).trim(), 'Clases seguidas: 2', 'queda el renglón de siempre');
   } finally { sinSubir.cerrar(); }
 });
 
