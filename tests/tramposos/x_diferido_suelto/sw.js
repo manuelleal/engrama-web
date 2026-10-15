@@ -10,7 +10,7 @@
 //
 // Súbelo un número cada vez que cambie la lista de precarga o la estrategia; la `activate`
 // borra cualquier caché con otro nombre.
-const VERSION = 'engrama-shell-v56';
+const VERSION = 'engrama-shell-v57';
 
 // Cada encargo agrega los suyos en su propio commit (W7: Inicio + api/cliente,core,retos + los
 // SVG de Drako que usa el estudiante; W10: profe/grupos,grupo,sesion_asistencia + api/profe). El
@@ -177,7 +177,6 @@ const DIFERIDOS = [
   '/src/vistas/estudiante/inicio_practica.js',
   '/src/vistas/estudiante/repaso.js',
   '/src/ui/racha_semanal.js',
-  '/src/ui/lectura.js', // W84: el texto de un reto de Lectura (docs/ESPEC_lectura_texto.md)
 ];
 
 // Cuánto se espera a CADA recurso de la precarga. Antes era `cache.addAll(PRECARGA)`: todo o nada, sin límite de tiempo. Un solo recurso

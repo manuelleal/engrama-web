@@ -5,6 +5,7 @@ import test from 'node:test';
 import assert from 'node:assert/strict';
 import { avanceDelReto, senalDeSeleccion } from '../../src/ui/progreso.js';
 import { contenidoDelPanel } from '../../src/ui/panel_resultado.js';
+import { ICONOS } from '../../src/ui/iconos.js';
 import { debeDarToque } from '../../src/ui/toque.js';
 import { entradasNav } from '../../src/ui/nav_inferior.js';
 
@@ -28,10 +29,12 @@ test('panel de resultado: correcto e incorrecto SIEMPRE con ícono y texto; el n
     const c = contenidoDelPanel({ tipo });
     assert.ok(c.icono.length > 0 && c.texto.length > 0, `${tipo} sin ícono o sin texto`);
   }
-  assert.equal(contenidoDelPanel({ tipo: 'correcto' }).icono, '✓');
-  assert.equal(contenidoDelPanel({ tipo: 'incorrecto' }).icono, '✗');
+  // Tanda visual 2: los íconos son SVG de ui/iconos.js (antes, los glifos ✓ / ✗ / ✎ de texto); aquí se nombran.
+  assert.equal(contenidoDelPanel({ tipo: 'correcto' }).icono, 'visto');
+  assert.equal(contenidoDelPanel({ tipo: 'incorrecto' }).icono, 'equis');
+  for (const tipo of /** @type {const} */ (['correcto', 'incorrecto', 'neutro'])) assert.ok(ICONOS.includes(contenidoDelPanel({ tipo }).icono), `${tipo}: un ícono que existe`);
   const neutro = contenidoDelPanel({ tipo: 'neutro', texto: 'Elegiste B: sí' });
-  assert.ok(!['✓', '✗'].includes(neutro.icono), 'elegir no es acertar: el panel neutro no usa los íconos del veredicto');
+  assert.ok(!['visto', 'equis'].includes(neutro.icono), 'elegir no es acertar: el panel neutro no usa los íconos del veredicto');
 });
 
 test('toque: lo dan los botones del estudiante, no los deshabilitados, ni las opciones, ni el panel del profe', () => {

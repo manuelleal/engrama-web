@@ -9,7 +9,9 @@
 // (reto_flujo.js); en el navegador, x_reto_sin_salida_e30 rompe la salida en los dos caminos. Todas las copias las rehace regenerar_x_practica.mjs.
 import test from 'node:test';
 import assert from 'node:assert/strict';
-import { buscar, textoDe, entornoDeFotos } from './foto_vistas.mjs';
+import { buscar, textoDe, entornoDeFotos, elementos } from './foto_vistas.mjs';
+/** El hueco del ícono de la banda (tanda visual 2: un SVG de ui/iconos.js, antes el glifo ✓/✗ de texto; en el DOM de las fotos no se dibuja SVG). */
+const hayIcono = (n) => elementos(n).some((e) => String(e.className).includes('sx-banda__icono') && e.getAttribute('aria-hidden') === 'true');
 import { ctxEstudiante, asentar } from './fotos_de_navegacion.mjs';
 import { pintar, enOrden } from './apoyo_nav.mjs';
 import { renderRetoFlujo } from '../../src/vistas/estudiante/reto_flujo.js';
@@ -97,7 +99,7 @@ test('U78: al fallar, la banda dice en orden la oración correcta, la regla, por
   const plan = planDeExplicacion(RESPUESTAS.q1);
   assert.deepEqual([plan.ok, plan.titulo, plan.idioma], [false, 'Esta vez no', 'es']);
   assert.deepEqual(plan.partes.map((p) => [p.rotulo, p.texto]), [
-    ['Así queda', 'She goes to school every day.'], ['La regla', EXPLICACION_ES.regla], ['Por qué no la tuya', EXPLICACION_ES.por_opcion], ['Otro ejemplo', EXPLICACION_ES.ejemplo],
+    ['La respuesta correcta', 'She goes to school every day.'], ['La regla', EXPLICACION_ES.regla], ['Por qué no la tuya', EXPLICACION_ES.por_opcion], ['Otro ejemplo', EXPLICACION_ES.ejemplo],
   ]);
 });
 
@@ -111,11 +113,13 @@ test('U78: al acertar no hay "por qué no la tuya" aunque el servidor lo mande; 
 test('U78: desde B1 (idioma en) los rótulos van en inglés y cada parte lleva lang="en"; el veredicto con ícono y texto', () => {
   const plan = planDeExplicacion({ ...RESPUESTAS.q1, explanation: { ...EXPLICACION_ES, idioma: 'en' } });
   assert.equal(plan.idioma, 'en');
-  assert.deepEqual(plan.partes.map((p) => p.rotulo), ['The right sentence', 'The rule', 'Why not yours', 'Another example']);
+  assert.deepEqual(plan.partes.map((p) => p.rotulo), ['The right answer', 'The rule', 'Why not yours', 'Another example']);
+  assert.equal(plan.icono, 'equis', 'el veredicto con su ícono (ui/iconos.js)');
+  assert.equal(planDeExplicacion(RESPUESTAS.q2).icono, 'visto');
   const entorno = entornoDeFotos({});
   try {
     const banda = crearBanda(plan);
-    assert.match(textoDe(banda), /✗/);
+    assert.ok(hayIcono(banda));
     assert.equal(textoDe(buscar(banda, 'explicacion-veredicto')), 'Esta vez no');
     for (const clave of ['oracion', 'regla', 'porQue', 'ejemplo']) assert.equal(buscar(banda, `explicacion-${clave}`).getAttribute('lang'), 'en', clave);
   } finally { entorno.restaurar(); }
@@ -131,7 +135,7 @@ test('U78: en A1 y A2 (idioma es) la oración y el ejemplo van con lang="en" y l
     assert.deepEqual(langs, { oracion: 'en', regla: 'es', porQue: 'es', ejemplo: 'en' });
     for (const c of ['oracion', 'regla', 'porQue', 'ejemplo']) {
       const rotulo = buscar(banda, `explicacion-${c}`).children.find((n) => n.tagName === 'strong');
-      assert.equal(rotulo?.getAttribute('lang'), 'es', `el rótulo de ${c} ("Así queda", "La regla"…) es español`);
+      assert.equal(rotulo?.getAttribute('lang'), 'es', `el rótulo de ${c} ("La respuesta correcta", "La regla"…) es español`);
     }
   } finally { entorno.restaurar(); }
 });
@@ -168,7 +172,7 @@ test('U79: Comprobar manda la label una sola vez por toque y la banda dice el ve
     assert.deepEqual(cuerpos, [{ question_id: 'q1', answer: 'A' }], 'la label, nunca el texto de la opción');
     const banda = buscar(raiz, 'explicacion');
     assert.ok(banda, 'la banda');
-    assert.match(textoDe(banda), /✗/);
+    assert.ok(hayIcono(banda));
     assert.equal(textoDe(buscar(banda, 'explicacion-veredicto')), 'Esta vez no');
     assert.match(textoDe(buscar(banda, 'explicacion-oracion')), /She goes to school every day\./);
     assert.match(textoDe(buscar(banda, 'explicacion-porQue')), /Go es para I/);
@@ -178,6 +182,38 @@ test('U79: Comprobar manda la label una sola vez por toque y la banda dice el ve
     assert.equal(textoDe(buscar(raiz, 'enunciado')), 'We ___ breakfast at seven.');
     assert.equal(buscar(raiz, 'explicacion'), null, 'la pregunta 2 no trae nada de la 1');
   } finally { cerrar(); }
+});
+
+// Tanda visual 2 (docs/ESPEC_visual_reto_tanda2.md; compuerta 18, hallazgo 3): tras comprobar, las opciones dicen el resultado con palabra (y su ícono,
+// que el DOM de las fotos no dibuja): lo que dice el servidor (`is_correct`, `answer`, `correct_answer`), nunca una cuenta de la web. Visual: sin tramposo.
+test('U98: tras comprobar, la correcta dice "Correcta" y la tuya que falló "Tu respuesta"; al acertar, solo la tuya; sin correct_answer, solo la tuya', async () => {
+  const estadoDe = (raiz, label) => {
+    const b = buscar(raiz, `opcion-${label}`);
+    const marca = elementos(b).find((e) => String(e.className) === 'opcion-estado');
+    return [String(b.className).split(/\s+/).filter((c) => c.startsWith('es-')).join(' '), marca ? textoDe(marca) : null];
+  };
+  const fallo = await abrir(servidor().rutas);
+  try {
+    await tocar(fallo.raiz, 'opcion-A');
+    assert.deepEqual([estadoDe(fallo.raiz, 'A'), estadoDe(fallo.raiz, 'B')], [['', null], ['', null]], 'antes de comprobar ninguna dice nada');
+    await tocar(fallo.raiz, 'boton-comprobar');
+    assert.deepEqual([estadoDe(fallo.raiz, 'A'), estadoDe(fallo.raiz, 'B')], [['es-incorrecta', 'Tu respuesta'], ['es-correcta', 'Correcta']]);
+  } finally { fallo.cerrar(); }
+  const acierto = await abrir(servidor({ respondidas: [{ ...RESPUESTAS.q1, repetida: true }] }).rutas);
+  try {
+    await tocar(acierto.raiz, 'opcion-B');
+    await tocar(acierto.raiz, 'boton-comprobar');
+    assert.deepEqual([estadoDe(acierto.raiz, 'A'), estadoDe(acierto.raiz, 'B')], [['', null], ['es-correcta', 'Correcta']]);
+  } finally { acierto.cerrar(); }
+  const { rutas } = servidor();
+  rutas['POST /challenges/attempts/int-1/answers'] = () => ({ ...RESPUESTAS.q1, correct_answer: undefined }); // falló y llegó sin correct_answer
+  const sinClave = await abrir(rutas);
+  try {
+    await tocar(sinClave.raiz, 'opcion-A');
+    await tocar(sinClave.raiz, 'boton-comprobar');
+    assert.equal(textoDe(buscar(sinClave.raiz, 'explicacion-veredicto')), 'Esta vez no');
+    assert.deepEqual([estadoDe(sinClave.raiz, 'A'), estadoDe(sinClave.raiz, 'B')], [['es-incorrecta', 'Tu respuesta'], ['', null]], 'la web no adivina la correcta');
+  } finally { sinClave.cerrar(); }
 });
 
 test('U79: Ver resultado cierra con /finish una vez (dos toques) y muestra la revisión de siempre', async () => {

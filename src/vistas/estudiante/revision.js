@@ -32,7 +32,7 @@ function filaDeRevision(pregunta, respuestasDadas, correctAnswers, i) {
     'li', { class: `tarjeta fila-revision ${acerto ? 'revision-ok' : 'revision-mal'}`, 'data-testid': `revision-${pregunta.id}` },
     h('p', { class: 'fila-titulo' }, pregunta.question_text),
     crearResultado({ ok: acerto, texto: acerto ? textos.revision.correcta : textos.revision.incorrecta, testid: `revision-${pregunta.id}-resultado` }),
-    h('p', { 'data-testid': `revision-${pregunta.id}-correcta` }, textos.revision.laCorrectaEra(textoDeOpcion(pregunta, correcta))),
+    acerto ? null : h('p', { 'data-testid': `revision-${pregunta.id}-correcta` }, textos.revision.laCorrectaEra(textoDeOpcion(pregunta, correcta))),
   );
   fila.style.setProperty('--i', String(i));
   return fila;

@@ -35,8 +35,9 @@ async function responder(sesion, label) {
     const boton = t('boton-siguiente') || t('boton-terminar');
     const r = boton.getBoundingClientRect();
     return {
-      banda: t('explicacion').textContent, veredicto: t('explicacion-veredicto')?.textContent ?? null,
+      banda: t('explicacion').textContent, icono: t('explicacion').querySelector('.sx-banda__icono svg')?.dataset.icono ?? null, veredicto: t('explicacion-veredicto')?.textContent ?? null,
       partes: ['oracion', 'regla', 'porQue', 'ejemplo'].map((p) => t('explicacion-' + p) ? [p, t('explicacion-' + p).getAttribute('lang'), t('explicacion-' + p).textContent] : null).filter(Boolean),
+      estados: [...document.querySelectorAll('[data-testid^="opcion-"]')].map((b) => [b.dataset.testid, b.querySelector('.opcion-estado')?.textContent ?? null, b.querySelector('.opcion-estado svg')?.dataset.icono ?? null]),
       boton: { id: boton.dataset.testid, arriba: Math.round(r.top), abajo: Math.round(r.bottom), alto: Math.round(r.height), alturaVentana: innerHeight },
     };
   })()`);
@@ -59,20 +60,28 @@ test('E35: un reto A2 pregunta por pregunta: nada antes de Comprobar, la banda e
       // H-A (auditoría 06, U94): "Comprobar" es la acción del sistema (navy), nunca oro: se mide el color que pinta el navegador, no el CSS.
       const colores = await sesion.evaluar(`(() => {
         const pintado = (v) => { const n = document.createElement('i'); n.style.background = v; document.body.append(n); const c = getComputedStyle(n).backgroundColor; n.remove(); return c; };
-        return { boton: getComputedStyle(document.querySelector('[data-testid="boton-comprobar"]')).backgroundColor, navy: pintado('var(--sx-accion)'), oro: pintado('var(--oro)') };
+        const cs = (sel) => getComputedStyle(document.querySelector(sel));
+        return { boton: cs('[data-testid="boton-comprobar"]').backgroundColor, navy: pintado('var(--sx-accion)'), oro: pintado('var(--oro)'),
+          elegida: cs('[data-testid="opcion-A"]').borderTopColor, letraElegida: cs('[data-testid="opcion-A"] .escudo-letra').backgroundColor,
+          letra: cs('[data-testid="opcion-B"] .escudo-letra').backgroundColor, primario: pintado('var(--primario)') };
       })()`);
       assert.equal(colores.boton, colores.navy, '"Comprobar" en el navy del sistema');
       assert.notEqual(colores.boton, colores.oro, '"Comprobar" no va en oro');
+      // Tanda visual 2 (compuerta 18, hallazgos 3 y 9): la elegida y las letras A-D ya no van en oro; la elegida, en el navy del sistema.
+      assert.equal(colores.elegida, colores.primario, 'la elegida, con borde navy');
+      assert.equal(colores.letraElegida, colores.primario, 'su letra, rellena de navy');
+      for (const c of [colores.elegida, colores.letraElegida, colores.letra]) assert.notEqual(c, colores.oro, 'nada de oro en la pregunta');
       const antes = await sesion.evaluar('document.body.textContent');
       for (const clave of ['She goes to school every day.', 'Con he, she o it', 'Esta vez no']) assert.ok(!antes.includes(clave), `antes de comprobar se ve "${clave}"`);
 
       const mal = await responder(sesion, 'A');
       assert.equal(mal.veredicto, 'Esta vez no');
-      assert.match(mal.banda, /✗/);
+      assert.equal(mal.icono, 'equis', 'el veredicto con su ícono SVG (tanda visual 2: antes, el glifo ✗)');
+      assert.deepEqual(mal.estados, [['opcion-A', 'Tu respuesta', 'equis'], ['opcion-B', 'Correcta', 'visto'], ['opcion-C', null, null]], 'tras comprobar, las opciones dicen el resultado con ícono y palabra');
       // H-4 (docs/ESPEC_correcciones_practica.md): la oración y el ejemplo son frases en inglés (lang="en"); la regla y el "por qué", en español.
       // Antes esta línea fijaba las cuatro en "es", el defecto que encontró la auditoría 05 (se declara: la espec de H-4 no nombró a E35).
       assert.deepEqual(mal.partes.map(([p, lang]) => [p, lang]), [['oracion', 'en'], ['regla', 'es'], ['porQue', 'es'], ['ejemplo', 'en']]);
-      assert.match(mal.partes[0][2], /Así queda: She goes to school every day\./);
+      assert.match(mal.partes[0][2], /La respuesta correcta: She goes to school every day\./);
       assert.match(mal.partes[2][2], /Por qué no la tuya: Go es para I, you, we y they\./);
       assert.ok(mal.boton.abajo <= mal.boton.alturaVentana && mal.boton.arriba >= 0 && mal.boton.alto >= 44, `el botón "Siguiente" se ve entero y mide 44 px o más: ${JSON.stringify(mal.boton)}`);
 
@@ -82,10 +91,17 @@ test('E35: un reto A2 pregunta por pregunta: nada antes de Comprobar, la banda e
 
       const bien = await responder(sesion, 'B');
       assert.equal(bien.veredicto, 'Correcta');
-      assert.match(bien.banda, /✓/);
+      assert.equal(bien.icono, 'visto');
+      assert.deepEqual(bien.estados.filter(([, t]) => t), [['opcion-B', 'Correcta', 'visto']], 'al acertar, solo la tuya: Correcta');
       assert.deepEqual(bien.partes.map(([p]) => p), ['oracion', 'regla', 'ejemplo'], 'al acertar, sin "por qué no la tuya"');
-      await clic(sesion, 'boton-siguiente');
-      await esperar(300);
+      // Tanda visual 2 (compuerta 18, hallazgo 6): mientras la pregunta nueva entra deslizándose, la página no se ensancha (antes, 431 a 375).
+      const ancho = await sesion.evaluar(`(async () => {
+        let sw = 0; const t0 = performance.now();
+        document.querySelector('[data-testid="boton-siguiente"]').click();
+        await new Promise((fin) => { const paso = () => { sw = Math.max(sw, document.documentElement.scrollWidth); if (performance.now() - t0 < 800) requestAnimationFrame(paso); else fin(); }; requestAnimationFrame(paso); });
+        return { sw, iw: innerWidth };
+      })()`);
+      assert.deepEqual(ancho, { sw: 375, iw: 375 }, 'al deslizar la pregunta nada desborda a lo ancho');
       const ultima = await responder(sesion, 'A');
       assert.equal(ultima.boton.id, 'boton-terminar');
       await clic(sesion, 'boton-terminar');
@@ -111,7 +127,7 @@ test('E35: un reto B1: la explicación y sus rótulos en inglés (lang="en"), co
       const mal = await responder(sesion, 'A');
       assert.equal(mal.veredicto, 'Esta vez no');
       assert.deepEqual(mal.partes.map(([p, lang]) => [p, lang]), [['oracion', 'en'], ['regla', 'en'], ['porQue', 'en'], ['ejemplo', 'en']]);
-      assert.match(mal.partes[0][2], /The right sentence: I have worked here since 2020\./);
+      assert.match(mal.partes[0][2], /The right answer: I have worked here since 2020\./);
       assert.match(mal.partes[1][2], /The rule: Use the present perfect/);
       assert.match(mal.partes[2][2], /Why not yours: Work is the simple present/);
       assert.deepEqual(sesion.errores, []);

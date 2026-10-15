@@ -1,6 +1,6 @@
 // @ts-check
 // ui/iconos.js · Los íconos de la casa (docs/ESPEC_visual_sistema1.md §1): SVG de trazo armados con createElementNS, nunca emoji del sistema
-// (cambian de dibujo en cada teléfono). Son los de la guía (diseno/sistema/guia.html) más `silencio` y `moneda`: caja de 24, trazo 2,2,
+// (cambian de dibujo en cada teléfono). Son los de la guía (diseno/sistema/guia.html) más `silencio`, `moneda` y `lapiz`: caja de 24, trazo 2,2,
 // puntas redondas y color heredado. Decorativos: la palabra o el nombre accesible va al lado.
 
 const NS = 'http://www.w3.org/2000/svg';
@@ -17,6 +17,9 @@ const FORMAS = {
   silencio: [`${ALTAVOZ}M16 9.5l5 5M21 9.5l-5 5`],
   vivo: [[3.5, 5, 17, 11.5, 2.5], 'M8.5 20.5h7M10.5 9l4 2-4 2z'],
   moneda: [[12, 12, 8.5], 'M12 7.5a4.5 4.5 0 1 0 4.5 4.5'],
+  visto: ['M5 12.5l4.5 4.5L19 7.5'],
+  equis: ['M6.5 6.5l11 11M17.5 6.5l-11 11'],
+  lapiz: ['M5 19l1-4.5L15.5 5a2 2 0 0 1 3 3L9 17.5zM13.5 7l3 3'],
 };
 
 /** Los nombres que existen. */

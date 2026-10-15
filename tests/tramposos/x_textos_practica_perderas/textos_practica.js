@@ -27,10 +27,13 @@ export const textosPractica = {
     // H-3: una pregunta que la web aún no sabe contestar (no es de opción múltiple).
     noContestable: 'Esta pregunta aún no se puede contestar aquí.',
     noContestableApoyo: 'Puedes seguir con el reto: esta queda sin responder.',
-    /** Los rótulos van en el idioma de la explicación (dictamen 04 §1.5: español en A1 y A2, inglés sencillo desde B1). */
+    // Tanda visual 2 (compuerta 18, hallazgo 3): tras comprobar, la opción que elegiste y no era. La correcta dice "Correcta" (textos.revision).
+    tuRespuesta: 'Tu respuesta',
+    /** Los rótulos van en el idioma de la explicación (dictamen 04 §1.5: español en A1 y A2, inglés sencillo desde B1). La oración: tanda visual 2
+     * (compuerta 18, hallazgo 8), antes "Así queda" / "The right sentence", que no leían bien en Verdadero/Falso ("Así queda: True"). */
     rotulos: {
-      es: { oracion: 'Así queda', regla: 'La regla', porQue: 'Por qué no la tuya', ejemplo: 'Otro ejemplo' },
-      en: { oracion: 'The right sentence', regla: 'The rule', porQue: 'Why not yours', ejemplo: 'Another example' },
+      es: { oracion: 'La respuesta correcta', regla: 'La regla', porQue: 'Por qué no la tuya', ejemplo: 'Otro ejemplo' },
+      en: { oracion: 'The right answer', regla: 'The rule', porQue: 'Why not yours', ejemplo: 'Another example' },
     },
     /** La que guardó el servidor (gana la primera) cuando no es la que se ve elegida. @param {string} label @param {string} texto */
     quedoGuardada: (label, texto) => `Quedó guardada tu primera respuesta: ${label}: ${texto}`,

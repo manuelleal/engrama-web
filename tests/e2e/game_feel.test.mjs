@@ -130,6 +130,7 @@ test('game feel: en la pregunta el botón nace plano, despierta al elegir, sube 
             despierta: q('boton-siguiente').classList.contains('despierta'),
             progreso: q('progreso-reto').getAttribute('aria-valuenow'),
             panel: q('panel-respuesta').textContent,
+            panelIcono: q('panel-respuesta').querySelector('.panel-icono svg')?.dataset.icono ?? null,
             panelClase: q('panel-respuesta').className,
             elegida: q('opcion-A').getAttribute('aria-pressed'),
             posicionBarra: getComputedStyle(barra).position,
@@ -147,6 +148,8 @@ test('game feel: en la pregunta el botón nace plano, despierta al elegir, sube 
     assert.equal(r.eval.despues.progreso, '1', 'la barra cuenta la respuesta');
     assert.match(r.eval.despues.panel, /Elegiste A: 4/);
     assert.doesNotMatch(r.eval.despues.panel, /[✓✗]|[Cc]orrect|[Ii]ncorrect|Esta vez no/, 'elegir no revela nada de la clave');
+    // Tanda visual 2: el ícono es un SVG (ui/iconos.js), sin texto: se mira su nombre. El del panel neutro es el lápiz, nunca el del veredicto.
+    assert.equal(r.eval.despues.panelIcono, 'lapiz', 'elegir no es acertar: el panel neutro lleva el lápiz, no visto ni equis');
     assert.match(r.eval.despues.panelClase, /panel-sube/);
     assert.equal(r.eval.despues.elegida, 'true');
     assert.equal(r.eval.despues.posicionBarra, 'fixed', 'la barra de acción queda fija abajo');
