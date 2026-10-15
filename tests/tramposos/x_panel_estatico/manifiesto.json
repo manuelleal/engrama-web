@@ -1,0 +1,16 @@
+{
+  "descripcion": "margen: app.js vuelve a importar de forma estática una pantalla del profe (el shell vuelve a cargar lo que el estudiante no usa)",
+  "archivos": {
+    "src/app.js": "app.js"
+  },
+  "comando": [
+    "node",
+    "--test",
+    "--test-reporter=tap",
+    "tests/unit/panel_diferido.test.mjs"
+  ],
+  "espera_codigo_no_cero": true,
+  "espera_fallan_tests": [
+    "margen: app.js no importa de forma estática ninguna pantalla del profe ni del admin; las pide con UN import() del panel"
+  ]
+}

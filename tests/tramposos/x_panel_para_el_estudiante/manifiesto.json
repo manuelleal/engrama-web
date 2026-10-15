@@ -1,0 +1,16 @@
+{
+  "descripcion": "margen: el panel se pide para todo rol: el estudiante vuelve a descargar las pantallas del profe y del admin",
+  "archivos": {
+    "src/app.js": "app.js"
+  },
+  "comando": [
+    "node",
+    "--test",
+    "--test-reporter=tap",
+    "tests/e2e/panel_diferido.test.mjs"
+  ],
+  "espera_codigo_no_cero": true,
+  "espera_fallan_tests": [
+    "margen: el estudiante recorre sus pestañas y la página no pide ningún módulo del panel del profe ni del admin"
+  ]
+}

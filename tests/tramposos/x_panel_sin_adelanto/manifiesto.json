@@ -1,0 +1,16 @@
+{
+  "descripcion": "margen: el panel solo se pide al abrir una pantalla suya; el profe que entra por otra pantalla no lo tiene en memoria si se cae la red",
+  "archivos": {
+    "src/app.js": "app.js"
+  },
+  "comando": [
+    "node",
+    "--test",
+    "--test-reporter=tap",
+    "tests/e2e/panel_diferido.test.mjs"
+  ],
+  "espera_codigo_no_cero": true,
+  "espera_fallan_tests": [
+    "margen: el profe recargado en Perfil ya pidió el panel, y sin red llega a Mis grupos y a la asistencia de un grupo, con su barra"
+  ]
+}
