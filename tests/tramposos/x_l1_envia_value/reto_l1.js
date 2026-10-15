@@ -167,7 +167,7 @@ function barraRespondida(raiz, estado, pregunta, respuesta) {
   const boton = botonQueSigue(raiz, estado);
   const elegida = estado.elegidas[pregunta.id];
   const nota = elegida && elegida !== respuesta.answer ? T.quedoGuardada(respuesta.answer, textoDeOpcion(pregunta, respuesta.answer)) : null;
-  return h('div', { class: 'barra-accion con-banda' }, crearBanda(planDeExplicacion(respuesta), { accion: boton, nota }));
+  return h('div', { class: 'barra-accion con-banda' }, crearBanda(planDeExplicacion(respuesta, { opciones: pregunta.options_json, skill: estado.challenge.skill }), { accion: boton, nota }));
 }
 
 function pintar(raiz, estado, entrada = 'desliza', recien = null) {

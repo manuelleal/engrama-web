@@ -35,6 +35,13 @@ export const textosPractica = {
       es: { oracion: 'La respuesta correcta', regla: 'La regla', porQue: 'Por qué no la tuya', ejemplo: 'Otro ejemplo' },
       en: { oracion: 'The right answer', regla: 'The rule', porQue: 'Why not yours', ejemplo: 'Another example' },
     },
+    /** Adenda 3 (docs/ESPEC_practica_del_dia.md §6d; pedagogía 05, puntos 1 y 9): los rótulos que cambian según el tipo de pregunta. Lo que un tipo no
+     * dice lo hereda de `rotulos` (la gramática no está aquí: es la de hoy). `verdadero` = lectura V/F/ND ("The right answer: True" y "The rule: True. The
+     * text says…" no leían); `vocabulario` = la "regla" es el significado. */
+    rotulosPorTipo: {
+      verdadero: { es: { oracion: 'La respuesta', regla: 'Por qué' }, en: { oracion: 'The answer', regla: 'Why' } },
+      vocabulario: { es: { regla: 'Significado' }, en: { regla: 'Meaning' } },
+    },
     /** La que guardó el servidor (gana la primera) cuando no es la que se ve elegida. @param {string} label @param {string} texto */
     quedoGuardada: (label, texto) => `Quedó guardada tu primera respuesta: ${label}: ${texto}`,
   },
