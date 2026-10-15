@@ -70,3 +70,14 @@ de U59. Los demás hallazgos de la compuerta 18 (opciones tras Comprobar, rachas
   `lang="en"`. Hoy solo el sembrador crea retos `reading`; si eso cambia, el criterio es otro encargo.
 - Escuchar (`listening`) no entra. Lado por lado a 1280 no entra: arriba, en la columna de 600 px.
 - Teléfono real, 360 px, otro navegador y lector de pantalla: no se prueban aquí.
+
+## 6. Adenda tras correr (2026-10-14, no mueve ningún criterio)
+
+- **E39 salió rojo en la primera corrida** con el diseño de §1 (`max-height` 30 vh): a 375 × 667 el bloque medía 283 px, más del 40 % (266). El
+  criterio se quedó; cambió el diseño: `.lectura-cuerpo { max-height: calc(40vh - 6rem) }` en todo ancho (el rótulo y la pista caben en 6rem) y
+  sin la regla de 38 vh para escritorio. Medido después: 254 px de 667 y 307 de 800.
+- **Peso:** con los enchufes tal como los describe §1 (`import()` propio en `reto_flujo.js` y comentarios) la precarga quedó en 830.089 (sobre el
+  techo). Se movió lo nuevo a lo diferido: `intentarL1` (reto_l1.js, diferido) le pasa `crearLectura` a `reto_flujo.js` en `datos.lectura` (sin un
+  segundo `import()`), y los comentarios largos viven en `ui/lectura.js`. Queda en 829.836 (+138, margen 164).
+- Los nombres: U97b y U97c de §2 son, en el código, las pruebas "U97: con un backend sin L1…" y "U97: plegar el texto…"; el tramposo
+  `x_lectura_sin_texto` se llama `x_lectura_ciega` y el de E39, `x_e39_lectura_ciega` (el corredor elige por subcadena: así no se pisan).
