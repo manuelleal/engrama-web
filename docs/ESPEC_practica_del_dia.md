@@ -184,6 +184,32 @@ demás filas de "Ahora"; título de tarjeta, 18 px; la barra de avance delgada) 
 - E30 (`nav_sin_callejones`) deja fuera `/repaso` de "toda ruta de la tabla se alcanza por toques", igual que el reto en curso: solo se enlaza cuando la
   tanda trae repaso. Su barra y su volver los miden U62 y el humo de navegación (que lo visita por su dirección: rutas del estudiante 10 → 11).
 
+## 6d. Adenda 3 (2026-10-14, rótulos de la banda según el tipo de pregunta; pedagogía 05, puntos 1 y 9)
+La revisión de contenido para la demo (`investigacion/pedagogia/05-revision-contenido-demo.md`) halló que la banda leía mal fuera de la gramática: en una
+lectura Verdadero/Falso/Not given salía "The right answer: True" y "The rule: True. The text says…", y en Vocabulario "The rule: Weakness = debilidad…".
+El sembrador manda solo `regla` (`herramientas/sembrar/mapeo.mjs`, `preguntaDeAfirmacion`) y el servidor pone `oracion_correcta` = el valor de la opción,
+así que se arregla en la web, sin pedir nada al backend ni resembrar.
+- **Los rótulos, por tipo** (`textosPractica.l1.rotulosPorTipo`; lo que un tipo no dice lo hereda de `rotulos`, que queda como hoy para la gramática):
+  | tipo | idioma | `oracion` | `regla` |
+  |---|---|---|---|
+  | `verdadero` (lectura V/F/ND) | en | The answer | Why |
+  | `verdadero` | es | La respuesta | Por qué |
+  | `vocabulario` | en | (igual) | Meaning |
+  | `vocabulario` | es | (igual) | Significado |
+  | `gramatica` (el resto) | en / es | The right answer / La respuesta correcta | The rule / La regla |
+  "Por qué no la tuya" y "Otro ejemplo" no cambian en ningún tipo. El idioma del rótulo sigue siendo el de la explicación (`explanation.idioma`).
+- **Cómo se detecta** (pura, `tipoDeRotulos({opciones, skill})` en `ui/explicacion.js`; solo con lo que la web ya tiene, nada nuevo del backend):
+  1. **Primero, las opciones:** si el `label` de TODAS las opciones de la pregunta está en {`V`, `F`, `ND`} y están `V` y `F` → `verdadero`. Es lo que
+     manda el sembrador para una afirmación de lectura (`OPCIONES_LO_DICE`) y no depende de que el reto traiga `skill`: sirve también en el repaso, donde la
+     entrada trae la pregunta (`options_json`) pero no el reto. Un reto `reading` con opción múltiple normal NO es `verdadero` (su "regla" sí es una regla).
+  2. **Después, el `skill` del reto:** `vocabulary` → `vocabulario`. `skill` viene en el reto de `/attempt` (la lectura ya lo usa, `ui/lectura.js`).
+  3. **Si no, `gramatica`** (los rótulos de hoy). `question_type` NO distingue: toda pregunta que la web sabe contestar es `multiple_choice` (`preguntaContestable`).
+  Lo desconocido (opciones ausentes, `skill` nulo, etiquetas raras) cae en `gramatica`: nunca un rótulo inventado.
+- **Límite declarado:** en el repaso (`#/repaso`) la entrada no trae el `skill` del reto, así que una pregunta de Vocabulario de ahí sigue diciendo "La regla"
+  / "The rule"; las V/F/ND del repaso sí quedan bien. Se arreglaría cuando la entrada traiga el `skill` o el servidor mande el rótulo (a "Después").
+- **Dónde:** `src/textos_practica.js`, `src/ui/explicacion.js` (`planDeExplicacion(r, contexto)`; el plan suma `tipo`) y los dos llamadores diferidos
+  (`reto_l1.js`, `repaso.js`). Todos fuera de `PRECARGA`. Prueba nueva: la siguiente U libre, con su tramposo (los rótulos viejos en V/F → rojo).
+
 ## 7. Medido al cerrar (2026-10-14)
 - **Commits** (sobre `8ef6298`): `75b71d3` espec · `37e067e` U59 · `bf08b06` W78 mock · `176d90c` W78 · `bb4a2c1` W79 mock · `a33b7d8` W79 · `cb2fd84` W80 ·
   `3e65199` W79 corrección por E31 (adenda 2) y E36 · `48de093` W81 mock · `4fb17aa` W81 · `f4b4e32` W81 E2E · `309a9bc` W82 humo · `c3c639b` capturas ·
