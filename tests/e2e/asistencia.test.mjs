@@ -51,7 +51,9 @@ test(
         eval: '(async () => { await new Promise((r) => setTimeout(r, 600)); const el = document.querySelector(\'[data-testid="asistencia-resultado"]\'); return [...el.querySelectorAll(\'[data-icono]\')].map((i) => i.dataset.icono).join() + \'|\' + el.textContent; })()',
       });
       assert.deepEqual(r.errores, []);
-      assert.match(r.eval, /^visto\|/, 'el ícono visto (SVG, B1) y el texto');
+      // El renglón "Clases seguidas" del sello (una-racha) lleva el ícono de asistencia, sin llama; el resultado, el visto (SVG, B1).
+      assert.match(r.eval, /^asistencia,visto\|/, 'el ícono de asistencia (clases seguidas), el visto (SVG, B1) y el texto');
+      assert.match(r.eval, /Clases seguidas: 1/);
       assert.match(r.eval, /monedas/);
     });
   },
