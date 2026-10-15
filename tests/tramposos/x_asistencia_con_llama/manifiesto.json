@@ -1,0 +1,16 @@
+{
+  "descripcion": "U100c (adenda 4): el renglon de Asistencia vuelve a llevar la llama y la palabra 'Constancia' (y el aviso con llama al subir).",
+  "archivos": {
+    "src/ui/sello.js": "sello.js"
+  },
+  "comando": [
+    "node",
+    "--test",
+    "--test-reporter=tap",
+    "tests/unit/una_racha.test.mjs"
+  ],
+  "espera_codigo_no_cero": true,
+  "espera_fallan_tests": [
+    "U100c: en Asistencia no hay llama"
+  ]
+}

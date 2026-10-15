@@ -11,7 +11,7 @@
   ],
   "espera_codigo_no_cero": true,
   "espera_fallan_tests": [
-    "U47: en la asistencia, la racha que baja pide /auth/me SOLO en ese caso",
+    "U47: en la asistencia, el número que baja pide /auth/me SOLO en ese caso",
     "U47: ninguna vista ni componente de la racha calcula un máximo"
   ]
 }

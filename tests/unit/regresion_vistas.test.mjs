@@ -19,7 +19,9 @@ const CRUDA = JSON.parse(readFileSync(fileURLToPath(new URL('../snapshots/vistas
  */
 export const TEXTOS_DECLARADOS = {
   // W67 (docs/ESPEC_navegacion.md §5.5): "sesión" queda solo para la cuenta; en el grupo, la acción es "Abrir asistencia".
-  profe_grupo: [['Abrir sesión de asistencia', 'Abrir asistencia']],
+  profe_grupo: [['Abrir sesión de asistencia', 'Abrir asistencia'],
+    // Adenda 4 (docs/ESPEC_practica_del_dia.md §6e): la columna del roster era "Constancia" (los días de asistencia seguidos); la racha de Inicio es la semanal.
+    ['Constancia', 'Clases seguidas']],
 };
 
 /** La línea base con los textos declarados puestos al día (el archivo de la foto no se regenera). */

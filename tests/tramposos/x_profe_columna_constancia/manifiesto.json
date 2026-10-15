@@ -1,0 +1,18 @@
+{
+  "descripcion": "U100b (adenda 4): el roster del profe vuelve a titular la columna 'Constancia'.",
+  "archivos": {
+    "src/textos.js": "textos.js"
+  },
+  "comando": [
+    "node",
+    "--test",
+    "--test-reporter=tap",
+    "tests/unit/una_racha.test.mjs",
+    "tests/unit/regresion_vistas.test.mjs"
+  ],
+  "espera_codigo_no_cero": true,
+  "espera_fallan_tests": [
+    "U100b: el roster del profe titula la columna",
+    "R4: cada texto declarado como cambiado"
+  ]
+}

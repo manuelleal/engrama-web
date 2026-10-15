@@ -226,7 +226,7 @@ export const textos = {
     drako: 'Drako celebra que llegaste',
     sinRed: 'Sin conexión: no puedes marcar asistencia ahora.',
     /** @param {number} monedas @param {number} racha */
-    exito: (monedas, racha) => `Asistencia marcada · +${monedas} monedas · constancia ${racha}`,
+    exito: (monedas, racha) => `Asistencia marcada · +${monedas} monedas · clases seguidas ${racha}`,
     codigoInvalido: 'Código no válido para tu grupo.',
     yaMarcada: 'Ya habías marcado esta asistencia.',
     sesionVencida: 'Ese código ya venció.',
@@ -234,9 +234,12 @@ export const textos = {
     /** Adenda 17.8 (adelanta W45), sin "+0" ni reproche (nada de "tarde"): "5 por asistir + 5 por llegar a tiempo". @param {number} base @param {number} puntualidad */
     desglose: (base, puntualidad) => [base > 0 ? `${base} por asistir` : '', puntualidad > 0 ? `${puntualidad} por llegar a tiempo` : ''].filter(Boolean).join(' + '),
     /** @param {number} racha */
-    yaCobrada: (racha) => `Asistencia marcada. La de hoy ya la cobraste: las monedas de asistencia son una vez por día. Constancia: ${racha}.`,
+    yaCobrada: (racha) => `Asistencia marcada. La de hoy ya la cobraste: las monedas de asistencia son una vez por día. Clases seguidas: ${racha}.`,
     /** @param {number} racha */
-    sinMonedas: (racha) => `Asistencia marcada. Constancia: ${racha}.`,
+    sinMonedas: (racha) => `Asistencia marcada. Clases seguidas: ${racha}.`,
+    clasesSeguidas: 'Clases seguidas',
+    /** @param {number} n */
+    deNuevo: (n) => `Empezamos de nuevo. Tu mejor marca de clases seguidas: ${n}.`,
     bolsaAgotada: 'No pudimos registrar tu asistencia: la bolsa de monedas de tu institución se agotó. No es por ti. Avísale a tu profe.',
   },
   profe: {
@@ -257,7 +260,7 @@ export const textos = {
       noEncontrado: 'No encontrado.',
       sinEstudiantes: 'Este grupo no tiene estudiantes inscritos todavía.',
       columnaNombre: 'Nombre',
-      columnaConstancia: 'Constancia',
+      columnaClases: 'Clases seguidas',
       columnaUltimaAsistencia: 'Última asistencia',
       sinAsistencia: 'Sin registro',
       abrirSesion: 'Abrir asistencia',

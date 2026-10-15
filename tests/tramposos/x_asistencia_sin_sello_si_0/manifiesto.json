@@ -11,6 +11,6 @@
   ],
   "espera_codigo_no_cero": true,
   "espera_fallan_tests": [
-    "asistencia: el sello siempre; las monedas y la llama solo si el servidor las dio"
+    "asistencia: el sello siempre; las monedas y las clases seguidas solo si el servidor las dio"
   ]
 }

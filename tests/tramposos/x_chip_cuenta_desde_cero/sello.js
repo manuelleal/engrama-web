@@ -1,6 +1,6 @@
 // @ts-check
 // ui/sello.js · "Asistencia marcada": un sello que se ESTAMPA con rebote, las monedas que vuelan a su
-// contador, la llama de la constancia y el sonido de golpe (Lingo solo mostraba una alerta estática,
+// contador, las clases seguidas y el sonido de golpe (Lingo solo mostraba una alerta estática,
 // attendance.html:419-461: aquí es más que el original). Todo lo que se muestra llega del servidor
 // (`coins_awarded`, `streak`); lo único propio es el adorno. Sin movimiento (reduced-motion) el sello y
 // el contador quedan igual de legibles, solo quietos.
@@ -13,12 +13,13 @@ import { registrarCelebracion } from './celebraciones.js';
 import { lanzarConfeti } from './confeti.js';
 import { celebrarMonedas, planDeMonedas, duracionTotal } from './monedas.js';
 import { animarConteo } from './conteo.js';
-import { crearLlama, celebrarRacha, planDeRacha, crearDeNuevo, crearAvisoDeRacha } from './racha.js';
+import { celebrarRacha, planDeRacha } from './racha.js';
+import { crearIcono } from './iconos.js';
 import { leerUltimo, guardarUltimo } from './ultimo_visto.js';
 
 /** Qué momentos tiene la asistencia — pura. @param {number} monedas @param {number} racha */
 export function planDeAsistencia(monedas, racha) {
-  return { sello: true, monedas: monedas > 0, llama: racha > 0 };
+  return { sello: true, monedas: monedas > 0, clases: racha > 0 };
 }
 
 export function crearSello() {
@@ -43,11 +44,9 @@ function pintarYDisparar({ zona, monedas, racha, quien, mejorConstancia }) {
   // W45a: el chip NACE con el número del servidor y no cambia nunca (antes contaba desde 0 y, durante más de un segundo, decía "+2" sobre el "+10" del resultado).
   const num = plan.monedas ? h('span', { class: 'chip-num' }, '+0') : null;
   const chip = num ? h('p', { class: 'chip-monedas', 'aria-hidden': 'true', 'data-testid': 'chip-monedas' }, num, ` ${textos.inicio.monedas}`) : null;
-  // La racha es la del servidor: solo se compara con lo último visto. Si subió, su renglón ES el aviso ("¡Constancia N!"), en el flujo de la zona:
-  // no flota sobre la pantalla ni dice el número en dos renglones (docs/ESPEC_visual_sistema1.md §2b).
+  // Clases seguidas = `streak` del servidor, con el ícono de asistencia y SIN llama (la llama es de la racha semanal, adenda 4). Sube → suena y confeti.
   const queHacer = planParaLaRacha(quien, racha);
-  const llama = queHacer?.celebrar ? crearAvisoDeRacha(racha, queHacer)
-    : plan.llama ? h('p', { class: 'constancia-asistencia', 'aria-hidden': 'true' }, crearLlama(racha), `${textos.inicio.constanciaPrefijo}: ${racha}`) : null;
+  const llama = plan.clases ? h('p', { class: 'constancia-asistencia', 'aria-hidden': 'true' }, crearIcono('asistencia'), ` ${textos.asistencia.clasesSeguidas}: ${racha}`) : null;
   // Drako presenta el momento (nunca califica) y salta; el sello, las monedas y la llama son lo que dijo el servidor.
   const drako = crearDrako('celebra', textos.asistencia.drako, { desde: 'reposo', sinCiclo: true });
   const caja = h('div', { class: 'sello-zona', 'data-testid': 'sello-zona' }, drako, sello, chip, llama);
@@ -63,8 +62,8 @@ function pintarYDisparar({ zona, monedas, racha, quien, mejorConstancia }) {
   if (queHacer?.neutro) decirDeNuevo(caja, mejorConstancia);
 }
 
-// Qué hacer con la racha que llegó: si subió se celebra (y si cruzó 3, 7 o 14, la llama crece); si bajó desde 3 o más, una línea neutra, sin
-// sonido ni confeti, con la mejor constancia que diga el servidor. Sin saber quién es, nada (no hay con qué comparar). Anota lo último visto.
+// Qué hacer con el número que llegó: si subió se celebra (confeti `normal` si cruzó 3, 7 o 14); si bajó desde 3 o más, una línea neutra, sin
+// sonido ni confeti, con la mejor marca que diga el servidor. Sin saber quién es, nada (no hay con qué comparar). Anota lo último visto.
 function planParaLaRacha(quien, racha) {
   if (!quien) return null;
   const previo = leerUltimo('constancia', quien);
@@ -72,9 +71,10 @@ function planParaLaRacha(quien, racha) {
   return planDeRacha(previo, racha);
 }
 
-// "Empezamos de nuevo. Tu mejor constancia: M.": M se le pregunta al servidor SOLO en este caso; si no responde, la línea va sin número.
+// "Empezamos de nuevo. Tu mejor marca de clases seguidas: M.": M se le pregunta al servidor SOLO en este caso; si no responde, la línea va sin número.
 function decirDeNuevo(caja, mejorConstancia) {
-  Promise.resolve().then(() => mejorConstancia?.()).catch(() => null).then((mejor) => { caja.append(crearDeNuevo(mejor)); });
+  const linea = (mejor) => h('p', { class: 'racha-de-nuevo', role: 'status', 'data-testid': 'racha-de-nuevo' }, Number.isInteger(mejor) && mejor > 0 ? textos.asistencia.deNuevo(mejor) : textos.llama.deNuevoSinDato);
+  Promise.resolve().then(() => mejorConstancia?.()).catch(() => null).then((mejor) => { caja.append(linea(mejor)); });
 }
 
 // Un `setTimeout` que el cambio de pantalla puede cancelar (ui/celebraciones.js): la asistencia ya no celebra en otra vista.
