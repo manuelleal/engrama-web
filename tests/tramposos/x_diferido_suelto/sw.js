@@ -177,6 +177,7 @@ const DIFERIDOS = [
   '/src/vistas/estudiante/inicio_practica.js',
   '/src/vistas/estudiante/repaso.js',
   '/src/ui/racha_semanal.js',
+  '/src/ui/lectura.js', // W84: el texto de un reto de Lectura (docs/ESPEC_lectura_texto.md)
 ];
 
 // Cuánto se espera a CADA recurso de la precarga. Antes era `cache.addAll(PRECARGA)`: todo o nada, sin límite de tiempo. Un solo recurso
