@@ -38,7 +38,7 @@
 
   /* superficies */
   --sx-fondo: var(--fondo);
-  --sx-pozo: color-mix(in srgb, var(--fondo) 94%, black);
+  --sx-pozo: color-mix(in srgb, var(--fondo) 94%, black);   /* neutro frío (#E7E9EC, decisión 016) */
   --sx-superficie: var(--superficie);
   --sx-superficie-alta: var(--superficie);
   --sx-marca: var(--primario);
@@ -46,7 +46,7 @@
 
   /* tinta: tres tonos de la misma */
   --sx-tinta: var(--texto);
-  --sx-tinta-2: color-mix(in srgb, currentColor 78%, transparent);   /* salen del color heredado: sirven igual sobre crema, navy u oscuro */
+  --sx-tinta-2: color-mix(in srgb, currentColor 78%, transparent);   /* salen del color heredado: sirven igual sobre el fondo, navy u oscuro */
   --sx-tinta-3: color-mix(in srgb, currentColor 68%, transparent);
 
   /* acción (navy) */
@@ -121,7 +121,7 @@
   --sx-pozo: color-mix(in srgb, var(--texto) 34%, black);
   --sx-superficie: var(--texto);
   --sx-superficie-alta: color-mix(in srgb, var(--texto) 90%, white);
-  --sx-tinta: var(--fondo);
+  --sx-tinta: var(--fondo);   /* blanco frío (decisión 016) */
   --sx-accion: color-mix(in srgb, var(--primario) 42%, white);
   --sx-sobre-accion: color-mix(in srgb, var(--texto) 55%, black);
   --sx-accion-labio: color-mix(in srgb, var(--primario) 72%, white);
