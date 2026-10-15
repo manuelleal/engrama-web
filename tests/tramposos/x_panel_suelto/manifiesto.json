@@ -1,0 +1,7 @@
+{
+  "descripcion": "margen: lo que importa el panel del profe (api/profe.js) no está en DIFERIDOS de sw.js: nunca se guarda y el panel guardado no abriría",
+  "archivos": { "sw.js": "sw.js" },
+  "comando": ["node", "--test", "--test-reporter=tap", "tests/unit/sw_peso.test.mjs"],
+  "espera_codigo_no_cero": true,
+  "espera_fallan_tests": ["U59: lo diferido (sw.js DIFERIDOS) existe"]
+}

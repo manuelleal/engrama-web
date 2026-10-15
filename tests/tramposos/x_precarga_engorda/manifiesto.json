@@ -1,5 +1,5 @@
 {
-  "descripcion": "U59: el sistema visual (46 KB) entra a PRECARGA y el shell pasa su techo de 830.000 bytes sin que nada lo vea",
+  "descripcion": "U59: el sistema visual (46 KB) y las dos fuentes de marca (64 KB) entran a PRECARGA y el shell pasa su techo de 830.000 bytes sin que nada lo vea (desde docs/ESPEC_margen_precarga.md el sistema solo ya cabría)",
   "archivos": { "sw.js": "sw.js" },
   "comando": ["node", "--test", "--test-reporter=tap", "tests/unit/sw_peso.test.mjs"],
   "espera_codigo_no_cero": true,

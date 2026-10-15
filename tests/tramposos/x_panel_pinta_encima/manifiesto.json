@@ -1,0 +1,16 @@
+{
+  "descripcion": "margen: el panel termina de cargar después de que la persona cambió de pantalla y pinta la vieja encima de la nueva",
+  "archivos": {
+    "src/panel_diferido.js": "panel_diferido.js"
+  },
+  "comando": [
+    "node",
+    "--test",
+    "--test-reporter=tap",
+    "tests/unit/panel_diferido.test.mjs"
+  ],
+  "espera_codigo_no_cero": true,
+  "espera_fallan_tests": [
+    "margen: si se cambió de dirección mientras el panel cargaba, la pantalla vieja no se pinta encima de la nueva"
+  ]
+}

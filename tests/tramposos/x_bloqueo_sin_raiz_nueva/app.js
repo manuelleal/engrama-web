@@ -29,18 +29,18 @@ import { renderAsistencia } from './vistas/estudiante/asistencia.js';
 import { renderMonedas } from './vistas/estudiante/monedas.js';
 import { renderRetos } from './vistas/estudiante/retos.js';
 import { renderRetoFlujo } from './vistas/estudiante/reto_flujo.js';
-import { renderGrupos } from './vistas/profe/grupos.js';
-import { renderGrupo } from './vistas/profe/grupo.js';
-import { renderSesionAsistencia, olvidarAsistencias } from './vistas/profe/sesion_asistencia.js';
-import { renderInscripcion } from './vistas/profe/inscripcion.js';
-import { renderLogro } from './vistas/profe/logro.js';
-import { renderErrores } from './vistas/profe/errores.js';
-import { renderRetosProfe } from './vistas/profe/retos.js';
-import { renderCrearGrupo } from './vistas/admin/crear_grupo.js';
-import { renderAsignarDocente } from './vistas/admin/asignar_docente.js';
-import { renderImportarCsv } from './vistas/admin/importar_csv.js';
+import { crearPanelDiferido } from './panel_diferido.js';
 
 const HASH_REGISTRO = '#/registro';
+
+// Las 10 pantallas del profe y del admin NO se importan aquí de forma estática: van en un módulo diferido (docs/ESPEC_margen_precarga.md),
+// fuera de la precarga del shell, que el estudiante descarga sin necesitarlas. `panel` lo carga una vez y envuelve sus rutas.
+const panel = crearPanelDiferido(() => import('./vistas/panel_docente.js'));
+
+// W66: la memoria de las asistencias abiertas vive en sesion_asistencia.js, dentro del panel. Si el panel nunca se cargó, no hay nada que olvidar.
+function olvidarAsistencias() {
+  panel.cargado()?.olvidarAsistencias();
+}
 
 function registrarServiceWorker() {
   if (!('serviceWorker' in navigator)) return;
@@ -324,22 +324,30 @@ function arrancarConSesion(desdeElPrincipio = false) {
   ruta('/asistencia', conCtx((raiz, params, query, ctx) => renderAsistencia(raiz, query, ctx)));
   ruta('/retos', conCtx((raiz, params, query, ctx) => renderRetos(raiz, ctx)));
   ruta('/retos/:id', conCtx((raiz, params, query, ctx) => renderRetoFlujo(raiz, params, query, ctx)));
-  ruta('/profe/grupos', conCtx((raiz, params, query, ctx) => renderGrupos(raiz, ctx)));
-  ruta('/profe/grupo/:gid', conCtx((raiz, params, query, ctx) => renderGrupo(raiz, params, ctx)));
-  ruta('/profe/grupo/:gid/sesion', conCtx((raiz, params, query, ctx) => renderSesionAsistencia(raiz, params, ctx)));
-  ruta('/profe/grupo/:gid/inscripcion', conCtx((raiz, params, query, ctx) => renderInscripcion(raiz, params, ctx))); // W32: el código de grupo y quién espera aprobación
-  ruta('/profe/grupo/:gid/logro', conCtx((raiz, params, query, ctx) => renderLogro(raiz, params, ctx)));
-  ruta('/profe/grupo/:gid/errores', conCtx((raiz, params, query, ctx) => renderErrores(raiz, params, ctx)));
-  ruta('/profe/retos', conCtx((raiz, params, query, ctx) => renderRetosProfe(raiz, ctx)));
-  ruta('/admin', conCtx((raiz, params, query, ctx) => renderCrearGrupo(raiz, ctx)));
-  ruta('/admin/asignar-docente/:gid', conCtx((raiz, params, query, ctx) => renderAsignarDocente(raiz, params, ctx)));
-  ruta('/admin/importar-csv/:gid', conCtx((raiz, params, query, ctx) => renderImportarCsv(raiz, params, ctx)));
+  rutasDelPanel();
+  // El profe y el admin: el panel se pide YA, en segundo plano, para que sus pantallas queden en memoria como cuando eran imports estáticos
+  // (moverse sin red dentro de la sesión sigue igual). El estudiante no lo pide nunca.
+  if (sesionActual.rol !== 'student') panel.cargar().catch((e) => console.warn('app: el panel no cargó todavía (se vuelve a pedir al abrir una pantalla suya)', e));
   definirPorDefecto(rutaPorDefectoSegunRol(sesionActual));
   // W72 (docs/ESPEC_navegacion.md §5.8, H9): cada rol en sus rutas. Una dirección que no es del rol, o que no existe, se REEMPLAZA por el inicio del
   // rol antes de pintar nada (ni una petición de la pantalla ajena, nunca una pantalla en blanco). De quién es cada ruta lo dice navegacion.js.
   definirGuardia((patron) => redireccionPara(sesionActual.rol, patron));
   // Con sesión, un `#/registro` heredado (el enlace del profe) no es una ruta de la app: se arranca desde la ruta por defecto.
   iniciar(vistaRaiz, { desdeElPrincipio: desdeElPrincipio || location.hash === HASH_REGISTRO });
+}
+
+// Las rutas del profe y del admin (diferidas: docs/ESPEC_margen_precarga.md). Cada una pinta cuando el panel está; ya cargado, en el mismo turno.
+function rutasDelPanel() {
+  ruta('/profe/grupos', conCtx(panel.vista('/profe/grupos', (m, raiz, params, query, ctx) => m.renderGrupos(raiz, ctx))));
+  ruta('/profe/grupo/:gid', conCtx(panel.vista('/profe/grupo/:gid', (m, raiz, params, query, ctx) => m.renderGrupo(raiz, params, ctx))));
+  ruta('/profe/grupo/:gid/sesion', conCtx(panel.vista('/profe/grupo/:gid/sesion', (m, raiz, params, query, ctx) => m.renderSesionAsistencia(raiz, params, ctx))));
+  ruta('/profe/grupo/:gid/inscripcion', conCtx(panel.vista('/profe/grupo/:gid/inscripcion', (m, raiz, params, query, ctx) => m.renderInscripcion(raiz, params, ctx)))); // W32: el código de grupo y quién espera aprobación
+  ruta('/profe/grupo/:gid/logro', conCtx(panel.vista('/profe/grupo/:gid/logro', (m, raiz, params, query, ctx) => m.renderLogro(raiz, params, ctx))));
+  ruta('/profe/grupo/:gid/errores', conCtx(panel.vista('/profe/grupo/:gid/errores', (m, raiz, params, query, ctx) => m.renderErrores(raiz, params, ctx))));
+  ruta('/profe/retos', conCtx(panel.vista('/profe/retos', (m, raiz, params, query, ctx) => m.renderRetosProfe(raiz, ctx))));
+  ruta('/admin', conCtx(panel.vista('/admin', (m, raiz, params, query, ctx) => m.renderCrearGrupo(raiz, ctx))));
+  ruta('/admin/asignar-docente/:gid', conCtx(panel.vista('/admin/asignar-docente/:gid', (m, raiz, params, query, ctx) => m.renderAsignarDocente(raiz, params, ctx))));
+  ruta('/admin/importar-csv/:gid', conCtx(panel.vista('/admin/importar-csv/:gid', (m, raiz, params, query, ctx) => m.renderImportarCsv(raiz, params, ctx))));
 }
 
 iniciarApp();

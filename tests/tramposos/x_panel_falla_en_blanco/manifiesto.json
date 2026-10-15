@@ -1,0 +1,16 @@
+{
+  "descripcion": "margen: si el panel no carga, la ruta del profe queda en blanco (sin el aviso ni la barra para salir)",
+  "archivos": {
+    "src/panel_diferido.js": "panel_diferido.js"
+  },
+  "comando": [
+    "node",
+    "--test",
+    "--test-reporter=tap",
+    "tests/unit/panel_diferido.test.mjs"
+  ],
+  "espera_codigo_no_cero": true,
+  "espera_fallan_tests": [
+    "margen: si el panel no carga, la ruta dice Sin conexión con la barra del rol (nunca en blanco) y el siguiente intento lo vuelve a pedir"
+  ]
+}
