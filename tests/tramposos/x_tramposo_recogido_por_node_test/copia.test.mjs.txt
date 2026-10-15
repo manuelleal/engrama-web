@@ -1,0 +1,3 @@
+// copia rota a propósito: una copia de tramposo con nombre de prueba, que node --test recogería
+import test from 'node:test';
+test('copia de tramposo recogida', () => {});

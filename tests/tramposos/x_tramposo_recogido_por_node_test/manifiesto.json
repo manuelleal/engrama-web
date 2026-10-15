@@ -1,0 +1,11 @@
+{
+  "descripcion": "Una copia de tramposo se llama como prueba (*.test.mjs) dentro de tests/tramposos/: node --test sin argumentos la recoge",
+  "archivos": {
+    "tests/tramposos/err27_e2e_real_sin_bandera/copia_recogida.test.mjs": "copia.test.mjs.txt"
+  },
+  "comando": ["node", "--test", "--test-reporter=tap", "tests/unit/tramposos_no_recogidos.test.mjs"],
+  "espera_codigo_no_cero": true,
+  "espera_fallan_tests": [
+    "tramposos_no_recogidos: ningún archivo bajo tests/tramposos/ es recogido por node --test"
+  ]
+}
