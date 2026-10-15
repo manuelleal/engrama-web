@@ -23,7 +23,7 @@ const REJILLA = (columnas, contenido) => `(async () => {
   const { controladorDe } = await import('/src/ui/drako_animado.js');
   const { NOMBRES_DE_POSE } = await import('/src/ui/drako_rig.js');
   document.body.textContent = '';
-  document.body.style.background = '#FAF7F0';
+  document.body.style.background = '#F6F8FB';
   const rej = document.createElement('div');
   Object.assign(rej.style, { display: 'grid', gridTemplateColumns: 'repeat(${columnas}, 1fr)', gap: '4px', padding: '4px' });
   document.body.appendChild(rej);
@@ -61,7 +61,7 @@ async function secuencia(sesion, nombre, montar, accion, n, cadenciaMs) {
   await sesion.evaluar(`(async () => {
     const { crearDrako } = await import('/src/ui/drako.js');
     const { controladorDe } = await import('/src/ui/drako_animado.js');
-    document.body.textContent = ''; document.body.style.background = '#FAF7F0';
+    document.body.textContent = ''; document.body.style.background = '#F6F8FB';
     const caja = document.createElement('div'); Object.assign(caja.style, { width: '260px', margin: '60px auto 0' });
     document.body.appendChild(caja);
     const svg = ${montar}; svg.style.width = '260px'; svg.style.height = '260px'; caja.appendChild(svg);
@@ -88,7 +88,7 @@ async function hojasDeContacto() {
       const filas = Math.ceil(cuadros.length / columnas);
       await sesion.redimensionar(1000, filas * 170 + 10);
       await sesion.evaluar(`(async () => {
-        document.body.textContent = ''; document.body.style.cssText = 'margin:0;background:#FAF7F0';
+        document.body.textContent = ''; document.body.style.cssText = 'margin:0;background:#F6F8FB';
         const rej = document.createElement('div'); rej.style.cssText = 'display:grid;grid-template-columns:repeat(${columnas},1fr);gap:2px';
         document.body.appendChild(rej);
         const cargas = ${JSON.stringify(cuadros)}.map((b64) => new Promise((ok) => { const i = new Image(); i.onload = ok; i.src = 'data:image/png;base64,' + b64; i.style.cssText = 'width:100%;display:block;border:1px solid #ddd'; rej.appendChild(i); }));
