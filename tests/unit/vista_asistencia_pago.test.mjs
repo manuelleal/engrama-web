@@ -45,7 +45,7 @@ const checkIn = (monedas, racha = 3) => () => json(200, { success: true, coins_a
 
 test('U38: 200 con 10 monedas y un asiento 5 + 5 → el texto de siempre, el desglose "5 por asistir + 5 por llegar a tiempo", el sello y las fichas', async () => {
   const v = await marcar({ 'POST /core/attendance/check-in': checkIn(10), 'GET /core/coins/history': libro(10, { base: 5, puntualidad: 5, puntual: true }) });
-  assert.match(textoDe(buscar(v.raiz, 'resultado')), /✓ Asistencia marcada · \+10 monedas · constancia 3/);
+  assert.match(textoDe(buscar(v.raiz, 'resultado')), /✓ Asistencia marcada · \+10 monedas · clases seguidas 3/);
   assert.equal(textoDe(buscar(v.raiz, 'asistencia-desglose')), '5 por asistir + 5 por llegar a tiempo');
   assert.ok(buscar(v.raiz, 'sello'), 'el sello');
   assert.ok(buscar(v.raiz, 'chip-monedas'), 'las monedas');
@@ -72,7 +72,7 @@ test('U38: 200 con N monedas y sin un asiento que cuadre (backend viejo con mult
   for (const [caso, respuesta] of sinDesglose) {
     const v = await marcar({ 'POST /core/attendance/check-in': checkIn(10), 'GET /core/coins/history': respuesta });
     assert.equal(buscar(v.raiz, 'asistencia-desglose'), null, `${caso}: sin desglose`);
-    assert.match(v.texto(), /✓ Asistencia marcada · \+10 monedas · constancia 3/, `${caso}: el texto de siempre`);
+    assert.match(v.texto(), /✓ Asistencia marcada · \+10 monedas · clases seguidas 3/, `${caso}: el texto de siempre`);
     assert.equal(buscar(v.raiz, 'resultado-info'), null);
   }
 });
@@ -80,7 +80,7 @@ test('U38: 200 con N monedas y sin un asiento que cuadre (backend viejo con mult
 test('U38: 200 con 0 monedas Y otra marca de hoy que sí pagó → sello sí, 0 fichas, resultado positivo con ✓, "ya la cobraste", sin "+0"', async () => {
   const v = await marcar({ 'POST /core/attendance/check-in': checkIn(0, 4), 'GET /core/attendance/history': [marca('2026-10-08', 0), marca('2026-10-08', 10), marca('2026-10-07', 10)] });
   const resultado = textoDe(buscar(v.raiz, 'resultado'));
-  assert.equal(resultado, '✓ Asistencia marcada. La de hoy ya la cobraste: las monedas de asistencia son una vez por día. Constancia: 4.');
+  assert.equal(resultado, '✓ Asistencia marcada. La de hoy ya la cobraste: las monedas de asistencia son una vez por día. Clases seguidas: 4.');
   assert.ok(buscar(v.raiz, 'sello'), 'asistió: el sello se estampa');
   assert.equal(buscar(v.raiz, 'chip-monedas'), null, '0 fichas');
   assert.equal(buscar(v.raiz, 'asistencia-desglose'), null);
@@ -89,7 +89,7 @@ test('U38: 200 con 0 monedas Y otra marca de hoy que sí pagó → sello sí, 0 
   assert.deepEqual(v.llamadas, ['POST /core/attendance/check-in', 'GET /core/attendance/history'], 'el libro de monedas no se pide: no hay desglose que leer');
 });
 
-test('U38: 200 con 0 monedas SIN esa prueba (la que pagó es de ayer, o la lista falló, o vino rota) → "Asistencia marcada. Constancia: R." y no afirma lo que no sabe', async () => {
+test('U38: 200 con 0 monedas SIN esa prueba (la que pagó es de ayer, o la lista falló, o vino rota) → "Asistencia marcada. Clases seguidas: R." y no afirma lo que no sabe', async () => {
   const sinPrueba = [
     ['la que pagó es de ayer', () => json(200, [marca('2026-10-08', 0), marca('2026-10-07', 10)])],
     ['todas valen 0', () => json(200, [marca('2026-10-08', 0), marca('2026-10-08', 0)])],
@@ -99,7 +99,7 @@ test('U38: 200 con 0 monedas SIN esa prueba (la que pagó es de ayer, o la lista
   ];
   for (const [caso, respuesta] of sinPrueba) {
     const v = await marcar({ 'POST /core/attendance/check-in': checkIn(0, 4), 'GET /core/attendance/history': respuesta });
-    assert.equal(textoDe(buscar(v.raiz, 'resultado')), '✓ Asistencia marcada. Constancia: 4.', caso);
+    assert.equal(textoDe(buscar(v.raiz, 'resultado')), '✓ Asistencia marcada. Clases seguidas: 4.', caso);
     assert.doesNotMatch(textoDe(v.raiz), /cobraste|\+0/, caso);
     assert.equal(buscar(v.raiz, 'chip-monedas'), null, `${caso}: 0 fichas`);
     assert.ok(buscar(v.raiz, 'sello'), `${caso}: el sello`);
@@ -129,7 +129,7 @@ const SOLO_EL_POST = ['POST /core/attendance/check-in'];
 
 test('U73: con los campos del check-in (10 = 5 + 5) se ve "+10 monedas" y su desglose con 1 POST y 0 GET', async () => {
   const v = await marcar({ 'POST /core/attendance/check-in': checkInConCampos(10, { base: 5, puntualidad: 5, puntual: true, ya_cobrada_hoy: false }) });
-  assert.match(textoDe(buscar(v.raiz, 'resultado')), /✓ Asistencia marcada · \+10 monedas · constancia 3/);
+  assert.match(textoDe(buscar(v.raiz, 'resultado')), /✓ Asistencia marcada · \+10 monedas · clases seguidas 3/);
   assert.equal(textoDe(buscar(v.raiz, 'asistencia-desglose')), '5 por asistir + 5 por llegar a tiempo');
   assert.deepEqual(v.llamadas, SOLO_EL_POST, 'ni el libro ni el historial: la respuesta ya lo dijo');
   assert.ok(buscar(v.raiz, 'sello') && buscar(v.raiz, 'chip-monedas'));
@@ -142,9 +142,9 @@ test('U73: con 5 = 5 + 0 se ve solo "5 por asistir" (nada sobre la hora de llega
   assert.deepEqual(v.llamadas, SOLO_EL_POST);
 });
 
-test('U73: con 0 monedas y ya_cobrada_hoy: true dice "La de hoy ya la cobraste" con 1 POST y 0 GET; con false, "Asistencia marcada. Constancia: R." y tampoco pide nada', async () => {
+test('U73: con 0 monedas y ya_cobrada_hoy: true dice "La de hoy ya la cobraste" con 1 POST y 0 GET; con false, "Asistencia marcada. Clases seguidas: R." y tampoco pide nada', async () => {
   const cobrada = await marcar({ 'POST /core/attendance/check-in': checkInConCampos(0, { base: 0, puntualidad: 0, puntual: false, ya_cobrada_hoy: true }, 4) });
-  assert.equal(textoDe(buscar(cobrada.raiz, 'resultado')), '✓ Asistencia marcada. La de hoy ya la cobraste: las monedas de asistencia son una vez por día. Constancia: 4.');
+  assert.equal(textoDe(buscar(cobrada.raiz, 'resultado')), '✓ Asistencia marcada. La de hoy ya la cobraste: las monedas de asistencia son una vez por día. Clases seguidas: 4.');
   assert.deepEqual(cobrada.llamadas, SOLO_EL_POST);
   assert.ok(buscar(cobrada.raiz, 'sello'), 'asistió: el sello');
   assert.equal(buscar(cobrada.raiz, 'chip-monedas'), null, '0 fichas');
@@ -153,7 +153,7 @@ test('U73: con 0 monedas y ya_cobrada_hoy: true dice "La de hoy ya la cobraste" 
   assert.doesNotMatch(textoDe(cobrada.raiz), /\+0|✗|tarde/);
 
   const sinPaga = await marcar({ 'POST /core/attendance/check-in': checkInConCampos(0, { base: 0, puntualidad: 0, puntual: true, ya_cobrada_hoy: false }, 4) });
-  assert.equal(textoDe(buscar(sinPaga.raiz, 'resultado')), '✓ Asistencia marcada. Constancia: 4.');
+  assert.equal(textoDe(buscar(sinPaga.raiz, 'resultado')), '✓ Asistencia marcada. Clases seguidas: 4.');
   assert.deepEqual(sinPaga.llamadas, SOLO_EL_POST, 'el servidor ya dijo que NO era una segunda marca: no hay nada que averiguar');
   assert.doesNotMatch(textoDe(sinPaga.raiz), /cobraste|\+0/);
 });

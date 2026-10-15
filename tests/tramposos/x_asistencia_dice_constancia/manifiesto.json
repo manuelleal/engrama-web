@@ -1,0 +1,16 @@
+{
+  "descripcion": "U100a (adenda 4): el resultado de la asistencia vuelve a decir 'Constancia' (el vocabulario de antes, que chocaba con la racha semanal de Inicio).",
+  "archivos": {
+    "src/textos.js": "textos.js"
+  },
+  "comando": [
+    "node",
+    "--test",
+    "--test-reporter=tap",
+    "tests/unit/una_racha.test.mjs"
+  ],
+  "espera_codigo_no_cero": true,
+  "espera_fallan_tests": [
+    "U100a: los textos del resultado de la asistencia"
+  ]
+}
