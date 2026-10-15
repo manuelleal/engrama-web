@@ -16,6 +16,7 @@ import { tituloLegible } from '../../ui/titulo.js';
 import { crearCabecera } from '../../ui/cabecera.js';
 import { crearBarraProgreso, senalDeSeleccion } from '../../ui/progreso.js';
 import { crearPanelResultado } from '../../ui/panel_resultado.js';
+import { crearIcono } from '../../ui/iconos.js';
 import { marcarCargando } from '../../ui/boton.js';
 import { senal } from '../../ui/sonido.js';
 import { accionUnica, ErrorApi } from '../../api/cliente.js';
@@ -89,7 +90,24 @@ function quietas(lista) {
   for (const li of lista?.children ?? []) { const b = /** @type {any} */ (li).children?.[0]; if (b) b.disabled = true; }
 }
 
-/** Las opciones de la pregunta; ya respondida, quietas (la que quedó guardada, marcada). */
+/**
+ * Tanda visual 2 (compuerta 18, hallazgo 3): ya comprobada, las opciones dicen el resultado con ícono y palabra (nunca solo color): la correcta,
+ * "Correcta"; la tuya, si falló, "Tu respuesta". Todo sale de lo que el servidor ya devolvió al comprobar (`is_correct`, `answer`, `correct_answer`):
+ * la web no califica. Sin `correct_answer`, solo se marca la tuya. @param {any} lista @param {any} r
+ */
+function marcarResultado(lista, r) {
+  const correcta = r.is_correct ? r.answer : r.correct_answer;
+  for (const li of lista?.children ?? []) {
+    const b = li.children?.[0];
+    const label = String(b?.getAttribute?.('data-testid') ?? '').slice('opcion-'.length);
+    const ok = label === correcta;
+    if (!b || !(ok || label === r.answer)) continue;
+    b.className = `${b.className || ''} ${ok ? 'es-correcta' : 'es-incorrecta'}`.trim();
+    b.appendChild(h('span', { class: 'opcion-estado' }, crearIcono(ok ? 'visto' : 'equis'), ok ? textos.revision.correcta : T.tuRespuesta));
+  }
+}
+
+/** Las opciones de la pregunta; ya respondida, quietas (la que quedó guardada, marcada con el resultado). */
 function opcionesDe(raiz, estado, pregunta, respuesta) {
   const elegida = respuesta ? respuesta.answer : estado.elegidas[pregunta.id];
   const alElegir = (/** @type {string} */ label) => {
@@ -99,7 +117,7 @@ function opcionesDe(raiz, estado, pregunta, respuesta) {
     pintar(raiz, estado, 'quieta', label);
   };
   const lista = nodoOpciones(pregunta, { [pregunta.id]: elegida }, alElegir, null);
-  if (respuesta) quietas(lista);
+  if (respuesta) { quietas(lista); marcarResultado(lista, respuesta); }
   estado.opciones = lista;
   return lista;
 }

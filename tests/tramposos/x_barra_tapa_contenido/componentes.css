@@ -410,7 +410,7 @@ nav {
 
 /* ---------- Ficha de opción de respuesta (reto_flujo.js): antes era un <button> desnudo dentro
    de una viñeta. Ahora una tarjeta blanca con el mismo lenguaje "chunky" y la letra en un escudo
-   dorado (referencia: investigacion/evagame/pantallas-modo-en-vivo.html, .opt/.let). ---------- */
+   navy claro (el oro es solo logro; referencia: investigacion/evagame/pantallas-modo-en-vivo.html). ---------- */
 #vista [data-testid="opciones"] {
   display: flex;
   flex-direction: column;
@@ -450,8 +450,8 @@ nav {
   flex: none;
   width: 1.7em;
   height: 1.7em;
-  background: var(--oro);
-  color: var(--oro-texto);
+  background: var(--sx-accion-suave);
+  color: var(--primario);
   font-family: var(--fuente-titulos);
   font-weight: 800;
   font-size: 0.95rem;

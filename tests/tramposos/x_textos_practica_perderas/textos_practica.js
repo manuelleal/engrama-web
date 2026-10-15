@@ -27,6 +27,8 @@ export const textosPractica = {
     // H-3: una pregunta que la web aún no sabe contestar (no es de opción múltiple).
     noContestable: 'Esta pregunta aún no se puede contestar aquí.',
     noContestableApoyo: 'Puedes seguir con el reto: esta queda sin responder.',
+    // Tanda visual 2 (compuerta 18, hallazgo 3): tras comprobar, la opción que elegiste y no era. La correcta dice "Correcta" (textos.revision).
+    tuRespuesta: 'Tu respuesta',
     /** Los rótulos van en el idioma de la explicación (dictamen 04 §1.5: español en A1 y A2, inglés sencillo desde B1). */
     rotulos: {
       es: { oracion: 'Así queda', regla: 'La regla', porQue: 'Por qué no la tuya', ejemplo: 'Otro ejemplo' },

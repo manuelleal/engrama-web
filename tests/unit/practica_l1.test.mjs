@@ -184,6 +184,38 @@ test('U79: Comprobar manda la label una sola vez por toque y la banda dice el ve
   } finally { cerrar(); }
 });
 
+// Tanda visual 2 (docs/ESPEC_visual_reto_tanda2.md; compuerta 18, hallazgo 3): tras comprobar, las opciones dicen el resultado con palabra (y su ícono,
+// que el DOM de las fotos no dibuja): lo que dice el servidor (`is_correct`, `answer`, `correct_answer`), nunca una cuenta de la web. Visual: sin tramposo.
+test('U79: tras comprobar, la correcta dice "Correcta" y la tuya que falló "Tu respuesta"; al acertar, solo la tuya; sin correct_answer, solo la tuya', async () => {
+  const estadoDe = (raiz, label) => {
+    const b = buscar(raiz, `opcion-${label}`);
+    const marca = elementos(b).find((e) => String(e.className) === 'opcion-estado');
+    return [String(b.className).split(/\s+/).filter((c) => c.startsWith('es-')).join(' '), marca ? textoDe(marca) : null];
+  };
+  const fallo = await abrir(servidor().rutas);
+  try {
+    await tocar(fallo.raiz, 'opcion-A');
+    assert.deepEqual([estadoDe(fallo.raiz, 'A'), estadoDe(fallo.raiz, 'B')], [['', null], ['', null]], 'antes de comprobar ninguna dice nada');
+    await tocar(fallo.raiz, 'boton-comprobar');
+    assert.deepEqual([estadoDe(fallo.raiz, 'A'), estadoDe(fallo.raiz, 'B')], [['es-incorrecta', 'Tu respuesta'], ['es-correcta', 'Correcta']]);
+  } finally { fallo.cerrar(); }
+  const acierto = await abrir(servidor({ respondidas: [{ ...RESPUESTAS.q1, repetida: true }] }).rutas);
+  try {
+    await tocar(acierto.raiz, 'opcion-B');
+    await tocar(acierto.raiz, 'boton-comprobar');
+    assert.deepEqual([estadoDe(acierto.raiz, 'A'), estadoDe(acierto.raiz, 'B')], [['', null], ['es-correcta', 'Correcta']]);
+  } finally { acierto.cerrar(); }
+  const { rutas } = servidor();
+  rutas['POST /challenges/attempts/int-1/answers'] = () => ({ ...RESPUESTAS.q1, correct_answer: undefined }); // falló y llegó sin correct_answer
+  const sinClave = await abrir(rutas);
+  try {
+    await tocar(sinClave.raiz, 'opcion-A');
+    await tocar(sinClave.raiz, 'boton-comprobar');
+    assert.equal(textoDe(buscar(sinClave.raiz, 'explicacion-veredicto')), 'Esta vez no');
+    assert.deepEqual([estadoDe(sinClave.raiz, 'A'), estadoDe(sinClave.raiz, 'B')], [['es-incorrecta', 'Tu respuesta'], ['', null]], 'la web no adivina la correcta');
+  } finally { sinClave.cerrar(); }
+});
+
 test('U79: Ver resultado cierra con /finish una vez (dos toques) y muestra la revisión de siempre', async () => {
   const { rutas } = servidor({ respondidas: [{ ...RESPUESTAS.q1, repetida: true }] });
   const { raiz, llamadas, cerrar } = await abrir(rutas);

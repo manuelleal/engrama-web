@@ -31,6 +31,41 @@
 /* H-A (auditoría 06): lo mismo para "Comprobar" y para el botón de la barra de la pregunta no contestable, del reto por pregunta (`data-modo`, reto_l1.js):
    una acción, no un logro. Solo color: el ancho del labio no se toca, para que `:active` (juego.css) siga hundiéndolo. */
 
+/* Tanda visual 2 (compuerta 18, hallazgo 3): tras comprobar, la ficha dice el resultado con ícono y palabra (reto_l1.js), nunca solo color: la correcta
+   en verde ("Correcta"), la tuya que falló en rojo ("Tu respuesta"). Los tres pasos de `.sx-opcion.es-correcta` / `.es-incorrecta` del sistema (fondo
+   tenue, borde medio, texto fuerte) y la letra rellena. Ganan a la elegida de juego.css por ir después con la misma especificidad. */
+#vista .juego [data-testid^="opcion-"].es-correcta {
+  background: var(--sx-ok-fondo);
+  border-color: var(--sx-ok-borde);
+  color: var(--sx-ok);
+}
+#vista .juego [data-testid^="opcion-"].es-incorrecta {
+  background: var(--sx-mal-fondo);
+  border-color: var(--sx-mal-borde);
+  color: var(--sx-mal);
+}
+#vista .juego [data-testid^="opcion-"].es-correcta .escudo-letra {
+  background: var(--sx-ok-cara);
+  color: var(--sx-sobre-ok);
+}
+#vista .juego [data-testid^="opcion-"].es-incorrecta .escudo-letra {
+  background: var(--sx-mal-cara);
+  color: var(--sx-sobre-mal);
+}
+.opcion-estado {
+  flex: none;
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  font: 800 var(--sx-t-etiqueta)/1 var(--fuente-cuerpo);
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+}
+.opcion-estado .sx-icono {
+  width: 18px;
+  height: 18px;
+}
+
 /* W79: "Tu práctica de hoy", la protagonista de "Ahora" (sx-prota de marca). Compacta: el texto a la izquierda y "Jugar" a la derecha, como las demás
    filas de "Ahora", para que los tres botones sigan sobre la barra sin desplazar (E31, también a 360 × 640). La barra de avance, abajo y delgada. */
 .practica-hoy {

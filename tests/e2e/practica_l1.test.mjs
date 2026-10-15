@@ -37,6 +37,7 @@ async function responder(sesion, label) {
     return {
       banda: t('explicacion').textContent, icono: t('explicacion').querySelector('.sx-banda__icono svg')?.dataset.icono ?? null, veredicto: t('explicacion-veredicto')?.textContent ?? null,
       partes: ['oracion', 'regla', 'porQue', 'ejemplo'].map((p) => t('explicacion-' + p) ? [p, t('explicacion-' + p).getAttribute('lang'), t('explicacion-' + p).textContent] : null).filter(Boolean),
+      estados: [...document.querySelectorAll('[data-testid^="opcion-"]')].map((b) => [b.dataset.testid, b.querySelector('.opcion-estado')?.textContent ?? null, b.querySelector('.opcion-estado svg')?.dataset.icono ?? null]),
       boton: { id: boton.dataset.testid, arriba: Math.round(r.top), abajo: Math.round(r.bottom), alto: Math.round(r.height), alturaVentana: innerHeight },
     };
   })()`);
@@ -59,16 +60,24 @@ test('E35: un reto A2 pregunta por pregunta: nada antes de Comprobar, la banda e
       // H-A (auditoría 06, U94): "Comprobar" es la acción del sistema (navy), nunca oro: se mide el color que pinta el navegador, no el CSS.
       const colores = await sesion.evaluar(`(() => {
         const pintado = (v) => { const n = document.createElement('i'); n.style.background = v; document.body.append(n); const c = getComputedStyle(n).backgroundColor; n.remove(); return c; };
-        return { boton: getComputedStyle(document.querySelector('[data-testid="boton-comprobar"]')).backgroundColor, navy: pintado('var(--sx-accion)'), oro: pintado('var(--oro)') };
+        const cs = (sel) => getComputedStyle(document.querySelector(sel));
+        return { boton: cs('[data-testid="boton-comprobar"]').backgroundColor, navy: pintado('var(--sx-accion)'), oro: pintado('var(--oro)'),
+          elegida: cs('[data-testid="opcion-A"]').borderTopColor, letraElegida: cs('[data-testid="opcion-A"] .escudo-letra').backgroundColor,
+          letra: cs('[data-testid="opcion-B"] .escudo-letra').backgroundColor, primario: pintado('var(--primario)') };
       })()`);
       assert.equal(colores.boton, colores.navy, '"Comprobar" en el navy del sistema');
       assert.notEqual(colores.boton, colores.oro, '"Comprobar" no va en oro');
+      // Tanda visual 2 (compuerta 18, hallazgos 3 y 9): la elegida y las letras A-D ya no van en oro; la elegida, en el navy del sistema.
+      assert.equal(colores.elegida, colores.primario, 'la elegida, con borde navy');
+      assert.equal(colores.letraElegida, colores.primario, 'su letra, rellena de navy');
+      for (const c of [colores.elegida, colores.letraElegida, colores.letra]) assert.notEqual(c, colores.oro, 'nada de oro en la pregunta');
       const antes = await sesion.evaluar('document.body.textContent');
       for (const clave of ['She goes to school every day.', 'Con he, she o it', 'Esta vez no']) assert.ok(!antes.includes(clave), `antes de comprobar se ve "${clave}"`);
 
       const mal = await responder(sesion, 'A');
       assert.equal(mal.veredicto, 'Esta vez no');
       assert.equal(mal.icono, 'equis', 'el veredicto con su ícono SVG (tanda visual 2: antes, el glifo ✗)');
+      assert.deepEqual(mal.estados, [['opcion-A', 'Tu respuesta', 'equis'], ['opcion-B', 'Correcta', 'visto'], ['opcion-C', null, null]], 'tras comprobar, las opciones dicen el resultado con ícono y palabra');
       // H-4 (docs/ESPEC_correcciones_practica.md): la oración y el ejemplo son frases en inglés (lang="en"); la regla y el "por qué", en español.
       // Antes esta línea fijaba las cuatro en "es", el defecto que encontró la auditoría 05 (se declara: la espec de H-4 no nombró a E35).
       assert.deepEqual(mal.partes.map(([p, lang]) => [p, lang]), [['oracion', 'en'], ['regla', 'es'], ['porQue', 'es'], ['ejemplo', 'en']]);
@@ -83,6 +92,7 @@ test('E35: un reto A2 pregunta por pregunta: nada antes de Comprobar, la banda e
       const bien = await responder(sesion, 'B');
       assert.equal(bien.veredicto, 'Correcta');
       assert.equal(bien.icono, 'visto');
+      assert.deepEqual(bien.estados.filter(([, t]) => t), [['opcion-B', 'Correcta', 'visto']], 'al acertar, solo la tuya: Correcta');
       assert.deepEqual(bien.partes.map(([p]) => p), ['oracion', 'regla', 'ejemplo'], 'al acertar, sin "por qué no la tuya"');
       await clic(sesion, 'boton-siguiente');
       await esperar(300);
