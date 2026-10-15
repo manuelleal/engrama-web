@@ -154,7 +154,7 @@ test('U47: si el servidor no manda la mejor constancia, la línea sale sin núme
   } finally { v.cerrar(); }
 });
 
-test('U47: en la asistencia, la racha que baja pide /auth/me SOLO en ese caso y dice la mejor constancia del servidor', async () => {
+test('U47: en la asistencia, el número que baja pide /auth/me SOLO en ese caso y dice la mejor marca de clases seguidas del servidor', async () => {
   const g = /** @type {any} */ (globalThis);
   const entorno = entornoDeFotos({ 'POST /core/attendance/check-in': ({ init }) => ({ success: true, coins_awarded: 10, streak: racha, message: 'ok', base: 5, puntualidad: 5, puntual: true, ya_cobrada_hoy: false }) });
   const previo = { window: g.window, navigator: Object.getOwnPropertyDescriptor(globalThis, 'navigator'), consola: { ...console } };
@@ -177,7 +177,7 @@ test('U47: en la asistencia, la racha que baja pide /auth/me SOLO en ese caso y 
     assert.equal(recargas, 0, 'y no se pidió /auth/me');
     racha = 1;
     const baja = await marcar();
-    assert.equal(textoDe(buscar(baja, 'racha-de-nuevo')), 'Empezamos de nuevo. Tu mejor constancia: 6.', 'la que dijo el servidor al refrescar, no la de la sesión vieja ni una calculada');
+    assert.equal(textoDe(buscar(baja, 'racha-de-nuevo')), 'Empezamos de nuevo. Tu mejor marca de clases seguidas: 6.', 'la que dijo el servidor al refrescar, no la de la sesión vieja ni una calculada');
     assert.equal(recargas, 1, 'una sola petición, solo en este caso');
     assert.doesNotMatch(textoDe(baja), /✗|perd|riesgo/i);
     racha = 2;

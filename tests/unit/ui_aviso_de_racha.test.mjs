@@ -3,7 +3,7 @@
 // en su sitio, y nunca flota ni cuelga del `body`. Antes era un cartel fijo a 76 px del borde: tapaba el saludo y dejaba inalcanzable el enlace
 // "Ver mis movimientos" durante tres segundos.
 //   - Inicio: después de "Ahora" y antes de "Tu semana" (el mismo sitio de la línea neutra "Empezamos de nuevo"), una sola vez.
-//   - Asistencia: dentro de la zona del sello, EN EL LUGAR del renglón de la constancia (el número se dice una vez, no dos).
+//   - Asistencia (adenda 4): sin aviso ni llama; el renglón de "Clases seguidas" va dentro de la zona del sello (el número se dice una vez, no dos).
 //   - En la hoja no tiene posición propia: ni `fixed`, ni `absolute`, ni `sticky`.
 // Tramposo: x_aviso_de_racha_flota (src/ui/racha.js: el aviso vuelve a colgarse del body). En el navegador lo mira E22 (tests/e2e/racha_viva.test.mjs).
 import test from 'node:test';
@@ -71,19 +71,19 @@ test('U73: en Inicio, con la misma constancia de la última vez o en la primera 
   }
 });
 
-test('U73: en la asistencia, si la constancia sube, el aviso ocupa el lugar del renglón de la constancia dentro de la zona del sello (el número se dice una vez) y no cuelga del body', async () => {
+test('U73 (adenda 4): en la asistencia, si el número sube NO hay aviso "¡Constancia N!" ni llama: el renglón de clases seguidas (con su ícono) ocupa su lugar dentro de la zona del sello, una sola vez, y nada cuelga del body', async () => {
   const e = entorno();
   try {
     e.guardar('engrama_ultimo_constancia_prof-u73c', 1);
     const zona = crearRaiz();
     celebrarAsistencia({ zona, monedas: 10, racha: 2, quien: 'prof-u73c' });
     const caja = buscar(zona, 'sello-zona');
-    const avisos = elementos(zona).filter(esAviso);
-    assert.equal(avisos.length, 1);
-    assert.equal(avisos[0].parentNode, caja, 'dentro de la zona del sello, desde el primer pintado (no aparece después empujando el resultado)');
-    assert.equal(textoDe(avisos[0]), '¡Constancia 2!');
-    assert.equal(elementos(caja).filter((n) => n.className === 'constancia-asistencia').length, 0, 'en vez del renglón "Constancia: 2", no además');
-    assert.equal((textoDe(caja).match(/Constancia/g) || []).length, 1, 'la constancia se dice una sola vez en la zona');
+    assert.equal(elementos(zona).filter(esAviso).length, 0, 'el aviso con llama es de la racha semanal de Inicio, no de la asistencia');
+    const renglones = elementos(caja).filter((n) => n.className === 'constancia-asistencia');
+    assert.equal(renglones.length, 1);
+    assert.equal(renglones[0].parentNode, caja, 'dentro de la zona del sello, desde el primer pintado');
+    assert.equal(textoDe(renglones[0]), 'Clases seguidas: 2');
+    assert.equal((textoDe(caja).match(/Clases seguidas/g) || []).length, 1, 'el número se dice una sola vez en la zona');
     await asentar();
     assert.equal(e.colgados.filter(esAviso).length, 0, 'nada flota sobre la pantalla');
   } finally { e.cerrar(); }
@@ -93,7 +93,7 @@ test('U73: en la asistencia, si la constancia sube, el aviso ocupa el lugar del 
     const zona = crearRaiz();
     celebrarAsistencia({ zona, monedas: 0, racha: 2, quien: 'prof-u73d' });
     assert.equal(elementos(zona).filter(esAviso).length, 0, 'sin subir no hay aviso');
-    assert.equal(textoDe(elementos(zona).find((n) => n.className === 'constancia-asistencia')), 'Constancia: 2', 'queda el renglón de siempre');
+    assert.equal(textoDe(elementos(zona).find((n) => n.className === 'constancia-asistencia')), 'Clases seguidas: 2', 'queda el renglón de siempre');
   } finally { sinSubir.cerrar(); }
 });
 
