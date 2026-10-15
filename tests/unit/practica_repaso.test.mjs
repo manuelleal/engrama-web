@@ -7,7 +7,9 @@
 // Tramposos: x_repaso_envia_value y x_repaso_doble_envio (vistas/estudiante/repaso.js).
 import test from 'node:test';
 import assert from 'node:assert/strict';
-import { buscar, textoDe } from './foto_vistas.mjs';
+import { buscar, textoDe, elementos } from './foto_vistas.mjs';
+/** El hueco del ícono de la banda (tanda visual 2: un SVG de ui/iconos.js, antes el glifo ✓/✗ de texto; en el DOM de las fotos no se dibuja SVG). */
+const hayIcono = (n) => elementos(n).some((e) => String(e.className).includes('sx-banda__icono') && e.getAttribute('aria-hidden') === 'true');
 import { ctxEstudiante, asentar } from './fotos_de_navegacion.mjs';
 import { pintar, enOrden, barraDe } from './apoyo_nav.mjs';
 import { renderRepaso } from '../../src/vistas/estudiante/repaso.js';
@@ -64,7 +66,7 @@ test('U82: tras responder, la banda con el veredicto, la oración, la regla, por
     await tocar(raiz, 'opcion-A');
     await tocar(raiz, 'boton-comprobar');
     assert.equal(textoDe(buscar(raiz, 'explicacion-veredicto')), 'Esta vez no');
-    assert.match(textoDe(buscar(raiz, 'explicacion')), /✗/);
+    assert.ok(hayIcono(buscar(raiz, 'explicacion')));
     for (const parte of ['oracion', 'regla', 'porQue', 'ejemplo']) assert.ok(buscar(raiz, `explicacion-${parte}`), parte);
     const texto = textoDe(raiz);
     assert.ok(!/moneda|\+0/i.test(texto.replace('no suma monedas', '')), `el repaso no habla de monedas: ${texto}`);

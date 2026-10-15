@@ -35,7 +35,7 @@ async function responder(sesion, label) {
     const boton = t('boton-siguiente') || t('boton-terminar');
     const r = boton.getBoundingClientRect();
     return {
-      banda: t('explicacion').textContent, veredicto: t('explicacion-veredicto')?.textContent ?? null,
+      banda: t('explicacion').textContent, icono: t('explicacion').querySelector('.sx-banda__icono svg')?.dataset.icono ?? null, veredicto: t('explicacion-veredicto')?.textContent ?? null,
       partes: ['oracion', 'regla', 'porQue', 'ejemplo'].map((p) => t('explicacion-' + p) ? [p, t('explicacion-' + p).getAttribute('lang'), t('explicacion-' + p).textContent] : null).filter(Boolean),
       boton: { id: boton.dataset.testid, arriba: Math.round(r.top), abajo: Math.round(r.bottom), alto: Math.round(r.height), alturaVentana: innerHeight },
     };
@@ -68,7 +68,7 @@ test('E35: un reto A2 pregunta por pregunta: nada antes de Comprobar, la banda e
 
       const mal = await responder(sesion, 'A');
       assert.equal(mal.veredicto, 'Esta vez no');
-      assert.match(mal.banda, /✗/);
+      assert.equal(mal.icono, 'equis', 'el veredicto con su ícono SVG (tanda visual 2: antes, el glifo ✗)');
       // H-4 (docs/ESPEC_correcciones_practica.md): la oración y el ejemplo son frases en inglés (lang="en"); la regla y el "por qué", en español.
       // Antes esta línea fijaba las cuatro en "es", el defecto que encontró la auditoría 05 (se declara: la espec de H-4 no nombró a E35).
       assert.deepEqual(mal.partes.map(([p, lang]) => [p, lang]), [['oracion', 'en'], ['regla', 'es'], ['porQue', 'es'], ['ejemplo', 'en']]);
@@ -82,7 +82,7 @@ test('E35: un reto A2 pregunta por pregunta: nada antes de Comprobar, la banda e
 
       const bien = await responder(sesion, 'B');
       assert.equal(bien.veredicto, 'Correcta');
-      assert.match(bien.banda, /✓/);
+      assert.equal(bien.icono, 'visto');
       assert.deepEqual(bien.partes.map(([p]) => p), ['oracion', 'regla', 'ejemplo'], 'al acertar, sin "por qué no la tuya"');
       await clic(sesion, 'boton-siguiente');
       await esperar(300);

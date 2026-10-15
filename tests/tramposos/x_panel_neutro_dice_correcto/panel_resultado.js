@@ -6,6 +6,7 @@
 //   - 'correcto' / 'incorrecto' (listos para W18 y para la revisión): SIEMPRE ícono + texto, nunca
 //     solo color ni solo sonido (regla de la casa). Drako no va aquí: presenta, no califica (010).
 import { h } from './dom.js';
+import { crearIcono } from './iconos.js';
 import { textos } from '../textos.js';
 
 /**
@@ -15,7 +16,7 @@ import { textos } from '../textos.js';
  */
 export function contenidoDelPanel(datos) {
   const porDefecto = { correcto: textos.revision.correcta, incorrecto: textos.revision.incorrecta, neutro: '' };
-  const icono = { correcto: '✓', incorrecto: '✗', neutro: '✓' }[datos.tipo];
+  const icono = { correcto: 'visto', incorrecto: 'equis', neutro: 'visto' }[datos.tipo];
   return { icono, texto: datos.texto || porDefecto[datos.tipo], clase: `panel-resultado panel-${datos.tipo}` };
 }
 
@@ -28,7 +29,7 @@ export function crearPanelResultado(datos) {
   const clases = [c.clase, datos.visible ? 'panel-visible' : 'panel-oculto', datos.visible && datos.sube ? 'panel-sube' : ''].filter(Boolean).join(' ');
   return h(
     'div', { class: clases, role: 'status', 'aria-live': 'polite', 'data-testid': datos.testid || 'panel-resultado' },
-    h('span', { class: 'panel-icono', 'aria-hidden': 'true' }, c.icono),
+    h('span', { class: 'panel-icono', 'aria-hidden': 'true' }, crearIcono(c.icono)),
     h('div', { class: 'panel-texto' },
       h('p', { class: 'panel-titulo' }, c.texto),
       datos.detalle ? h('p', { class: 'panel-detalle' }, datos.detalle) : null),

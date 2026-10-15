@@ -9,7 +9,9 @@
 // (reto_flujo.js); en el navegador, x_reto_sin_salida_e30 rompe la salida en los dos caminos. Todas las copias las rehace regenerar_x_practica.mjs.
 import test from 'node:test';
 import assert from 'node:assert/strict';
-import { buscar, textoDe, entornoDeFotos } from './foto_vistas.mjs';
+import { buscar, textoDe, entornoDeFotos, elementos } from './foto_vistas.mjs';
+/** El hueco del ícono de la banda (tanda visual 2: un SVG de ui/iconos.js, antes el glifo ✓/✗ de texto; en el DOM de las fotos no se dibuja SVG). */
+const hayIcono = (n) => elementos(n).some((e) => String(e.className).includes('sx-banda__icono') && e.getAttribute('aria-hidden') === 'true');
 import { ctxEstudiante, asentar } from './fotos_de_navegacion.mjs';
 import { pintar, enOrden } from './apoyo_nav.mjs';
 import { renderRetoFlujo } from '../../src/vistas/estudiante/reto_flujo.js';
@@ -112,10 +114,12 @@ test('U78: desde B1 (idioma en) los rótulos van en inglés y cada parte lleva l
   const plan = planDeExplicacion({ ...RESPUESTAS.q1, explanation: { ...EXPLICACION_ES, idioma: 'en' } });
   assert.equal(plan.idioma, 'en');
   assert.deepEqual(plan.partes.map((p) => p.rotulo), ['The right sentence', 'The rule', 'Why not yours', 'Another example']);
+  assert.equal(plan.icono, 'equis', 'el veredicto con su ícono (ui/iconos.js)');
+  assert.equal(planDeExplicacion(RESPUESTAS.q2).icono, 'visto');
   const entorno = entornoDeFotos({});
   try {
     const banda = crearBanda(plan);
-    assert.match(textoDe(banda), /✗/);
+    assert.ok(hayIcono(banda));
     assert.equal(textoDe(buscar(banda, 'explicacion-veredicto')), 'Esta vez no');
     for (const clave of ['oracion', 'regla', 'porQue', 'ejemplo']) assert.equal(buscar(banda, `explicacion-${clave}`).getAttribute('lang'), 'en', clave);
   } finally { entorno.restaurar(); }
@@ -168,7 +172,7 @@ test('U79: Comprobar manda la label una sola vez por toque y la banda dice el ve
     assert.deepEqual(cuerpos, [{ question_id: 'q1', answer: 'A' }], 'la label, nunca el texto de la opción');
     const banda = buscar(raiz, 'explicacion');
     assert.ok(banda, 'la banda');
-    assert.match(textoDe(banda), /✗/);
+    assert.ok(hayIcono(banda));
     assert.equal(textoDe(buscar(banda, 'explicacion-veredicto')), 'Esta vez no');
     assert.match(textoDe(buscar(banda, 'explicacion-oracion')), /She goes to school every day\./);
     assert.match(textoDe(buscar(banda, 'explicacion-porQue')), /Go es para I/);
