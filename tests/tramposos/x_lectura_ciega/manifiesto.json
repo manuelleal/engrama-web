@@ -1,0 +1,19 @@
+{
+  "descripcion": "U96/U97 (W84): ui/lectura.js nunca halla el texto: los retos de Lectura se juegan a ciegas, como en la compuerta 18 (hallazgo Alta 1)",
+  "archivos": {
+    "src/ui/lectura.js": "lectura.js"
+  },
+  "comando": [
+    "node",
+    "--test",
+    "--test-reporter=tap",
+    "tests/unit/practica_lectura.test.mjs"
+  ],
+  "espera_codigo_no_cero": true,
+  "espera_fallan_tests": [
+    "U96: textoDeLectura da el pasaje",
+    "U97: reto por pregunta",
+    "U97: la revisión del final",
+    "U97: con un backend sin L1"
+  ]
+}

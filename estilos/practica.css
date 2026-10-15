@@ -85,3 +85,53 @@
 .racha-semanal > .sx-t-apoyo {
   margin: 0;
 }
+
+/* W84 (docs/ESPEC_lectura_texto.md): el texto de un reto de Lectura (ui/lectura.js), el pasaje del sistema (`sx-tarjeta--pozo` + `sx-lectura`). Arriba
+   de la afirmación y con altura acotada: si no cabe, se desplaza por dentro (y lo dice la pista) para que la afirmación y sus opciones sigan a la vista.
+   No se desliza con cada pregunta nueva: la afirmación cambia, el texto es el mismo. Nada se anima aquí. */
+.lectura.sx-tarjeta {
+  padding: 0;
+  margin: 4px 0 14px;
+}
+.juego > .lectura {
+  animation: none;
+}
+.lectura-rotulo {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  min-height: 48px;
+  padding: 6px 16px;
+  cursor: pointer;
+  list-style: none;
+  border-radius: var(--sx-radio-caja);
+}
+.lectura-rotulo::-webkit-details-marker {
+  display: none;
+}
+.lectura-ocultar,
+.lectura-mostrar {
+  font: 700 var(--sx-t-apoyo)/1.2 var(--fuente-cuerpo);
+  color: var(--sx-accion);
+}
+.lectura[open] .lectura-mostrar,
+.lectura:not([open]) .lectura-ocultar {
+  display: none;
+}
+/* El bloque entero (rótulo + texto + pista) no pasa del 40 % del alto de la ventana (E39): el rótulo y la pista caben en 6rem. */
+.lectura-cuerpo {
+  max-height: calc(40vh - 6rem);
+  overflow-y: auto;
+  padding: 0 16px 14px;
+}
+.lectura-cuerpo .sx-lectura + .sx-lectura {
+  margin-top: 10px;
+}
+.lectura-pista {
+  padding: 0 16px 12px;
+}
+.lectura--fin .lectura-cuerpo {
+  max-height: none;
+  overflow: visible;
+}

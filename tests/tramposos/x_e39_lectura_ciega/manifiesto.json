@@ -1,0 +1,17 @@
+{
+  "descripcion": "E39 (W84): el defecto de x_lectura_ciega medido en el navegador: el reto de Lectura sin su texto, a 375 y a 1280",
+  "archivos": {
+    "src/ui/lectura.js": "lectura.js"
+  },
+  "comando": [
+    "node",
+    "--test",
+    "--test-reporter=tap",
+    "tests/e2e/practica_lectura.test.mjs"
+  ],
+  "espera_codigo_no_cero": true,
+  "espera_fallan_tests": [
+    "E39: a 375 × 667",
+    "E39: a 1280 × 800"
+  ]
+}

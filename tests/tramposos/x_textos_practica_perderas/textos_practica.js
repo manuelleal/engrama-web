@@ -109,4 +109,12 @@ export const textosPractica = {
     /** @param {string} texto */
     esHoy: (texto) => `${texto} (hoy)`,
   },
+  // W84 (docs/ESPEC_lectura_texto.md): el texto de un reto de Lectura (ui/lectura.js). PROVISIONALES hasta que los revisen Christiam y el pedagogo.
+  lectura: {
+    titulo: 'El texto',
+    ocultar: 'Ocultar',
+    mostrar: 'Mostrar',
+    region: 'El texto de la lectura',
+    pista: 'Desliza dentro del texto para leerlo todo.',
+  },
 };

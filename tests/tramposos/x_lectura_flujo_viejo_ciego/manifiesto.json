@@ -1,0 +1,16 @@
+{
+  "descripcion": "U97 (W84): el flujo de siempre (backend sin L1) no pinta el texto: con un backend viejo la Lectura se juega a ciegas",
+  "archivos": {
+    "src/vistas/estudiante/reto_flujo.js": "reto_flujo.js"
+  },
+  "comando": [
+    "node",
+    "--test",
+    "--test-reporter=tap",
+    "tests/unit/practica_lectura.test.mjs"
+  ],
+  "espera_codigo_no_cero": true,
+  "espera_fallan_tests": [
+    "U97: con un backend sin L1"
+  ]
+}

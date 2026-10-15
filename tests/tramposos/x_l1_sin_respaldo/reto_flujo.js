@@ -112,6 +112,7 @@ function pintarPregunta(raiz, estado, callbacks, entrada = 'desliza', efecto = {
     estado.encabezado = crearCabecera({ piezas: [estado.salir, h('h1', { class: 'titulo-reto' }, tituloLegible(challenge.title))], sonido: true }),
     barra,
     esRepaso ? h('p', { role: 'status', class: 'aviso-corto', 'data-testid': 'banner-repaso' }, textos.retoFlujo.bannerRepaso) : null,
+    estado.lectura?.(challenge),
     // Drako presenta la pregunta (fuera de la franja navy, donde no se vería); chico y se repinta con cada opción: imagen.
     h('div', { class: 'presenta-pregunta' },
       crearDrako('presenta', textos.retoFlujo.drakoPresenta, { estatico: true }),
@@ -143,7 +144,7 @@ async function manejarTerminar(raiz, estado, enviarUnaVez) {
   try {
     const resultado = await enviarUnaVez();
     borrarRespuestasGuardadas(estado.attemptId);
-    renderRevision(raiz, { challenge: estado.challenge, resultado, respuestasDadas: estado.respuestas, rol: estado.rol, esRepaso: estado.esRepaso, historialPrevio: estado.historialPrevio });
+    renderRevision(raiz, { challenge: estado.challenge, resultado, respuestasDadas: estado.respuestas, rol: estado.rol, esRepaso: estado.esRepaso, historialPrevio: estado.historialPrevio, lectura: estado.lectura?.(estado.challenge, true) });
   } catch (e) {
     // 409 = "Attempt already completed or abandoned": un doble toque real ya lo manejó
     // accionUnica (una sola petición); si aun así llega, es que el servidor ya lo cerró por otra
@@ -177,10 +178,11 @@ export async function renderRetoFlujo(raiz, params, query, ctx) {
     const previo = query.repaso === '1' ? { ganado: true, historial: null } : await yaGanado(challengeId, ctx);
     const esRepaso = previo.ganado;
     const { attempt_id: attemptId, challenge } = await arrancarIntento(challengeId, ctx);
-    if (await porPregunta(raiz, { attemptId, challenge, esRepaso, historialPrevio: previo.historial, ctx })) return;
+    const datos = { attemptId, challenge, esRepaso, historialPrevio: previo.historial, ctx }; // W84: con L1 cargado, trae `lectura`
+    if (await porPregunta(raiz, datos)) return;
     pintarErrorFlujo(raiz, 'No se pudo cargar el reto.'); return;
     const respuestas = leerRespuestasGuardadas(attemptId);
-    const estado = { attemptId, challenge, respuestas, esRepaso, historialPrevio: previo.historial, rol: /** @type {any} */ (ctx).sesion?.rol, indice: primeraSinResponder(challenge.questions, respuestas) };
+    const estado = { ...datos, respuestas, rol: /** @type {any} */ (ctx).sesion?.rol, indice: primeraSinResponder(challenge.questions, respuestas) };
     if (!query.reabierto) estado.reabrir = () => renderRetoFlujo(raiz, params, { ...query, reabierto: '1' }, ctx);
     const enviarUnaVez = accionUnica(() => enviarIntento(attemptId, respuestas, ctx));
     const callbacks = {
