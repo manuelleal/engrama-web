@@ -36,8 +36,8 @@ Contrato (solo lectura) de `engrama-backend` `f7f7aeb`: `docs/ESPEC_l1_correccio
   2. la regla (`explanation.regla`);
   3. "por qué no la tuya" (`explanation.por_opcion`) **solo si falló** (aunque el servidor lo mandara al acertar);
   4. el ejemplo (`explanation.ejemplo`).
-  Los rótulos salen en el idioma de la explicación (`explanation.idioma`: `es` → "Así queda", "La regla", "Por qué no la tuya", "Otro ejemplo";
-  `en` → "The right sentence", "The rule", "Why not yours", "Another example") y el bloque lleva `lang` (`es`/`en`). Sin explicación (`null`): veredicto
+  Los rótulos salen en el idioma de la explicación (`explanation.idioma`: `es` → "La respuesta correcta" (antes "Así queda"; tanda visual 2, `ESPEC_visual_reto_tanda2.md`), "La regla", "Por qué no la tuya", "Otro ejemplo";
+  `en` → "The right answer" (antes "The right sentence"), "The rule", "Why not yours", "Another example") y el bloque lleva `lang` (`es`/`en`). Sin explicación (`null`): veredicto
   y oración. La respuesta que vale es la que guardó el servidor (`answer`; gana la primera). Después: "Siguiente" (`boton-siguiente`) o, en la última,
   "Ver resultado" (`boton-terminar`) → `POST …/finish` una vez → la revisión de siempre (`renderRevision`, sin cambio) con las respuestas guardadas.
 - La clave de una pregunta no aparece en el DOM antes de que el servidor responda ESA pregunta (ni la oración, ni la explicación, ni una opción marcada).

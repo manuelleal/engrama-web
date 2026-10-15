@@ -104,9 +104,9 @@ test(
       // U10 / X11: Drako nunca vive dentro del bloque de resultado de una pregunta.
       assert.equal(r.eval.q1TieneDrako, false);
 
-      // El resto de la revisión: la correcta se revela DESPUÉS de responder, y las monedas
-      // son las que mandó el servidor (2/2 correctas → paga completo, 5 monedas).
-      assert.match(r.eval.q1Correcta, /4/);
+      // El resto de la revisión: las monedas son las que mandó el servidor (2/2 correctas → paga completo, 5 monedas). Tanda visual 2 (compuerta 18,
+      // nit 23): al acertar ya no se repite "La correcta era: 4" (antes esta línea lo exigía); en una que falló sigue saliendo (R4, revisión con un fallo).
+      assert.equal(r.eval.q1Correcta, null);
       assert.match(r.eval.monedas, /\+5 monedas/);
       assert.ok(r.eval.testids.includes('vista-revision'));
     });

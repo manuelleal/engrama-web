@@ -99,7 +99,7 @@ test('U78: al fallar, la banda dice en orden la oración correcta, la regla, por
   const plan = planDeExplicacion(RESPUESTAS.q1);
   assert.deepEqual([plan.ok, plan.titulo, plan.idioma], [false, 'Esta vez no', 'es']);
   assert.deepEqual(plan.partes.map((p) => [p.rotulo, p.texto]), [
-    ['Así queda', 'She goes to school every day.'], ['La regla', EXPLICACION_ES.regla], ['Por qué no la tuya', EXPLICACION_ES.por_opcion], ['Otro ejemplo', EXPLICACION_ES.ejemplo],
+    ['La respuesta correcta', 'She goes to school every day.'], ['La regla', EXPLICACION_ES.regla], ['Por qué no la tuya', EXPLICACION_ES.por_opcion], ['Otro ejemplo', EXPLICACION_ES.ejemplo],
   ]);
 });
 
@@ -113,7 +113,7 @@ test('U78: al acertar no hay "por qué no la tuya" aunque el servidor lo mande; 
 test('U78: desde B1 (idioma en) los rótulos van en inglés y cada parte lleva lang="en"; el veredicto con ícono y texto', () => {
   const plan = planDeExplicacion({ ...RESPUESTAS.q1, explanation: { ...EXPLICACION_ES, idioma: 'en' } });
   assert.equal(plan.idioma, 'en');
-  assert.deepEqual(plan.partes.map((p) => p.rotulo), ['The right sentence', 'The rule', 'Why not yours', 'Another example']);
+  assert.deepEqual(plan.partes.map((p) => p.rotulo), ['The right answer', 'The rule', 'Why not yours', 'Another example']);
   assert.equal(plan.icono, 'equis', 'el veredicto con su ícono (ui/iconos.js)');
   assert.equal(planDeExplicacion(RESPUESTAS.q2).icono, 'visto');
   const entorno = entornoDeFotos({});
@@ -135,7 +135,7 @@ test('U78: en A1 y A2 (idioma es) la oración y el ejemplo van con lang="en" y l
     assert.deepEqual(langs, { oracion: 'en', regla: 'es', porQue: 'es', ejemplo: 'en' });
     for (const c of ['oracion', 'regla', 'porQue', 'ejemplo']) {
       const rotulo = buscar(banda, `explicacion-${c}`).children.find((n) => n.tagName === 'strong');
-      assert.equal(rotulo?.getAttribute('lang'), 'es', `el rótulo de ${c} ("Así queda", "La regla"…) es español`);
+      assert.equal(rotulo?.getAttribute('lang'), 'es', `el rótulo de ${c} ("La respuesta correcta", "La regla"…) es español`);
     }
   } finally { entorno.restaurar(); }
 });

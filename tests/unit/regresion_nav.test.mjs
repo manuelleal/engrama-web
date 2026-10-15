@@ -135,8 +135,9 @@ const CABECERA_S1 = {
 };
 
 // Tanda visual 2 del reto (docs/ESPEC_visual_reto_tanda2.md; compuerta 18): el ícono del panel de la pregunta deja de ser el glifo "✎" (un nodo de texto)
-// y pasa a ser un SVG de ui/iconos.js (en la foto, sin SVG, el hueco queda vacío) (B1). Nada más.
-const RETO_T2 = { reto_en_curso: [{ etiqueta: 'span', clase: 'panel-icono' }] };
+// y pasa a ser un SVG de ui/iconos.js (en la foto, sin SVG, el hueco queda vacío) (B1); y en la revisión, la pregunta que se acertó ya no repite "La
+// correcta era: …" (nit 23): sale ese nodo y su texto. Nada más.
+const RETO_T2 = { reto_en_curso: [{ etiqueta: 'span', clase: 'panel-icono' }], revision: ['revision-q1-correcta'] };
 
 const CAPAS = [HASTA_W70, VOLVER_W71, SALIR_W73, SONIDO_S1, NUMEROS_S1, CABECERA_S1, RETO_T2];
 /** @type {Record<string, Array<string|{etiqueta: string, clase?: string}>>} */
@@ -321,11 +322,13 @@ test('R9: lo que la tanda "sistema 1" declara de la cabecera cambió de verdad: 
   for (const nombre of Object.keys(hoy).filter((n) => n.startsWith('profe_') || n.startsWith('admin_'))) assert.ok(!hoy[nombre].some((l) => l.trimStart().startsWith('header ')), `${nombre}: sobrio, sin cabecera`);
 });
 
-test('R9: lo que la tanda visual 2 del reto declara cambió de verdad: el panel de la pregunta sin el glifo "✎"; nada más', async () => {
-  const hoy = await tomarFotosNav({ solo: ['reto_en_curso'] });
+test('R9: lo que la tanda visual 2 del reto declara cambió de verdad: el panel de la pregunta sin el glifo "✎"; en la revisión, "La correcta era" solo en la que falló; nada más', async () => {
+  const hoy = await tomarFotosNav({ solo: ['reto_en_curso', 'revision'] });
   const dice = (lineas, texto) => lineas.some((l) => l.trim() === JSON.stringify(texto));
   assert.ok(dice(CRUDA.vistas.reto_en_curso, '✎') && !dice(hoy.reto_en_curso, '✎'), 'el lápiz de texto salió del panel');
   assert.ok(hoy.reto_en_curso.some((l) => l.includes('class="panel-icono"') && l.includes('aria-hidden="true"')), 'queda el hueco del ícono, decorativo');
+  assert.ok(dice(CRUDA.vistas.revision, 'La correcta era: gate') && !hoy.revision.some((l) => l.includes('revision-q1-correcta')), 'la acertada (q1) ya no repite la correcta');
+  assert.ok(hoy.revision.some((l) => l.includes('revision-q2-correcta')), 'la que falló (q2) sí la dice');
 });
 
 test('R9: dos tomas seguidas dan lo mismo (la foto no depende del reloj ni del azar)', async () => {
