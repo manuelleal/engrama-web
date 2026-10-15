@@ -186,7 +186,7 @@ test('U79: Comprobar manda la label una sola vez por toque y la banda dice el ve
 
 // Tanda visual 2 (docs/ESPEC_visual_reto_tanda2.md; compuerta 18, hallazgo 3): tras comprobar, las opciones dicen el resultado con palabra (y su ícono,
 // que el DOM de las fotos no dibuja): lo que dice el servidor (`is_correct`, `answer`, `correct_answer`), nunca una cuenta de la web. Visual: sin tramposo.
-test('U79: tras comprobar, la correcta dice "Correcta" y la tuya que falló "Tu respuesta"; al acertar, solo la tuya; sin correct_answer, solo la tuya', async () => {
+test('U98: tras comprobar, la correcta dice "Correcta" y la tuya que falló "Tu respuesta"; al acertar, solo la tuya; sin correct_answer, solo la tuya', async () => {
   const estadoDe = (raiz, label) => {
     const b = buscar(raiz, `opcion-${label}`);
     const marca = elementos(b).find((e) => String(e.className) === 'opcion-estado');
