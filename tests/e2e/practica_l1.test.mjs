@@ -94,8 +94,14 @@ test('E35: un reto A2 pregunta por pregunta: nada antes de Comprobar, la banda e
       assert.equal(bien.icono, 'visto');
       assert.deepEqual(bien.estados.filter(([, t]) => t), [['opcion-B', 'Correcta', 'visto']], 'al acertar, solo la tuya: Correcta');
       assert.deepEqual(bien.partes.map(([p]) => p), ['oracion', 'regla', 'ejemplo'], 'al acertar, sin "por qué no la tuya"');
-      await clic(sesion, 'boton-siguiente');
-      await esperar(300);
+      // Tanda visual 2 (compuerta 18, hallazgo 6): mientras la pregunta nueva entra deslizándose, la página no se ensancha (antes, 431 a 375).
+      const ancho = await sesion.evaluar(`(async () => {
+        let sw = 0; const t0 = performance.now();
+        document.querySelector('[data-testid="boton-siguiente"]').click();
+        await new Promise((fin) => { const paso = () => { sw = Math.max(sw, document.documentElement.scrollWidth); if (performance.now() - t0 < 800) requestAnimationFrame(paso); else fin(); }; requestAnimationFrame(paso); });
+        return { sw, iw: innerWidth };
+      })()`);
+      assert.deepEqual(ancho, { sw: 375, iw: 375 }, 'al deslizar la pregunta nada desborda a lo ancho');
       const ultima = await responder(sesion, 'A');
       assert.equal(ultima.boton.id, 'boton-terminar');
       await clic(sesion, 'boton-terminar');

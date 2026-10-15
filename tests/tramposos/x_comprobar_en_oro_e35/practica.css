@@ -66,6 +66,17 @@
   height: 18px;
 }
 
+/* Tanda visual 2 (compuerta 18, hallazgo 6): al entrar una pregunta (`entra-desliza` de juego.css, 56 px desde la derecha) nada desborda a lo ancho;
+   antes, a 375, la página medía 431. La franja de arriba no se desliza (es la misma en cada pregunta) y `#vista` recorta a lo ancho mientras tiene una
+   pregunta que entra. `:has()` con un hijo directo y nada detrás (css_cara.test.mjs): no recalcula el árbol entero. Aquí y no en juego.css: la precarga
+   está al tope (U59); si esta hoja no llegara, la entrada desborda como antes y nada más. */
+.juego-desliza > .barra-superior {
+  animation: none;
+}
+#vista:has(> .juego-desliza) {
+  overflow-x: clip;
+}
+
 /* W79: "Tu práctica de hoy", la protagonista de "Ahora" (sx-prota de marca). Compacta: el texto a la izquierda y "Jugar" a la derecha, como las demás
    filas de "Ahora", para que los tres botones sigan sobre la barra sin desplazar (E31, también a 360 × 640). La barra de avance, abajo y delgada. */
 .practica-hoy {
