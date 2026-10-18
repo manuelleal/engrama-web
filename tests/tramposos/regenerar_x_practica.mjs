@@ -26,6 +26,7 @@ const REPASO = 'tests/unit/practica_repaso.test.mjs';
 const RACHA = 'tests/unit/practica_racha.test.mjs';
 const CORR = 'tests/unit/practica_correcciones.test.mjs'; // W83: docs/ESPEC_correcciones_practica.md
 const LECT = 'tests/unit/practica_lectura.test.mjs'; // W84: docs/ESPEC_lectura_texto.md
+const BANDA = 'tests/unit/despejar_banda.test.mjs'; // adenda 1 de docs/ESPEC_visual_reto_tanda2.md (la banda no tapa lo que explica)
 /** @type {[string, string]} W84: el reto de Lectura sin su texto (como antes de W84). */
 const LECTURA_CIEGA = ['  return texto || null;\n', '  return null; // TRAMPOSO: el reto de Lectura sin su texto, como antes de W84\n'];
 /** El override de H-A en estilos/practica.css (el defecto lo quita). */
@@ -314,6 +315,17 @@ export const TRAMPOSOS = {
     archivo: 'src/ui/lectura.js', prueba: 'tests/e2e/practica_lectura.test.mjs', tests: ['E39: a 375 × 667', 'E39: a 1280 × 800'],
     descripcion: 'E39 (W84): el defecto de x_lectura_ciega medido en el navegador: el reto de Lectura sin su texto, a 375 y a 1280',
     cambios: [LECTURA_CIEGA],
+  },
+  // Adenda 1 de docs/ESPEC_visual_reto_tanda2.md (compuerta 21, hallazgo 4): la banda de resultado no tapa el enunciado ni lo marcado.
+  x_despejo_ignora_marcadas: {
+    archivo: 'src/ui/despejar_banda.js', prueba: BANDA, tests: ['U101a: la banda tapa lo marcado'],
+    descripcion: 'U101a: la cuenta del desplazamiento solo mira el enunciado y no las opciones marcadas: la banda sigue tapando "Correcta" y "Tu respuesta" (el defecto del hallazgo 4)',
+    cambios: [['  const masBajo = Math.max(enunciado.abajo, ...marcadas.map((m) => m.abajo));\n', '  const masBajo = enunciado.abajo; // TRAMPOSO: solo mira el enunciado\n']],
+  },
+  x_banda_sin_reducido: {
+    archivo: 'src/ui/despejar_banda.js', prueba: BANDA, tests: ['U101b: con prefers-reduced-motion'],
+    descripcion: 'U101b: el desplazamiento es siempre suave, aun con prefers-reduced-motion',
+    cambios: [["behavior: reducirMovimiento() ? 'auto' : 'smooth'", "behavior: 'smooth'"]],
   },
 };
 

@@ -10,7 +10,7 @@
 //
 // Súbelo un número cada vez que cambie la lista de precarga o la estrategia; la `activate`
 // borra cualquier caché con otro nombre.
-const VERSION = 'engrama-shell-v65';
+const VERSION = 'engrama-shell-v66';
 
 // Cada encargo agrega los suyos en su propio commit (W7: Inicio + api/cliente,core,retos + los
 // SVG de Drako que usa el estudiante; W10: profe/grupos,grupo,sesion_asistencia + api/profe). El
@@ -162,6 +162,7 @@ const DIFERIDOS = [
   '/src/vistas/estudiante/inicio_practica.js',
   '/src/vistas/estudiante/repaso.js',
   '/src/ui/racha_semanal.js',
+  '/src/ui/despejar_banda.js', // adenda 1 de ESPEC_visual_reto_tanda2: la banda de resultado no tapa lo que explica
   '/src/ui/lectura.js', // W84: el texto de un reto de Lectura (docs/ESPEC_lectura_texto.md)
   // El panel del profe y del admin (docs/ESPEC_margen_precarga.md): 91.513 bytes que el estudiante descargaba en el shell sin pintarlos nunca.
   // app.js lo pide con UN import() (src/panel_diferido.js) en cuanto entra alguien que no es estudiante, así que sus pantallas quedan en memoria
