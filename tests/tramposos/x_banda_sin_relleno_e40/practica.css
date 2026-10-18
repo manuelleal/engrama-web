@@ -1,0 +1,187 @@
+/* estilos/practica.css · La práctica del día (docs/ESPEC_practica_del_dia.md): lo poco que el sistema visual (`sx-`) no trae. Va FUERA de la precarga
+   del shell (lista DIFERIDOS de sw.js, §0): sin red y sin haberla guardado, la app abre igual. Solo tokens; nada se anima aquí. */
+
+/* W78: tras comprobar, la barra de acción lleva la banda de la explicación (sx-banda). Puede ser alta: se desplaza por dentro y la pantalla deja
+   lugar abajo para volver a leer la pregunta. La barra sigue fija y del mismo ancho (juego.css, cara.css). */
+.barra-accion.con-banda {
+  max-height: var(--tope-banda, 78vh);
+  overflow-y: auto;
+  padding: 0;
+  background: transparent;
+  border-top: 0;
+}
+/* Adenda 1 de ESPEC_visual_reto_tanda2 (compuerta 21, hallazgo 4): lo más alto que puede ser la banda (`--tope-banda`) es también el relleno de abajo, para
+   que SIEMPRE haya recorrido con que subir el contenido (ui/despejar_banda.js) y dejar el enunciado y lo marcado por encima de ella. Al relleno de la
+   pantalla se suman los 190 px que `#vista:has(.barra-accion)` ya reserva (juego.css) y 12 de aire: 78vh + 12 - 190 = 78vh - 178px. */
+.juego.con-banda {
+  --tope-banda: 78vh;
+  padding-bottom: 40vh; /* TRAMPOSO: el relleno de antes */
+}
+.banda-explicacion {
+  border-radius: var(--radio-md) var(--radio-md) 0 0;
+  padding-bottom: calc(16px + env(safe-area-inset-bottom));
+}
+.banda-explicacion .sx-banda__accion .boton-principal {
+  width: 100%;
+}
+/* El botón que sigue (Siguiente / Ver resultado) va en navy, la acción del sistema. OJO: el oro es solo para logro, monedas y racha, y `.barra-accion
+   .boton-principal` de juego.css lo pone en oro en TODA la barra (también en el flujo de siempre, sin L1: excepción heredada de Lingo Coins, anotada
+   en docs/ESPEC_correcciones_practica.md §6c); en el reto por pregunta se corrige aquí, no en juego.css (precarga). */
+.banda-explicacion .sx-banda__accion .boton-principal:not(:disabled) {
+  background: var(--sx-accion);
+  color: var(--sx-sobre-accion);
+  border-bottom: 4px solid var(--sx-accion-labio);
+}
+/* H-A (auditoría 06): lo mismo para "Comprobar" y para el botón de la barra de la pregunta no contestable, del reto por pregunta (`data-modo`, reto_l1.js):
+   una acción, no un logro. Solo color: el ancho del labio no se toca, para que `:active` (juego.css) siga hundiéndolo. */
+.juego[data-modo="por-pregunta"] .barra-accion .boton-principal:not(:disabled) {
+  background: var(--sx-accion);
+  color: var(--sx-sobre-accion);
+  border-bottom-color: var(--sx-accion-labio);
+}
+
+/* Tanda visual 2 (compuerta 18, hallazgo 3): tras comprobar, la ficha dice el resultado con ícono y palabra (reto_l1.js), nunca solo color: la correcta
+   en verde ("Correcta"), la tuya que falló en rojo ("Tu respuesta"). Los tres pasos de `.sx-opcion.es-correcta` / `.es-incorrecta` del sistema (fondo
+   tenue, borde medio, texto fuerte) y la letra rellena. Ganan a la elegida de juego.css por ir después con la misma especificidad. */
+#vista .juego [data-testid^="opcion-"].es-correcta {
+  background: var(--sx-ok-fondo);
+  border-color: var(--sx-ok-borde);
+  color: var(--sx-ok);
+}
+#vista .juego [data-testid^="opcion-"].es-incorrecta {
+  background: var(--sx-mal-fondo);
+  border-color: var(--sx-mal-borde);
+  color: var(--sx-mal);
+}
+#vista .juego [data-testid^="opcion-"].es-correcta .escudo-letra {
+  background: var(--sx-ok-cara);
+  color: var(--sx-sobre-ok);
+}
+#vista .juego [data-testid^="opcion-"].es-incorrecta .escudo-letra {
+  background: var(--sx-mal-cara);
+  color: var(--sx-sobre-mal);
+}
+.opcion-estado {
+  flex: none;
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  font: 800 var(--sx-t-etiqueta)/1 var(--fuente-cuerpo);
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+}
+.opcion-estado .sx-icono {
+  width: 18px;
+  height: 18px;
+}
+
+/* Tanda visual 2 (compuerta 18, hallazgo 6): al entrar una pregunta (`entra-desliza` de juego.css, 56 px desde la derecha) nada desborda a lo ancho;
+   antes, a 375, la página medía 431. La franja de arriba no se desliza (es la misma en cada pregunta) y `#vista` recorta a lo ancho mientras tiene una
+   pregunta que entra. `:has()` con un hijo directo y nada detrás (css_cara.test.mjs): no recalcula el árbol entero. Aquí y no en juego.css: la precarga
+   está al tope (U59); si esta hoja no llegara, la entrada desborda como antes y nada más. */
+.juego-desliza > .barra-superior {
+  animation: none;
+}
+#vista:has(> .juego-desliza) {
+  overflow-x: clip;
+}
+
+/* W79: "Tu práctica de hoy", la protagonista de "Ahora" (sx-prota de marca). Compacta: el texto a la izquierda y "Jugar" a la derecha, como las demás
+   filas de "Ahora", para que los tres botones sigan sobre la barra sin desplazar (E31, también a 360 × 640). La barra de avance, abajo y delgada. */
+.practica-hoy {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) auto;
+  align-items: center;
+  gap: 6px 12px;
+  padding: 14px 16px 16px;
+}
+.practica-hoy > .sx-rotulo,
+.practica-hoy > .sx-progreso {
+  grid-column: 1 / -1;
+}
+.practica-hoy > .sx-progreso {
+  height: 8px;
+  margin-top: 4px;
+}
+.practica-hoy .practica-texto {
+  display: grid;
+  gap: 2px;
+}
+.practica-hoy .practica-texto .sx-pildora {
+  justify-self: start;
+  margin-top: 4px;
+}
+.practica-hoy > .sx-btn {
+  min-height: 48px;
+  padding-inline: 22px;
+  white-space: nowrap;
+}
+/* El nivel de práctica, después de "Ahora": una línea de apoyo, nunca con cara de nivel (no va en el escudo). */
+.practica-nivel {
+  margin: 4px 2px 0;
+}
+
+/* W81: "Tu semana" con la racha semanal (sx-racha y sx-semana del sistema). La llama es la de siempre (juego.css), grande y QUIETA: solo parpadea la
+   de la cabecera (como el aviso de constancia, por fluidez). */
+.racha-semanal .sx-racha__llama {
+  display: grid;
+  place-items: end center;
+  font-size: 40px;
+}
+.racha-semanal .sx-racha__llama .llama {
+  margin: 0;
+  animation: none;
+}
+.racha-semanal > .sx-t-apoyo {
+  margin: 0;
+}
+
+/* W84 (docs/ESPEC_lectura_texto.md): el texto de un reto de Lectura (ui/lectura.js), el pasaje del sistema (`sx-tarjeta--pozo` + `sx-lectura`). Arriba
+   de la afirmación y con altura acotada: si no cabe, se desplaza por dentro (y lo dice la pista) para que la afirmación y sus opciones sigan a la vista.
+   No se desliza con cada pregunta nueva: la afirmación cambia, el texto es el mismo. Nada se anima aquí. */
+.lectura.sx-tarjeta {
+  padding: 0;
+  margin: 4px 0 14px;
+}
+.juego > .lectura {
+  animation: none;
+}
+.lectura-rotulo {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  min-height: 48px;
+  padding: 6px 16px;
+  cursor: pointer;
+  list-style: none;
+  border-radius: var(--sx-radio-caja);
+}
+.lectura-rotulo::-webkit-details-marker {
+  display: none;
+}
+.lectura-ocultar,
+.lectura-mostrar {
+  font: 700 var(--sx-t-apoyo)/1.2 var(--fuente-cuerpo);
+  color: var(--sx-accion);
+}
+.lectura[open] .lectura-mostrar,
+.lectura:not([open]) .lectura-ocultar {
+  display: none;
+}
+/* El bloque entero (rótulo + texto + pista) no pasa del 40 % del alto de la ventana (E39): el rótulo y la pista caben en 6rem. */
+.lectura-cuerpo {
+  max-height: calc(40vh - 6rem);
+  overflow-y: auto;
+  padding: 0 16px 14px;
+}
+.lectura-cuerpo .sx-lectura + .sx-lectura {
+  margin-top: 10px;
+}
+.lectura-pista {
+  padding: 0 16px 12px;
+}
+.lectura--fin .lectura-cuerpo {
+  max-height: none;
+  overflow: visible;
+}

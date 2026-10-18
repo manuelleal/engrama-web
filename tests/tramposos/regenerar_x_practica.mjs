@@ -27,6 +27,7 @@ const RACHA = 'tests/unit/practica_racha.test.mjs';
 const CORR = 'tests/unit/practica_correcciones.test.mjs'; // W83: docs/ESPEC_correcciones_practica.md
 const LECT = 'tests/unit/practica_lectura.test.mjs'; // W84: docs/ESPEC_lectura_texto.md
 const BANDA = 'tests/unit/despejar_banda.test.mjs'; // adenda 1 de docs/ESPEC_visual_reto_tanda2.md (la banda no tapa lo que explica)
+const BANDA_E2E = 'tests/e2e/practica_banda.test.mjs'; // E40: el mismo defecto medido en el navegador
 /** @type {[string, string]} W84: el reto de Lectura sin su texto (como antes de W84). */
 const LECTURA_CIEGA = ['  return texto || null;\n', '  return null; // TRAMPOSO: el reto de Lectura sin su texto, como antes de W84\n'];
 /** El override de H-A en estilos/practica.css (el defecto lo quita). */
@@ -326,6 +327,32 @@ export const TRAMPOSOS = {
     archivo: 'src/ui/despejar_banda.js', prueba: BANDA, tests: ['U101b: con prefers-reduced-motion'],
     descripcion: 'U101b: el desplazamiento es siempre suave, aun con prefers-reduced-motion',
     cambios: [["behavior: reducirMovimiento() ? 'auto' : 'smooth'", "behavior: 'smooth'"]],
+  },
+  // E40 (tests/e2e/practica_banda.test.mjs): los mismos defectos medidos en el navegador de verdad.
+  x_banda_tapa_e40: {
+    archivo: 'src/ui/despejar_banda.js', prueba: BANDA_E2E, tests: ['E40: a 375 × 667', 'E40: a 1280 × 800', 'E40: con prefers-reduced-motion', 'E40: una explicación muy larga'],
+    descripcion: 'E40: la app calcula pero nunca desplaza: la banda tapa el enunciado y las opciones marcadas como en la compuerta 21 (hallazgo 4)',
+    cambios: [["  if (d !== 0) globalThis.scrollBy?.({ top: d, left: 0, behavior: reducirMovimiento() ? 'auto' : 'smooth' });\n", '  void reducirMovimiento; // TRAMPOSO: la banda tapa y nadie desplaza\n']],
+  },
+  x_banda_sin_reducido_e40: {
+    archivo: 'src/ui/despejar_banda.js', prueba: BANDA_E2E, tests: ['E40: con prefers-reduced-motion'],
+    descripcion: 'E40: con prefers-reduced-motion el desplazamiento sigue siendo suave (behavior smooth)',
+    cambios: [["behavior: reducirMovimiento() ? 'auto' : 'smooth'", "behavior: 'smooth'"]],
+  },
+  x_banda_sin_relleno_e40: {
+    archivo: 'estilos/practica.css', prueba: BANDA_E2E, tests: ['E40: una explicación muy larga'],
+    descripcion: 'E40: el relleno de abajo vuelve a ser 40vh (no cubre una banda en su tope de 78 vh): con una explicación muy larga la pantalla no tiene recorrido para subir el contenido',
+    cambios: [['  padding-bottom: calc(var(--tope-banda) - 178px);\n', '  padding-bottom: 40vh; /* TRAMPOSO: el relleno de antes */\n']],
+  },
+  x_banda_sin_enchufe_e40: {
+    archivo: 'src/vistas/estudiante/reto_l1.js', prueba: BANDA_E2E, tests: ['E40: a 375 × 667', 'E40: a 1280 × 800'],
+    descripcion: 'E40: el reto no llama a despejarBanda tras pintar con respuesta: la banda vuelve a tapar',
+    cambios: [['  if (respuesta) globalThis.requestAnimationFrame?.(() => despejarBanda(nodo));\n', '']],
+  },
+  x_banda_sin_volver_arriba_e40: {
+    archivo: 'src/vistas/estudiante/reto_l1.js', prueba: BANDA_E2E, tests: ['E40: a 375 × 667', 'E40: a 1280 × 800'],
+    descripcion: 'E40: "Siguiente" no vuelve arriba: la pregunta nueva abre ya desplazada, donde la app dejó la anterior para ver su banda',
+    cambios: [['  globalThis.scrollTo?.(0, 0); // la pregunta nueva abre arriba, no donde la app dejó la anterior para ver su banda\n', '']],
   },
 };
 

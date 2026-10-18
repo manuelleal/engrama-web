@@ -20,6 +20,7 @@ export const MEDIR_BANDA = `(() => {
   }));
   const marcadas = opciones.filter((o) => o.marcada);
   const enunciado = caja(t('enunciado'));
+  const ultima = opciones.length ? opciones[opciones.length - 1] : null;
   const boton = banda ? banda.querySelector('button') : null;
   const botonCaja = caja(boton);
   return {
@@ -33,6 +34,8 @@ export const MEDIR_BANDA = `(() => {
     marcadas: marcadas.map((o) => o.label + ':' + o.marcada),
     enunciadoVisible: entera(enunciado),
     marcadasVisibles: marcadas.length > 0 && marcadas.every(entera),
+    // El relleno que queda debajo de la última opción hasta el final de la página: debe alcanzar para subir el contenido sobre la banda (alto + 12 de aire).
+    rellenoAbajo: ultima ? Math.round(document.documentElement.scrollHeight - (ultima.abajo + scrollY)) : null,
     todasLasOpcionesVisibles: opciones.length > 0 && opciones.every(entera),
     bandaVisible: Boolean(bandaCaja) && bandaCaja.arriba < alto && bandaCaja.abajo <= alto + 1,
     botonVisible: Boolean(botonCaja) && botonCaja.arriba >= 0 && botonCaja.abajo <= alto,

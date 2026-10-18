@@ -1,0 +1,17 @@
+{
+  "descripcion": "E40: \"Siguiente\" no vuelve arriba: la pregunta nueva abre ya desplazada, donde la app dejó la anterior para ver su banda",
+  "archivos": {
+    "src/vistas/estudiante/reto_l1.js": "reto_l1.js"
+  },
+  "comando": [
+    "node",
+    "--test",
+    "--test-reporter=tap",
+    "tests/e2e/practica_banda.test.mjs"
+  ],
+  "espera_codigo_no_cero": true,
+  "espera_fallan_tests": [
+    "E40: a 375 × 667",
+    "E40: a 1280 × 800"
+  ]
+}

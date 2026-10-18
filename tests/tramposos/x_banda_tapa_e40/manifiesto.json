@@ -1,0 +1,19 @@
+{
+  "descripcion": "E40: la app calcula pero nunca desplaza: la banda tapa el enunciado y las opciones marcadas como en la compuerta 21 (hallazgo 4)",
+  "archivos": {
+    "src/ui/despejar_banda.js": "despejar_banda.js"
+  },
+  "comando": [
+    "node",
+    "--test",
+    "--test-reporter=tap",
+    "tests/e2e/practica_banda.test.mjs"
+  ],
+  "espera_codigo_no_cero": true,
+  "espera_fallan_tests": [
+    "E40: a 375 × 667",
+    "E40: a 1280 × 800",
+    "E40: con prefers-reduced-motion",
+    "E40: una explicación muy larga"
+  ]
+}

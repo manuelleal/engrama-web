@@ -8,7 +8,7 @@ import { createHash } from 'node:crypto';
 import { mkdirSync, writeFileSync } from 'node:fs';
 import { join, resolve } from 'node:path';
 import { conAppCompleta } from '../tests/e2e/ayudante_servidor.mjs';
-import { ESCENARIOS, VENTANAS, recorrerEscenario } from './humo/guion_banda.mjs';
+import { ESCENARIOS, ESCENARIO_LARGO, VENTANAS, recorrerEscenario } from './humo/guion_banda.mjs';
 
 async function main() {
   const reducido = process.argv.includes('--reducido');
@@ -17,7 +17,7 @@ async function main() {
   /** @type {any[]} */
   const pasos = [];
   for (const ventana of VENTANAS) {
-    for (const escenario of ESCENARIOS) {
+    for (const escenario of [...ESCENARIOS, ESCENARIO_LARGO]) {
       await recorrerEscenario(ventana, escenario, async (paso, medida, sesion) => {
         const archivo = `${paso.escenario}-p${paso.indice + 1}-${paso.ancho}.png`;
         writeFileSync(join(carpeta, archivo), await sesion.capturar());
