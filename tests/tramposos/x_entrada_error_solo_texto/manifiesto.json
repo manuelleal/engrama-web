@@ -1,0 +1,16 @@
+{
+  "descripcion": "H5 (compuerta 24): el error de la entrada vuelve a ser un texto suelto, sin el ícono de lo incorrecto",
+  "archivos": {
+    "src/vistas/entrada.js": "entrada.js"
+  },
+  "comando": [
+    "node",
+    "--test",
+    "--test-reporter=tap",
+    "tests/unit/vista_entrada_error.test.mjs"
+  ],
+  "espera_codigo_no_cero": true,
+  "espera_fallan_tests": [
+    "U-H5: el error de credenciales sale con ícono"
+  ]
+}

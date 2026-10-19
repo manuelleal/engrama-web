@@ -76,6 +76,21 @@
   margin: 4px 0 0;
   font-weight: 700;
 }
+/* H5 (compuerta 24): con un error dentro se lee como error: ícono (equis), el color de "incorrecto" del sistema y el texto; nunca solo el color. */
+[data-testid="entrada-error"]:not(:empty) {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  margin-top: 12px;
+  padding: 10px 14px;
+  border-radius: var(--radio-md);
+  background: var(--sx-mal-fondo);
+  color: var(--sx-mal);
+}
+[data-testid="entrada-error"] .sx-icono {
+  width: 20px;
+  height: 20px;
+}
 
 /* Los secundarios, centrados y uno debajo del otro: crear cuenta justo después de la acción, el aviso de datos al pie de la columna (en el
    celular el espacio que sobra queda entre los dos, no debajo de todo). El toque sigue siendo de 44 px. */
