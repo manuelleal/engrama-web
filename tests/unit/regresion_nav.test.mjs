@@ -143,7 +143,12 @@ const RETO_T2 = { reto_en_curso: [{ etiqueta: 'span', clase: 'panel-icono' }], r
 // ui/iconos.js (en la foto, sin SVG, el hueco queda vacío); el texto de cada fila no cambia. La salida "Salir" pierde su "✕" por la misma razón (SALIR_W73).
 const RESULTADO_B1 = { revision: ['revision-q1-resultado', 'revision-q2-resultado'] };
 
-const CAPAS = [HASTA_W70, VOLVER_W71, SALIR_W73, SONIDO_S1, NUMEROS_S1, CABECERA_S1, RETO_T2, RESULTADO_B1];
+// B1 (compuerta 24, H1, rama web/glifos-svg): lo que antes era un glifo de texto usado como ícono pasa a ser un SVG de ui/iconos.js (en la foto, sin SVG,
+// el hueco del ícono queda vacío y `aria-hidden`); el texto de cada nodo no cambia. Se declara UN subárbol por glifo:
+//   - la etiqueta de estado de Mis solicitudes (el sobre del estado "abierta").
+const GLIFOS_B1 = { solicitudes: ['solicitud-7-estado'] };
+
+const CAPAS = [HASTA_W70, VOLVER_W71, SALIR_W73, SONIDO_S1, NUMEROS_S1, CABECERA_S1, RETO_T2, RESULTADO_B1, GLIFOS_B1];
 /** @type {Record<string, Array<string|{etiqueta: string, clase?: string}>>} */
 export const DECLARADAS_NAV = Object.fromEntries([...new Set(CAPAS.flatMap((c) => Object.keys(c)))].map((nombre) => [nombre, [...new Set(CAPAS.flatMap((c) => c[nombre] || []))]]));
 
@@ -350,4 +355,15 @@ test('R9: lo que B1 declara en la revisión cambió de verdad: el glifo ✓ / �
     assert.equal(hoyFila[2].trim(), JSON.stringify(texto), `${id}: sin glifo, el texto de la fila es el mismo`);
   }
   assert.ok(!hoy.some((l) => /"[✓✗]"/.test(l)), 'ningún glifo ✓ / ✗ suelto en la revisión');
+});
+
+test('R9: lo que B1 declara de los glifos de texto cambió de verdad: cada glifo de la línea base salió y queda el hueco del ícono SVG (span aria-hidden, vacío en la foto) con el texto de siempre', async () => {
+  const hoy = await tomarFotosNav({ solo: ['solicitudes'] });
+  const dice = (lineas, texto) => lineas.some((l) => l.trim() === JSON.stringify(texto));
+  // La etiqueta de estado: span.etiqueta-icono (aria-hidden) con el glifo, y el texto en su span.
+  assert.ok(dice(CRUDA.vistas.solicitudes, '✉'), 'la línea base traía el sobre de texto');
+  assert.ok(!dice(hoy.solicitudes, '✉'), 'hoy ya no');
+  const i = hoy.solicitudes.findIndex((l) => l.includes('class="etiqueta-icono"') && l.includes('aria-hidden="true"'));
+  assert.ok(i > 0 && hoy.solicitudes[i + 1].includes('class="etiqueta-texto"'), 'queda el hueco del ícono, vacío, y enseguida su texto');
+  assert.equal(hoy.solicitudes[i + 2].trim(), '"Recibida, sin respuesta todavía"', 'el texto de la etiqueta es el de siempre');
 });

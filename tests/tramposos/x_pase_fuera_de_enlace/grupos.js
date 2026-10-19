@@ -5,7 +5,8 @@
 //
 // W64 (docs/ESPEC_navegacion.md §5.3): el inicio del profe pone PRIMERO los grupos, cada uno en una tarjeta con lo que se hace en cada clase a
 // un toque ("Abrir asistencia", "Inscripciones", "Ver el grupo"), y debajo las herramientas que sacan de la app. Si alguien espera aprobación,
-// la tarjeta lo dice con ícono y texto ("⏳ 2 esperan aprobación"): solo el NÚMERO, nunca un nombre en el inicio.
+// la tarjeta lo dice con ícono y texto (reloj + "2 esperan aprobación"): solo el NÚMERO, nunca un nombre en el inicio.
+import { crearIcono } from '../../ui/iconos.js';
 import { h, montar } from '../../ui/dom.js';
 import { textos } from '../../textos.js';
 import { listarGrupos, listarSolicitudesInscripcion } from '../../api/profe.js';
@@ -41,10 +42,10 @@ function tarjetaDeGrupo(grupo) {
   return { nodo, esperan };
 }
 
-/** Escribe "⏳ N esperan aprobación" en la tarjeta, solo si N es mayor que 0 (ícono y texto, nunca solo color). */
+/** Escribe el reloj y "N esperan aprobación" en la tarjeta, solo si N es mayor que 0 (ícono y texto, nunca solo color). */
 function mostrarEsperan(esperan, n) {
   if (!(n > 0)) return;
-  esperan.appendChild(h('span', { class: 'etiqueta-icono', 'aria-hidden': 'true' }, '⏳'));
+  esperan.appendChild(h('span', { class: 'etiqueta-icono', 'aria-hidden': 'true' }, crearIcono('reloj')));
   esperan.appendChild(document.createTextNode(` ${T.esperan(n)}`));
 }
 

@@ -4,7 +4,7 @@
 // Textos del dictamen pedagógico 03 (G5). Tramposos: x_solicitud_con_profile_id (api/datos.js), x_solicitud_en_consola (vista), x_solicitudes_tras_el_aviso (bloqueos.js).
 import test from 'node:test';
 import assert from 'node:assert/strict';
-import { entornoDeFotos, crearRaiz, buscar, elementos, textoDe } from './foto_vistas.mjs';
+import { entornoDeFotos, crearRaiz, buscar, elementos, textoDe, ponerSvgFalso, iconosDe } from './foto_vistas.mjs';
 import { renderSolicitudesDatos } from '../../src/vistas/datos_solicitudes.js';
 import { validarSolicitudDatos, TIPOS_DE_SOLICITUD } from '../../src/api/datos.js';
 import { pintarBloqueo, BLOQUEO_CONSENTIMIENTO } from '../../src/bloqueos.js';
@@ -26,6 +26,7 @@ function conServidor({ lista = [], alCrear = () => json(201, solicitud(99)) } = 
     'GET /auth/solicitudes-datos': () => json(200, lista),
     'POST /auth/solicitudes-datos': ({ init }) => { posts.push({ cuerpo: JSON.parse(init.body), cabeceras: init.headers }); return alCrear(); },
   });
+  ponerSvgFalso(); // B1: las etiquetas de estado dibujan su ícono SVG; la prueba mira cuál
   return {
     posts, llamadas: entorno.llamadas, lista,
     restaurar() {
@@ -132,10 +133,12 @@ test('U27: la lista conserva el orden del servidor, cada estado lleva ícono + t
     const ids = buscar(raiz, 'solicitudes-lista').children.map((li) => li.getAttribute('data-testid'));
     assert.deepEqual(ids, ['solicitud-9', 'solicitud-3', 'solicitud-7', 'solicitud-1'], 'el orden del servidor, tal cual');
     const etiqueta = (id) => textoDe(buscar(raiz, `solicitud-${id}-estado`));
-    assert.match(etiqueta(9), /^✓Resuelta$/);
-    assert.match(etiqueta(3), /^ℹRespondida: no se pudo hacer$/, 'sin ✗: eso es de una respuesta incorrecta');
-    assert.match(etiqueta(7), /^⏳En trámite$/);
-    assert.match(etiqueta(1), /^✉Recibida, sin respuesta todavía$/);
+    const icono = (id) => iconosDe(buscar(raiz, `solicitud-${id}-estado`));
+    // B1: ícono SVG (de ui/iconos.js) + texto; antes, los glifos ✓ ℹ ⏳ ✉ de texto.
+    assert.match(etiqueta(9), /^Resuelta$/); assert.deepEqual(icono(9), ['visto']);
+    assert.match(etiqueta(3), /^Respondida: no se pudo hacer$/, 'sin equis: eso es de una respuesta incorrecta'); assert.deepEqual(icono(3), ['info']);
+    assert.match(etiqueta(7), /^En trámite$/); assert.deepEqual(icono(7), ['reloj']);
+    assert.match(etiqueta(1), /^Recibida, sin respuesta todavía$/); assert.deepEqual(icono(1), ['sobre']);
     assert.match(textoDe(buscar(raiz, 'solicitud-9-respuesta')), /Ya quedó tramitado\./);
     assert.match(textoDe(buscar(raiz, 'solicitud-9-respuesta')), /Respondida el 7 oct 2026/);
     assert.match(textoDe(buscar(raiz, 'solicitud-3-respuesta')), /No tenemos ese dato\./, 'en "no se pudo hacer" la explicación se ve siempre');

@@ -8,7 +8,7 @@
 import test from 'node:test';
 import assert from 'node:assert/strict';
 import { textoDelEscudo, crearEscudo, detalleDelNivel, fechaCorta, valorDeNivel } from '../../src/ui/escudo.js';
-import { entornoDeFotos, buscar, textoDe, elementos } from './foto_vistas.mjs';
+import { entornoDeFotos, buscar, textoDe, elementos, ponerSvgFalso, iconosDe } from './foto_vistas.mjs';
 
 test('U8: sin nivel confirmado, el escudo dice "Por confirmar" aunque level y monedas sean altos', () => {
   // El objeto se parece a un perfil "peligroso" (level alto, monedas altas): textoDelEscudo()
@@ -29,8 +29,9 @@ const DEFINITIVO = { cefr: 'B1', provisional: false, fuente: 'set', evaluadoEn: 
 const PROVISIONAL = { ...DEFINITIVO, provisional: true };
 const AYUDA_G1 = 'Falta tu escritura. Cuando tu profe la califique, tu nivel puede subir, bajar o quedar igual.';
 
-test('U15: sin nivel confirmado el escudo dice "Por confirmar" y nada más; con uno definitivo, el nivel + "✓ Confirmado" con su fuente y fecha', () => {
+test('U15: sin nivel confirmado el escudo dice "Por confirmar" y nada más; con uno definitivo, el nivel + el visto SVG y "Confirmado" con su fuente y fecha', () => {
   const entorno = entornoDeFotos();
+  ponerSvgFalso();
   try {
     const sin = crearEscudo({ nivelConfirmado: null });
     assert.equal(textoDe(sin), 'Por confirmar');
@@ -40,19 +41,22 @@ test('U15: sin nivel confirmado el escudo dice "Por confirmar" y nada más; con 
     const def = crearEscudo({ nivelConfirmado: DEFINITIVO });
     assert.equal(textoDe(buscar(def, 'escudo')), 'B1');
     const etiqueta = buscar(def, 'escudo-etiqueta');
-    assert.match(textoDe(etiqueta), /^✓Confirmado$/, 'ícono + texto');
+    assert.match(textoDe(etiqueta), /^Confirmado$/, 'texto');
+    assert.deepEqual(iconosDe(etiqueta), ['visto'], 'ícono SVG + texto (B1: antes, el glifo ✓ de texto)');
     assert.equal(textoDe(buscar(def, 'escudo-fuente')), 'Examen de nivel SET · Medido el 6 oct 2026', 'G4: siempre la fuente y la fecha');
     assert.equal(buscar(def, 'escudo-ayuda'), null, 'lo definitivo no trae la ayuda del provisional');
     assert.equal(buscar(def, 'escudo').getAttribute('aria-label'), 'Nivel B1, confirmado. Examen de nivel SET · Medido el 6 oct 2026.');
   } finally { entorno.restaurar(); }
 });
 
-test('U15: un provisional dice el nivel + "⏳ Provisional" + la ayuda del dictamen (G1), y el aria-label lo dice completo', () => {
+test('U15: un provisional dice el nivel + el reloj SVG y "Provisional" + la ayuda del dictamen (G1), y el aria-label lo dice completo', () => {
   const entorno = entornoDeFotos();
+  ponerSvgFalso();
   try {
     const prov = crearEscudo({ nivelConfirmado: PROVISIONAL });
     assert.equal(textoDe(buscar(prov, 'escudo')), 'B1');
-    assert.match(textoDe(buscar(prov, 'escudo-etiqueta')), /^⏳Provisional$/, 'ícono + texto, no solo un color ni un borde');
+    assert.match(textoDe(buscar(prov, 'escudo-etiqueta')), /^Provisional$/, 'texto');
+    assert.deepEqual(iconosDe(buscar(prov, 'escudo-etiqueta')), ['reloj'], 'ícono SVG + texto, no solo un color ni un borde (B1: antes, el glifo ⏳ de texto)');
     assert.equal(textoDe(buscar(prov, 'escudo-ayuda')), AYUDA_G1);
     assert.equal(buscar(prov, 'escudo').getAttribute('aria-label'), `Nivel B1, provisional. ${AYUDA_G1}`);
     assert.equal(textoDe(buscar(prov, 'escudo-fuente')), 'Examen de nivel SET · Medido el 6 oct 2026');

@@ -8,7 +8,7 @@
 // x_codigo_sobrevive_a_la_ruta y x_sondeo_con_pestana_oculta.
 import test from 'node:test';
 import assert from 'node:assert/strict';
-import { entornoDeFotos, crearRaiz, buscar, elementos, textoDe } from './foto_vistas.mjs';
+import { entornoDeFotos, crearRaiz, buscar, elementos, textoDe, ponerSvgFalso, iconosDe } from './foto_vistas.mjs';
 import { renderInscripcion } from '../../src/vistas/profe/inscripcion.js';
 import { cancelarCelebraciones } from '../../src/ui/celebraciones.js';
 
@@ -45,6 +45,7 @@ function conServidor({ pendientes = [fila(1, 'Ana Pérez'), fila(2, 'Beto Díaz'
     }))),
   ]);
   const entorno = entornoDeFotos(rutas);
+  ponerSvgFalso(); // B1: las etiquetas de estado dibujan su ícono SVG; la prueba mira cuál
   const cuantas = (metodo, r) => hechas.filter((x) => x.metodo === metodo && x.ruta === r).length;
   return {
     estado, hechas, consola, cuantas, almacenes: () => [globalThis.localStorage, globalThis.sessionStorage],
@@ -171,8 +172,9 @@ test('U25: rechazar necesita DOS toques (el primero pide confirmación y no hace
     await reposar();
     assert.equal(s.cuantas('POST', `/teachers/groups/${GID}/solicitudes/2/rechazar`), 1, 'un doble toque: una petición');
     assert.equal(buscar(raiz, 'pendiente-2'), null, 'la fila sale de la lista');
-    assert.equal(textoDe(buscar(raiz, 'resultado-rechazada')), '✗Rechazada', 'con ícono y texto');
-    assert.equal(textoDe(buscar(raiz, 'inscripcion-aviso')), '✗Rechazada: Beto Díaz');
+    assert.equal(textoDe(buscar(raiz, 'resultado-rechazada')), 'Rechazada', 'con ícono y texto');
+    assert.deepEqual(iconosDe(buscar(raiz, 'resultado-rechazada')), ['equis'], 'el ícono es la equis SVG (B1: antes, el glifo ✗ de texto)');
+    assert.equal(textoDe(buscar(raiz, 'inscripcion-aviso')), 'Rechazada: Beto Díaz');
   } finally { s.restaurar(); }
 });
 
@@ -185,7 +187,8 @@ test('U25: aprobar es un toque, un doble toque es UNA petición, y el resultado 
     await reposar();
     assert.equal(s.cuantas('POST', `/teachers/groups/${GID}/solicitudes/1/aprobar`), 1);
     assert.equal(s.cuantas('POST', `/teachers/groups/${GID}/solicitudes/1/rechazar`), 0, 'aprobar nunca llama a rechazar');
-    assert.equal(textoDe(buscar(raiz, 'inscripcion-aviso')), '✓Aprobado: Ana Pérez');
+    assert.equal(textoDe(buscar(raiz, 'inscripcion-aviso')), 'Aprobado: Ana Pérez');
+    assert.deepEqual(iconosDe(buscar(raiz, 'inscripcion-aviso')), ['visto'], 'el ícono es el visto SVG (B1: antes, el glifo ✓ de texto)');
     assert.equal(buscar(raiz, 'inscripcion-aviso').getAttribute('aria-live'), 'polite');
     assert.equal(buscar(raiz, 'pendiente-1'), null);
     assert.ok(buscar(raiz, 'pendiente-2') && buscar(raiz, 'pendiente-3'), 'las demás siguen');

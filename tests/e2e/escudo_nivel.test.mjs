@@ -23,6 +23,8 @@ const MODO_SUPABASE = { authConfig: CONFIG_PILOTO };
 const esperar = (ms) => new Promise((r) => setTimeout(r, ms));
 const hay = (sesion, testid) => sesion.evaluar(`Boolean(document.querySelector('[data-testid="${testid}"]'))`);
 const texto = (sesion, testid) => sesion.evaluar(`document.querySelector('[data-testid="${testid}"]')?.textContent ?? null`);
+/** El `data-icono` del SVG que dibuja la etiqueta (ui/iconos.js), o null si no hay. */
+const iconoDe = (sesion, testid) => sesion.evaluar(`document.querySelector('[data-testid="${testid}"] svg')?.getAttribute('data-icono') ?? null`);
 async function esperarVista(sesion, testid, limiteMs = 7000) {
   const fin = Date.now() + limiteMs;
   while (Date.now() < fin) { if (await hay(sesion, testid)) return true; await esperar(100); }
@@ -69,7 +71,7 @@ async function entrarAInicio(url, correo) {
   return sesion;
 }
 
-test('E13: sin nivel el escudo dice "Por confirmar" (y nada más); con uno provisional, "B1 · ⏳ Provisional" y la ayuda de G1; con uno definitivo, "B1 · ✓ Confirmado" con fuente y fecha', { skip: OMITIR }, async () => {
+test('E13: sin nivel el escudo dice "Por confirmar" (y nada más); con uno provisional, "B1 · Provisional" con su reloj SVG y la ayuda de G1; con uno definitivo, "B1 · Confirmado" con su visto SVG, fuente y fecha', { skip: OMITIR }, async () => {
   const { estado } = estadoConNiveles();
   await conAppCompleta(async (url) => {
     // Sin nivel: el estado de siempre.
@@ -85,7 +87,7 @@ test('E13: sin nivel el escudo dice "Por confirmar" (y nada más); con uno provi
     try {
       assert.equal(await texto(sesion, 'escudo'), 'B1');
       const etiqueta = await texto(sesion, 'escudo-etiqueta');
-      assert.match(etiqueta, /⏳/);
+      assert.equal(await iconoDe(sesion, 'escudo-etiqueta'), 'reloj', 'ícono SVG (B1: antes, el glifo ⏳ de texto)');
       assert.match(etiqueta, /Provisional/);
       assert.equal(await texto(sesion, 'escudo-ayuda'), 'Falta tu escritura. Cuando tu profe la califique, tu nivel puede subir, bajar o quedar igual.');
       assert.equal(await texto(sesion, 'escudo-fuente'), 'Examen de nivel SET · Medido el 6 oct 2026');
@@ -95,12 +97,12 @@ test('E13: sin nivel el escudo dice "Por confirmar" (y nada más); con uno provi
       assert.equal(await hay(sesion, 'aviso-nivel-baja'), false);
     } finally { await sesion.cerrar(); }
 
-    // Definitivo: el nivel, "✓ Confirmado" y la fuente con su fecha; sin ayuda.
+    // Definitivo: el nivel, "Confirmado" con su visto y la fuente con su fecha; sin ayuda.
     sesion = await entrarAInicio(url, 'definitivo@piloto.test');
     try {
       assert.equal(await texto(sesion, 'escudo'), 'B1');
       const etiqueta = await texto(sesion, 'escudo-etiqueta');
-      assert.match(etiqueta, /✓/);
+      assert.equal(await iconoDe(sesion, 'escudo-etiqueta'), 'visto', 'ícono SVG (B1: antes, el glifo ✓ de texto)');
       assert.match(etiqueta, /Confirmado/);
       assert.equal(await texto(sesion, 'escudo-fuente'), 'Examen de nivel SET · Medido el 6 oct 2026');
       assert.equal(await hay(sesion, 'escudo-ayuda'), false, 'lo definitivo no trae la ayuda del provisional');

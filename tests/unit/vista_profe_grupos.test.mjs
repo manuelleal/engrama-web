@@ -10,7 +10,7 @@ import test from 'node:test';
 import assert from 'node:assert/strict';
 import { readFileSync } from 'node:fs';
 import { fileURLToPath } from 'node:url';
-import { buscar, textoDe } from './foto_vistas.mjs';
+import { buscar, textoDe, ponerSvgFalso, iconosDe } from './foto_vistas.mjs';
 import { ctxProfe } from './fotos_de_navegacion.mjs';
 import { pintar, enOrden, vaAntes, error500 } from './apoyo_nav.mjs';
 import { renderGrupos, TOPE_DE_CONTEOS } from '../../src/vistas/profe/grupos.js';
@@ -52,11 +52,12 @@ test('U65: los grupos van antes que las herramientas de clase, y cada tarjeta tr
 
 test('U65: "N esperan aprobación" sale solo si N es mayor que 0, con ícono y texto, y el inicio no trae ningún nombre de estudiante', async () => {
   const esperan = { g1: [pendiente(1, 'Ana Pérez'), pendiente(2, 'Beto Díaz')], g2: [pendiente(3, 'Cleo Ruiz')], g3: [] };
-  const { raiz, cerrar } = await pintar(servidor(3, esperan), (r) => renderGrupos(r, ctxProfe()));
+  const { raiz, cerrar } = await pintar(servidor(3, esperan), (r) => { ponerSvgFalso(); return renderGrupos(r, ctxProfe()); }); // B1: con SVG de mentira se ve cuál ícono es
   try {
     const de = (gid) => buscar(raiz, `grupo-${gid}-esperan`);
-    assert.equal(textoDe(de('g1')), '⏳ 2 esperan aprobación');
-    assert.equal(textoDe(de('g2')), '⏳ 1 espera aprobación');
+    assert.equal(textoDe(de('g1')), ' 2 esperan aprobación', 'el texto (B1: el reloj ya no es un glifo de texto)');
+    assert.equal(textoDe(de('g2')), ' 1 espera aprobación');
+    assert.deepEqual(iconosDe(de('g1')), ['reloj'], 'el reloj SVG de ui/iconos.js');
     const icono = de('g1').children.find((h) => h.nodeType !== 3);
     assert.equal(icono.getAttribute('aria-hidden'), 'true', 'el ícono es decorativo: el texto lo dice');
     assert.equal(textoDe(de('g3')), '', 'con 0 no se dice nada');
@@ -73,8 +74,8 @@ test('U65: si la lectura del conteo de un grupo falla, la página sale completa 
     assert.ok(buscar(raiz, 'herramientas-clase'), 'las herramientas siguen ahí');
     assert.ok(!enOrden(raiz).some((e) => e.getAttribute?.('role') === 'alert' && textoDe(e) !== ''), 'ningún error en pantalla: el conteo es una ayuda');
     assert.equal(textoDe(buscar(raiz, 'grupo-g2-esperan')), '', 'la tarjeta cuyo conteo falló no dice nada');
-    assert.equal(textoDe(buscar(raiz, 'grupo-g1-esperan')), '⏳ 1 espera aprobación');
-    assert.equal(textoDe(buscar(raiz, 'grupo-g3-esperan')), '⏳ 1 espera aprobación');
+    assert.equal(textoDe(buscar(raiz, 'grupo-g1-esperan')), ' 1 espera aprobación');
+    assert.equal(textoDe(buscar(raiz, 'grupo-g3-esperan')), ' 1 espera aprobación');
   } finally { cerrar(); }
 });
 
