@@ -7,6 +7,7 @@
 // el primer perfecto). Ante la duda no se celebra: si el historial previo no se pudo leer o venía lleno (20, el tope del servidor), no hay sello.
 // Son momentos, no insignias guardadas: no dan monedas y no se guardan en ninguna parte. Drako presenta desde la cabecera; nunca va dentro del sello.
 import { h } from './dom.js';
+import { crearIcono } from './iconos.js';
 import { textos } from '../textos.js';
 import { senal } from './sonido.js';
 import { duracionEfectiva, reducirMovimiento } from './movimiento.js';
@@ -57,7 +58,7 @@ export function crearSelloDeMerito(merito, { enEspera = false } = {}) {
   const plan = planDeMerito(merito);
   return h(
     'div', { class: `sello-merito sello-merito-${merito === 'primer_perfecto' ? 'perfecto' : 'superado'}${enEspera ? ' merito-espera' : ''}`, role: 'status', 'data-testid': 'merito', 'data-merito': merito },
-    h('span', { class: 'sello-merito-icono', 'aria-hidden': 'true' }, merito === 'primer_perfecto' ? '★' : '✓'),
+    h('span', { class: 'sello-merito-icono', 'aria-hidden': 'true' }, crearIcono(merito === 'primer_perfecto' ? 'estrella' : 'visto')),
     h('span', { class: 'sello-merito-texto' }, plan.titulo),
   );
 }

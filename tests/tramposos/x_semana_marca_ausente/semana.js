@@ -7,6 +7,7 @@
 //   - la semana completa (N clases en días distintos y M retos distintos ganados; las metas son del despliegue) NO da monedas: es un momento. Se celebra
 //     una vez por semana, persona e institución; con una meta en 0 se apaga.
 import { h } from './dom.js';
+import { crearIcono } from './iconos.js';
 import { textos } from '../textos.js';
 import { duracionEfectiva, reducirMovimiento } from './movimiento.js';
 
@@ -84,7 +85,7 @@ export function crearSemana(plan) {
   let turno = 0;
   const puntos = plan.puntos.map((p) => {
     const punto = h('li', { class: `semana-dia${p.lleno ? ' semana-dia-lleno' : ''}`, 'aria-label': p.texto, 'data-fecha': p.fecha },
-      h('span', { class: 'semana-punto', 'aria-hidden': 'true' }, p.lleno ? '✓' : ''),
+      h('span', { class: 'semana-punto', 'aria-hidden': 'true' }, p.lleno ? crearIcono('visto') : null),
       h('span', { class: 'semana-letra', 'aria-hidden': 'true' }, p.letra));
     if (p.lleno) punto.style.setProperty('--i', String(turno++)); // A5: los llenos entran uno tras otro
     return punto;
@@ -95,7 +96,7 @@ export function crearSemana(plan) {
     h('ul', { class: 'semana-dias', 'data-testid': 'semana-dias' }, ...puntos),
     h('p', { class: 'semana-resumen', 'data-testid': 'semana-resumen' }, plan.resumen),
     plan.completa ? h('div', { class: `semana-sello${plan.celebrar ? ' semana-sello-entra' : ''}`, 'data-testid': 'semana-completa' },
-      h('span', { class: 'semana-sello-icono', 'aria-hidden': 'true' }, '★'),
+      h('span', { class: 'semana-sello-icono', 'aria-hidden': 'true' }, crearIcono('estrella')),
       h('div', {}, h('p', { class: 'semana-sello-titulo' }, textos.semana.completa), h('p', { class: 'semana-sello-detalle' }, plan.detalle))) : null,
   );
 }
