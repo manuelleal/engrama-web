@@ -8,7 +8,10 @@
 //   - "Reintentar" pinta la pantalla pedida ahí mismo (sin recargar), bloquea su botón mientras vuela y, si vuelve a fallar, lo dice;
 //   - app.js no vuelve a importar de forma estática ninguna pantalla del panel (si lo hiciera, el shell volvería a cargar 91 KB que el estudiante
 //     no usa, y sw_precarga obligaría a meterlas otra vez en PRECARGA).
-// Tramposos: x_panel_pinta_encima, x_panel_falla_en_blanco y x_panel_respaldo_sin_reintentar (src/panel_diferido.js); x_panel_estatico (src/app.js).
+//   - el reintento pide OTRA dirección (adenda 1): si un import() falla, el navegador guarda el fallo por dirección y no la vuelve a pedir;
+//     `importar` recibe 0 (la dirección de siempre) y luego 1, 2… (app.js los vuelve `?intento=N`, sobre la MISMA ruta del literal);
+// Tramposos: x_panel_pinta_encima, x_panel_falla_en_blanco, x_panel_respaldo_sin_reintentar y x_panel_reintento_misma_url (src/panel_diferido.js);
+// x_panel_estatico (src/app.js); x_panel_reintento_misma_url_e2e (src/app.js, en tests/e2e/panel_reintento.test.mjs).
 import test from 'node:test';
 import assert from 'node:assert/strict';
 import { readFileSync } from 'node:fs';
@@ -19,10 +22,10 @@ import { crearPanelDiferido } from '../../src/panel_diferido.js';
 import { textos } from '../../src/textos.js';
 import { h, montar } from '../../src/ui/dom.js';
 
-/** Un import() de mentira: cuenta las veces y se resuelve (o falla) cuando la prueba lo dice. */
+/** Un import() de mentira: cuenta las veces, anota con qué número de intento se pidió y se resuelve (o falla) cuando la prueba lo dice. */
 function importDeMentira() {
   const llamadas = [];
-  const importar = () => new Promise((resolver, rechazar) => { llamadas.push({ resolver, rechazar }); });
+  const importar = (/** @type {number} */ intento) => new Promise((resolver, rechazar) => { llamadas.push({ resolver, rechazar, intento }); });
   return { importar, llamadas };
 }
 
@@ -140,4 +143,25 @@ test('margen: app.js no importa de forma estática ninguna pantalla del profe ni
   const estaticos = [...app.matchAll(/^\s*import\s[^;]*?from\s*'([^']+)'/gm)].map((m) => m[1]);
   assert.deepEqual(estaticos.filter((r) => /\/vistas\/(profe|admin)\/|panel_docente/.test(r)), [], 'import estático de una pantalla del panel');
   assert.deepEqual([...app.matchAll(/import\('([^']+)'\)/g)].map((m) => m[1]).filter((r) => /profe|admin|panel/.test(r)), ['./vistas/panel_docente.js']);
+});
+
+test('margen: el siguiente intento pide OTRA dirección (el navegador guarda el fallo de un import() por dirección y no la vuelve a pedir)', async (t) => {
+  const { panel, llamadas } = await respaldoTrasUnFallo(t);
+  assert.equal(llamadas[0].intento, 0, 'el primero va a la dirección de siempre (la que U59 ve y sw.js guarda)');
+  const segundo = panel.cargar();
+  assert.equal(llamadas[1].intento, 1, 'el reintento pide una dirección nueva');
+  llamadas[1].rechazar(new TypeError('Failed to fetch dynamically imported module'));
+  await assert.rejects(segundo);
+  const tercero = panel.cargar();
+  assert.equal(llamadas[2].intento, 2, 'y cada reintento, otra (la del anterior también quedó marcada como fallida)');
+  llamadas[2].resolver(PANEL);
+  assert.equal(await tercero, PANEL);
+});
+
+test('margen: el reintento de app.js va a la MISMA ruta del panel con ?intento=N, y sw.js quita ese mismo parámetro', () => {
+  const app = readFileSync(fileURLToPath(new URL('../../src/app.js', import.meta.url)), 'utf8');
+  const sw = readFileSync(fileURLToPath(new URL('../../sw.js', import.meta.url)), 'utf8');
+  const reintentos = [...app.matchAll(/import\(`([^`$?]+)\?(\w+)=\$\{\w+\}`\)/g)].map((m) => [m[1], m[2]]);
+  assert.deepEqual(reintentos, [['./vistas/panel_docente.js', 'intento']], 'un solo reintento, sobre la ruta del literal');
+  assert.match(sw, /const PARAMETRO_REINTENTO = 'intento';/, 'sw.js quita el mismo parámetro que pone app.js');
 });

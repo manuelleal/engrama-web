@@ -1,0 +1,17 @@
+{
+  "descripcion": "adenda 1 de ESPEC_margen_precarga: sw.js busca y guarda el reintento del panel con su ?intento=N: sin red no lo sirve aunque el panel esté guardado, y con red guarda una entrada por reintento",
+  "archivos": {
+    "sw.js": "sw.js"
+  },
+  "comando": [
+    "node",
+    "--test",
+    "--test-reporter=tap",
+    "tests/unit/sw_reintento.test.mjs"
+  ],
+  "espera_codigo_no_cero": true,
+  "espera_fallan_tests": [
+    "sw (reintento del panel): sin red, panel_docente.js?intento=N se sirve de lo guardado con la dirección de siempre, sin ir a la red",
+    "sw (reintento del panel): con red y sin guardar, pide la dirección de siempre y la guarda UNA vez (sin una entrada por reintento)"
+  ]
+}

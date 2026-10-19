@@ -35,7 +35,9 @@ const HASH_REGISTRO = '#/registro';
 
 // Las 10 pantallas del profe y del admin NO se importan aquí de forma estática: van en un módulo diferido (docs/ESPEC_margen_precarga.md),
 // fuera de la precarga del shell, que el estudiante descarga sin necesitarlas. `panel` lo carga una vez y envuelve sus rutas.
-const panel = crearPanelDiferido(() => import('./vistas/panel_docente.js'));
+// El primer pedido va a la dirección de siempre (la que U59 ve); cada reintento, a `?intento=N`: si un import() falla, el navegador guarda el fallo
+// por dirección y no la vuelve a pedir (adenda 1 de la espec; sw.js quita ese parámetro y sirve lo guardado con la dirección de siempre).
+const panel = crearPanelDiferido((intento) => (intento ? import(`./vistas/panel_docente.js?intento=${intento}`) : import('./vistas/panel_docente.js')));
 
 // W66: la memoria de las asistencias abiertas vive en sesion_asistencia.js, dentro del panel. Si el panel nunca se cargó, no hay nada que olvidar.
 function olvidarAsistencias() {

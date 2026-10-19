@@ -302,6 +302,10 @@ export async function abrirSesion(op) {
     enviar: (metodo, parametros) => s(metodo, parametros),
     redimensionar: (ancho, alto) => redimensionar(s, ancho, alto),
     redSinConexion: (offline) => redSinConexion(nav.cdp, s, offline),
+    // Bloquea las peticiones que casan con esos patrones (`*panel_docente.js*`), en la pestaña Y en cada service worker adjunto: con el
+    // service worker al mando, la pestaña no sale a la red (la petición la atiende él), así que bloquear solo en la pestaña no hace fallar nada.
+    // `[]` las deja pasar otra vez. Lo usa tests/e2e/panel_reintento.test.mjs (docs/ESPEC_margen_precarga.md, adenda 1).
+    bloquear: (patrones) => bloquearEnTodos(nav.cdp, s, patrones),
     capturar: async () => Buffer.from((await s('Page.captureScreenshot', { format: 'png' })).data, 'base64'),
     cerrar: () => cerrarNavegador(nav),
   };
@@ -314,6 +318,22 @@ function redimensionar(s, ancho, alto) {
 async function redSinConexion(cdp, s, offline) {
   await s('Network.emulateNetworkConditions', condicionesDeRed(offline));
   await emularRedEnTrabajadores(cdp, offline);
+}
+
+// La misma sesión por service worker que usa `emularRedEnTrabajadores` (una sola por target: ver la nota de arriba).
+async function bloquearEnTodos(cdp, s, patrones) {
+  await s('Network.setBlockedURLs', { urls: patrones });
+  cdp._sesionesTrabajador ||= new Map();
+  const { targetInfos } = await cdp.enviar('Target.getTargets');
+  for (const info of targetInfos.filter((t) => t.type === 'service_worker')) {
+    let sessionId = cdp._sesionesTrabajador.get(info.targetId);
+    if (!sessionId) {
+      ({ sessionId } = await cdp.enviar('Target.attachToTarget', { targetId: info.targetId, flatten: true }));
+      cdp._sesionesTrabajador.set(info.targetId, sessionId);
+      await cdp.enviar('Network.enable', {}, sessionId);
+    }
+    await cdp.enviar('Network.setBlockedURLs', { urls: patrones }, sessionId);
+  }
 }
 
 async function evaluarEnSesion(s, expresion) {

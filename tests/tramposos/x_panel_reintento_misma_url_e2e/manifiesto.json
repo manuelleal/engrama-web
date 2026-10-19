@@ -1,0 +1,16 @@
+{
+  "descripcion": "adenda 1 de ESPEC_margen_precarga: app.js pide el panel siempre con la misma dirección (como en 7b146c6); en el navegador real, con la red de vuelta, Reintentar no llega a Mis grupos",
+  "archivos": {
+    "src/app.js": "app.js"
+  },
+  "comando": [
+    "node",
+    "--test",
+    "--test-reporter=tap",
+    "tests/e2e/panel_reintento.test.mjs"
+  ],
+  "espera_codigo_no_cero": true,
+  "espera_fallan_tests": [
+    "panel: con la red de vuelta, Reintentar del respaldo llega a Mis grupos sin recargar, con una sola entrada en la caché (375)"
+  ]
+}
