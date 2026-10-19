@@ -56,7 +56,7 @@ async function manejarAsignar(reto, select, boton, ctx, asignarUnaVez, estadoAsi
   try {
     await asignarUnaVez(gid, reto.id, ctx);
     boton.textContent = '';
-    boton.appendChild(h('span', { class: 'boton-icono', 'aria-hidden': 'true' }, crearIcono('visto')));
+    boton.appendChild(h('span', { class: 'icono-en-linea', 'aria-hidden': 'true' }, crearIcono('visto')));
     boton.appendChild(document.createTextNode(textos.profe.retos.asignado));
     estadoAsignar.hecho = true;
   } catch (e) {

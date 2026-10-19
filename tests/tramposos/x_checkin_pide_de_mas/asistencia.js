@@ -3,6 +3,7 @@
 // QR (`#/asistencia?codigo=XXXXXX`), con el resultado 200/404/409/410 siempre con ícono y texto,
 // y el botón deshabilitado (con su mensaje) mientras no hay red — nunca en silencio (§7.3, E8).
 import { h, montar } from '../../ui/dom.js';
+import { crearIcono } from '../../ui/iconos.js';
 import { crearResultado } from '../../ui/retro.js';
 import { crearNavInferior } from '../../ui/nav_inferior.js';
 import { suscribirRed } from '../../ui/red.js';
@@ -27,9 +28,9 @@ export function mensajeDeAsistencia(e) {
   return e.mensaje;
 }
 
-/** Un aviso que INFORMA y no califica: ícono ℹ y texto, sin ✗ ni rojo. Para lo que no es culpa de quien marcó. @param {string} texto */
+/** Un aviso que INFORMA y no califica: ícono de información (SVG) y texto, sin equis ni rojo. Para lo que no es culpa de quien marcó. @param {string} texto */
 function crearAvisoInformativo(texto) {
-  return h('p', { role: 'status', 'aria-live': 'polite', 'data-testid': 'resultado-info', class: 'resultado resultado-info' }, h('span', { 'aria-hidden': 'true' }, 'ℹ'), ` ${texto}`);
+  return h('p', { role: 'status', 'aria-live': 'polite', 'data-testid': 'resultado-info', class: 'resultado resultado-info' }, h('span', { 'aria-hidden': 'true' }, crearIcono('info')), ` ${texto}`);
 }
 
 /** La línea del desglose ("5 por asistir + 5 por llegar a tiempo") en su renglón, que está reservado desde que hay monedas (A7: nada salta al llegar). */
@@ -115,7 +116,7 @@ function mostrarMarcada({ zonaResultado, boton, r, ctx }) {
   completarConLoDelServidor({ cuerpo, renglon, r, token: ctx.token, tenantId: ctx.tenantId }); // respaldo, sin esperar: el botón no se queda bloqueado
 }
 
-/** Un check-in que falló: el 402 informa (ℹ), todo lo demás es un resultado con ✗ como siempre. */
+/** Un check-in que falló: el 402 informa (con el ícono de información), todo lo demás es un resultado con equis como siempre. */
 function mostrarFallo(zonaResultado, e) {
   const mensaje = e instanceof ErrorApi ? mensajeDeAsistencia(e) : textos.asistencia.codigoInvalido;
   montar(zonaResultado, e instanceof ErrorApi && e.status === 402 ? crearAvisoInformativo(mensaje) : crearResultado({ ok: false, texto: mensaje }));

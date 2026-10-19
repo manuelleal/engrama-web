@@ -292,14 +292,20 @@ nav {
 
 /* B1: el visto de "Completado" y de "Asignado" es un SVG de ui/iconos.js (antes, un glifo de texto pegado a la palabra). */
 .insignia .sx-icono,
-.boton-icono .sx-icono {
+.icono-en-linea .sx-icono,
+.chip-estado .sx-icono {
   width: 1.1em;
   height: 1.1em;
 }
-.boton-icono {
+/* Un ícono SVG dentro de una línea de texto, antes de la frase (la nota de salida, "Asignado") o después (los botones que salen de ENGRAMA). */
+.icono-en-linea {
   display: inline-flex;
   vertical-align: middle;
-  margin-right: 4px;
+  margin-right: 6px;
+}
+.icono-en-linea.icono-despues {
+  margin-right: 0;
+  margin-left: 6px;
 }
 
 /* Aviso corto (p. ej. "Repaso: no suma monedas"): chip navy suave, nunca un párrafo suelto. Sin oro: oro = logro, monedas y racha. */

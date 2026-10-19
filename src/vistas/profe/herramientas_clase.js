@@ -6,6 +6,7 @@
 // la institución activa; si ninguno la tiene, no se pinta el bloque (la vista queda idéntica a la de antes, R4). El pase se pide al tocar
 // (anillo/abrir.js): ningún nodo de aquí lo contiene antes. El docente nunca ve los enlaces del estudiante, ni al revés.
 import { h } from '../../ui/dom.js';
+import { crearIcono } from '../../ui/iconos.js';
 import { ligarEscrituraARed } from '../../ui/red.js';
 import { registrarCelebracion } from '../../ui/celebraciones.js';
 import { textos } from '../../textos.js';
@@ -26,7 +27,7 @@ export function crearHerramientasDeClase(ctx) {
   const avisoRed = h('p', { role: 'status', 'data-testid': 'herramientas-sin-red' });
   const salidas = destinos.map(({ destino, base }) => ({ destino, salida: crearSalida(ctx, destino, base) }));
   const botones = salidas.map(({ destino, salida }) => {
-    const boton = /** @type {HTMLButtonElement} */ (h('button', { type: 'button', 'data-testid': `herramienta-${destino}`, 'data-destino': destino }, /** @type {Record<string, string>} */ (ETIQUETA)[destino], h('span', { 'aria-hidden': 'true' }, ' ↗'))); // W71 (§5.3): "↗" = sale de ENGRAMA; no se lee (lo dice la nota)
+    const boton = /** @type {HTMLButtonElement} */ (h('button', { type: 'button', 'data-testid': `herramienta-${destino}`, 'data-destino': destino }, /** @type {Record<string, string>} */ (ETIQUETA)[destino], h('span', { class: 'icono-en-linea icono-despues', 'aria-hidden': 'true' }, crearIcono('flecha_externa')))); // W71 (§5.3): la flecha externa = sale de ENGRAMA; no se lee (lo dice la nota)
     boton.addEventListener('click', async () => {
       if (salidas.some((s) => s.salida.salio)) return; // ya se está saliendo: un segundo toque no navega otra vez
       error.textContent = '';

@@ -6,7 +6,7 @@
 // x_402_generico (asistencia.js: el 402 sale como "Error inesperado (402)"). El de U37 (x_desglose_inventado) está en ui_desglose.test.mjs.
 import test from 'node:test';
 import assert from 'node:assert/strict';
-import { entornoDeFotos, crearRaiz, buscar, textoDe } from './foto_vistas.mjs';
+import { entornoDeFotos, crearRaiz, buscar, textoDe, ponerSvgFalso, iconosDe } from './foto_vistas.mjs';
 import { renderAsistencia } from '../../src/vistas/estudiante/asistencia.js';
 
 const json = (status, cuerpo) => new Response(JSON.stringify(cuerpo), { status, headers: { 'Content-Type': 'application/json' } });
@@ -19,7 +19,7 @@ const marca = (fecha, monedas) => ({ id: `${fecha}${monedas}`, attendance_date: 
  * Escribe el código y marca, con el servidor falso `rutas`, y deja que terminen las peticiones.
  * @param {Record<string, unknown>} rutas
  */
-async function marcar(rutas) {
+async function marcar(rutas, { svg = false } = {}) {
   const g = /** @type {any} */ (globalThis);
   const previo = { window: g.window, navigator: Object.getOwnPropertyDescriptor(globalThis, 'navigator'), consola: { ...console } };
   g.window = { addEventListener() {}, removeEventListener() {} };
@@ -27,6 +27,7 @@ async function marcar(rutas) {
   /** @type {string[]} */ const consola = [];
   for (const nivel of ['log', 'info', 'warn', 'error', 'debug']) console[nivel] = (...a) => { consola.push(a.map(String).join(' ')); };
   const entorno = entornoDeFotos(rutas);
+  if (svg) ponerSvgFalso(); // B1: para ver QUÉ ícono dibuja el aviso (solo donde no se celebra: con el sello, Drako usaría el rig)
   try {
     const raiz = crearRaiz();
     renderAsistencia(raiz, {}, CTX);
@@ -100,6 +101,7 @@ test('U38: 200 con 0 monedas SIN esa prueba (la que pagó es de ayer, o la lista
   for (const [caso, respuesta] of sinPrueba) {
     const v = await marcar({ 'POST /core/attendance/check-in': checkIn(0, 4), 'GET /core/attendance/history': respuesta });
     assert.equal(textoDe(buscar(v.raiz, 'resultado')), ' Asistencia marcada. Clases seguidas: 4.', caso);
+    assert.match(buscar(v.raiz, 'resultado').className, /resultado-ok/, `${caso}: la segunda marca del día es un resultado POSITIVO (con el ícono SVG, ya no el glifo ✗/✓ del texto, el texto solo no lo delata)`);
     assert.doesNotMatch(textoDe(v.raiz), /cobraste|\+0/, caso);
     assert.equal(buscar(v.raiz, 'chip-monedas'), null, `${caso}: 0 fichas`);
     assert.ok(buscar(v.raiz, 'sello'), `${caso}: el sello`);
@@ -107,9 +109,10 @@ test('U38: 200 con 0 monedas SIN esa prueba (la que pagó es de ayer, o la lista
 });
 
 test('U40 (check-in): un 402 muestra su texto con ícono de información — no "Error inesperado (402)" ni ✗', async () => {
-  const v = await marcar({ 'POST /core/attendance/check-in': () => json(402, { detail: 'Insufficient funds' }) });
+  const v = await marcar({ 'POST /core/attendance/check-in': () => json(402, { detail: 'Insufficient funds' }) }, { svg: true });
   const aviso = textoDe(buscar(v.raiz, 'resultado-info'));
-  assert.equal(aviso, 'ℹ No pudimos registrar tu asistencia: la bolsa de monedas de tu institución se agotó. No es por ti. Avísale a tu profe.');
+  assert.deepEqual(iconosDe(buscar(v.raiz, 'resultado-info')), ['info'], 'el ícono es el de información SVG (B1: antes, el glifo ℹ de texto)');
+  assert.equal(aviso, ' No pudimos registrar tu asistencia: la bolsa de monedas de tu institución se agotó. No es por ti. Avísale a tu profe.');
   assert.doesNotMatch(textoDe(v.raiz), /Error inesperado|402|✗/);
   assert.equal(buscar(v.raiz, 'resultado'), null, 'no es un resultado con ✗');
   assert.equal(buscar(v.raiz, 'sello'), null, 'no se celebra');

@@ -5,7 +5,8 @@
 // campo vacío o con formato malo no navega. Tramposo: x_estudiante_ve_tablero (src/vistas/estudiante/inicio.js); los de U31 viven en tests/unit/anillo_abrir.test.mjs.
 import test from 'node:test';
 import assert from 'node:assert/strict';
-import { entornoDeFotos, crearRaiz, buscar, elementos, textoDe, fotografiar } from './foto_vistas.mjs';
+import { entornoDeFotos, crearRaiz, buscar, elementos, textoDe, fotografiar, ponerSvgFalso, iconosDe } from './foto_vistas.mjs';
+import { crearNotaDeSalida } from '../../src/ui/nota_salida.js';
 import { RUTAS, sesionDeEstudiante, TENANT_A, TENANT_B } from './fotos_de_las_vistas.mjs';
 import { renderVivo } from '../../src/vistas/estudiante/vivo.js';
 import { renderNivel } from '../../src/vistas/estudiante/nivel.js';
@@ -82,7 +83,7 @@ test('U31: pantalla Clase en vivo: el DOM no trae el pase ni la base; el pase se
     renderVivo(raiz, {}, ctx);
     assert.ok(buscar(raiz, 'vista-vivo'));
     assert.equal(textoDe(buscar(raiz, 'vista-vivo')).includes('Clase en vivo'), true);
-    assert.equal(textoDe(buscar(raiz, 'salida-sales')), '↗ Vas a salir de ENGRAMA con tu cuenta; se abre en esta misma pestaña. Para volver, usa el botón atrás del navegador.'); // W71 (docs/ESPEC_navegacion.md §5.7)
+    assert.equal(textoDe(buscar(raiz, 'salida-sales')), 'Vas a salir de ENGRAMA con tu cuenta; se abre en esta misma pestaña. Para volver, usa el botón atrás del navegador.'); // W71 (docs/ESPEC_navegacion.md §5.7); B1: la flecha es un SVG, no un glifo de texto
     vistaSinPase(raiz);
     assert.equal(ctx.pedidos, 0, 'pintar no pide el pase');
     await escribirYEnviar(raiz, '1234');
@@ -273,6 +274,7 @@ test('U32: Inicio del estudiante pinta solo la tarjeta de EVA y la de SET (las d
 
 test('U32: "Herramientas de clase" del docente: solo tablero, Escamas y calificar escritura (nada del estudiante); el pase se pide al tocar', async () => {
   const e = entorno({ rutas: RUTAS });
+  ponerSvgFalso(); // B1: la flecha de cada botón es un SVG; la prueba mira cuál
   try {
     const ctx = contexto({ rol: 'teacher' });
     const raiz = crearRaiz();
@@ -281,7 +283,8 @@ test('U32: "Herramientas de clase" del docente: solo tablero, Escamas y califica
     assert.ok(bloque, 'el bloque está en la lista de grupos');
     const botones = elementos(bloque).filter((n) => n.getAttribute?.('data-destino'));
     assert.deepEqual(botones.map((n) => n.getAttribute('data-destino')), ['eva_tablero', 'eva_escamas', 'set_revisar']);
-    assert.deepEqual(botones.map((n) => textoDe(n)), ['Abrir el tablero de la clase ↗', 'Abrir Escamas ↗', 'Calificar escritura ↗']); // W71: "↗" = sale de ENGRAMA
+    assert.deepEqual(botones.map((n) => textoDe(n)), ['Abrir el tablero de la clase', 'Abrir Escamas', 'Calificar escritura']); // W71: la flecha externa = sale de ENGRAMA (B1: un SVG, no el glifo ↗)
+    for (const b of botones) assert.deepEqual(iconosDe(b), ['flecha_externa'], 'la flecha externa de ui/iconos.js');
     for (const b of botones) assert.equal(elementos(b).find((n) => n.tagName === 'span')?.getAttribute('aria-hidden'), 'true', 'la flecha no se lee: el nombre del botón sigue siendo su texto');
     assert.match(textoDe(buscar(bloque, 'herramientas-sales')), /Vas a salir de ENGRAMA con tu cuenta/);
     for (const ajeno of ['tarjeta-eva_celular', 'tarjeta-set_examen', 'anillo-tarjetas', 'salida-codigo']) assert.equal(buscar(raiz, ajeno), null, ajeno);
@@ -345,5 +348,17 @@ test('U32: "Herramientas de clase" sin red: los tres botones deshabilitados con 
     assert.ok(botones.every((b) => b.disabled));
     assert.equal(textoDe(buscar(bloque, 'herramientas-sin-red')), 'Sin conexión: no puedes abrir esta herramienta ahora.');
     assert.equal(ctx.pedidos, 0);
+  } finally { e.restaurar(); }
+});
+
+test('U31 (B1): la nota de salida dibuja la flecha externa (un SVG de ui/iconos.js, oculto al lector) antes de la frase; ya no hay un glifo de texto', () => {
+  const e = entornoDeFotos();
+  ponerSvgFalso();
+  try {
+    const nota = crearNotaDeSalida('salida-sales');
+    assert.deepEqual(iconosDe(nota), ['flecha_externa']);
+    const hueco = elementos(nota).find((n) => n.getAttribute('aria-hidden') === 'true');
+    assert.ok(hueco && iconosDe(hueco).length === 1, 'el ícono va en su hueco aria-hidden');
+    assert.equal(textoDe(nota), 'Vas a salir de ENGRAMA con tu cuenta; se abre en esta misma pestaña. Para volver, usa el botón atrás del navegador.');
   } finally { e.restaurar(); }
 });

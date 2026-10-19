@@ -6,6 +6,7 @@
 // cuatro llamadas de `cargarDatos` ya existían por separado en otras vistas (retos.js, core.js);
 // aquí solo se juntan para no inventar ningún dato que el servidor no dé.
 import { h, montar } from '../../ui/dom.js';
+import { crearIcono } from '../../ui/iconos.js';
 import { crearEscudo } from '../../ui/escudo.js';
 import { crearDrako } from '../../ui/drako.js';
 import { crearLlama, celebrarRacha, planDeRacha, crearDeNuevo, crearAvisoDeRacha } from '../../ui/racha.js';
@@ -138,7 +139,7 @@ function avisoDeBaja(definitivo, provisional) {
   const entendido = h('button', { type: 'button', class: 'boton-secundario boton-chico', 'data-testid': 'aviso-nivel-baja-entendido' }, textos.escudo.entendido);
   const aviso = h(
     'div', { class: 'aviso-nivel', role: 'status', 'data-testid': 'aviso-nivel-baja' },
-    h('span', { class: 'etiqueta-icono', 'aria-hidden': 'true' }, 'ℹ'),
+    h('span', { class: 'etiqueta-icono', 'aria-hidden': 'true' }, crearIcono('info')),
     h('p', {}, textos.escudo.avisoBaja(definitivo, provisional)),
     entendido,
   );
