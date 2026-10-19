@@ -12,7 +12,7 @@
   ],
   "espera_codigo_no_cero": true,
   "espera_fallan_tests": [
-    "U15: un provisional dice el nivel + \"⏳ Provisional\" + la ayuda del dictamen (G1), y el aria-label lo dice completo",
-    "E13: sin nivel el escudo dice \"Por confirmar\" (y nada más); con uno provisional, \"B1 · ⏳ Provisional\" y la ayuda de G1; con uno definitivo, \"B1 · ✓ Confirmado\" con fuente y fecha"
+    "U15: un provisional dice el nivel + el reloj SVG y \"Provisional\" + la ayuda del dictamen (G1), y el aria-label lo dice completo",
+    "E13: sin nivel el escudo dice \"Por confirmar\" (y nada más); con uno provisional, \"B1 · Provisional\" con su reloj SVG y la ayuda de G1; con uno definitivo, \"B1 · Confirmado\" con su visto SVG, fuente y fecha"
   ]
 }

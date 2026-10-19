@@ -6,7 +6,7 @@
 // Cuidado con lo que se fija: el Drako va como imagen estática (el entorno no ofrece `createElementNS`, así que
 // `crearDrako` cae a `crearDrakoEstatico`): no se enciende el motor de anime.js en Node (a veces dejaba el proceso
 // colgado) y la foto mide las VISTAS, no el rig del personaje (eso ya lo cubren los tests de drako).
-import { instalarDomFalso } from './dom_falso.mjs';
+import { instalarDomFalso, NodoFalso } from './dom_falso.mjs';
 import { configurarAviso } from '../../src/aviso.js';
 import { configurarRaizApi, fijarColegios } from '../../src/api/cliente.js';
 
@@ -129,6 +129,9 @@ export function conTextos(lineas, pares) {
   });
 }
 
+/** La línea de la foto que abre la barra de abajo: `nav` con la clase `nav-inferior`, sola (la línea base) o con las del sistema (`sx-barra`, hoy). */
+export const ES_LA_BARRA = / class="nav-inferior[ "]/;
+
 /** ¿Esta línea de la foto es el nodo que se excluye? Por `data-testid`, o por etiqueta Y clase (las dos). @param {string} linea @param {string|{etiqueta: string, clase?: string}} e */
 function calzaExclusion(linea, e) {
   if (typeof e === 'string') return linea.includes(`data-testid="${e}"`);
@@ -156,4 +159,17 @@ export function elementos(raiz) {
 export function textoDe(nodo) {
   if (nodo.nodeType === 3) return nodo.data;
   return [nodo.textContent || '', ...nodo.children.map(textoDe)].join('');
+}
+
+/**
+ * B1: el entorno de las fotos no dibuja SVG (`createElementNS` indefinido: el hueco del ícono queda vacío). Esto le pone un `createElementNS` de
+ * mentira para ver QUÉ ícono dibuja una vista (`iconosDe`). Va después de `entornoDeFotos`; su `restaurar()` lo deshace.
+ */
+export function ponerSvgFalso() {
+  /** @type {any} */ (globalThis).document.createElementNS = (/** @type {string} */ _ns, /** @type {string} */ etiqueta) => new NodoFalso(etiqueta);
+}
+
+/** Los nombres (`data-icono`) de los íconos SVG de ui/iconos.js bajo `nodo`, en el orden del documento (con `ponerSvgFalso`). @param {any} nodo @returns {string[]} */
+export function iconosDe(nodo) {
+  return elementos(nodo).filter((n) => n.tagName === 'svg').map((n) => n.getAttribute('data-icono'));
 }
