@@ -28,6 +28,17 @@ export function mensajeDeAsistencia(e) {
   return e.mensaje;
 }
 
+/**
+ * El resultado de una marca de asistencia (H4, compuerta 24): a la vista, solo lo que el sello, el chip de monedas y el renglón "Clases seguidas: N" NO
+ * dicen; las monedas y las clases seguidas, que esos tres ya muestran una sola vez y con su formato, van únicamente para el lector de pantalla.
+ * Si `visible` no es el comienzo de `completo` (nunca debería), se ve todo: preferible repetir a callar.
+ * @param {string} completo lo que se lee entero @param {string} visible el comienzo de `completo` que se ve
+ */
+function crearResultadoDeMarca(completo, visible) {
+  const corte = completo.startsWith(visible) ? visible.length : completo.length;
+  return crearResultado({ ok: true, texto: completo.slice(0, corte), soloLectores: completo.slice(corte) || null });
+}
+
 /** Un aviso que INFORMA y no califica: ícono de información (SVG) y texto, sin equis ni rojo. Para lo que no es culpa de quien marcó. @param {string} texto */
 function crearAvisoInformativo(texto) {
   return h('p', { role: 'status', 'aria-live': 'polite', 'data-testid': 'resultado-info', class: 'resultado resultado-info' }, h('span', { 'aria-hidden': 'true' }, crearIcono('info')), ` ${texto}`);
@@ -52,7 +63,7 @@ async function completarConLoDelServidor({ cuerpo, renglon, r, token, tenantId }
       const desglose = desgloseDeAsistencia(await leerHistorialMonedas({ token, tenantId, limite: 5 }), r.coins_awarded);
       if (desglose) pintarDesglose(renglon, desglose);
     } else if (haySegundaMarcaDelDia(await leerHistorialAsistencia({ token, tenantId, limite: 10 }))) {
-      montar(cuerpo, crearResultado({ ok: true, texto: textos.asistencia.yaCobrada(r.streak) }));
+      montar(cuerpo, crearResultadoDeMarca(textos.asistencia.yaCobrada(r.streak), textos.asistencia.yaCobradaVisible));
     }
   } catch (e) {
     console.warn('vistas/asistencia: no se pudo leer el detalle de la paga', e instanceof ErrorApi ? e.status : 'error'); // el resultado ya está pintado; nunca un catch mudo
@@ -103,10 +114,11 @@ function mostrarMarcada({ zonaResultado, boton, r, ctx }) {
   // W45b: primero lo que la respuesta del check-in ya dice (los cuatro campos, si vienen y cuadran): cero peticiones de más.
   const pago = pagoDelCheckIn(r);
   // Con 0 monedas (la segunda marca del día) nunca se dice "+0": la asistencia SÍ quedó marcada y el resultado es positivo.
-  const texto = r.coins_awarded > 0 ? textos.asistencia.exito(r.coins_awarded, r.streak)
-    : pago && 'yaCobrada' in pago && pago.yaCobrada ? textos.asistencia.yaCobrada(r.streak) : textos.asistencia.sinMonedas(r.streak);
+  const resultado = r.coins_awarded > 0 ? crearResultadoDeMarca(textos.asistencia.exito(r.coins_awarded, r.streak), textos.asistencia.marcada)
+    : pago && 'yaCobrada' in pago && pago.yaCobrada ? crearResultadoDeMarca(textos.asistencia.yaCobrada(r.streak), textos.asistencia.yaCobradaVisible)
+      : crearResultadoDeMarca(textos.asistencia.sinMonedas(r.streak), textos.asistencia.sinMonedasVisible);
   const renglon = r.coins_awarded > 0 ? h('div', { class: 'renglon-desglose' }) : null;
-  const cuerpo = h('div', { 'data-testid': 'asistencia-cuerpo' }, crearResultado({ ok: true, texto }), renglon);
+  const cuerpo = h('div', { 'data-testid': 'asistencia-cuerpo' }, resultado, renglon);
   montar(zonaResultado, cuerpo);
   // Game feel: el sello se estampa, las monedas vuelan a su contador, suena y vibra; la constancia
   // que llega del servidor se celebra solo si subió (ui/sello.js).

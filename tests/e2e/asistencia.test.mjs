@@ -51,8 +51,8 @@ test(
         eval: '(async () => { await new Promise((r) => setTimeout(r, 600)); const el = document.querySelector(\'[data-testid="asistencia-resultado"]\'); return [...el.querySelectorAll(\'[data-icono]\')].map((i) => i.dataset.icono).join() + \'|\' + el.textContent; })()',
       });
       assert.deepEqual(r.errores, []);
-      // El renglón "Clases seguidas" del sello (una-racha) lleva el ícono de asistencia, sin llama; el resultado, el visto (SVG, B1).
-      assert.match(r.eval, /^asistencia,visto\|/, 'el ícono de asistencia (clases seguidas), el visto (SVG, B1) y el texto');
+      // El sello lleva su visto (SVG, B1: antes el glifo ✓ de texto); el renglón "Clases seguidas" (una-racha), el ícono de asistencia, sin llama; el resultado, el visto (SVG, B1).
+      assert.match(r.eval, /^visto,asistencia,visto\|/, 'el visto del sello, el ícono de asistencia (clases seguidas), el visto del resultado y el texto');
       assert.match(r.eval, /Clases seguidas: 1/);
       assert.match(r.eval, /monedas/);
     });
@@ -94,6 +94,9 @@ const LEER_ASISTENCIA = `(async () => {
     fichas: document.querySelectorAll('.ficha-moneda').length,
     confeti: document.querySelectorAll('[data-testid="confeti"]').length,
     pagina: document.body.textContent,
+    // H4 (compuerta 24): lo que se VE de la zona del resultado, sin lo que va solo para el lector de pantalla (.solo-lectores).
+    visible: (() => { const c = q('asistencia-resultado').cloneNode(true); c.querySelectorAll('.solo-lectores').forEach((e) => e.remove()); return c.textContent; })(),
+    bandaVisible: (() => { const c = q('resultado')?.cloneNode(true); c?.querySelectorAll('.solo-lectores').forEach((e) => e.remove()); return c?.textContent ?? null; })(),
   };
 })()`;
 const deLaVista = (r, trozo) => r.peticiones.filter((p) => p.metodo === 'GET' && p.url.includes(trozo)).length;
@@ -120,6 +123,12 @@ test(
       assert.equal(puntual.eval.iconoResultado, 'visto', 'el resultado con su ícono SVG (B1: antes, el glifo ✓)');
       assert.equal(puntual.eval.desglose, '5 por asistir + 5 por llegar a tiempo');
       assert.equal(puntual.eval.chip, '+10 monedas');
+      // H4 (compuerta 24): cada dato se ve UNA vez y con el formato del renglón; la banda dice solo "Asistencia marcada" y el lector sigue oyendo todo.
+      assert.equal(puntual.eval.bandaVisible, ' Asistencia marcada', 'la banda verde ya no repite las monedas ni las clases seguidas');
+      assert.equal((puntual.eval.visible.match(/\+10\s*monedas/g) || []).length, 1, 'las monedas, una vez a la vista (el chip)');
+      assert.equal((puntual.eval.visible.match(/Clases seguidas/g) || []).length, 1, 'las clases seguidas, una vez a la vista (el renglón)');
+      assert.match(puntual.eval.visible, /Clases seguidas: 1/, 'con el formato del renglón, con dos puntos');
+      assert.doesNotMatch(puntual.eval.visible, /clases seguidas \d/, 'ni la forma vieja, sin dos puntos');
 
       extra = 6 * 60_000; // el segundo llega a los 6 minutos
       const aLosSeis = await marcar(primera.session_code, 'est-2');

@@ -229,7 +229,11 @@ export const textos = {
     drako: 'Drako celebra que llegaste',
     sinRed: 'Sin conexión: no puedes marcar asistencia ahora.',
     /** @param {number} monedas @param {number} racha */
-    exito: (monedas, racha) => `Asistencia marcada · +${monedas} monedas · clases seguidas ${racha}`,
+    exito: (monedas, racha) => `Asistencia marcada · +${monedas} monedas · Clases seguidas: ${racha}`,
+    /** H4 (compuerta 24): lo que se VE del resultado; lo demás (monedas, clases seguidas) ya lo dicen el chip y el renglón del sello y va solo para el lector de pantalla. */
+    marcada: 'Asistencia marcada',
+    yaCobradaVisible: 'Asistencia marcada. La de hoy ya la cobraste: las monedas de asistencia son una vez por día.',
+    sinMonedasVisible: 'Asistencia marcada.',
     codigoInvalido: 'Código no válido para tu grupo.',
     yaMarcada: 'Ya habías marcado esta asistencia.',
     sesionVencida: 'Ese código ya venció.',
