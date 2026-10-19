@@ -565,7 +565,8 @@ nav {
 @media (min-width: 900px) {
   #vista:has([data-testid^="vista-profe-"]),
   #vista:has([data-testid="vista-sesion-asistencia"]),
-  #vista:has([data-testid^="vista-admin-"]) {
+  #vista:has([data-testid^="vista-admin-"]),
+  #vista:has(.panel-sin-cargar) {
     max-width: 1100px;
   }
   /* Con el ancho de sobra ya no hace falta partir "Comprehension" en dos líneas (la galería lo
@@ -804,4 +805,17 @@ nav {
 #solicitud-mensaje {
   width: 100%;
   box-sizing: border-box;
+}
+
+/* Adenda 1 de docs/ESPEC_margen_precarga.md: el respaldo cuando el panel del profe y del admin no cargó (src/panel_diferido.js). Antes: "Sin
+   conexión." a 16 px, sin título ni qué hacer. Ahora, en el orden de lectura: el título, qué pasó, "Reintentar" (el primario del panel) y, más
+   abajo y más suave, el último recurso con "Recargar la página" (secundario). Sobrio: sin Drako ni `.juego`. A 1280 va en la columna de 1100 del
+   panel (la regla de arriba, junto a las vistas del profe y del admin). */
+.panel-sin-cargar > p {
+  max-width: 40rem;
+  margin: 0 0 16px;
+}
+.panel-sin-cargar > .panel-sin-cargar-ultimo {
+  margin: 32px 0 8px;
+  color: color-mix(in srgb, var(--texto) 70%, white); /* 6:1 sobre blanco, como .texto-apoyo, pero al tamaño del cuerpo (16 px, no 14) */
 }

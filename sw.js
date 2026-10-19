@@ -253,11 +253,27 @@ self.addEventListener('fetch', (ev) => {
   ev.respondWith(cachePrimeroConRed(request));
 });
 
+// El reintento del panel del profe y del admin (src/panel_diferido.js; adenda 1 de docs/ESPEC_margen_precarga.md) pide el MISMO módulo con
+// `?intento=N`: si un import() falla, el navegador guarda el fallo por dirección y no la vuelve a pedir. Pero aquí todo se guarda y se busca por
+// dirección CON su consulta: sin quitar ese parámetro, el reintento no casaría con el panel ya guardado en DIFERIDOS (sin red, no abriría) y, con
+// red, se guardaría otra vez con su consulta (una entrada por reintento). Se quita SOLO `intento` antes de buscar, de pedir a la red y de guardar;
+// cualquier otra consulta queda como estaba.
+const PARAMETRO_REINTENTO = 'intento';
+
+/** La dirección con la que se busca, se pide y se guarda: la del pedido, sin el parámetro del reintento (el pedido tal cual si no lo trae). */
+function sinReintento(request) {
+  const url = new URL(request.url);
+  if (!url.searchParams.has(PARAMETRO_REINTENTO)) return request;
+  url.searchParams.delete(PARAMETRO_REINTENTO);
+  return url.href;
+}
+
 async function cachePrimeroConRed(request) {
-  const enCache = await caches.match(request);
+  const clave = sinReintento(request);
+  const enCache = await caches.match(clave);
   if (enCache) return enCache;
-  const resp = await fetch(request);
-  if (resp.ok) (await caches.open(VERSION)).put(request, resp.clone());
+  const resp = await fetch(clave);
+  if (resp.ok) (await caches.open(VERSION)).put(clave, resp.clone());
   return resp;
 }
 

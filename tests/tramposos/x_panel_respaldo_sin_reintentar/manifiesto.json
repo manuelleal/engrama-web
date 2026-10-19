@@ -1,0 +1,17 @@
+{
+  "descripcion": "adenda 1 de ESPEC_margen_precarga: el respaldo del panel vuelve a ser el de 7b146c6, solo \"Sin conexión.\" y la barra, sin título, sin qué hacer y sin Reintentar ni Recargar",
+  "archivos": {
+    "src/panel_diferido.js": "panel_diferido.js"
+  },
+  "comando": [
+    "node",
+    "--test",
+    "--test-reporter=tap",
+    "tests/unit/panel_diferido.test.mjs"
+  ],
+  "espera_codigo_no_cero": true,
+  "espera_fallan_tests": [
+    "margen: si el panel no carga, la ruta dice qué pasó, con título, Reintentar, Recargar y la barra del rol (nunca en blanco)",
+    "margen: Reintentar del respaldo pinta la pantalla pedida ahí mismo (sin recargar) y bloquea su botón mientras vuela"
+  ]
+}

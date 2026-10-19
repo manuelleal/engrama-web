@@ -11,6 +11,14 @@
 //   - si el panel ya está cargado, la pantalla se pinta en el mismo turno, sin un `await` de más (igual que cuando era un import estático);
 //   - si se cambió de dirección mientras cargaba, NO se pinta: la pantalla vieja no cae encima de la nueva;
 //   - si no carga (sin red y sin haberlo guardado), la ruta lo dice con la barra de su rol, nunca en blanco; el siguiente intento lo vuelve a pedir.
+//     Adenda 1 de la espec: el respaldo tiene título, dice qué pasó y qué hacer, y trae "Reintentar" (pinta la pantalla pedida ahí mismo, sin
+//     recargar) y, como último recurso, "Recargar la página".
+//
+// "Lo vuelve a pedir" exige una dirección NUEVA (adenda 1, medido en Edge): si un `import()` falla, el navegador guarda el fallo en el mapa de
+// módulos de la página, por dirección, y el siguiente `import()` de la misma dirección falla sin ir a la red. Por eso el primer pedido va a la
+// dirección de siempre y cada reintento a `panel_docente.js?intento=N`; sw.js quita ese parámetro (lo sirve de su caché si ya estaba guardado y
+// nunca guarda una entrada por reintento). Lo que el panel importa resuelve a su dirección de siempre. Si lo que falló fue una de esas
+// dependencias, su fallo también queda guardado y solo recargar lo arregla: para eso está "Recargar la página".
 import { h, montar } from './ui/dom.js';
 import { crearNavInferior } from './ui/nav_inferior.js';
 import { textos } from './textos.js';
@@ -20,17 +28,19 @@ import { textos } from './textos.js';
  */
 
 /**
- * @param {() => Promise<any>} importar el `import()` del panel; lo escribe app.js para que la ruta quede relativa a él (y U59 la vea)
+ * @param {(intento: number) => Promise<any>} importar el `import()` del panel; lo escribe app.js para que la ruta quede relativa a él (y U59 la vea).
+ *   `intento` dice cuántas veces se pidió antes: 0 → la dirección de siempre; N → `?intento=N`, una que el navegador no tiene marcada como fallida.
  * @param {{leerDireccion?: () => string}} [o] cómo leer la dirección actual (en las pruebas, una de mentira)
  */
 export function crearPanelDiferido(importar, { leerDireccion = () => location.hash } = {}) {
   let modulo = null; // el panel, una vez cargado: desde ahí todo es sincrónico
   let enVuelo = /** @type {Promise<any>|null} */ (null); // una sola petición aunque varias rutas (o la carga por rol) lo pidan a la vez
+  let intentos = 0; // cuántas veces se pidió: el número de la dirección del próximo reintento
 
-  /** Carga el panel una vez. Si falla, olvida el intento: el próximo lo vuelve a pedir (la red pudo volver). */
+  /** Carga el panel una vez. Si falla, olvida el intento: el próximo lo vuelve a pedir, con otra dirección (la red pudo volver). */
   function cargar() {
     if (modulo) return Promise.resolve(modulo);
-    if (!enVuelo) enVuelo = importar().then((m) => { modulo = m; return m; }, (e) => { enVuelo = null; throw e; });
+    if (!enVuelo) enVuelo = importar(intentos++).then((m) => { modulo = m; return m; }, (e) => { enVuelo = null; throw e; });
     return enVuelo;
   }
 
@@ -40,7 +50,8 @@ export function crearPanelDiferido(importar, { leerDireccion = () => location.ha
    * @param {PintarPanel} pintar
    */
   function vista(patron, pintar) {
-    return async (/** @type {HTMLElement} */ raiz, /** @type {Record<string,string>} */ params, /** @type {Record<string,string>} */ query, /** @type {any} */ ctx) => {
+    /** `otraVez`: lo pide "Reintentar" del respaldo (si vuelve a fallar, el respaldo lo dice). */
+    const render = async (/** @type {HTMLElement} */ raiz, /** @type {Record<string,string>} */ params, /** @type {Record<string,string>} */ query, /** @type {any} */ ctx, otraVez = false) => {
       if (modulo) return pintar(modulo, raiz, params, query, ctx); // ya cargado: como un import estático
       const direccion = leerDireccion();
       let m;
@@ -48,19 +59,43 @@ export function crearPanelDiferido(importar, { leerDireccion = () => location.ha
         m = await cargar();
       } catch (e) {
         console.error('panel_diferido: no se pudo cargar el panel del profe y del admin', e); // nunca un catch mudo
-        if (leerDireccion() === direccion) pintarSinPanel(raiz, patron, ctx?.sesion?.rol);
+        if (leerDireccion() === direccion) pintarSinPanel(raiz, patron, ctx?.sesion?.rol, otraVez, () => render(raiz, params, query, ctx, true));
         return;
       }
       if (leerDireccion() !== direccion) return; // se fue a otra pantalla mientras cargaba: esa ya se pintó (o se está pintando)
       return pintar(m, raiz, params, query, ctx);
     };
+    return (/** @type {HTMLElement} */ raiz, /** @type {Record<string,string>} */ params, /** @type {Record<string,string>} */ query, /** @type {any} */ ctx) => render(raiz, params, query, ctx);
   }
 
   return { cargar, vista, cargado: () => modulo };
 }
 
-/** El respaldo: "Sin conexión." y la barra del rol para salir de ahí. Sobrio, como el panel (sin Drako ni `.juego`). */
-function pintarSinPanel(raiz, patron, rol) {
-  montar(raiz, h('div', { 'data-testid': 'panel-sin-red' }, h('p', { role: 'status' }, textos.auth.sinConexion), crearNavInferior(patron, rol)));
+/**
+ * El respaldo: qué pasó, "Reintentar" y, de último recurso, "Recargar la página", con la barra del rol para salir de ahí. Sobrio, como el panel
+ * (sin Drako ni `.juego`). "Reintentar" bloquea su botón mientras vuela (una acción por toque); si vuelve a fallar, el respaldo se repinta con
+ * "Todavía no…" y el foco vuelve a "Reintentar" (el botón de antes ya no existe).
+ * @param {HTMLElement} raiz @param {string} patron @param {string|undefined} rol @param {boolean} otraVez @param {() => Promise<unknown>} reintentar
+ */
+function pintarSinPanel(raiz, patron, rol, otraVez, reintentar) {
+  const T = textos.panelSinCargar;
+  const boton = /** @type {HTMLButtonElement} */ (h('button', { type: 'button', 'data-testid': 'panel-reintentar' }));
+  boton.textContent = T.reintentar;
+  boton.addEventListener('click', () => {
+    if (boton.disabled) return;
+    boton.disabled = true;
+    boton.textContent = T.reintentando;
+    return reintentar();
+  });
+  montar(raiz, h(
+    'div', { 'data-testid': 'panel-sin-red', class: 'panel-sin-cargar' },
+    h('h1', {}, T.titulo),
+    h('p', { role: 'status', 'data-testid': 'panel-sin-red-mensaje' }, otraVez ? T.todaviaNo : T.queOcurrio),
+    boton,
+    h('p', { class: 'panel-sin-cargar-ultimo' }, T.ultimoRecurso),
+    h('button', { type: 'button', class: 'boton-secundario', 'data-testid': 'panel-recargar', onClick: () => location.reload() }, T.recargar),
+    crearNavInferior(patron, rol),
+  ));
+  if (otraVez) boton.focus?.();
   document.body.dataset.listo = '1';
 }

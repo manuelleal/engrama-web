@@ -1,0 +1,16 @@
+{
+  "descripcion": "adenda 1 de ESPEC_margen_precarga: el reintento del panel pide siempre la dirección de siempre (importar(0)); en el navegador el fallo guardado vuelve sin ir a la red y el profe queda atascado hasta recargar",
+  "archivos": {
+    "src/panel_diferido.js": "panel_diferido.js"
+  },
+  "comando": [
+    "node",
+    "--test",
+    "--test-reporter=tap",
+    "tests/unit/panel_diferido.test.mjs"
+  ],
+  "espera_codigo_no_cero": true,
+  "espera_fallan_tests": [
+    "margen: el siguiente intento pide OTRA dirección (el navegador guarda el fallo de un import() por dirección y no la vuelve a pedir)"
+  ]
+}
