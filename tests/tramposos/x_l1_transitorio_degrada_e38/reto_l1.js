@@ -24,6 +24,7 @@ import { retomarIntento, responderPregunta, terminarIntento, ErrorTransitorio } 
 import { planDeExplicacion, crearBanda } from '../../ui/explicacion.js';
 import { preguntaContestable } from '../../ui/practica.js';
 import { crearLectura } from '../../ui/lectura.js';
+import { despejarBanda } from '../../ui/despejar_banda.js';
 import { renderRevision, textoDeOpcion } from './revision.js';
 import { crearSalir, nodoOpciones, pintarErrorFlujo, nodoRevisando } from './reto_flujo.js';
 
@@ -193,6 +194,8 @@ function pintar(raiz, estado, entrada = 'desliza', recien = null) {
   );
   montar(raiz, nodo);
   document.body.dataset.listo = '1';
+  // Adenda 1 de ESPEC_visual_reto_tanda2: con la banda puesta, la app deja ver juntos el enunciado, lo marcado y la banda (un cuadro después: ya con su alto).
+  if (respuesta) globalThis.requestAnimationFrame?.(() => despejarBanda(nodo));
 }
 
 /** Un toque de Comprobar = una petición (un segundo toque recibe la misma); la banda sale con lo que el servidor guardó. */
@@ -238,6 +241,7 @@ function avisoDeCierre(raiz, estado, fijo = null) {
 function siguiente(raiz, estado) {
   estado.indice = Math.min(estado.indice + 1, estado.challenge.questions.length - 1);
   pintar(raiz, estado);
+  globalThis.scrollTo?.(0, 0); // la pregunta nueva abre arriba, no donde la app dejó la anterior para ver su banda
 }
 
 /** "Ver resultado": `/finish` una vez y la revisión de siempre, con lo que el servidor guardó. */

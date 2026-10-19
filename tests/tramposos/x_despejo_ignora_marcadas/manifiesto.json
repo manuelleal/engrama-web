@@ -1,0 +1,16 @@
+{
+  "descripcion": "U101a: la cuenta del desplazamiento solo mira el enunciado y no las opciones marcadas: la banda sigue tapando \"Correcta\" y \"Tu respuesta\" (el defecto del hallazgo 4)",
+  "archivos": {
+    "src/ui/despejar_banda.js": "despejar_banda.js"
+  },
+  "comando": [
+    "node",
+    "--test",
+    "--test-reporter=tap",
+    "tests/unit/despejar_banda.test.mjs"
+  ],
+  "espera_codigo_no_cero": true,
+  "espera_fallan_tests": [
+    "U101a: la banda tapa lo marcado"
+  ]
+}

@@ -1,0 +1,17 @@
+{
+  "descripcion": "E40: el reto no llama a despejarBanda tras pintar con respuesta: la banda vuelve a tapar",
+  "archivos": {
+    "src/vistas/estudiante/reto_l1.js": "reto_l1.js"
+  },
+  "comando": [
+    "node",
+    "--test",
+    "--test-reporter=tap",
+    "tests/e2e/practica_banda.test.mjs"
+  ],
+  "espera_codigo_no_cero": true,
+  "espera_fallan_tests": [
+    "E40: a 375 × 667",
+    "E40: a 1280 × 800"
+  ]
+}

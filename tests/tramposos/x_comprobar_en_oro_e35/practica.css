@@ -4,14 +4,18 @@
 /* W78: tras comprobar, la barra de acción lleva la banda de la explicación (sx-banda). Puede ser alta: se desplaza por dentro y la pantalla deja
    lugar abajo para volver a leer la pregunta. La barra sigue fija y del mismo ancho (juego.css, cara.css). */
 .barra-accion.con-banda {
-  max-height: 78vh;
+  max-height: var(--tope-banda, 78vh);
   overflow-y: auto;
   padding: 0;
   background: transparent;
   border-top: 0;
 }
+/* Adenda 1 de ESPEC_visual_reto_tanda2 (compuerta 21, hallazgo 4): lo más alto que puede ser la banda (`--tope-banda`) es también el relleno de abajo, para
+   que SIEMPRE haya recorrido con que subir el contenido (ui/despejar_banda.js) y dejar el enunciado y lo marcado por encima de ella. Al relleno de la
+   pantalla se suman los 190 px que `#vista:has(.barra-accion)` ya reserva (juego.css) y 12 de aire: 78vh + 12 - 190 = 78vh - 178px. */
 .juego.con-banda {
-  padding-bottom: 40vh;
+  --tope-banda: 78vh;
+  padding-bottom: calc(var(--tope-banda) - 178px);
 }
 .banda-explicacion {
   border-radius: var(--radio-md) var(--radio-md) 0 0;

@@ -1,0 +1,16 @@
+{
+  "descripcion": "E40: el relleno de abajo vuelve a ser 40vh (no cubre una banda en su tope de 78 vh): con una explicación muy larga la pantalla no tiene recorrido para subir el contenido",
+  "archivos": {
+    "estilos/practica.css": "practica.css"
+  },
+  "comando": [
+    "node",
+    "--test",
+    "--test-reporter=tap",
+    "tests/e2e/practica_banda.test.mjs"
+  ],
+  "espera_codigo_no_cero": true,
+  "espera_fallan_tests": [
+    "E40: una explicación muy larga"
+  ]
+}

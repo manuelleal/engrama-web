@@ -194,6 +194,9 @@ Fuente de cómo se ve: `..\..\diseno\sistema\` (`sistema.css`, `LEEME.md`). Regl
 - **L1 (`vistas/estudiante/reto_l1.js`):** pinta las preguntas de `/attempt` (nunca el detalle); elegir es neutro; "Comprobar" manda la label, una vez;
   la banda (`ui/explicacion.js`, `sx-banda`) dice veredicto con ícono y texto, oración, regla, "por qué no la tuya" SOLO si falló y ejemplo, con rótulos
   y `lang` por idioma (`es` A1/A2, `en` desde B1); retoma con `GET …/answers`; cierra con `/finish`. Nada de una pregunta aparece antes de comprobarla.
+  **La banda no tapa lo que explica** (adenda 1 de `docs/ESPEC_visual_reto_tanda2.md`): tras comprobar, `ui/despejar_banda.js` desplaza la página lo mínimo (suave; `auto` con
+  movimiento reducido) para dejar el enunciado y las opciones marcadas por encima de la banda, `practica.css` reserva abajo el tope de la banda (`--tope-banda`, 78 vh) y "Siguiente"
+  abre arriba. Lo mide E40 (`practica_banda.test.mjs`, `herramientas/humo/medir_banda.mjs`); fotos con `node herramientas/capturas_banda.mjs <carpeta> [--reducido]`.
 - **"Tu práctica de hoy" (`inicio_practica.js`, `ui/practica.js`):** la protagonista de "Ahora" conserva `tarjeta-reto-hoy`, `jugar-reto-hoy` (un enlace),
   `fila-ahora` y la única invitación, y es compacta (E31: los tres botones de "Ahora" sobre la barra sin desplazar, también a 360 × 640). **0 `POST
   /challenges/tanda` al pintar**: "Jugar" lo hace con un toque. El nivel de práctica va después de "Ahora", nunca en el escudo. `#/repaso`

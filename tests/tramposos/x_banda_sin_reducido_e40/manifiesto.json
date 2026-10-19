@@ -1,0 +1,16 @@
+{
+  "descripcion": "E40: con prefers-reduced-motion el desplazamiento sigue siendo suave (behavior smooth)",
+  "archivos": {
+    "src/ui/despejar_banda.js": "despejar_banda.js"
+  },
+  "comando": [
+    "node",
+    "--test",
+    "--test-reporter=tap",
+    "tests/e2e/practica_banda.test.mjs"
+  ],
+  "espera_codigo_no_cero": true,
+  "espera_fallan_tests": [
+    "E40: con prefers-reduced-motion"
+  ]
+}
