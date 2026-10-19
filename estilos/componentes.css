@@ -582,6 +582,15 @@ nav {
     white-space: nowrap;
   }
 }
+/* B1: a 375 px la columna de un eje mide ~85 px y el ícono SVG es más ancho que el glifo de antes: junto a la palabra la parte letra por letra ("Sin dato s"). En
+   celular el ícono va ARRIBA de la palabra; desde 900 px sigue a su lado, en una sola línea (regla de arriba). */
+@media (max-width: 899px) {
+  #vista [data-testid="tabla-logro"] .chip-estado {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 2px;
+  }
+}
 
 /* Barra de la pantalla de entrada del profe y del admin (Mis grupos, Crear grupo): esos dos roles
    no tienen la navegación inferior del estudiante, así que este es su único "Cerrar sesión"
