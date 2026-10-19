@@ -24,7 +24,7 @@ export function planDeAsistencia(monedas, racha) {
 
 export function crearSello() {
   return h('div', { class: 'sello', 'aria-hidden': 'true', 'data-testid': 'sello' },
-    h('span', { class: 'sello-marca' }, '✓'), h('span', { class: 'sello-texto' }, textos.asistencia.sello));
+    h('span', { class: 'sello-marca' }, crearIcono('visto')), h('span', { class: 'sello-texto' }, textos.asistencia.sello));
 }
 
 /**

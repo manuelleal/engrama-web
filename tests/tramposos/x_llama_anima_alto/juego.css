@@ -646,6 +646,13 @@ body {
 .sello-marca {
   font-size: 3rem;
   line-height: 1;
+  display: grid;
+  place-items: center;
+}
+/* B1: la marca es un SVG de ui/iconos.js (antes el glifo de texto), del tamaño que tenía la letra. */
+.sello-marca .sx-icono {
+  width: 1em;
+  height: 1em;
 }
 .sello-texto {
   font-size: 1.15rem;
@@ -1114,6 +1121,11 @@ body {
   line-height: 1;
   color: var(--oro-texto);
 }
+/* B1: el visto es un SVG de ui/iconos.js (antes un glifo de texto). */
+.semana-punto .sx-icono {
+  width: 18px;
+  height: 18px;
+}
 .semana-dia-lleno .semana-punto {
   border-color: color-mix(in srgb, var(--oro) 75%, black);
   background: var(--oro);
@@ -1174,6 +1186,16 @@ body {
   background: var(--oro);
   color: var(--oro-texto);
   font-size: 1.3rem;
+}
+/* B1: la estrella es un SVG de ui/iconos.js (antes un glifo de texto), llena como el sello. */
+.semana-sello-icono .sx-icono,
+.sello-merito-icono .sx-icono {
+  width: 22px;
+  height: 22px;
+}
+.semana-sello-icono .sx-icono[data-icono="estrella"],
+.sello-merito-icono .sx-icono[data-icono="estrella"] {
+  fill: currentColor;
 }
 .semana-sello-titulo {
   margin: 0;

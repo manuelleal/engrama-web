@@ -6,6 +6,7 @@ import test from 'node:test';
 import assert from 'node:assert/strict';
 import { textoCefrLevels, textoEje, chipDeEstado } from '../../src/vistas/profe/logro.js';
 import { textos } from '../../src/textos.js';
+import { ICONOS } from '../../src/ui/iconos.js';
 
 test('textoCefrLevels: con niveles, los lista', () => {
   assert.equal(textoCefrLevels({ B1: 2, sin_nivel: 1 }), 'B1: 2, sin_nivel: 1');
@@ -38,10 +39,12 @@ for (const eje of EJES_DE_MUESTRA) {
 // Segunda pasada de diseño (2026-09-28): el chip corto (ícono + palabra) de cada estado real del
 // servidor — nunca "débil"/"weak", mismo vocabulario que P1.
 test('chipDeEstado: los 4 estados reales del servidor tienen su propio chip', () => {
-  assert.deepEqual(chipDeEstado('logrado'), { icono: '✓', texto: textos.profe.logro.chipLogrado });
-  assert.deepEqual(chipDeEstado('en_desarrollo'), { icono: '↗', texto: textos.profe.logro.chipEnDesarrollo });
-  assert.deepEqual(chipDeEstado('a_reforzar'), { icono: '⚠', texto: textos.profe.logro.chipAReforzar });
-  assert.deepEqual(chipDeEstado('datos_insuficientes'), { icono: '–', texto: textos.profe.logro.chipSinDatos });
+  // B1: el ícono es el NOMBRE de uno de ui/iconos.js (antes, los glifos de texto ✓ ↗ ⚠ –).
+  assert.deepEqual(chipDeEstado('logrado'), { icono: 'visto', texto: textos.profe.logro.chipLogrado });
+  assert.deepEqual(chipDeEstado('en_desarrollo'), { icono: 'flecha_externa', texto: textos.profe.logro.chipEnDesarrollo });
+  assert.deepEqual(chipDeEstado('a_reforzar'), { icono: 'alerta', texto: textos.profe.logro.chipAReforzar });
+  assert.deepEqual(chipDeEstado('datos_insuficientes'), { icono: 'guion', texto: textos.profe.logro.chipSinDatos });
+  for (const status of ['logrado', 'en_desarrollo', 'a_reforzar', 'datos_insuficientes']) assert.ok(ICONOS.includes(chipDeEstado(status).icono), `${status}: el ícono existe en ui/iconos.js`);
 });
 
 test('chipDeEstado: un status desconocido (o sin eje) cae en "sin datos", nunca en un chip vacío', () => {

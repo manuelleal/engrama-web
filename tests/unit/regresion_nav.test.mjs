@@ -143,7 +143,15 @@ const RETO_T2 = { reto_en_curso: [{ etiqueta: 'span', clase: 'panel-icono' }], r
 // ui/iconos.js (en la foto, sin SVG, el hueco queda vacío); el texto de cada fila no cambia. La salida "Salir" pierde su "✕" por la misma razón (SALIR_W73).
 const RESULTADO_B1 = { revision: ['revision-q1-resultado', 'revision-q2-resultado'] };
 
-const CAPAS = [HASTA_W70, VOLVER_W71, SALIR_W73, SONIDO_S1, NUMEROS_S1, CABECERA_S1, RETO_T2, RESULTADO_B1];
+// B1 (compuerta 24, H1, rama web/glifos-svg): lo que antes era un glifo de texto usado como ícono pasa a ser un SVG de ui/iconos.js (en la foto, sin SVG,
+// el hueco del ícono queda vacío y `aria-hidden`); el texto de cada nodo no cambia. Se declara UN subárbol por glifo:
+//   - la etiqueta de estado de Mis solicitudes (el sobre del estado "abierta");
+//   - la insignia "Completado" de la lista de Retos (su visto ya no va pegado al texto: ícono SVG aparte);
+//   - los chips de estado del logro del profe (visto, flecha, alerta): un nodo sin testid, por etiqueta y clase.
+const CHIP_DE_LOGRO = { etiqueta: 'span', clase: 'chip-estado' };
+const GLIFOS_B1 = { solicitudes: ['solicitud-7-estado'], retos: ['reto-reto-0-estado'], profe_logro: [CHIP_DE_LOGRO] };
+
+const CAPAS = [HASTA_W70, VOLVER_W71, SALIR_W73, SONIDO_S1, NUMEROS_S1, CABECERA_S1, RETO_T2, RESULTADO_B1, GLIFOS_B1];
 /** @type {Record<string, Array<string|{etiqueta: string, clase?: string}>>} */
 export const DECLARADAS_NAV = Object.fromEntries([...new Set(CAPAS.flatMap((c) => Object.keys(c)))].map((nombre) => [nombre, [...new Set(CAPAS.flatMap((c) => c[nombre] || []))]]));
 
@@ -193,8 +201,9 @@ test('R9: lo que W71 declara cambió de verdad: cada escena que no es pestaña t
   for (const nombre of ['vivo', 'nivel']) {
     const i = hoy[nombre].findIndex((l) => l.includes('data-testid="salida-sales"'));
     assert.ok(hoy[nombre][i].includes('class="nota-salida"') && !hoy[nombre][i].includes('texto-apoyo'), `${nombre}: la nota de salida ya no va en mayúsculas grises`);
-    assert.ok(hoy[nombre][i + 1].includes('aria-hidden="true"') && hoy[nombre][i + 2].trim() === '"↗ "', `${nombre}: con "↗" delante, que no se lee`);
-    assert.equal(hoy[nombre][i + 3].trim(), JSON.stringify('Vas a salir de ENGRAMA con tu cuenta; se abre en esta misma pestaña. Para volver, usa el botón atrás del navegador.'));
+    // B1 (H1): la flecha que antes era el glifo "↗ " de texto es un SVG de ui/iconos.js (en la foto, el hueco vacío, oculto al lector); la frase es la misma.
+    assert.ok(hoy[nombre][i + 1].includes('class="icono-en-linea"') && hoy[nombre][i + 1].includes('aria-hidden="true"'), `${nombre}: con la flecha externa delante (en la foto, su hueco), que no se lee`);
+    assert.equal(hoy[nombre][i + 2].trim(), JSON.stringify('Vas a salir de ENGRAMA con tu cuenta; se abre en esta misma pestaña. Para volver, usa el botón atrás del navegador.'));
   }
 });
 
@@ -350,4 +359,26 @@ test('R9: lo que B1 declara en la revisión cambió de verdad: el glifo ✓ / �
     assert.equal(hoyFila[2].trim(), JSON.stringify(texto), `${id}: sin glifo, el texto de la fila es el mismo`);
   }
   assert.ok(!hoy.some((l) => /"[✓✗]"/.test(l)), 'ningún glifo ✓ / ✗ suelto en la revisión');
+});
+
+test('R9: lo que B1 declara de los glifos de texto cambió de verdad: cada glifo de la línea base salió y queda el hueco del ícono SVG (span aria-hidden, vacío en la foto) con el texto de siempre', async () => {
+  const hoy = await tomarFotosNav({ solo: ['solicitudes', 'retos', 'profe_logro'] });
+  const dice = (lineas, texto) => lineas.some((l) => l.trim() === JSON.stringify(texto));
+  // La etiqueta de estado: span.etiqueta-icono (aria-hidden) con el glifo, y el texto en su span.
+  assert.ok(dice(CRUDA.vistas.solicitudes, '✉'), 'la línea base traía el sobre de texto');
+  assert.ok(!dice(hoy.solicitudes, '✉'), 'hoy ya no');
+  const i = hoy.solicitudes.findIndex((l) => l.includes('class="etiqueta-icono"') && l.includes('aria-hidden="true"'));
+  assert.ok(i > 0 && hoy.solicitudes[i + 1].includes('class="etiqueta-texto"'), 'queda el hueco del ícono, vacío, y enseguida su texto');
+  assert.equal(hoy.solicitudes[i + 2].trim(), '"Recibida, sin respuesta todavía"', 'el texto de la etiqueta es el de siempre');
+  // La insignia de Retos: el glifo iba DENTRO del texto ("Completado ✓"); hoy el texto es "Completado" y el ícono es un hueco aparte.
+  assert.ok(dice(CRUDA.vistas.retos, 'Completado ✓') && !dice(hoy.retos, 'Completado ✓'), 'el glifo pegado al texto salió');
+  const j = hoy.retos.findIndex((l) => l.includes('data-testid="reto-reto-0-estado"'));
+  assert.ok(j > 0 && hoy.retos[j + 1].includes('span aria-hidden="true"') && hoy.retos[j + 2].trim() === '"Completado"', 'queda el hueco del ícono, oculto al lector, y el texto "Completado"');
+  // Los chips del logro: span.chip-estado con el glifo en un span aria-hidden y el texto suelto; hoy, el hueco vacío y el mismo texto.
+  for (const glifo of ['✓', '↗', '⚠']) {
+    assert.ok(dice(CRUDA.vistas.profe_logro, glifo) && !dice(hoy.profe_logro, glifo), `el glifo ${glifo} de un chip salió`);
+  }
+  const chips = hoy.profe_logro.map((l, k) => [l, k]).filter(([l]) => l.includes('class="chip-estado chip-estado-'));
+  assert.ok(chips.length >= 3, 'los chips siguen en la tabla');
+  for (const [, k] of chips) assert.ok(hoy.profe_logro[k + 1].trim() === 'span aria-hidden="true"' && hoy.profe_logro[k + 2].trim().startsWith('"'), 'cada chip: el hueco del ícono, oculto al lector, y luego su texto');
 });

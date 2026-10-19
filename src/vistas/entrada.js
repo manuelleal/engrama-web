@@ -3,8 +3,9 @@
 // En modo supabase (W22, encargo A): correo y contraseña de verdad, contra GoTrue por REST
 // (auth/supabase_rest.js) — los botones de actores "demo" JAMÁS aparecen en este modo (tramposo
 // x_botones_demo_en_supabase prueba justo lo contrario de esto).
-import { h, montar } from '../ui/dom.js';
+import { h, montar, vaciar } from '../ui/dom.js';
 import { textos } from '../textos.js';
+import { crearIcono } from '../ui/iconos.js';
 import { ACTORES_SINTETICOS } from '../auth/mock.js';
 import { leerAviso } from '../aviso.js';
 import { renderLeerAviso } from './aviso_datos.js';
@@ -26,10 +27,22 @@ function vistaActores(alEntrar) {
   );
 }
 
+/**
+ * H5 (compuerta 24): el error se lee como error: el ícono de lo incorrecto (equis), el color de "incorrecto" del sistema (entrada.css) y el texto. La zona
+ * sigue siendo UNA región `role="alert"` desde que se pinta (vacía, no ocupa sitio); lo que cambia es lo que lleva dentro.
+ * @param {HTMLElement} zona @param {string} mensaje
+ */
+function mostrarError(zona, mensaje) {
+  vaciar(zona);
+  zona.appendChild(h('span', { 'aria-hidden': 'true' }, crearIcono('equis')));
+  zona.appendChild(h('span', {}, mensaje));
+}
+
 async function manejarEntrarReal(alEntrar, campoCorreo, campoContrasena, boton, zonaError) {
   const correo = campoCorreo.value.trim();
   const contrasena = campoContrasena.value;
-  if (!correo || !contrasena) { zonaError.textContent = textos.entrada.faltanDatos; return; }
+  if (!correo || !contrasena) { mostrarError(zonaError, textos.entrada.faltanDatos); return; }
+  vaciar(zonaError); // un intento nuevo no deja a la vista el error del anterior
   boton.disabled = true;
   boton.textContent = textos.entrada.entrando;
   try {
@@ -40,7 +53,7 @@ async function manejarEntrarReal(alEntrar, campoCorreo, campoContrasena, boton, 
   } catch (e) {
     boton.disabled = false;
     boton.textContent = textos.entrada.entrar;
-    zonaError.textContent = (e && e.mensaje) || textos.entrada.errorGeneral;
+    mostrarError(zonaError, (e && e.mensaje) || textos.entrada.errorGeneral);
   }
 }
 

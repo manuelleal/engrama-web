@@ -6,6 +6,7 @@
 //   - textos neutros (dictamen 04 §1.1): nunca una pérdida ni una cuenta regresiva; la semana nueva se dice una vez, sin sonido ni rojo;
 //   - la llama solo se celebra si la racha SUBIÓ respecto de lo último visto (como la constancia: ui/racha.js `planDeRacha`, que se reutiliza).
 import { h } from './dom.js';
+import { crearIcono } from './iconos.js';
 import { textos } from '../textos.js';
 import { textosPractica } from '../textos_practica.js';
 import { duracionEfectiva, reducirMovimiento } from './movimiento.js';
@@ -93,7 +94,7 @@ export function planDeRachaSemanal(previo, semanas, reducido = reducirMovimiento
  */
 export function crearTarjetaRacha(plan) {
   const puntos = plan.puntos.map((p) => h('li', { class: `sx-dia${p.lleno ? ' es-hecho' : ''}${p.hoy ? ' es-hoy' : ''}`, 'aria-label': p.texto, 'data-fecha': p.fecha },
-    h('span', { class: 'sx-dia__punto', 'aria-hidden': 'true' }, p.lleno ? '✓' : ''),
+    h('span', { class: 'sx-dia__punto', 'aria-hidden': 'true' }, crearIcono('visto')), // el sistema lo muestra solo en `es-hecho` (sistema.css)
     h('span', { 'aria-hidden': 'true' }, p.letra)));
   return h(
     'section', { class: `sx-tarjeta sx-racha racha-semanal${plan.completa ? ' semana-completa' : ''}`, 'data-testid': 'progreso-semana', 'aria-label': textos.semana.titulo },

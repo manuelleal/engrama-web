@@ -6,7 +6,7 @@
 // x_402_generico (asistencia.js: el 402 sale como "Error inesperado (402)"). El de U37 (x_desglose_inventado) está en ui_desglose.test.mjs.
 import test from 'node:test';
 import assert from 'node:assert/strict';
-import { entornoDeFotos, crearRaiz, buscar, textoDe } from './foto_vistas.mjs';
+import { entornoDeFotos, crearRaiz, buscar, elementos, textoDe, ponerSvgFalso, iconosDe } from './foto_vistas.mjs';
 import { renderAsistencia } from '../../src/vistas/estudiante/asistencia.js';
 
 const json = (status, cuerpo) => new Response(JSON.stringify(cuerpo), { status, headers: { 'Content-Type': 'application/json' } });
@@ -19,7 +19,7 @@ const marca = (fecha, monedas) => ({ id: `${fecha}${monedas}`, attendance_date: 
  * Escribe el código y marca, con el servidor falso `rutas`, y deja que terminen las peticiones.
  * @param {Record<string, unknown>} rutas
  */
-async function marcar(rutas) {
+async function marcar(rutas, { svg = false } = {}) {
   const g = /** @type {any} */ (globalThis);
   const previo = { window: g.window, navigator: Object.getOwnPropertyDescriptor(globalThis, 'navigator'), consola: { ...console } };
   g.window = { addEventListener() {}, removeEventListener() {} };
@@ -27,6 +27,7 @@ async function marcar(rutas) {
   /** @type {string[]} */ const consola = [];
   for (const nivel of ['log', 'info', 'warn', 'error', 'debug']) console[nivel] = (...a) => { consola.push(a.map(String).join(' ')); };
   const entorno = entornoDeFotos(rutas);
+  if (svg) ponerSvgFalso(); // B1: para ver QUÉ ícono dibuja el aviso (solo donde no se celebra: con el sello, Drako usaría el rig)
   try {
     const raiz = crearRaiz();
     renderAsistencia(raiz, {}, CTX);
@@ -45,7 +46,7 @@ const checkIn = (monedas, racha = 3) => () => json(200, { success: true, coins_a
 
 test('U38: 200 con 10 monedas y un asiento 5 + 5 → el texto de siempre, el desglose "5 por asistir + 5 por llegar a tiempo", el sello y las fichas', async () => {
   const v = await marcar({ 'POST /core/attendance/check-in': checkIn(10), 'GET /core/coins/history': libro(10, { base: 5, puntualidad: 5, puntual: true }) });
-  assert.match(textoDe(buscar(v.raiz, 'resultado')), / Asistencia marcada · \+10 monedas · clases seguidas 3/);
+  assert.match(textoDe(buscar(v.raiz, 'resultado')), / Asistencia marcada · \+10 monedas · Clases seguidas: 3/);
   assert.equal(textoDe(buscar(v.raiz, 'asistencia-desglose')), '5 por asistir + 5 por llegar a tiempo');
   assert.ok(buscar(v.raiz, 'sello'), 'el sello');
   assert.ok(buscar(v.raiz, 'chip-monedas'), 'las monedas');
@@ -72,7 +73,7 @@ test('U38: 200 con N monedas y sin un asiento que cuadre (backend viejo con mult
   for (const [caso, respuesta] of sinDesglose) {
     const v = await marcar({ 'POST /core/attendance/check-in': checkIn(10), 'GET /core/coins/history': respuesta });
     assert.equal(buscar(v.raiz, 'asistencia-desglose'), null, `${caso}: sin desglose`);
-    assert.match(v.texto(), / Asistencia marcada · \+10 monedas · clases seguidas 3/, `${caso}: el texto de siempre`);
+    assert.match(v.texto(), / Asistencia marcada · \+10 monedas · Clases seguidas: 3/, `${caso}: el texto de siempre`);
     assert.equal(buscar(v.raiz, 'resultado-info'), null);
   }
 });
@@ -100,6 +101,7 @@ test('U38: 200 con 0 monedas SIN esa prueba (la que pagó es de ayer, o la lista
   for (const [caso, respuesta] of sinPrueba) {
     const v = await marcar({ 'POST /core/attendance/check-in': checkIn(0, 4), 'GET /core/attendance/history': respuesta });
     assert.equal(textoDe(buscar(v.raiz, 'resultado')), ' Asistencia marcada. Clases seguidas: 4.', caso);
+    assert.match(buscar(v.raiz, 'resultado').className, /resultado-ok/, `${caso}: la segunda marca del día es un resultado POSITIVO (con el ícono SVG, ya no el glifo ✗/✓ del texto, el texto solo no lo delata)`);
     assert.doesNotMatch(textoDe(v.raiz), /cobraste|\+0/, caso);
     assert.equal(buscar(v.raiz, 'chip-monedas'), null, `${caso}: 0 fichas`);
     assert.ok(buscar(v.raiz, 'sello'), `${caso}: el sello`);
@@ -107,9 +109,10 @@ test('U38: 200 con 0 monedas SIN esa prueba (la que pagó es de ayer, o la lista
 });
 
 test('U40 (check-in): un 402 muestra su texto con ícono de información — no "Error inesperado (402)" ni ✗', async () => {
-  const v = await marcar({ 'POST /core/attendance/check-in': () => json(402, { detail: 'Insufficient funds' }) });
+  const v = await marcar({ 'POST /core/attendance/check-in': () => json(402, { detail: 'Insufficient funds' }) }, { svg: true });
   const aviso = textoDe(buscar(v.raiz, 'resultado-info'));
-  assert.equal(aviso, 'ℹ No pudimos registrar tu asistencia: la bolsa de monedas de tu institución se agotó. No es por ti. Avísale a tu profe.');
+  assert.deepEqual(iconosDe(buscar(v.raiz, 'resultado-info')), ['info'], 'el ícono es el de información SVG (B1: antes, el glifo ℹ de texto)');
+  assert.equal(aviso, ' No pudimos registrar tu asistencia: la bolsa de monedas de tu institución se agotó. No es por ti. Avísale a tu profe.');
   assert.doesNotMatch(textoDe(v.raiz), /Error inesperado|402|✗/);
   assert.equal(buscar(v.raiz, 'resultado'), null, 'no es un resultado con ✗');
   assert.equal(buscar(v.raiz, 'sello'), null, 'no se celebra');
@@ -129,7 +132,7 @@ const SOLO_EL_POST = ['POST /core/attendance/check-in'];
 
 test('U73: con los campos del check-in (10 = 5 + 5) se ve "+10 monedas" y su desglose con 1 POST y 0 GET', async () => {
   const v = await marcar({ 'POST /core/attendance/check-in': checkInConCampos(10, { base: 5, puntualidad: 5, puntual: true, ya_cobrada_hoy: false }) });
-  assert.match(textoDe(buscar(v.raiz, 'resultado')), / Asistencia marcada · \+10 monedas · clases seguidas 3/);
+  assert.match(textoDe(buscar(v.raiz, 'resultado')), / Asistencia marcada · \+10 monedas · Clases seguidas: 3/);
   assert.equal(textoDe(buscar(v.raiz, 'asistencia-desglose')), '5 por asistir + 5 por llegar a tiempo');
   assert.deepEqual(v.llamadas, SOLO_EL_POST, 'ni el libro ni el historial: la respuesta ya lo dijo');
   assert.ok(buscar(v.raiz, 'sello') && buscar(v.raiz, 'chip-monedas'));
@@ -180,5 +183,45 @@ test('U73: el renglón del desglose está reservado desde que hay monedas (y no 
   assert.ok(cuerpo.children.some((n) => n.className === 'renglon-desglose'), 'el renglón está aunque el desglose no llegue');
   const sinMonedas = await marcar({ 'POST /core/attendance/check-in': checkInConCampos(0, { ya_cobrada_hoy: true }) });
   assert.ok(!buscar(sinMonedas.raiz, 'asistencia-cuerpo').children.some((n) => n.className === 'renglon-desglose'));
+});
+
+/** El texto que se VE bajo `nodo`: sin lo que va solo para el lector de pantalla (`.solo-lectores`). @param {any} nodo @returns {string} */
+function visibleDe(nodo) {
+  if (nodo.nodeType === 3) return nodo.data;
+  if (String(nodo.className).split(/\s+/).includes('solo-lectores')) return '';
+  return [nodo.textContent || '', ...nodo.children.map(visibleDe)].join('');
+}
+const veces = (texto, trozo) => texto.split(trozo).length - 1;
+
+test('U38 (H4): lo que se ve de la marca dice cada dato UNA vez y con el formato del renglón: la banda solo "Asistencia marcada" y el lector de pantalla sigue oyendo las monedas y las clases seguidas', async () => {
+  const v = await marcar({ 'POST /core/attendance/check-in': checkIn(10), 'GET /core/coins/history': libro(10, { base: 5, puntualidad: 5, puntual: true }) });
+  const banda = buscar(v.raiz, 'resultado');
+  assert.equal(visibleDe(banda), ' Asistencia marcada', 'la banda verde ya no repite las monedas ni las clases seguidas');
+  assert.equal(textoDe(banda), ' Asistencia marcada · +10 monedas · Clases seguidas: 3', 'el lector de pantalla oye lo de siempre, con el formato del renglón');
+  const solo = elementos(banda).filter((n) => String(n.className) === 'solo-lectores');
+  assert.equal(solo.length, 1, 'un solo trozo solo-para-lectores');
+  assert.equal(textoDe(solo[0]), ' · +10 monedas · Clases seguidas: 3');
+  assert.equal(solo[0].getAttribute('aria-hidden'), null, 'ese trozo SÍ se lee');
+  const visible = visibleDe(buscar(v.raiz, 'asistencia-resultado'));
+  assert.equal(veces(visible, '+10 monedas'), 1, 'las monedas, una vez (el chip)');
+  assert.equal(veces(visible, 'Clases seguidas'), 1, 'las clases seguidas, una vez (el renglón)');
+  assert.match(visible, /Clases seguidas: 3/, 'con el formato del renglón: dos puntos');
+  assert.doesNotMatch(visible, /clases seguidas \d/, 'sin la forma vieja, sin dos puntos');
+});
+
+test('U38 (H4): la segunda marca del día y la de 0 monedas tampoco repiten las clases seguidas a la vista (el renglón las dice; el lector las oye aparte)', async () => {
+  const cobrada = await marcar({ 'POST /core/attendance/check-in': checkIn(0, 4), 'GET /core/attendance/history': () => json(200, [marca('2026-10-08', 0), marca('2026-10-08', 10)]) });
+  const sinPrueba = await marcar({ 'POST /core/attendance/check-in': checkIn(0, 4), 'GET /core/attendance/history': () => json(200, [marca('2026-10-07', 10)]) });
+  for (const [caso, v, completo, visibleBanda] of /** @type {[string, any, string, string][]} */ ([
+    ['ya la cobraste', cobrada, ' Asistencia marcada. La de hoy ya la cobraste: las monedas de asistencia son una vez por día. Clases seguidas: 4.', ' Asistencia marcada. La de hoy ya la cobraste: las monedas de asistencia son una vez por día.'],
+    ['sin prueba', sinPrueba, ' Asistencia marcada. Clases seguidas: 4.', ' Asistencia marcada.'],
+  ])) {
+    const banda = buscar(v.raiz, 'resultado');
+    assert.equal(textoDe(banda), completo, `${caso}: el lector oye el texto entero`);
+    assert.equal(visibleDe(banda), visibleBanda, `${caso}: a la vista, sin las clases seguidas`);
+    const visible = visibleDe(buscar(v.raiz, 'asistencia-resultado'));
+    assert.equal(veces(visible, 'Clases seguidas'), 1, `${caso}: las clases seguidas, una vez (el renglón)`);
+    assert.doesNotMatch(visible, /\+\d+ monedas/, `${caso}: ni un "+N monedas"`);
+  }
 });
 

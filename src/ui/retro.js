@@ -14,7 +14,8 @@ export function contenidoDelResultado(datos) {
 }
 
 /**
- * @param {{ok: boolean, texto: string, testid?: string}} datos
+ * @param {{ok: boolean, texto: string, testid?: string, soloLectores?: string|null}} datos `soloLectores`: lo que el lector de pantalla oye además (y que ya
+ *   se ve en otro sitio de la pantalla, p. ej. el chip de monedas); no se ve ahí para no decir lo mismo dos veces (H4, compuerta 24)
  */
 export function crearResultado(datos) {
   const c = contenidoDelResultado(datos);
@@ -23,5 +24,6 @@ export function crearResultado(datos) {
     { role: 'status', 'aria-live': 'polite', 'data-testid': datos.testid || 'resultado', class: c.clase },
     h('span', { 'aria-hidden': 'true' }, crearIcono(c.icono)),
     ` ${c.texto}`,
+    datos.soloLectores ? h('span', { class: 'solo-lectores' }, datos.soloLectores) : null,
   );
 }

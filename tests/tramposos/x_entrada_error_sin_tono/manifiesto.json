@@ -1,0 +1,16 @@
+{
+  "descripcion": "H5 (compuerta 24): el error de la entrada vuelve a leerse en tinta negra, sin el color de incorrecto ni su fondo",
+  "archivos": {
+    "estilos/entrada.css": "entrada.css"
+  },
+  "comando": [
+    "node",
+    "--test",
+    "--test-reporter=tap",
+    "tests/e2e/entrada_error.test.mjs"
+  ],
+  "espera_codigo_no_cero": true,
+  "espera_fallan_tests": [
+    "E41: el error de la entrada se lee como error"
+  ]
+}

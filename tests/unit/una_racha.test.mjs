@@ -21,7 +21,7 @@ test('U100a: los textos del resultado de la asistencia dicen "clases seguidas", 
     assert.match(t, /[Cc]lases seguidas:? \d/, t);
     assert.doesNotMatch(t, /constancia|llama|racha|semana/i, `${t}: la asistencia no usa el vocabulario de la racha semanal`);
   }
-  assert.equal(textos.asistencia.exito(10, 3), 'Asistencia marcada · +10 monedas · clases seguidas 3');
+  assert.equal(textos.asistencia.exito(10, 3), 'Asistencia marcada · +10 monedas · Clases seguidas: 3');
   assert.equal(textos.asistencia.sinMonedas(2), 'Asistencia marcada. Clases seguidas: 2.');
   assert.match(textos.asistencia.yaCobrada(4), /una vez por día\. Clases seguidas: 4\.$/);
 });

@@ -13,6 +13,7 @@
 // ambos viven en la misma celda con jerarquía visual.
 import { h, montar } from '../../ui/dom.js';
 import { textos } from '../../textos.js';
+import { crearIcono } from '../../ui/iconos.js';
 import { leerLogro } from '../../api/profe.js';
 import { ErrorApi } from '../../api/cliente.js';
 import { crearNavInferior } from '../../ui/nav_inferior.js';
@@ -26,10 +27,10 @@ const barra = (ctx) => crearNavInferior(RUTA, /** @type {any} */ (ctx)?.sesion?.
 const EJES = ['Comprehension', 'Expression', 'Accuracy'];
 
 const CHIPS_POR_ESTADO = {
-  logrado: { icono: '✓', texto: textos.profe.logro.chipLogrado },
-  en_desarrollo: { icono: '↗', texto: textos.profe.logro.chipEnDesarrollo },
-  a_reforzar: { icono: '⚠', texto: textos.profe.logro.chipAReforzar },
-  datos_insuficientes: { icono: '–', texto: textos.profe.logro.chipSinDatos },
+  logrado: { icono: 'visto', texto: textos.profe.logro.chipLogrado },
+  en_desarrollo: { icono: 'flecha_externa', texto: textos.profe.logro.chipEnDesarrollo },
+  a_reforzar: { icono: 'alerta', texto: textos.profe.logro.chipAReforzar },
+  datos_insuficientes: { icono: 'guion', texto: textos.profe.logro.chipSinDatos },
 };
 
 /** Pura: "B1: 2, sin_nivel: 1" o el texto de "sin niveles" si el eje no tiene retos todavía. */
@@ -44,7 +45,7 @@ export function textoEje(axisOut) {
   return `${axisOut.label} · ${textoCefrLevels(axisOut.cefr_levels)}`;
 }
 
-/** Ícono + palabra corta para un `status` del servidor — pura, sin DOM. Un status desconocido
+/** Ícono (el NOMBRE de uno de ui/iconos.js) + palabra corta para un `status` del servidor — pura, sin DOM. Un status desconocido
  * (que el servidor de hoy nunca manda) cae en "sin datos", nunca en un chip vacío. */
 export function chipDeEstado(status) {
   return CHIPS_POR_ESTADO[status] || CHIPS_POR_ESTADO.datos_insuficientes;
@@ -57,7 +58,7 @@ function celdaDeEje(estudiante, eje) {
     'td', { 'data-testid': `logro-${estudiante.profile_id}-${eje}` },
     h('div', { class: 'celda-logro' },
       h('span', { class: `chip-estado chip-estado-${axisOut?.status || 'datos_insuficientes'}` },
-        h('span', { 'aria-hidden': 'true' }, chip.icono), chip.texto),
+        h('span', { 'aria-hidden': 'true' }, crearIcono(chip.icono)), chip.texto),
       h('span', { class: 'detalle-logro' }, axisOut ? textoEje(axisOut) : textos.profe.logro.sinNivelesCefr)),
   );
 }

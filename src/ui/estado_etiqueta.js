@@ -5,20 +5,21 @@
 // Drako no aparece aquí: presenta, nunca califica (010).
 import { h } from './dom.js';
 import { textos } from '../textos.js';
+import { crearIcono } from './iconos.js';
 
-/** El ícono de cada estado. Los glifos son de texto (sin imágenes que cargar). */
+/** El NOMBRE del ícono SVG de cada estado (ui/iconos.js; B1: antes eran glifos de texto, que cambian de dibujo en cada teléfono). */
 const ICONOS = {
-  pendiente: '⏳',
-  ya_no_esta: 'ℹ',
-  suspendida: '⏸',
-  inscripcion_aprobada: '✓',
-  inscripcion_rechazada: '✗',
-  nivel_confirmado: '✓',
-  nivel_provisional: '⏳',
-  solicitud_abierta: '✉',
-  solicitud_en_tramite: '⏳',
-  solicitud_resuelta: '✓',
-  solicitud_rechazada: 'ℹ', // no `✗`: ese es el de una respuesta incorrecta (dictamen 03, G5)
+  pendiente: 'reloj',
+  ya_no_esta: 'info',
+  suspendida: 'pausa',
+  inscripcion_aprobada: 'visto',
+  inscripcion_rechazada: 'equis',
+  nivel_confirmado: 'visto',
+  nivel_provisional: 'reloj',
+  solicitud_abierta: 'sobre',
+  solicitud_en_tramite: 'reloj',
+  solicitud_resuelta: 'visto',
+  solicitud_rechazada: 'info', // no `equis`: ese es el de una respuesta incorrecta (dictamen 03, G5)
 };
 
 /** Los estados que existen, en el orden de la tabla. */
@@ -26,7 +27,7 @@ export const ESTADOS_CON_ETIQUETA = Object.keys(ICONOS);
 
 /**
  * @param {string} estado una de ESTADOS_CON_ETIQUETA
- * @returns {{icono: string, texto: string}} ambos no vacíos; lanza si el estado no existe (nunca una etiqueta vacía)
+ * @returns {{icono: string, texto: string}} el nombre del ícono (de ui/iconos.js) y el texto, ambos no vacíos; lanza si el estado no existe (nunca una etiqueta vacía)
  */
 export function etiquetaDeEstado(estado) {
   const icono = ICONOS[estado];
@@ -40,7 +41,7 @@ export function crearEtiquetaEstado(estado, opciones = {}) {
   const { icono, texto } = etiquetaDeEstado(estado);
   return h(
     'span', { class: 'etiqueta-estado', 'data-estado': estado, 'data-testid': opciones.testid || `estado-${estado}` },
-    h('span', { class: 'etiqueta-icono', 'aria-hidden': 'true' }, icono),
+    h('span', { class: 'etiqueta-icono', 'aria-hidden': 'true' }, crearIcono(icono)),
     h('span', { class: 'etiqueta-texto' }, texto),
   );
 }

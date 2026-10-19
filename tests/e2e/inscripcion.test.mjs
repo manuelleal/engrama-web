@@ -29,6 +29,8 @@ const PERSONAS = [['Nora Núñez', 'nora14@piloto.test', '1401'], ['Óscar Ruiz'
 const esperar = (ms) => new Promise((r) => setTimeout(r, ms));
 const hay = (sesion, testid) => sesion.evaluar(`Boolean(document.querySelector('[data-testid="${testid}"]'))`);
 const texto = (sesion, testid) => sesion.evaluar(`document.querySelector('[data-testid="${testid}"]')?.textContent ?? null`);
+/** El `data-icono` del SVG que va en el aviso de la inscripción (ui/iconos.js), o null si no hay. */
+const iconoDeAviso = (sesion) => sesion.evaluar(`document.querySelector('[data-testid="inscripcion-aviso"] svg')?.getAttribute('data-icono') ?? null`);
 async function esperarVista(sesion, testid, limiteMs = 8000) {
   const fin = Date.now() + limiteMs;
   while (Date.now() < fin) { if (await hay(sesion, testid)) return true; await esperar(100); }
@@ -100,7 +102,8 @@ test('E14: el profe genera el código (se ve UNA vez), ve 3 pendientes, aprueba 
       // Aprueba a la primera: un toque.
       await tocar(sesion, `aprobar-${primera}`);
       assert.ok(await esperarVista(sesion, 'resultado-aprobado'));
-      assert.match(await texto(sesion, 'inscripcion-aviso'), /^✓Aprobado: Nora Núñez$/);
+      assert.match(await texto(sesion, 'inscripcion-aviso'), /^Aprobado: Nora Núñez$/);
+      assert.equal(await iconoDeAviso(sesion), 'visto', 'ícono SVG (B1: antes, el glifo ✓ de texto)');
       assert.equal(estado.memberships.find((m) => m.profile_id === estado.solicitudesInscripcion[0].profileId)?.is_active, true, 'quedó inscrita');
       // Rechaza a la segunda: dos toques.
       const perfilRechazado = estado.solicitudesInscripcion[1].profileId;
@@ -109,7 +112,8 @@ test('E14: el profe genera el código (se ve UNA vez), ve 3 pendientes, aprueba 
       assert.ok(estado.profiles.has(perfilRechazado), 'tras el primer toque no se borró nada');
       await tocar(sesion, `rechazar-confirmar-${segunda}`);
       assert.ok(await esperarVista(sesion, 'resultado-rechazada'));
-      assert.match(await texto(sesion, 'inscripcion-aviso'), /^✗Rechazada: Óscar Ruiz$/);
+      assert.match(await texto(sesion, 'inscripcion-aviso'), /^Rechazada: Óscar Ruiz$/);
+      assert.equal(await iconoDeAviso(sesion), 'equis', 'ícono SVG (B1: antes, el glifo ✗ de texto)');
       assert.equal(estado.profiles.has(perfilRechazado), false, 'se borró su cuenta');
       assert.equal((await pendientesEnPantalla(sesion)).length, 1, 'queda una');
       // Al salir de la ruta el código desaparece; al volver, el panel dice que solo se muestra al crearlo.

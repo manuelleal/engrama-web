@@ -1,0 +1,16 @@
+{
+  "descripcion": "B1 (H1): la nota de salida vuelve a usar el glifo de texto \"↗ \" como ícono en vez del SVG de ui/iconos.js (cambia de dibujo en cada teléfono)",
+  "archivos": {
+    "src/ui/nota_salida.js": "nota_salida.js"
+  },
+  "comando": [
+    "node",
+    "--test",
+    "--test-reporter=tap",
+    "tests/unit/sin_glifos_de_texto.test.mjs"
+  ],
+  "espera_codigo_no_cero": true,
+  "espera_fallan_tests": [
+    "UB1: ningún glifo ni emoji de texto se usa como ícono"
+  ]
+}

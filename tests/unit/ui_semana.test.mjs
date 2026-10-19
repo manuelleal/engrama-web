@@ -7,7 +7,7 @@ import test from 'node:test';
 import assert from 'node:assert/strict';
 import { planDeSemana, diasDeLaSemana, crearSemana } from '../../src/ui/semana.js';
 import { metasDeSemana } from '../../src/config.js';
-import { entornoDeFotos, crearRaiz, buscar, textoDe, elementos } from './foto_vistas.mjs';
+import { entornoDeFotos, crearRaiz, buscar, textoDe, elementos, ponerSvgFalso, iconosDe } from './foto_vistas.mjs';
 import { NodoFalso } from './dom_falso.mjs';
 import { RUTAS, sesionDeEstudiante, TENANT_A, TENANT_B } from './fotos_de_las_vistas.mjs';
 import { renderInicio } from '../../src/vistas/estudiante/inicio.js';
@@ -169,11 +169,13 @@ test('U50: con la meta en 0 en config.json, Inicio muestra los puntos pero ni se
 
 test('U50: crearSemana conserva data-testid="progreso-semana" y marca los llenos con ícono y texto, no solo con color', () => {
   const entorno = entornoDeFotos({});
+  ponerSvgFalso(); // B1: la marca es un SVG; la prueba mira cuál
   try {
     const nodo = /** @type {any} */ (crearSemana(plan({ asistencias: [asistencia('2026-10-20')] })));
     assert.equal(nodo.getAttribute('data-testid'), 'progreso-semana');
     const lleno = elementos(nodo).find((e) => /semana-dia-lleno/.test(e.className));
-    assert.equal(textoDe(lleno), '✓M', 'la marca y la letra del día');
+    assert.equal(textoDe(lleno), 'M', 'la letra del día');
+    assert.deepEqual(iconosDe(lleno), ['visto'], 'y la marca, un SVG (B1: antes, el glifo ✓ de texto)');
     assert.equal(lleno.getAttribute('aria-label'), 'Martes: asistencia marcada');
   } finally { entorno.restaurar(); }
 });

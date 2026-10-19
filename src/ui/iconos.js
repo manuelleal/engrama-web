@@ -20,6 +20,15 @@ const FORMAS = {
   visto: ['M5 12.5l4.5 4.5L19 7.5'],
   equis: ['M6.5 6.5l11 11M17.5 6.5l-11 11'],
   lapiz: ['M5 19l1-4.5L15.5 5a2 2 0 0 1 3 3L9 17.5zM13.5 7l3 3'],
+  // B1 (compuerta 24, H1): los que antes eran glifos de texto (reloj de arena, flecha, alerta, info, sobre, estrella, pausa), ahora de la misma familia.
+  reloj: [[12, 12, 8.5], 'M12 7.5V12l3 2'],
+  flecha_externa: ['M7 17L17 7M9 7h8v8'],
+  alerta: ['M12 4l9 16H3z', 'M12 10v4M12 17h.01'],
+  info: [[12, 12, 8.5], 'M12 11v5.5M12 7.8h.01'],
+  sobre: [[3, 5.5, 18, 13, 2.5], 'M3.5 7.5l8.5 6 8.5-6'],
+  estrella: ['M12 3.8l2.5 5.2 5.7.8-4.1 4 1 5.7-5.1-2.7-5.1 2.7 1-5.7-4.1-4 5.7-.8z'],
+  pausa: ['M9 6v12M15 6v12'],
+  guion: ['M7 12h10'],
 };
 
 /** Los nombres que existen. */

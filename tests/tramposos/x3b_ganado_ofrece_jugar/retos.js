@@ -5,6 +5,7 @@
 import { h, montar } from '../../ui/dom.js';
 import { textos } from '../../textos.js';
 import { tituloLegible } from '../../ui/titulo.js';
+import { crearIcono } from '../../ui/iconos.js';
 import { crearNavInferior } from '../../ui/nav_inferior.js';
 import { crearCargando, crearVacio } from '../../ui/estados.js';
 import { crearCabecera } from '../../ui/cabecera.js';
@@ -47,7 +48,7 @@ function filaDeReto(reto, ganado) {
     h('div', { class: 'fila-texto' },
       h('span', { class: 'fila-titulo' }, tituloLegible(reto.title)),
       premio ? h('span', { class: 'texto-apoyo', 'data-testid': `reto-${reto.id}-premio` }, premio) : null, // discreto: sin oro ni animación
-      ganado ? h('span', { class: 'insignia', 'data-testid': `reto-${reto.id}-estado` }, textos.retos.completado) : null),
+      ganado ? h('span', { class: 'insignia', 'data-testid': `reto-${reto.id}-estado` }, h('span', { 'aria-hidden': 'true' }, crearIcono('visto')), textos.retos.completado) : null),
     enlace,
   );
 }

@@ -11,7 +11,7 @@ import test from 'node:test';
 import assert from 'node:assert/strict';
 import { meritoDelReto, planDeMerito, PASO_DE_MERITO_MS } from '../../src/ui/merito.js';
 import { planDeLinea, PASOS, PASOS_CON_MERITO } from '../../src/ui/linea_fin_reto.js';
-import { entornoDeFotos, crearRaiz, buscar, textoDe, elementos } from './foto_vistas.mjs';
+import { entornoDeFotos, crearRaiz, buscar, textoDe, elementos, ponerSvgFalso, iconosDe } from './foto_vistas.mjs';
 import { renderRevision } from '../../src/vistas/estudiante/revision.js';
 import { renderRetoFlujo } from '../../src/vistas/estudiante/reto_flujo.js';
 import { cancelarCelebraciones } from '../../src/ui/celebraciones.js';
@@ -87,6 +87,7 @@ const RETO = { id: 'r1', title: 'Reto', questions: [{ id: 'q1', question_text: '
 const RESULTADO = { ...perfecto, correct_answers: [{ question_id: 'q1', correct_answer: 'A' }] };
 function revisar(datos) {
   const entorno = entornoDeFotos({});
+  ponerSvgFalso(); // B1: el sello dibuja su ícono SVG; la prueba mira cuál
   const raiz = crearRaiz();
   renderRevision(raiz, { challenge: RETO, resultado: RESULTADO, respuestasDadas: { q1: 'A' }, rol: 'student', ...datos });
   return { raiz, cerrar() { cancelarCelebraciones(); entorno.restaurar(); } };
@@ -97,10 +98,11 @@ test('U49: en la revisión el sello va después de la medalla y antes de la prim
   try {
     const sello = buscar(v.raiz, 'merito');
     assert.equal(sello.getAttribute('data-merito'), 'primer_perfecto');
-    assert.equal(textoDe(sello), '★Primer reto perfecto');
+    assert.equal(textoDe(sello), 'Primer reto perfecto');
+    assert.deepEqual(iconosDe(sello), ['estrella'], 'ícono SVG + texto (B1: antes, el glifo ★ de texto)');
     assert.doesNotMatch(sello.className, /merito-espera/, 'con "reducir movimiento" el sello ya está puesto');
     assert.match(sello.className, /merito-estampado/);
-    assert.equal(elementos(sello).filter((e) => /drako/.test(e.className) || e.tagName === 'img' || e.tagName === 'svg').length, 0, 'Drako no va dentro del sello');
+    assert.equal(elementos(sello).filter((e) => /drako/.test(e.className) || e.tagName === 'img' || (e.tagName === 'svg' && !e.getAttribute('data-icono'))).length, 0, 'Drako no va dentro del sello (su ícono SVG es de ui/iconos.js)');
     const orden = elementos(v.raiz);
     const medalla = orden.findIndex((e) => String(e.className).split(' ').includes('medalla-monedas'));
     const fila = orden.findIndex((e) => e.getAttribute('data-testid') === 'revision-q1');
@@ -115,7 +117,10 @@ test('U49: un repaso, un historial que no se pudo leer y la revisión de siempre
     try { assert.equal(buscar(v.raiz, 'merito'), null, caso); } finally { v.cerrar(); }
   }
   const superado = revisar({ historialPrevio: [intento('r0', true)], esRepaso: false });
-  try { assert.equal(textoDe(buscar(superado.raiz, 'merito')), '✓Reto superado'); } finally { superado.cerrar(); }
+  try {
+    assert.equal(textoDe(buscar(superado.raiz, 'merito')), 'Reto superado');
+    assert.deepEqual(iconosDe(buscar(superado.raiz, 'merito')), ['visto'], 'ícono SVG + texto (B1: antes, el glifo ✓ de texto)');
+  } finally { superado.cerrar(); }
 });
 
 test('U48: jugar un reto pide el historial las mismas veces que antes: 1 sin `?repaso=1` y 0 con él', async () => {
