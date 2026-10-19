@@ -1,0 +1,16 @@
+{
+  "descripcion": "B1 (H1): una hoja de estilos pinta un glifo de texto desde CSS (content: \"✓\") en vez de usar un SVG de ui/iconos.js",
+  "archivos": {
+    "estilos/practica.css": "practica.css"
+  },
+  "comando": [
+    "node",
+    "--test",
+    "--test-reporter=tap",
+    "tests/unit/sin_glifos_de_texto.test.mjs"
+  ],
+  "espera_codigo_no_cero": true,
+  "espera_fallan_tests": [
+    "UB1: ningún glifo ni emoji de texto se usa como ícono"
+  ]
+}
