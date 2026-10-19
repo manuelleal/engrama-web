@@ -11,6 +11,6 @@
   ],
   "espera_codigo_no_cero": true,
   "espera_fallan_tests": [
-    "margen: si el panel no carga, la ruta dice Sin conexión con la barra del rol (nunca en blanco) y el siguiente intento lo vuelve a pedir"
+    "margen: si el panel no carga, la ruta dice qué pasó, con título, Reintentar, Recargar y la barra del rol (nunca en blanco)"
   ]
 }

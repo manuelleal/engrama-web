@@ -56,4 +56,15 @@ export const textosNav = {
     /** Cuántos esperan que el profe apruebe su inscripción: solo el número, nunca un nombre. @param {number} n */
     esperan: (n) => (n === 1 ? '1 espera aprobación' : `${n} esperan aprobación`),
   },
+  // Adenda 1 de docs/ESPEC_margen_precarga.md: el respaldo cuando el panel del profe y del admin (que se carga aparte) no llegó. Dice qué pasó y
+  // qué hacer: "Reintentar" lo vuelve a pedir y pinta la pantalla ahí mismo; recargar es el último recurso. PROVISIONAL (Christiam y el pedagogo).
+  panelSinCargar: {
+    titulo: 'No se pudo abrir esta pantalla',
+    queOcurrio: 'Falta descargar una parte del panel y no hubo conexión. Revisa tu conexión y toca Reintentar.',
+    todaviaNo: 'Todavía no se pudo descargar. Revisa tu conexión y vuelve a tocar Reintentar.',
+    reintentar: 'Reintentar',
+    reintentando: 'Reintentando…',
+    ultimoRecurso: 'Si tienes conexión y sigue sin abrir, recarga la página.',
+    recargar: 'Recargar la página',
+  },
 };

@@ -114,7 +114,8 @@ Guion temporal (`salida/creador_panel/explorar.mjs`): el profe entra, se borra e
 título (`h1`), una línea de qué pasó y qué hacer (`role="status"`), botón **"Reintentar"** (primario, el de todo el panel) y, debajo, una línea de
 último recurso con **"Recargar la página"** (`boton-secundario`, `location.reload()`), y la barra del rol. Sobrio: sin Drako ni `.juego`. A ≥ 900 px
 `#vista` se ensancha a 1100 como las demás pantallas del panel (se suma `[data-testid="panel-sin-red"]` a la lista de `:has()` que ya existe dentro
-del `@media` de escritorio). "Reintentar" bloquea su botón mientras vuela ("Reintentando…"); si carga y la dirección no cambió, pinta la pantalla
+del `@media` de escritorio; al hacerlo, V3 de `verificar.mjs` leyó `#vista:has([…panel-sin-red])` como la declaración `vista: has(… red)`, el color
+con nombre: la regla usa la clase `.panel-sin-cargar` del mismo nodo, y el `data-testid` sigue igual). "Reintentar" bloquea su botón mientras vuela ("Reintentando…"); si carga y la dirección no cambió, pinta la pantalla
 pedida en el mismo lugar, sin recargar; si vuelve a fallar, repinta el respaldo con "Todavía no se pudo abrir…" y devuelve el foco a "Reintentar".
 
 **(b) El reintento pide una dirección nueva** (`src/panel_diferido.js`, `src/app.js`, `sw.js`):
