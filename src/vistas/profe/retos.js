@@ -6,6 +6,7 @@
 import { h, montar } from '../../ui/dom.js';
 import { textos } from '../../textos.js';
 import { tituloLegible } from '../../ui/titulo.js';
+import { crearIcono } from '../../ui/iconos.js';
 import { listarTodosLosRetos, cambiarEstadoReto } from '../../api/retos.js';
 import { listarGrupos, asignarReto } from '../../api/profe.js';
 import { accionUnica, ErrorApi } from '../../api/cliente.js';
@@ -53,7 +54,9 @@ async function manejarAsignar(reto, select, boton, ctx, asignarUnaVez, estadoAsi
   boton.textContent = textos.profe.retos.asignando;
   try {
     await asignarUnaVez(gid, reto.id, ctx);
-    boton.textContent = textos.profe.retos.asignado;
+    boton.textContent = '';
+    boton.appendChild(h('span', { class: 'boton-icono', 'aria-hidden': 'true' }, crearIcono('visto')));
+    boton.appendChild(document.createTextNode(textos.profe.retos.asignado));
     estadoAsignar.hecho = true;
   } catch (e) {
     console.warn('vistas/profe/retos: no se pudo asignar', e);
@@ -64,7 +67,7 @@ async function manejarAsignar(reto, select, boton, ctx, asignarUnaVez, estadoAsi
 
 // W16 (§7.3, §9.5 E10): activar/desactivar y asignar escriben — sin red, cada botón de cada fila
 // queda deshabilitado con el mismo aviso, arriba de la lista (una fila puede tener docenas de
-// retos; repetir el aviso por fila no ayuda a nadie). "Asignado ✓" es terminal: al volver la red
+// retos; repetir el aviso por fila no ayuda a nadie). "Asignado" (con su visto) es terminal: al volver la red
 // no debe reactivarse (por eso `estadoAsignar` viaja hasta `ligarEscrituraARed`, no solo hasta el
 // manejador — `otraCondicionOk` es justo el gancho que la firma de `red.js` deja para esto).
 /** @param {(cancelar: () => void) => void} registrarCancelable junta los "soltar suscripción" de la fila */

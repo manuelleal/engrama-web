@@ -50,16 +50,19 @@ test(
           select.value = [...select.options].find((o) => o.value !== '').value;
           document.querySelector('[data-testid="reto-${reto.id}-asignar"]').click();
           await esperar(400);
-          const asignado = document.querySelector('[data-testid="reto-${reto.id}-asignar"]').textContent;
+          const botonAsignar = document.querySelector('[data-testid="reto-${reto.id}-asignar"]');
+          const asignado = botonAsignar.textContent;
+          const iconoAsignado = botonAsignar.querySelector('svg')?.getAttribute('data-icono') ?? null;
 
-          return { aviso, estadoInicial, estadoTrasClic, asignado };
+          return { aviso, estadoInicial, estadoTrasClic, asignado, iconoAsignado };
         })()`,
       });
       assert.deepEqual(r.errores, []);
       assert.match(r.eval.aviso, /toda la institución/); // W67: "institución", nunca "colegio"
       assert.equal(r.eval.estadoInicial, 'Desactivar', 'un reto recién creado empieza activo');
       assert.equal(r.eval.estadoTrasClic, 'Activar', 'tras un clic, pasa a inactivo (botón ahora ofrece reactivarlo)');
-      assert.equal(r.eval.asignado, 'Asignado ✓');
+      assert.equal(r.eval.asignado, 'Asignado');
+      assert.equal(r.eval.iconoAsignado, 'visto', 'con su visto SVG (B1: antes, el glifo ✓ pegado al texto)');
       assert.equal(estado.challenges.get(reto.id).group_id, [...estado.groups.values()][0].id, 'T6 debe haber movido el reto al grupo elegido');
     });
   },

@@ -178,7 +178,7 @@ export const textos = {
     titulo: 'Retos',
     jugar: 'Jugar',
     repasar: 'Repasar',
-    completado: 'Completado ✓',
+    completado: 'Completado',
     sinRetos: 'No tienes retos disponibles.',
     errorGeneral: 'No se pudieron cargar tus retos.',
   },
@@ -337,7 +337,7 @@ export const textos = {
       etiquetaGrupoDestino: 'Asignar a',
       asignar: 'Asignar',
       asignando: 'Asignando…',
-      asignado: 'Asignado ✓',
+      asignado: 'Asignado',
       errorAsignar: 'No se pudo asignar el reto.',
       elegirGrupo: 'Elige un grupo…',
       accionEscribir: 'activar, desactivar o asignar un reto', // W16: infinitivo para textos.red.sinConexionAccion

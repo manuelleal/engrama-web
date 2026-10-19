@@ -279,6 +279,8 @@ nav {
 /* Insignia pequeña (completado, repaso, etc.), siempre junto a su texto. */
 .insignia {
   display: inline-flex;
+  align-items: center;
+  gap: 4px;
   width: fit-content;
   background: var(--correcto-fondo);
   color: var(--correcto);
@@ -286,6 +288,18 @@ nav {
   font-weight: 700;
   padding: 3px 9px;
   border-radius: var(--radio-sm);
+}
+
+/* B1: el visto de "Completado" y de "Asignado" es un SVG de ui/iconos.js (antes, un glifo de texto pegado a la palabra). */
+.insignia .sx-icono,
+.boton-icono .sx-icono {
+  width: 1.1em;
+  height: 1.1em;
+}
+.boton-icono {
+  display: inline-flex;
+  vertical-align: middle;
+  margin-right: 4px;
 }
 
 /* Aviso corto (p. ej. "Repaso: no suma monedas"): chip navy suave, nunca un párrafo suelto. Sin oro: oro = logro, monedas y racha. */
