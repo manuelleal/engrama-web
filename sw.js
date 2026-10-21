@@ -10,7 +10,7 @@
 //
 // Súbelo un número cada vez que cambie la lista de precarga o la estrategia; la `activate`
 // borra cualquier caché con otro nombre.
-const VERSION = 'engrama-shell-v69';
+const VERSION = 'engrama-shell-v75';
 
 // Cada encargo agrega los suyos en su propio commit (W7: Inicio + api/cliente,core,retos + los
 // SVG de Drako que usa el estudiante; W10: profe/grupos,grupo,sesion_asistencia + api/profe). El
@@ -154,6 +154,19 @@ const APARTE = [
 // No van en PRECARGA (el shell tiene techo de 830.000 bytes; U59 lo vigila): se guardan al activar, como las fuentes y el sistema.
 // U59 exige además que todo lo que un diferido importa de forma estática esté aquí o en PRECARGA.
 const DIFERIDOS = [
+  // Lingo Coins dentro de ENGRAMA (decisión 017): la tienda, la mochila, la Puja, Dar y Corregir, el presupuesto y la recarga. Todo diferido: el shell no crece.
+  '/estilos/economia.css',
+  '/src/textos_economia.js',
+  '/src/api/economia.js',
+  '/src/ui/economia.js',
+  '/src/vistas/estudiante/tienda.js',
+  '/src/vistas/estudiante/mochila.js',
+  '/src/vistas/estudiante/puja.js',
+  '/src/vistas/estudiante/inicio_economia.js',
+  '/src/vistas/profe/economia_grupo.js',
+  '/src/vistas/profe/tienda_grupo.js',
+  '/src/vistas/profe/puja_profe.js',
+  '/src/vistas/admin/profesores.js',
   '/estilos/practica.css',
   '/src/textos_practica.js',
   '/src/api/practica.js',
