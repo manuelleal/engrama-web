@@ -273,6 +273,8 @@ function pintarContenido(raiz, ctx, datos) {
     crearEscudo({ nivelConfirmado: datos.nivelConfirmado, animar: nivel.animar }), // W30: el de /auth/me; sin él, "Por confirmar"
     nivel.aviso,
     seccionAhora(datos, ctx),
+    // W92: el camino de nivel, justo después de "Ahora" (fuera de ella: "Ahora" son las tres acciones que caben sin desplazar, E31).
+    h('a', { href: '#/camino', class: 'enlace-camino', 'data-testid': 'ir-a-camino' }, textos.nav.caminoEnlace),
     // W48: la racha bajó (desde 3 o más): una línea neutra, una vez. Va DESPUÉS de "Ahora": arriba empujaba el tercer botón bajo la barra en 360 × 640.
     racha.neutro ? crearDeNuevo(datos.mejorConstancia) : rs?.nueva,
     // Si subió, su aviso va en ese mismo sitio, en el flujo: flotando tapaba el saludo y el enlace a Mis monedas (ESPEC_visual_sistema1 §2b).

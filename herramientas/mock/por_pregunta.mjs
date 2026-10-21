@@ -46,6 +46,15 @@ function salida(estado, intento, pregunta, guardada, repetida) {
   };
 }
 
+/** W91: el doble califica lo escrito como el backend, sin la tolerancia de una letra ni la pista: minúsculas, espacios, comillas rectas y sin `.!?` al
+ * final, contra la clave y las aceptadas. La opción múltiple, por label exacta como siempre. */
+const normalizar = (t) => String(t).normalize('NFC').replace(/[’‘ʼ]/g, "'").toLowerCase().replace(/\s+/g, ' ').trim().replace(/[.!?\s]+$/, '').trim();
+function acierta(reto, pregunta, respuesta) {
+  if (pregunta.question_type !== 'fill_blank') return respuesta === reto.correct_answers[pregunta.id];
+  const dada = normalizar(respuesta);
+  return Boolean(dada) && [reto.correct_answers[pregunta.id], ...(reto.aceptadas?.[pregunta.id] ?? [])].some((a) => normalizar(a) === dada);
+}
+
 // POST /challenges/attempts/:attempt_id/answers — una respuesta: se califica, se guarda (gana la primera) y se explica. No paga.
 export function responderPregunta(estado, req, attemptId, body) {
   exigirL1(estado);
@@ -59,7 +68,7 @@ export function responderPregunta(estado, req, attemptId, body) {
   const previa = intento.porPregunta.get(pregunta.id);
   if (!previa) {
     intento.porPregunta.set(pregunta.id, {
-      answer: body.answer, is_correct: body.answer === reto.correct_answers[pregunta.id], answered_at: estado.reloj.ahora(),
+      answer: body.answer, is_correct: acierta(reto, pregunta, body.answer), answered_at: estado.reloj.ahora(),
     });
   }
   return { status: 200, cuerpo: salida(estado, intento, pregunta, intento.porPregunta.get(pregunta.id), Boolean(previa)) };

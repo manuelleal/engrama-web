@@ -23,8 +23,9 @@ export function acertoPregunta(preguntaId, respuestasDadas, correctAnswers) {
   return respuestasDadas[preguntaId] === correcta;
 }
 
-function filaDeRevision(pregunta, respuestasDadas, correctAnswers, i) {
-  const acerto = acertoPregunta(pregunta.id, respuestasDadas, correctAnswers);
+function filaDeRevision(pregunta, respuestasDadas, correctAnswers, i, aciertos) {
+  // W91: si el servidor ya dijo el acierto de esa pregunta (`/answers`), manda él (lo escrito se normaliza allá).
+  const acerto = aciertos && typeof aciertos[pregunta.id] === 'boolean' ? aciertos[pregunta.id] : acertoPregunta(pregunta.id, respuestasDadas, correctAnswers);
   const correcta = correctAnswers.find((c) => c.question_id === pregunta.id)?.correct_answer;
   // Las filas entran una tras otra; la correcta rebota y la que no, tiembla apenas (corto, suave,
   // siempre con ícono y texto — juego.css). El orden y el retraso son de lectura, no de tiempo del estudiante.
@@ -40,13 +41,15 @@ function filaDeRevision(pregunta, respuestasDadas, correctAnswers, i) {
 
 /**
  * @param {HTMLElement} raiz
- * @param {{challenge: object, resultado: object, respuestasDadas: Record<string,string>, rol?: string, esRepaso?: boolean, historialPrevio?: unknown, lectura?: Node|null}} datos
+ * @param {{challenge: object, resultado: object, respuestasDadas: Record<string,string>, aciertos?: Record<string, boolean>, rol?: string, esRepaso?: boolean, historialPrevio?: unknown, lectura?: Node|null}} datos
  *   `rol`: el de la sesión, para la barra; `esRepaso` e `historialPrevio` (W50): lo que se sabía ANTES de jugar, para el sello de mérito
  */
 export function renderRevision(raiz, datos) {
   const { challenge, resultado, respuestasDadas } = datos;
-  const filas = challenge.questions.map((q, i) => filaDeRevision(q, respuestasDadas, resultado.correct_answers, i));
-  const aciertos = challenge.questions.filter((q) => acertoPregunta(q.id, respuestasDadas, resultado.correct_answers)).length;
+  const delServidor = datos.aciertos;
+  const filas = challenge.questions.map((q, i) => filaDeRevision(q, respuestasDadas, resultado.correct_answers, i, delServidor));
+  const aciertos = challenge.questions.filter((q) => (delServidor && typeof delServidor[q.id] === 'boolean' ? delServidor[q.id]
+    : acertoPregunta(q.id, respuestasDadas, resultado.correct_answers))).length;
   const total = challenge.questions.length;
   const monedas = resultado.coins_earned;
   const nivel = nivelDeCelebracion(aciertos, total);

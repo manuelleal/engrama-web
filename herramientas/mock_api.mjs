@@ -12,6 +12,7 @@
 // Uso: node herramientas/mock_api.mjs [--puerto 8090] [--piloto]   (--piloto siembra las cuentas del login piloto)
 // Actores de arranque (Bearer <token>): "admin-demo" y "docente-demo" (ver mock/estado.mjs).
 // Cada estudiante inscrito (M3/M4) queda con token = su documento_id.
+import { verCamino } from './mock/camino.mjs';
 import { createServer } from 'node:http';
 import { crearEstado } from './mock/estado.mjs';
 import { ErrorHTTP } from './mock/errores.mjs';
@@ -75,6 +76,7 @@ function rutasDeLaPractica(r) {
     r('POST', '/challenges/attempts/:attempt_id/finish', (estado, req, p) => terminarIntento(estado, req, p.attempt_id)),
     // La tanda de hoy y el repaso (backend f7f7aeb, mock/practica.mjs). Antes de `/challenges/:challenge_id`, como en el backend.
     r('GET', '/challenges/tanda', (estado, req) => verTanda(estado, req)),
+    r('GET', '/challenges/camino', (estado, req) => verCamino(estado, req)), // W92: el camino de nivel (mock/camino.mjs)
     r('POST', '/challenges/tanda', (estado, req) => pedirTanda(estado, req)),
     r('POST', '/challenges/refuerzo/:entrada_id/respuestas', (estado, req, p, body) => responderRepaso(estado, req, p.entrada_id, body)),
     // La racha semanal (mock/racha.mjs): se lee aquí; el bono se paga tras cada escritura que puede volver activo un día.

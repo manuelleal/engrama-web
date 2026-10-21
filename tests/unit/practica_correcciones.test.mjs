@@ -298,8 +298,11 @@ test('U90: preguntaContestable: solo la opción múltiple con opciones (question
   }
 });
 
-test('U90: en el reto, una pregunta fill_blank dice "aún no se puede contestar aquí", con su salida y el botón que sigue (sin Comprobar)', async () => {
-  const reto = { ...RETO, questions: [LLENAR, RETO.questions[1]] };
+// W91 (docs/ESPEC_camino_y_tu_palabra.md §2, declarado): desde que el reto pregunta por pregunta tiene campo escrito, el `fill_blank` sí se contesta
+// (practica_escrita.test.mjs); lo que sigue sin poder contestarse aquí es, p. ej., un `listening` sin opciones: H-3 se prueba con él.
+const SIN_CAMPO = { ...LLENAR, question_type: 'listening' };
+test('U90: en el reto, una pregunta que no se puede contestar aquí (listening sin opciones) lo dice, con su salida y el botón que sigue (sin Comprobar)', async () => {
+  const reto = { ...RETO, questions: [SIN_CAMPO, RETO.questions[1]] };
   const { raiz, llamadas, cerrar } = await abrirReto(servidorReto(ESTADO(), { 'POST /challenges/reto-1/attempt': { attempt_id: 'int-1', attempt_number: 1, challenge: reto } }));
   try {
     assert.equal(textoDe(buscar(raiz, 'enunciado')), LLENAR.question_text);

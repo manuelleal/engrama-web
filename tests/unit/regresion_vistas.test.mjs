@@ -77,7 +77,8 @@ export const DECLARADAS = {
   // Tanda "sistema 1" (docs/ESPEC_visual_sistema1.md §1 y §5): el ícono del botón del sonido (`boton-sonido`) pasa de emoji a SVG de ui/iconos.js.
   // Tanda "sistema 1" (§3): la barra del saldo (`div.barra-superior`) pasa a ser la cabecera única (`header.barra-superior`, con las clases del sistema) y
   // recibe el interruptor del sonido, que sale de junto al saludo. Se declaran el nodo viejo y el nuevo; el saludo (`div.encabezado-reto`) no cambia.
-  inicio: ['ahora', 'tarjeta-reto-hoy', { etiqueta: 'nav' }, 'ir-a-monedas', 'constancia', 'progreso-semana', 'boton-sonido', { etiqueta: 'div', clase: 'barra-superior' }, { etiqueta: 'header', clase: 'barra-superior' }],
+  // W92 (docs/ESPEC_camino_y_tu_palabra.md §3, UC5): Inicio gana UN enlace, "Tu camino" (`ir-a-camino`), justo después de "Ahora".
+  inicio: ['ahora', 'tarjeta-reto-hoy', { etiqueta: 'nav' }, 'ir-a-monedas', 'ir-a-camino', 'constancia', 'progreso-semana', 'boton-sonido', { etiqueta: 'div', clase: 'barra-superior' }, { etiqueta: 'header', clase: 'barra-superior' }],
   // La entrada con marca (docs/ESPEC_visual_entrada.md): entra la franja (`entrada-marca`, primer hijo); "Entrar" gana las clases del sistema; los
   // dos secundarios dejan de ser chips (`boton-secundario`) y van juntos en `div.entrada-enlaces`. La raíz, el título (su texto, en
   // TEXTOS_DECLARADOS), el formulario, los campos, sus etiquetas y la zona del error no cambian.

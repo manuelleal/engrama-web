@@ -50,5 +50,5 @@ test('SR8: los cuerpos de las 20 unidades reales A1 y A2 calzan con ChallengeCre
       }
     }
   }
-  assert.equal(retos, 160);
+  assert.equal(retos, 220); // W90 (declarado en docs/ESPEC_camino_y_tu_palabra.md §1): 160 + 60 retos Escríbela
 });

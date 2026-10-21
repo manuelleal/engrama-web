@@ -59,7 +59,7 @@ test('SR1: sin etiqueta ni explicación en el banco, la pregunta no inventa nodo
 });
 
 test('SR2: solo_refuerzo true en exactamente los retos de gemelas y repasos; el original y la lectura van sin el campo', () => {
-  const todos = cuerpos();
+  const todos = cuerpos().filter((c) => c.tipo !== 'escrita'); // W90 (declarado): los Escríbela tienen su prueba (sembrar_tu_palabra)
   assert.equal(todos.length, 7); // 3 roles x 2 destrezas + 1 lectura
   for (const c of todos) {
     const esRefuerzo = c.tipo === 'accuracy' && (c.rol === 'gemela' || c.rol === 'repaso');

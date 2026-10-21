@@ -128,11 +128,13 @@ export function crearChallenge(estado, req, body) {
   if (errores.length) fallar(422, errores.join('; '));
   const id = randomUUID();
   const correct_answers = {};
+  const aceptadas = {}; // W91: las otras respuestas escritas que también aciertan (`accepted_answers`)
   const explicaciones = {}; // L1 (backend f7f7aeb, ExplicacionIn): la explicación sembrada de cada pregunta; solo sale tras responderla (mock/por_pregunta.mjs)
   const questions = body.questions.map((q, i) => {
     const qid = randomUUID();
     correct_answers[qid] = q.correct_answer;
     if (q.explanation) explicaciones[qid] = q.explanation;
+    if (Array.isArray(q.accepted_answers)) aceptadas[qid] = q.accepted_answers;
     // order_index por defecto es 1-based (contrato: default 1), nunca el índice 0-based del map.
     return { id: qid, question_type: q.question_type || 'multiple_choice', question_text: q.question_text, options_json: q.options_json ?? null, order_index: q.order_index ?? (i + 1) };
   });
@@ -141,7 +143,7 @@ export function crearChallenge(estado, req, body) {
     challenge_type: body.challenge_type || 'multiple_choice', cefr_level: body.cefr_level ?? null, skill: body.skill ?? null,
     topic: body.topic ?? null, coins_reward: body.coins_reward ?? eco.recompensaDelReto, xp_reward: body.xp_reward ?? 0,
     max_attempts: body.max_attempts ?? 2, max_winners: body.max_winners ?? cupoPorDefecto(activosDelGrupo(estado, auth.tenantId, body.group_id), eco.pisoDeGanadores), current_winners: 0,
-    status: 'active', created_at: new Date(estado.reloj.ahora()).toISOString(), questions, correct_answers, explicaciones,
+    status: 'active', created_at: new Date(estado.reloj.ahora()).toISOString(), questions, correct_answers, explicaciones, aceptadas,
   };
   estado.challenges.set(id, challenge);
   return { status: 201, cuerpo: challengeOutPublico(challenge, { tope: estado.economia.topeDelReto }) };

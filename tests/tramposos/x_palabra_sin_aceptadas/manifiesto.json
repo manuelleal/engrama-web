@@ -1,0 +1,7 @@
+{
+  "descripcion": "W90 (docs/ESPEC_camino_y_tu_palabra.md §1): el sembrador arma tu_palabra sin las otras respuestas aceptadas (Nicolas's sin tilde quedaria mal)",
+  "archivos": { "herramientas/sembrar/mapeo.mjs": "mapeo.mjs" },
+  "comando": ["node", "--test", "--test-reporter=tap", "tests/unit/sembrar_tu_palabra.test.mjs"],
+  "espera_codigo_no_cero": true,
+  "espera_fallan_tests": ["ST1: a1-u01 da 3 retos"]
+}

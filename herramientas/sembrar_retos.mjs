@@ -19,7 +19,7 @@ import { existsSync, mkdirSync, readFileSync, writeFileSync } from 'node:fs';
 import { join, resolve } from 'node:path';
 import { fileURLToPath } from 'node:url';
 import {
-  bloquesDePiensalo, retosDeLectura, verificarFirma, esApiLocal, challengeCreate,
+  bloquesDePiensalo, retosDeLectura, bloquesDeTuPalabra, verificarFirma, esApiLocal, challengeCreate,
 } from './sembrar/mapeo.mjs';
 import { nodosPorFamilia as leerNodosPorFamilia, nodosVigentes } from './sembrar/curriculo.mjs';
 import { revisarCuerpos } from './sembrar/revision.mjs';
@@ -71,7 +71,14 @@ export function armarCuerpos(unidad, { groupId, borrador, nodosPorFamilia = {} }
   const ctx = { groupId, borrador };
   const bloques = bloquesDePiensalo(unidad, { nodosPorFamilia }).map((b) => ({ tipo: 'accuracy', ...b, cuerpo: challengeCreate(unidad, b, ctx) }));
   const lecturas = retosDeLectura(unidad).map((r) => ({ tipo: 'reading', ...r, cuerpo: challengeCreate(unidad, { ...r, destreza: 'reading' }, ctx) }));
-  return [...bloques, ...lecturas];
+  // W90 (docs/ESPEC_camino_y_tu_palabra.md §1): los retos Escríbela (`tu_palabra`) van AL FINAL: lo que ya se sembraba conserva su orden.
+  const escritas = bloquesDeTuPalabra(unidad, { nodosPorFamilia }).filter((b) => !b.vacio).map((b) => ({ tipo: 'escrita', ...b, cuerpo: challengeCreate(unidad, b, ctx) }));
+  return [...bloques, ...lecturas, ...escritas];
+}
+
+/** W90: los ítems `tu_palabra` que no caben en el contrato (no se recortan: quedan fuera y se dicen). Pura. */
+export function excluidasDe(unidad) {
+  return bloquesDeTuPalabra(unidad).flatMap((b) => b.excluidas);
 }
 
 /** ESPEC_sembrador_refuerzo §1.4: con un error en CUALQUIER cuerpo no se manda ninguno (código 2). `vigentes`: los ids del catálogo
@@ -97,7 +104,7 @@ async function sembrar({ unidad, apiUrl, token, grupoId, borrador, nodosPorFamil
     });
   }
 
-  const salida = { unidad: unidad.id, grupo: grupoId, borrador: veredicto.borrador, retos: creados, faltas: revision.faltas };
+  const salida = { unidad: unidad.id, grupo: grupoId, borrador: veredicto.borrador, retos: creados, faltas: revision.faltas, excluidas: excluidasDe(unidad) };
   const rutaSalida = join(RAIZ, 'salida', 'retos_sembrados.json');
   mkdirSync(join(RAIZ, 'salida'), { recursive: true });
   writeFileSync(rutaSalida, JSON.stringify(salida, null, 2));

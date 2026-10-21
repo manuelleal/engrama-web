@@ -1,0 +1,7 @@
+{
+  "descripcion": "W91 (docs/ESPEC_camino_y_tu_palabra.md §2): reto_l1.js vuelve a tratar la pregunta fill_blank como 'aún no se puede contestar aquí' (sin campo)",
+  "archivos": { "src/vistas/estudiante/reto_l1.js": "reto_l1.js" },
+  "comando": ["node", "--test", "--test-reporter=tap", "tests/unit/practica_escrita.test.mjs"],
+  "espera_codigo_no_cero": true,
+  "espera_fallan_tests": ["UE1-UE4: la pregunta escrita trae su campo"]
+}
