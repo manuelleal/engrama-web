@@ -82,3 +82,19 @@ Pantalla (`vistas/estudiante/retos.js`):
 - Los roles (`original`/`gemela`/`repaso`) siguen sin mostrarse: si dos filas de una unidad dicen "Gramática 1" (original y gemela) el estudiante no las distingue.
   Hoy las gemelas son `solo_refuerzo` y no están en el feed (`PEDIDO_sembrador.md`); si llegaran a la lista, hay que decidir cómo rotularlas.
 - Orden de las filas dentro de la unidad (la API las trae en su orden; la lista no ordena).
+
+## 7. Adenda (compuerta 27, 2026-10-20): idioma del encabezado y orden dentro de la unidad
+
+La compuerta (`investigacion/diseno/27-compuerta-titulos-unidad.md`, LISTO CON CORRECCIONES) pidió dos cambios. Ambos salen del §6 ("orden de las filas") o de la accesibilidad.
+
+1. **`lang="en"` en el `h2` de la unidad.** El nombre de la unidad viene del contenido en inglés ("I Don't Feel Well") dentro de una pantalla en español; sin `lang` el lector de
+   pantalla lo pronuncia con voz española. `cuerpoDeLaLista` pone `lang="en"` al `h2` de las secciones con unidad. El `h2` de "Otros retos" es texto de la interfaz (español): sin `lang`.
+2. **Orden de las filas dentro de cada unidad: destreza y número ascendente.** "Lectura 1" antes que "Lectura 2". `agruparPorUnidad` ordena las filas de cada grupo así:
+   - La destreza (la etiqueta del bloque sin su número: "Lectura", "Gramática"…) manda por su primera aparición dentro de la unidad (no se impone un orden de destrezas);
+     dentro de la destreza, el número ascendente. Es un orden estable.
+   - Un reto sin número (sin bloque: el grupo sin unidad, o un bloque que no calza) conserva su posición relativa: el grupo sin unidad no se reordena y sus filas
+     quedan como llegaron.
+   - Con la misma destreza y el mismo número (p. ej. original y gemela de "Gramática 1") queda el orden de la API.
+   - El orden de las unidades no cambia: sigue siendo el de la primera aparición.
+- Pruebas: U121 (orden dentro del grupo, destrezas por primera aparición, reto sin número, estabilidad) y U122 (`lang="en"` en el `h2` de unidad, ausente en "Otros retos").
+  Tramposos nuevos: `x_titulo_sin_ordenar` (no ordena), `x_retos_h2_sin_lang` (sin `lang` en el `h2`), `x_titulo_ordena_texto` (orden por texto, "Lectura 10" antes que "Lectura 2").
