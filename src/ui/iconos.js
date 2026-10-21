@@ -29,6 +29,11 @@ const FORMAS = {
   estrella: ['M12 3.8l2.5 5.2 5.7.8-4.1 4 1 5.7-5.1-2.7-5.1 2.7 1-5.7-4.1-4 5.7-.8z'],
   pausa: ['M9 6v12M15 6v12'],
   guion: ['M7 12h10'],
+  // Lingo Coins dentro de ENGRAMA: la tienda, la mochila, la puja (un mazo) y el más del campo numérico.
+  mas: ['M12 6.5v11M6.5 12h11'],
+  tienda: [[4.5, 8, 15, 12, 2.5], 'M9 8V7a3 3 0 0 1 6 0v1'],
+  mochila: [[5.5, 7, 13, 13, 3.5], 'M9.5 7V5.5a2.5 2.5 0 0 1 5 0V7M9 13h6'],
+  puja: ['M13.5 4.5l6 6-3 3-6-6z', 'M11.5 11.5L5 18M4 20.5h8'],
 };
 
 /** Los nombres que existen. */
