@@ -2,7 +2,9 @@
 // Aviso de datos v2 (docs/ESPEC_aviso_datos.md, ERR-16, Ley 1581): LO QUE EL TEXTO DICE tiene que ser verdad y tiene que estar.
 // Lo pidió Christiam: "sus datos serán anonimizados y se utilizarán para medir la función de la plataforma; es un ejercicio educativo".
 // Pero el sistema SÍ guarda nombre y correo para funcionar: lo anonimizado es el análisis para medir. Un aviso que dijera "no guardamos
-// tu nombre" sería falso. Tramposos: x_aviso_sin_medicion, x_aviso_oculta_lo_que_guarda, x_aviso_sin_plazos, x_aviso_no_dibuja_medir.
+// tu nombre" sería falso. Tramposos: x_aviso_sin_medicion, x_aviso_oculta_lo_que_guarda, x_aviso_sin_plazos, x_aviso_sin_encargados, x_aviso_no_dibuja_medir y, de la auditoría (adenda del espec),
+// x_aviso_copias_cifradas_fuera (H-1), x_aviso_sin_ip_de_ingresos (H-2), x_aviso_brevo_sin_condicional (H-3), x_aviso_derechos_incompletos (H-5); H-4 vive en aviso_version_texto.test.mjs.
+// Las copias rotas se rehacen con tests/tramposos/regenerar_x_aviso.mjs.
 import test from 'node:test';
 import assert from 'node:assert/strict';
 import { entornoDeFotos, crearRaiz, buscar, textoDe } from './foto_vistas.mjs';

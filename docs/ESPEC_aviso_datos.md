@@ -71,5 +71,9 @@ archivo bueno de hoy + su defecto). (4) Despliegue: el responsable cambia en `co
 `despliegue/aviso_v2/config_aviso.json` y `LEEME.md` quedan al día, con el paso previo "comprobar la poda del registro de
 accesos en el cron" antes de publicar el cliente.
 
+**Pruebas de la adenda.** `tests/unit/aviso_texto.test.mjs` (6, con el tope de 520 palabras; el aviso mide 513),
+`tests/unit/aviso_version_texto.test.mjs` (7, H-4 con `recargar` inyectado y sessionStorage de mentira o roto) y
+`tests/e2e/aviso_version_desfasada.test.mjs` (H-4 con `location.reload()` real en Edge: sin casilla, una recarga, sin bucle).
+
 **Fuera de alcance (para después).** El cifrado de las copias fuera del servidor (cuando se active, el texto cambia y la
 versión sube); revisión de un abogado; SET no se toca esta noche.
