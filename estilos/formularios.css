@@ -76,3 +76,24 @@
   font-size: 1rem;
   color: color-mix(in srgb, var(--texto) 70%, white);
 }
+
+/* Registro, K1 (compuerta 28; docs/ESPEC_regla_clave.md §5): el error de la contraseña (al enviar y en el 422) se lee como error: ícono (equis) + texto, en el color y el
+   fondo de "incorrecto" del sistema; nunca solo el color. Vacío no ocupa sitio (sigue en el árbol: es la región que avisa). */
+#vista form #contrasena-error {
+  margin: 0;
+}
+#vista form #contrasena-error:not(:empty) {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 10px 14px;
+  border-radius: var(--radio-sm);
+  background: var(--incorrecto-fondo);
+  color: var(--incorrecto);
+  font-weight: 700;
+}
+#vista form #contrasena-error .sx-icono {
+  width: 20px;
+  height: 20px;
+  flex: none;
+}

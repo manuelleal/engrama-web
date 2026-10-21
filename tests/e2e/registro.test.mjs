@@ -268,6 +268,17 @@ test('E12 (ESPEC_regla_clave C2): mientras se escribe, la línea "qué falta" ca
       await esperar(600);
       assert.equal(await texto(sesion, 'registro-error-contrasena'), dicho, 'el envío dice lo mismo que la línea');
       assert.equal((await linea()).texto, '', 'y la línea calla para no repetirlo');
+      // K1 (compuerta 28): el error del envío se lee como error: ícono + texto, en el color y el fondo de --incorrecto (no solo texto suelto)
+      const err = await sesion.evaluar(`(() => {
+        const z = document.querySelector('[data-testid="registro-error-contrasena"]');
+        const sonda = (prop, token) => { const s = document.createElement('span'); s.style[prop] = 'var(' + token + ')'; document.body.appendChild(s); const v = getComputedStyle(s)[prop]; s.remove(); return v; };
+        const c = getComputedStyle(z), r = z.getBoundingClientRect();
+        return {iconos: z.querySelectorAll('svg').length, color: c.color, fondo: c.backgroundColor, display: c.display, colorEsperado: sonda('color', '--incorrecto'), fondoEsperado: sonda('backgroundColor', '--incorrecto-fondo'), derecha: r.right, alto: r.height};
+      })()`);
+      assert.equal(err.iconos, 1, 'K1: ícono + texto');
+      assert.equal(err.color, err.colorEsperado, 'K1: el color de --incorrecto');
+      assert.equal(err.fondo, err.fondoEsperado, 'K1: el fondo de --incorrecto-fondo');
+      assert.ok(err.derecha <= 375 && err.alto > 0, `K1: el error cabe en 375 px: ${JSON.stringify(err)}`);
       assert.equal(peticionesDeRegistro(estado), 0, '0 peticiones');
       assert.equal(await sesion.evaluar('JSON.stringify([localStorage, sessionStorage])'), '[{},{}]', 'nada guardado');
     } finally { await sesion.cerrar(); }

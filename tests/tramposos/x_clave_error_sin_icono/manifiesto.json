@@ -1,0 +1,16 @@
+{
+  "descripcion": "ESPEC_regla_clave K1 (compuerta 28): el error de la contrasena al enviar y en el 422 vuelve a salir como texto suelto (textContent), sin icono; el unitario lo ve.",
+  "archivos": {
+    "src/vistas/registro_campos.js": "registro_campos.js"
+  },
+  "comando": [
+    "node",
+    "--test",
+    "--test-reporter=tap",
+    "tests/unit/vista_registro.test.mjs"
+  ],
+  "espera_codigo_no_cero": true,
+  "espera_fallan_tests": [
+    "U17/U19 (ESPEC_regla_clave K1, compuerta 28): el error de la contraseña (al enviar y en el 422) lleva ícono + texto, nunca solo texto; vacío no lleva ícono y al volver a escribir se va entero"
+  ]
+}

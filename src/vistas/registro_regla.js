@@ -94,7 +94,7 @@ function pintarLinea(viva, mensaje, hayClave) {
 export function ligarRegla({ entrada, viva, error }) {
   ponerHoja();
   const alCambiar = (/** @type {boolean} */ borrarError) => {
-    if (borrarError && error) error.textContent = '';
+    if (borrarError && error) vaciar(error); // con ícono + texto adentro (K1): se va todo
     const clave = entrada.value ?? ''; // el DOM de las pruebas no trae `value` hasta que alguien escribe
     pintarLinea(viva, mensajeDeLoQueFalta(clave), clave !== '');
   };

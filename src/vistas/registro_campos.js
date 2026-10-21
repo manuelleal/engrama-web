@@ -4,6 +4,7 @@
 // perder lo escrito al leerlo) y su casilla. `vistas/registro.js` los arma, lee lo escrito y manda; aquí no hay red ni estado de envío.
 // Nada de lo que se escribe aquí (la contraseña, el código de grupo, el correo) se guarda en un almacenamiento, va a la dirección o sale por la consola.
 import { h, vaciar } from '../ui/dom.js';
+import { crearIcono } from '../ui/iconos.js';
 import { textos } from '../textos.js';
 import { crearTextoAviso } from './aviso_datos.js';
 
@@ -20,6 +21,30 @@ function crearCampo({ id, etiqueta, atributos, ayuda }) {
   const entrada = /** @type {HTMLInputElement} */ (h('input', { id, 'data-testid': `registro-${id}`, 'aria-describedby': describe, spellcheck: 'false', ...atributos }));
   // La ayuda va ENTRE la etiqueta y el campo: se lee antes de escribir (docs/ESPEC_regla_clave.md C1).
   return { entrada, error, nodos: [h('label', { for: id }, etiqueta), ...(nota ? [nota] : []), entrada, error] };
+}
+
+/**
+ * El mensaje de la contraseña junto al campo: ícono (equis, decorativo) + texto, nunca solo texto ni solo color (docs/ESPEC_regla_clave.md §2 y K1, compuerta 28). Es del shell, no del
+ * módulo diferido: el envío y el 422 sin ese módulo también llevan ícono. El `textContent` de la zona sigue siendo exactamente el texto (el ícono no trae texto). Sin texto, la zona queda vacía.
+ * @param {HTMLElement} zona @param {string} texto
+ */
+function ponerErrorConIcono(zona, texto) {
+  vaciar(zona);
+  if (!texto) return;
+  zona.appendChild(h('span', { class: 'etiqueta-icono', 'aria-hidden': 'true' }, crearIcono('equis')));
+  zona.appendChild(h('span', { class: 'error-texto' }, texto));
+}
+
+/**
+ * Pone cada mensaje en la zona de su campo y borra los demás; la zona de la contraseña lleva ícono + texto (K1).
+ * @param {Record<string, HTMLElement|undefined>} zonas @param {HTMLElement} zonaContrasena @param {Record<string, string>} mensajes
+ */
+function ponerMensajes(zonas, zonaContrasena, mensajes) {
+  for (const [campo, zona] of Object.entries(zonas)) {
+    if (!zona) continue;
+    if (zona === zonaContrasena) ponerErrorConIcono(zona, mensajes[campo] ?? '');
+    else zona.textContent = mensajes[campo] ?? '';
+  }
 }
 
 /** Una casilla con su texto: el blanco táctil es de 44 px (E17). @param {{id: string, texto: string}} d */
@@ -98,7 +123,7 @@ export function crearCamposDelRegistro(aviso) {
     },
     /** Pone `mensajes` ({campo: texto}) junto a cada campo y borra los demás. @param {Record<string, string>} mensajes */
     marcar(mensajes) {
-      for (const [campo, zona] of Object.entries(zonas)) if (zona) zona.textContent = mensajes[campo] ?? '';
+      ponerMensajes(zonas, contrasena.zonas.contrasena, mensajes);
       if (mensajes.contrasena) contrasena.callarLinea();
     },
     /** La conexión de la contraseña con su línea "qué falta" (`vistas/registro_regla.js`, diferido). */

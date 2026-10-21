@@ -482,6 +482,45 @@ test('U19 (ESPEC_regla_clave C3): el 422 de la contraseña se traduce: con lo es
   }
 });
 
+test('U17/U19 (ESPEC_regla_clave K1, compuerta 28): el error de la contraseña (al enviar y en el 422) lleva ícono + texto, nunca solo texto; vacío no lleva ícono y al volver a escribir se va entero', async () => {
+  const MSG = 'Value error, la contraseña debe tener al menos una letra y al menos un número o un símbolo (- _ . ! @ # $ % & * +)';
+  const e = conEntorno({ responder: () => json(422, { detail: [{ type: 'value_error', loc: ['body', 'contrasena'], msg: MSG }] }) });
+  try {
+    ponerSvgFalso();
+    const { raiz } = await pintar();
+    const zona = buscar(raiz, 'registro-error-contrasena');
+    assert.equal(zona.getAttribute('role'), 'alert');
+    assert.deepEqual(iconosDe(zona), [], 'sin error no hay ícono');
+    // 1. al enviar con la contraseña corta
+    await Promise.all(llenarYEnviar(raiz, { contrasena: 'abcdef' }));
+    await reposar();
+    assert.match(textoDe(zona), /^Te falta: llegar a 10 caracteres y un número o un símbolo/);
+    assert.deepEqual(iconosDe(zona), ['equis'], 'al enviar: ícono + texto');
+    assert.equal(e.posts.length, 0);
+    // 2. al volver a escribir se va entero: texto e ícono
+    const campo = buscar(raiz, 'registro-contrasena');
+    campo.value = 'abcdefghi1'; campo.disparar('input');
+    assert.equal(textoDe(zona), '');
+    assert.deepEqual(iconosDe(zona), [], 'sin texto no queda ícono huérfano');
+    // 3. el 422 del backend (lo escrito cumple la regla local)
+    await Promise.all(llenarYEnviar(raiz));
+    await reposar();
+    assert.equal(e.posts.length, 1);
+    assert.match(textoDe(zona), /^El servidor no aceptó esa contraseña\./);
+    assert.deepEqual(iconosDe(zona), ['equis'], 'en el 422: ícono + texto');
+  } finally { e.restaurar(); }
+  // 4. sin el módulo diferido (no cargó) el error del envío también lleva ícono: el ícono es del shell
+  const sin = conEntorno();
+  try {
+    ponerSvgFalso();
+    const { raiz } = await pintar({ cargarRegla: () => Promise.reject(new Error('no cargó')) });
+    await Promise.all(llenarYEnviar(raiz, { contrasena: 'abcdef' }));
+    await reposar();
+    assert.deepEqual(iconosDe(buscar(raiz, 'registro-error-contrasena')), ['equis']);
+    assert.equal(textoDe(buscar(raiz, 'registro-error-contrasena')), textos.registro.errores.contrasenaCorta);
+  } finally { sin.restaurar(); }
+});
+
 test('U19 (ESPEC_regla_clave C3): si lo que hay en el campo cuando llega el 422 no cumple la regla, el mensaje es EL MISMO que diría la línea en vivo', async () => {
   let suelta = () => {};
   const e = conEntorno({ responder: () => new Promise((r) => { suelta = () => r(json(422, [{ type: 'value_error', loc: ['body', 'contrasena'], msg: MSG_422_CLAVE }])); }) });
