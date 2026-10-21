@@ -287,13 +287,19 @@ test('U26 / R4: el botón "Crear cuenta con código de grupo" de la entrada solo
 const MSG_422_CLAVE = 'Value error, la contraseña debe tener al menos una letra y al menos un número o un símbolo (- _ . ! @ # $ % & * +)';
 const TEXTO_422_CLAVE = 'La contraseña debe tener al menos una letra y al menos un número o un símbolo (- _ . ! @ # $ % & * +)';
 
-test('U17 (17.8): la regla de la contraseña está escrita junto al campo ANTES de enviar, con la lista de símbolos, y el campo la nombra en aria-describedby', () => {
+test('U17 (17.8, ESPEC_regla_clave C1): la regla COMPLETA de la contraseña está escrita ANTES del campo (se lee antes de escribir): el mínimo, el máximo en bytes, una letra, un número o un símbolo y la lista; y el campo la nombra en aria-describedby', () => {
   const e = conEntorno();
   try {
     const { raiz } = pintar();
     const regla = textoDe(buscar(raiz, 'registro-ayuda-contrasena'));
-    assert.equal(regla, 'Debe tener una letra y un número o un símbolo: - _ . ! @ # $ % & * +');
+    assert.equal(regla, 'Mínimo 10 caracteres. Máximo 72 (la ñ y las letras con tilde cuentan doble). Debe tener una letra y un número o un símbolo: - _ . ! @ # $ % & * +');
     assert.equal(regla, textos.registro.reglaContrasena);
+    for (const parte of [/10 caracteres/, /72/, /letra/, /número o un símbolo/, /- _ \. ! @ # \$ % & \* \+/]) assert.match(regla, parte, `la regla dice ${parte}`);
+    // El orden en la pantalla: etiqueta, REGLA, campo (antes: la regla iba debajo del campo, después de empezar a escribir).
+    const hermanos = buscar(raiz, 'registro-contrasena').parentNode.children;
+    const lugar = (testid) => hermanos.findIndex((n) => n.getAttribute?.('data-testid') === testid);
+    assert.ok(lugar('registro-ayuda-contrasena') >= 0 && lugar('registro-contrasena') >= 0);
+    assert.ok(lugar('registro-ayuda-contrasena') < lugar('registro-contrasena'), 'la regla va antes del campo');
     assert.match(buscar(raiz, 'registro-contrasena').getAttribute('aria-describedby'), /contrasena-ayuda/);
     assert.match(buscar(raiz, 'registro-contrasena').getAttribute('aria-describedby'), /contrasena-error/);
     assert.equal(e.llamadas.length, 0, 'solo mirar la pantalla no pide nada');

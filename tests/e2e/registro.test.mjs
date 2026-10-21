@@ -211,9 +211,12 @@ test('E12 (17.8): la regla de la contraseña se lee antes de enviar, sin desbord
     const sesion = await abrirRegistro(url);
     try {
       assert.ok(await esperarVista(sesion, 'vista-registro'));
-      assert.equal(await texto(sesion, 'registro-ayuda-contrasena'), 'Debe tener una letra y un número o un símbolo: - _ . ! @ # $ % & * +');
+      assert.equal(await texto(sesion, 'registro-ayuda-contrasena'), 'Mínimo 10 caracteres. Máximo 72 (la ñ y las letras con tilde cuentan doble). Debe tener una letra y un número o un símbolo: - _ . ! @ # $ % & * +');
       const caja = await sesion.evaluar(`(() => { const r = document.querySelector('[data-testid="registro-ayuda-contrasena"]').getBoundingClientRect(); return {derecha: r.right, ancho: window.innerWidth, alto: r.height}; })()`);
       assert.ok(caja.derecha <= 375 && caja.alto > 0, `la regla cabe en 375 px: ${JSON.stringify(caja)}`);
+      // ESPEC_regla_clave C1: la regla se lee ANTES del campo (arriba de él en la pantalla), no después de empezar a escribir.
+      const orden = await sesion.evaluar(`(() => { const a = document.querySelector('[data-testid="registro-ayuda-contrasena"]').getBoundingClientRect(); const c = document.querySelector('[data-testid="registro-contrasena"]').getBoundingClientRect(); return {reglaFin: a.bottom, campoIni: c.top}; })()`);
+      assert.ok(orden.reglaFin <= orden.campoIni, `la regla termina antes de donde empieza el campo: ${JSON.stringify(orden)}`);
       await llenar(sesion, { clave: 'solo-letras-aqui'.replace(/-/g, '').padEnd(12, 'x') });
       await enviar(sesion);
       await esperar(600);

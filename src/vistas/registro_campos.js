@@ -18,7 +18,8 @@ function crearCampo({ id, etiqueta, atributos, ayuda }) {
   const nota = ayuda ? h('p', { class: 'ayuda-campo', id: `${id}-ayuda`, 'data-testid': `registro-ayuda-${id}` }, ayuda) : null;
   const describe = nota ? `${id}-ayuda ${id}-error` : `${id}-error`;
   const entrada = /** @type {HTMLInputElement} */ (h('input', { id, 'data-testid': `registro-${id}`, 'aria-describedby': describe, spellcheck: 'false', ...atributos }));
-  return { entrada, error, nodos: [h('label', { for: id }, etiqueta), entrada, ...(nota ? [nota] : []), error] };
+  // La ayuda va ENTRE la etiqueta y el campo: se lee antes de escribir (docs/ESPEC_regla_clave.md C1).
+  return { entrada, error, nodos: [h('label', { for: id }, etiqueta), ...(nota ? [nota] : []), entrada, error] };
 }
 
 /** Una casilla con su texto: el blanco táctil es de 44 px (E17). @param {{id: string, texto: string}} d */
@@ -45,7 +46,7 @@ function crearBloqueContrasena() {
   verTodo(false);
   boton.addEventListener('click', () => verTodo(!visible));
   const delCampo = [...clave.nodos];
-  delCampo.splice(2, 0, boton); // etiqueta, campo, [Mostrar], regla, mensaje
+  delCampo.splice(3, 0, boton); // etiqueta, regla, campo, [Mostrar], mensaje
   return {
     nodos: [...delCampo, ...repite.nodos],
     zonas: { contrasena: clave.error, repite: repite.error },

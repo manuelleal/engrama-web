@@ -1,0 +1,16 @@
+{
+  "descripcion": "ESPEC_regla_clave C1: la regla de la contrasena vuelve a ir DEBAJO del campo (despues de empezar a escribir); la prueba exige que se lea antes.",
+  "archivos": {
+    "src/vistas/registro_campos.js": "registro_campos.js"
+  },
+  "comando": [
+    "node",
+    "--test",
+    "--test-reporter=tap",
+    "tests/unit/vista_registro.test.mjs"
+  ],
+  "espera_codigo_no_cero": true,
+  "espera_fallan_tests": [
+    "la regla COMPLETA de la contraseña está escrita ANTES del campo"
+  ]
+}
