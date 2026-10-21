@@ -52,8 +52,8 @@ Pantalla (`vistas/estudiante/retos.js`):
   "Gramática 1"). La sección va `aria-labelledby` al `h2`, de modo que un lector de pantalla oye "I Don't Feel Well, lista, Lectura 2". Los retos sin unidad, si
   los hay junto con otros, quedan en su propia sección "Otros retos" (texto en `textos.retos.otros`).
 - La fila es la de siempre (casilla, título, "Hasta N monedas", "Completado", Jugar/Repasar, mismos `data-testid`). Solo cambia el texto del título.
-- Estilo: el `h2` de sección ya tiene margen (`#vista section:not(.aviso-seccion) > h2`); se agrega solo el tamaño del encabezado de unidad a 1.05 rem y
-  el margen superior un poco menor entre la cabecera y la primera unidad. Solo tokens.
+- Estilo (`estilos/cara.css`): el `h2` de unidad va a 1,2 rem en `--primario` (se midió en capturas: a 1,05 rem se confundía con el título de la fila), con 24 px de aire
+  arriba y 10 abajo (le gana a `#vista section > h2`, que es del panel del profe); el contenedor no entra animado (como la `ul` de siempre): entran las filas. Solo tokens.
 
 ## 4. Pruebas
 
