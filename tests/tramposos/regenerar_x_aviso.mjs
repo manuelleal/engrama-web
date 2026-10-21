@@ -77,6 +77,12 @@ const TRAMPOSOS = [
     falla: [T_GUARDA, T_TIEMPO],
   },
   {
+    nombre: 'x_aviso_brevo_sin_condicional', destino: 'src/textos_aviso.js', archivo: 'textos_aviso.js',
+    descripcion: 'Auditoría H-3: Brevo vuelve a aparecer como si enviara el correo siempre ("envía el correo para recuperar tu contraseña, por eso ve tu correo"), sin el condicional "si pides recuperar".',
+    contenido: cambiar(textos, 'Brevo (el servicio de correo con el que te enviamos el enlace si pides recuperar tu contraseña; ve tu correo).', 'Brevo (envía el correo para recuperar tu contraseña, por eso ve tu correo).'),
+    falla: [T_DERECHOS],
+  },
+  {
     nombre: 'x_aviso_no_dibuja_medir', destino: 'src/vistas/aviso_datos.js', archivo: 'aviso_datos.js',
     descripcion: 'Aviso v2: la vista no pinta las secciones "medir", "cuánto tiempo" ni "registro de conexiones" aunque los textos existan.',
     contenido: [

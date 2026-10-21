@@ -69,7 +69,8 @@ test('aviso v2: derechos (conocer, actualizar, corregir, suprimir, retirar) con 
   assert.match(t, /Tú decides si aceptas\. Si no aceptas, no podrás usar ENGRAMA: habla con tu docente\./);
   assert.match(t, /solo para personas mayores de 18 años/);
   assert.match(t, /no se venden ni se comparten con nadie más/);
-  assert.match(t, /Cloudflare \(la red por la que pasa el tráfico; sus servidores están en EE\. UU\.\) y Brevo \(envía el correo para recuperar tu contraseña/, 'los encargados que ven datos, nombrados');
+  assert.match(t, /Cloudflare \(la red por la que pasa el tráfico; sus servidores están en EE\. UU\.\) y Brevo \(el servicio de correo con el que te enviamos el enlace si pides recuperar tu contraseña; ve tu correo\)/, 'los encargados que ven datos, nombrados');
+  assert.doesNotMatch(t, /Brevo \(envía el correo/, 'H-3: Brevo en condicional: solo ve tu correo SI pides recuperar la contraseña');
   assert.match(t, /Examen de nivel \(SET\) te muestra además su propio aviso/);
 });
 

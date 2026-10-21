@@ -1,0 +1,16 @@
+{
+  "descripcion": "Auditoría H-3: Brevo vuelve a aparecer como si enviara el correo siempre (\"envía el correo para recuperar tu contraseña, por eso ve tu correo\"), sin el condicional \"si pides recuperar\".",
+  "archivos": {
+    "src/textos_aviso.js": "textos_aviso.js"
+  },
+  "comando": [
+    "node",
+    "--test",
+    "--test-reporter=tap",
+    "tests/unit/aviso_texto.test.mjs"
+  ],
+  "espera_codigo_no_cero": true,
+  "espera_fallan_tests": [
+    "aviso v2: derechos (conocer, actualizar, corregir, suprimir, retirar) con la pantalla \"Mis solicitudes sobre mis datos\"; voluntario; mayores de 18; no se vende"
+  ]
+}

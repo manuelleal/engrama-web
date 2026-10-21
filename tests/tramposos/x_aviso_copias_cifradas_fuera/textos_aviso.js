@@ -30,7 +30,7 @@ export const textosAviso = {
     quienLosVeTitulo: 'Quién los ve',
     quienLosVe: 'Tu docente, la coordinación de tu institución y quien administra ENGRAMA. Nadie de otra institución puede verlos.',
     noSeVendenTitulo: 'Lo que no hacemos',
-    noSeVenden: 'Tus datos no se venden ni se comparten con nadie más. Solo los ven dos servicios que nos ayudan a que funcione: Cloudflare (la red por la que pasa el tráfico; sus servidores están en EE. UU.) y Brevo (envía el correo para recuperar tu contraseña, por eso ve tu correo).',
+    noSeVenden: 'Tus datos no se venden ni se comparten con nadie más. Solo los ven dos servicios que nos ayudan a que funcione: Cloudflare (la red por la que pasa el tráfico; sus servidores están en EE. UU.) y Brevo (el servicio de correo con el que te enviamos el enlace si pides recuperar tu contraseña; ve tu correo).',
     otrasPartesTitulo: 'Clase en vivo y Examen de nivel',
     otrasPartes: 'Entras desde ENGRAMA y el resultado vuelve a tu perfil. El Examen de nivel (SET) te muestra además su propio aviso: si tiene escritura, la califica con ayuda de una inteligencia artificial de un tercero, fuera de Colombia, y te pide tu autorización aparte.',
     cuantoTitulo: 'Cuánto tiempo',
