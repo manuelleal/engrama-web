@@ -50,6 +50,8 @@ Las fotos R4 (`entrada_aviso_leer`, `aviso_consentimiento`) y R9 (`aviso_leer`) 
 
 ## Adenda 2026-10-20 (noche): correcciones de la auditoría independiente (NO LISTO → corregir)
 
+**Esta adenda manda sobre "El texto (secciones, en orden)" y "La regla de veracidad" de arriba** (copias, registro, Brevo, derechos y retención cambiaron).
+
 La auditoría dijo que el texto afirmaba cosas que el **servidor de la casa** (https://engramaingles.com) no hace hoy. Regla:
 el texto dice SOLO lo que hoy es cierto allí. Versión del texto: se mantiene `2026-10-v2` (el texto aún no se ha
 publicado a nadie).
