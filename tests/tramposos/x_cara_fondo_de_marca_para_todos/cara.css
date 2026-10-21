@@ -456,6 +456,23 @@ button.boton-secundario {
   padding: 3px 10px;
 }
 
+/* Retos agrupados por unidad (docs/ESPEC_titulos_unidad.md): cada unidad es una sección con su nombre como encabezado y debajo sus filas. Como la `ul` de
+   siempre (juego.css), el contenedor no entra animado: entran las filas. El encabezado le gana a `#vista section > h2` (28 px de aire, pensado para el panel
+   del profe) por especificidad, y queda más chico y más cerca de sus filas que del grupo anterior. */
+.juego > .retos-por-unidad {
+  animation: none;
+}
+#vista [data-testid="vista-retos"] .unidad-retos > h2 {
+  margin: 24px 0 10px;
+  font-size: 1.2rem;
+  line-height: 1.2;
+  color: var(--primario);
+  text-wrap: balance;
+}
+#vista [data-testid="vista-retos"] .unidad-retos:first-child > h2 {
+  margin-top: 16px;
+}
+
 /* Vacío: un panel con el título con peso (Drako, en su tamaño de siempre); sin el borde punteado gris de "aquí falta algo". */
 .estado-vacio {
   gap: 6px;

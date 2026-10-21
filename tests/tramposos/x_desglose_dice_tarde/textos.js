@@ -181,6 +181,7 @@ export const textos = {
     completado: 'Completado',
     sinRetos: 'No tienes retos disponibles.',
     errorGeneral: 'No se pudieron cargar tus retos.',
+    otros: 'Otros retos', // encabezado de los retos sin unidad (los que crea el profe a mano) cuando la lista trae también unidades
   },
   retoFlujo: {
     /** @param {number} n @param {number} total */
