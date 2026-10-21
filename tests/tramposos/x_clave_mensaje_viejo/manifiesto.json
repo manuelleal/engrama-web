@@ -1,0 +1,17 @@
+{
+  "descripcion": "ESPEC_regla_clave C2: el envio no usa la regla y vuelve a decir solo lo primero que encontro validarRegistro (\"Usa al menos 10 caracteres.\") aunque falte el numero o el simbolo.",
+  "archivos": {
+    "src/vistas/registro.js": "registro.js"
+  },
+  "comando": [
+    "node",
+    "--test",
+    "--test-reporter=tap",
+    "tests/unit/vista_registro.test.mjs"
+  ],
+  "espera_codigo_no_cero": true,
+  "espera_fallan_tests": [
+    "una contraseña mala → 0 peticiones, el mensaje junto al campo dice TODO lo que le falta",
+    "al enviar con la contraseña mal, el mensaje del campo es EL MISMO"
+  ]
+}

@@ -8,7 +8,7 @@
 // x_registro_avisa_lo_que_no_sabe (todos sobre src/vistas/registro.js); x_registro_con_campo_de_mas está en api_registro.test.mjs.
 import test from 'node:test';
 import assert from 'node:assert/strict';
-import { entornoDeFotos, crearRaiz, buscar, textoDe } from './foto_vistas.mjs';
+import { entornoDeFotos, crearRaiz, buscar, textoDe, ponerSvgFalso, iconosDe } from './foto_vistas.mjs';
 import { renderRegistro } from '../../src/vistas/registro.js';
 import { renderEntrada } from '../../src/vistas/entrada.js';
 import { registroConCodigo } from '../../src/config.js';
@@ -49,8 +49,12 @@ function conEntorno({ responder = () => json(201, { estado: 'pendiente' }), enLi
   };
 }
 
-/** Pinta la vista abierta, con una espera que solo se dispara a mano. @returns {{raiz: any, volvio: () => number, dispararEspera: () => void, esperas: number[]}} */
-function pintar(extra = {}) {
+/**
+ * Pinta la vista abierta, con una espera que solo se dispara a mano, y espera a que cargue el módulo DIFERIDO de la regla de la contraseña (ESPEC_regla_clave): en el navegador
+ * carga en milisegundos y la persona no escribe antes; aquí se espera para que cada prueba sea la misma siempre. `cargarRegla` en `extra` lo cambia (la prueba de "no cargó").
+ * @returns {Promise<{raiz: any, control: any, volvio: () => number, dispararEspera: () => void, esperas: number[]}>}
+ */
+async function pintar(extra = {}) {
   const raiz = crearRaiz();
   let volvio = 0;
   /** @type {Array<() => void>} */ const pendientes = []; /** @type {number[]} */ const esperas = [];
@@ -58,6 +62,7 @@ function pintar(extra = {}) {
     abierto: true, aviso: leerAviso(), volver: () => { volvio += 1; },
     esperar: (fn, ms) => { pendientes.push(fn); esperas.push(ms); return () => {}; }, ...extra,
   });
+  await control.listo;
   return { raiz, control, volvio: () => volvio, dispararEspera: () => pendientes.shift()?.(), esperas };
 }
 
@@ -76,13 +81,13 @@ const mensaje = (raiz, campo) => textoDe(buscar(raiz, `registro-error-${campo}`)
 test('U17: cada regla rota → 0 peticiones, el mensaje junto a SU campo, y lo escrito se conserva', async () => {
   const e = conEntorno();
   try {
-    const { raiz } = pintar();
+    const { raiz } = await pintar();
     const casos = [
       [{ codigo: '' }, 'codigo', /Escribe el código de tu grupo/],
       [{ nombre: '   ' }, 'nombre', /Escribe tu nombre completo/],
       [{ correo: 'sin-arroba' }, 'correo', /nombre@dominio\.com/],
       [{ 'codigo-estudiantil': 'ab cd' }, 'codigo-estudiantil', /letras, números y guion/],
-      [{ contrasena: '123456789' }, 'contrasena', /al menos 10 caracteres/],
+      [{ contrasena: '123456789' }, 'contrasena', /^Te falta: llegar a 10 caracteres y una letra\.$/], // ESPEC_regla_clave C2: TODO lo que falta, no solo el largo
       [{ contrasena: 'ñ'.repeat(37) }, 'contrasena', /72 bytes/],
       [{ mayor: false }, 'mayor', /18 años o más/],
       [{ 'acepto-aviso': false }, 'acepto-aviso', /aviso de tratamiento de datos/],
@@ -111,7 +116,7 @@ test('U17: cada regla rota → 0 peticiones, el mensaje junto a SU campo, y lo e
 test('U17: sin marcar "Tengo 18 años o más" no se envía NUNCA, y la ayuda para el menor está a la vista (dictamen 03, G5)', async () => {
   const e = conEntorno();
   try {
-    const { raiz } = pintar();
+    const { raiz } = await pintar();
     assert.match(textoDe(buscar(raiz, 'registro-menor-ayuda')), /Si tienes menos de 18, no puedes crear la cuenta tú mismo: tu institución te inscribe con su lista\. Dile a tu profe\./);
     assert.match(textoDe(buscar(raiz, 'form-registro')), /Tengo 18 años o más/);
     for (let i = 0; i < 3; i += 1) { await Promise.all(llenarYEnviar(raiz, { mayor: false })); await reposar(); }
@@ -123,7 +128,7 @@ test('U17: sin marcar "Tengo 18 años o más" no se envía NUNCA, y la ayuda par
 test('U19: el 201 es SIEMPRE la misma pantalla "Registro enviado", sin iniciar sesión ni pedir /auth/me ni afirmar que quedó inscrito (dictamen 03, G5)', async () => {
   const e = conEntorno();
   try {
-    const { raiz } = pintar();
+    const { raiz } = await pintar();
     await Promise.all(llenarYEnviar(raiz));
     await reposar();
     assert.ok(buscar(raiz, 'vista-registro-enviado'), 'la pantalla del 201');
@@ -140,7 +145,7 @@ test('U19: 403 → UN solo texto junto al código; 422 con lista → el mensaje 
   let respuesta = () => json(403, { detail: 'codigo_no_valido' });
   const e = conEntorno({ responder: () => respuesta() });
   try {
-    const { raiz } = pintar();
+    const { raiz } = await pintar();
     await Promise.all(llenarYEnviar(raiz)); await reposar();
     assert.equal(mensaje(raiz, 'codigo'), 'Ese código no sirve. Revisa que esté bien escrito o pídele uno nuevo a tu profe.');
     assert.doesNotMatch(textoDe(buscar(raiz, 'vista-registro')), /vencid|apagad|no existe|sin cupo|cupo/i, 'no dice por qué');
@@ -162,7 +167,7 @@ test('U19: 429 → los minutos de Retry-After y el botón deshabilitado ese tiem
   let respuesta = () => json(429, { detail: 'demasiados_intentos' }, { 'Retry-After': '120' });
   const e = conEntorno({ responder: () => respuesta() });
   try {
-    const p = pintar();
+    const p = await pintar();
     await Promise.all(llenarYEnviar(p.raiz)); await reposar();
     assert.equal(textoDe(buscar(p.raiz, 'registro-error')), 'Demasiados intentos. Espera 2 min y vuelve a intentar.');
     assert.equal(buscar(p.raiz, 'registro-enviar').disabled, true, 'deshabilitado mientras dura la espera');
@@ -188,7 +193,7 @@ test('U19: 429 → los minutos de Retry-After y el botón deshabilitado ese tiem
 test('U19: el 503 registro_no_configurado dice "Todavía no está abierto" y NO "Error inesperado (503)"; sin reintento automático', async () => {
   const e = conEntorno({ responder: () => json(503, { detail: 'registro_no_configurado' }) });
   try {
-    const p = pintar();
+    const p = await pintar();
     await Promise.all(llenarYEnviar(p.raiz)); await reposar();
     const pantalla = buscar(p.raiz, 'vista-registro-no-abierto');
     assert.ok(pantalla, 'la pantalla del 503');
@@ -209,7 +214,7 @@ test('U19: un doble toque en "Crear mi cuenta" es UNA petición y el botón qued
   let suelta = () => {};
   const e = conEntorno({ responder: () => new Promise((r) => { suelta = () => r(json(201, { estado: 'pendiente' })); }) });
   try {
-    const { raiz } = pintar();
+    const { raiz } = await pintar();
     const pendientes = [...llenarYEnviar(raiz), ...buscar(raiz, 'form-registro').disparar('submit'), ...buscar(raiz, 'form-registro').disparar('submit')];
     await reposar();
     assert.equal(e.posts.length, 1);
@@ -224,7 +229,7 @@ test('U19: un doble toque en "Crear mi cuenta" es UNA petición y el botón qued
 test('U19: sin red el botón queda deshabilitado con su texto y no sale ninguna petición', async () => {
   const e = conEntorno({ enLinea: false });
   try {
-    const { raiz } = pintar();
+    const { raiz } = await pintar();
     assert.equal(buscar(raiz, 'registro-enviar').disabled, true);
     assert.equal(textoDe(buscar(raiz, 'registro-sin-red')), 'Sin conexión: no puedes crear tu cuenta ahora.');
     assert.equal(e.llamadas.length, 0);
@@ -237,7 +242,7 @@ test('U20: ni la contraseña, ni el correo, ni el código de grupo en un almacen
     () => json(502, { detail: 'registro_no_disponible' }), () => json(429, {}, { 'Retry-After': '30' }), () => json(422, [{ loc: ['body', 'correo'] }]), () => new Response('<html>', { status: 500 })]) {
     const e = conEntorno({ responder: respuesta });
     try {
-      const { raiz } = pintar();
+      const { raiz } = await pintar();
       await Promise.all(llenarYEnviar(raiz)); await reposar();
       const g = /** @type {any} */ (globalThis);
       for (const almacen of e.almacenes()) assert.equal(almacen.length, 0, 'nada en localStorage ni en sessionStorage');
@@ -287,10 +292,10 @@ test('U26 / R4: el botón "Crear cuenta con código de grupo" de la entrada solo
 const MSG_422_CLAVE = 'Value error, la contraseña debe tener al menos una letra y al menos un número o un símbolo (- _ . ! @ # $ % & * +)';
 const TEXTO_422_CLAVE = 'La contraseña debe tener al menos una letra y al menos un número o un símbolo (- _ . ! @ # $ % & * +)';
 
-test('U17 (17.8, ESPEC_regla_clave C1): la regla COMPLETA de la contraseña está escrita ANTES del campo (se lee antes de escribir): el mínimo, el máximo en bytes, una letra, un número o un símbolo y la lista; y el campo la nombra en aria-describedby', () => {
+test('U17 (17.8, ESPEC_regla_clave C1): la regla COMPLETA de la contraseña está escrita ANTES del campo (se lee antes de escribir): el mínimo, el máximo en bytes, una letra, un número o un símbolo y la lista; y el campo la nombra en aria-describedby', async () => {
   const e = conEntorno();
   try {
-    const { raiz } = pintar();
+    const { raiz } = await pintar();
     const regla = textoDe(buscar(raiz, 'registro-ayuda-contrasena'));
     assert.equal(regla, 'Mínimo 10 caracteres. Máximo 72 (la ñ y las letras con tilde cuentan doble). Debe tener una letra y un número o un símbolo: - _ . ! @ # $ % & * +');
     assert.equal(regla, textos.registro.reglaContrasena);
@@ -306,21 +311,31 @@ test('U17 (17.8, ESPEC_regla_clave C1): la regla COMPLETA de la contraseña est�
   } finally { e.restaurar(); }
 });
 
-test('U17 (17.8): una contraseña sin letra o sin número/símbolo → 0 peticiones, el mensaje junto al campo y lo escrito se conserva; con ñ o tildes SÍ se envía (el backend las acepta)', async () => {
+const SIMBOLOS_TEXTO = '- _ . ! @ # $ % & * +';
+test('U17 (17.8, ESPEC_regla_clave C2): una contraseña mala → 0 peticiones, el mensaje junto al campo dice TODO lo que le falta y lo escrito se conserva; con ñ o tildes SÍ se envía (el backend las acepta)', async () => {
   const e = conEntorno();
   try {
-    const { raiz } = pintar();
-    for (const contrasena of ['abcdefghijkl', '1234567890', '-_.!@#$%&*+', 'mi clave aaaa', 'clave?????a']) {
+    const { raiz } = await pintar();
+    const casos = [
+      ['abcdefghijkl', `Te falta: un número o un símbolo (${SIMBOLOS_TEXTO}).`],
+      ['1234567890', 'Te falta: una letra.'],
+      ['-_.!@#$%&*+', 'Te falta: una letra.'],
+      ['mi clave aaaa', `Te falta: un número o un símbolo (${SIMBOLOS_TEXTO}).`],
+      ['clave?????a', `Te falta: un número o un símbolo (${SIMBOLOS_TEXTO}).`],
+      ['abc', `Te falta: llegar a 10 caracteres y un número o un símbolo (${SIMBOLOS_TEXTO}).`],
+      ['   ', `Te falta: llegar a 10 caracteres, una letra y un número o un símbolo (${SIMBOLOS_TEXTO}).`],
+    ];
+    for (const [contrasena, esperado] of casos) {
       await Promise.all(llenarYEnviar(raiz, { contrasena }));
       await reposar();
-      assert.equal(mensaje(raiz, 'contrasena'), 'Usa al menos una letra y un número o un símbolo (- _ . ! @ # $ % & * +).', contrasena);
+      assert.equal(mensaje(raiz, 'contrasena'), esperado, contrasena);
       assert.equal(e.posts.length, 0, `${contrasena}: 0 peticiones`);
       assert.equal(buscar(raiz, 'registro-contrasena').value, contrasena, 'lo escrito se conserva');
     }
     // la ñ y las tildes cuentan como letra, y un símbolo o un número completa la regla: se envía
     // (con letras que NO son ASCII: si el cliente contara solo las ASCII, rechazaría estas dos y el backend no)
     for (const [n, contrasena] of [[1, 'ñññññññññ1'], [2, 'ÁÉÍÓÚáéíóú-']]) {
-      const otra = pintar(); // tras un 201 el formulario se va: una pantalla nueva por contraseña
+      const otra = await pintar(); // tras un 201 el formulario se va: una pantalla nueva por contraseña
       await Promise.all(llenarYEnviar(otra.raiz, { contrasena }));
       await reposar();
       assert.equal(e.posts.length, n, `${contrasena}: sale`);
@@ -330,10 +345,92 @@ test('U17 (17.8): una contraseña sin letra o sin número/símbolo → 0 peticio
   } finally { e.restaurar(); }
 });
 
+test('U17 (ESPEC_regla_clave C2): si el módulo diferido de la regla NO carga, el formulario es el de antes: la regla a la vista, los mensajes de siempre al enviar y 0 peticiones; el aviso en consola no lleva lo escrito', async () => {
+  const e = conEntorno();
+  try {
+    const { raiz } = await pintar({ cargarRegla: () => Promise.reject(new Error(`no cargó ${CLAVE}`)) });
+    assert.match(textoDe(buscar(raiz, 'registro-ayuda-contrasena')), /Mínimo 10 caracteres/, 'la regla completa está en el shell');
+    for (const [contrasena, esperado] of [['abcdef', textos.registro.errores.contrasenaCorta], ['abcdefghijkl', textos.registro.errores.contrasenaComposicion]]) {
+      await Promise.all(llenarYEnviar(raiz, { contrasena }));
+      await reposar();
+      assert.equal(mensaje(raiz, 'contrasena'), esperado, contrasena);
+      assert.equal(e.posts.length, 0);
+    }
+    // escribir no hace nada (no hay línea en vivo) y no revienta
+    buscar(raiz, 'registro-contrasena').value = 'abc';
+    buscar(raiz, 'registro-contrasena').disparar('input');
+    assert.equal(textoDe(buscar(raiz, 'registro-falta-contrasena')), '');
+    assert.ok(e.consola.some((l) => /sin la línea/.test(l)), 'avisa que no cargó');
+    assert.ok(!e.consola.join('\n').includes(CLAVE), 'sin lo escrito en la consola');
+  } finally { e.restaurar(); }
+});
+
+test('U17 (ESPEC_regla_clave C2): mientras se escribe, una línea de estado dice exactamente qué falta, con ícono y texto, y solo cambia cuando cambia QUÉ falta; no sale nada a ningún lado', async () => {
+  const e = conEntorno();
+  try {
+    ponerSvgFalso();
+    const { raiz } = await pintar();
+    const viva = buscar(raiz, 'registro-falta-contrasena');
+    const campo = buscar(raiz, 'registro-contrasena');
+    assert.equal(viva.getAttribute('role'), 'status', 'una región de estado: se lee sin quitar el foco del campo');
+    assert.match(campo.getAttribute('aria-describedby'), /contrasena-ayuda/);
+    assert.match(campo.getAttribute('aria-describedby'), /contrasena-falta/);
+    assert.match(campo.getAttribute('aria-describedby'), /contrasena-error/);
+    assert.equal(textoDe(viva), '', 'sin escribir nada, la línea no dice nada (la regla ya está arriba)');
+    const escribir = (valor) => { campo.value = valor; campo.disparar('input'); return textoDe(viva); };
+    const SIMB = `un número o un símbolo (${SIMBOLOS_TEXTO})`;
+    assert.equal(escribir('a'), `Te falta: llegar a 10 caracteres y ${SIMB}.`);
+    assert.deepEqual(iconosDe(viva), ['info'], 'ícono + texto, no solo color');
+    assert.equal(viva.getAttribute('data-estado'), 'falta');
+    assert.equal(escribir('abcdef'), `Te falta: llegar a 10 caracteres y ${SIMB}.`);
+    assert.equal(escribir('abcdefghij'), `Te falta: ${SIMB}.`);
+    assert.equal(escribir('1234567890'), 'Te falta: una letra.');
+    assert.equal(escribir('abcdefghi1'), 'Cumple la regla.');
+    assert.deepEqual(iconosDe(viva), ['visto']);
+    assert.equal(viva.getAttribute('data-estado'), 'ok');
+    assert.ok(escribir('ñ'.repeat(37) + '1').startsWith('Esa contraseña es demasiado larga. El máximo son 72 bytes'), 'pasada de 72 bytes lo dice');
+    assert.equal(escribir(''), '', 'al borrar todo, la línea se vacía');
+    assert.deepEqual(iconosDe(viva), []);
+    // el mismo "qué falta" no repinta la región (un lector de pantalla no lo repite en cada tecla)
+    escribir('abcdef');
+    const nodoDelTexto = viva.children[1];
+    escribir('abcdefg');
+    assert.equal(viva.children[1], nodoDelTexto, 'mismo texto → mismo nodo: la línea no se tocó');
+    // y no sale NADA a ningún lado: ni peticiones, ni consola, ni almacenamientos, ni la dirección; el texto no repite lo escrito
+    escribir('Zq9mxwk');
+    assert.ok(!textoDe(viva).includes('Zq9mxwk'), 'el texto de la línea no repite la contraseña');
+    assert.equal(e.llamadas.length, 0, '0 peticiones al escribir');
+    assert.equal(e.posts.length, 0);
+    assert.equal(e.consola.length, 0, '0 líneas de consola al escribir');
+    for (const almacen of e.almacenes()) assert.equal(almacen.length, 0, 'nada en un almacenamiento');
+    assert.ok(!String(/** @type {any} */ (globalThis).location.href).includes('Zq9mxwk'));
+  } finally { e.restaurar(); }
+});
+
+test('U17 (ESPEC_regla_clave C2): al enviar con la contraseña mal, el mensaje del campo es EL MISMO que decía la línea en vivo (y la línea calla); al volver a escribir se va el error viejo y manda la línea', async () => {
+  const e = conEntorno();
+  try {
+    const { raiz } = await pintar();
+    const campo = buscar(raiz, 'registro-contrasena');
+    const viva = buscar(raiz, 'registro-falta-contrasena');
+    campo.value = 'abcdef'; campo.disparar('input');
+    const enLaLinea = textoDe(viva);
+    assert.match(enLaLinea, /^Te falta: llegar a 10 caracteres y un número o un símbolo/);
+    await Promise.all(llenarYEnviar(raiz, { contrasena: 'abcdef' }));
+    await reposar();
+    assert.equal(mensaje(raiz, 'contrasena'), enLaLinea, 'el envío dice lo mismo que la línea');
+    assert.equal(textoDe(viva), '', 'y la línea calla: no hay dos textos iguales a la vez');
+    assert.equal(e.posts.length, 0);
+    campo.value = 'abcdefghi1'; campo.disparar('input');
+    assert.equal(mensaje(raiz, 'contrasena'), '', 'al volver a escribir se va el error viejo');
+    assert.equal(textoDe(viva), 'Cumple la regla.');
+  } finally { e.restaurar(); }
+});
+
 test('U19 (17.8): si igual llega el 422 de la contraseña, su mensaje (sin "Value error, ") va junto al campo de la contraseña y no como error general; lo escrito se conserva', async () => {
   const e = conEntorno({ responder: () => json(422, { detail: [{ type: 'value_error', loc: ['body', 'contrasena'], msg: MSG_422_CLAVE, input: null }] }) });
   try {
-    const { raiz } = pintar();
+    const { raiz } = await pintar();
     await Promise.all(llenarYEnviar(raiz));
     await reposar();
     assert.equal(e.posts.length, 1, 'la petición salió (el cliente la dejó pasar)');
@@ -351,7 +448,7 @@ test('U19 (17.8): si igual llega el 422 de la contraseña, su mensaje (sin "Valu
 test('U19 (17.8): un 422 de la contraseña en inglés (pydantic) no se muestra tal cual: queda el texto local de siempre', async () => {
   const e = conEntorno({ responder: () => json(422, [{ type: 'string_too_short', loc: ['body', 'contrasena'], msg: 'String should have at least 10 characters' }]) });
   try {
-    const { raiz } = pintar();
+    const { raiz } = await pintar();
     await Promise.all(llenarYEnviar(raiz));
     await reposar();
     assert.equal(mensaje(raiz, 'contrasena'), textos.registro.errores.contrasenaCorta);
@@ -363,7 +460,7 @@ test('U19 (17.8): un 422 de la contraseña en inglés (pydantic) no se muestra t
 test('U17 (17.8): la repetición debe coincidir: distinta o vacía → 0 peticiones y el mensaje junto al SEGUNDO campo; lo escrito se conserva', async () => {
   const e = conEntorno();
   try {
-    const { raiz } = pintar();
+    const { raiz } = await pintar();
     assert.match(textoDe(buscar(raiz, 'form-registro')), /Repite tu contraseña/);
     for (const [repite, patron] of [['una-clave-larga-2', /Las dos contraseñas no coinciden./], ['Una-clave-larga-1', /no coinciden/], ['una-clave-larga-1 ', /no coinciden/], ['', /Repite tu contraseña para confirmarla./]]) {
       await Promise.all(llenarYEnviar(raiz, { repite }));
@@ -388,7 +485,7 @@ test('U17 (17.8): la repetición debe coincidir: distinta o vacía → 0 peticio
 test('U17 (17.8): el segundo campo NO viaja: el cuerpo tiene exactamente las 7 claves del contrato y la repetición no aparece en ninguna petición', async () => {
   const e = conEntorno();
   try {
-    const { raiz } = pintar();
+    const { raiz } = await pintar();
     await Promise.all(llenarYEnviar(raiz));
     await reposar();
     assert.equal(e.posts.length, 1);
@@ -396,7 +493,7 @@ test('U17 (17.8): el segundo campo NO viaja: el cuerpo tiene exactamente las 7 c
     assert.ok(!JSON.stringify(e.posts[0]).includes('repite'), 'ni la clave ni el nombre del campo');
     // y la vista no se lo da a quien registra (un registrar inyectado recibe los datos sin la repetición)
     const recibidos = [];
-    const e2 = pintar({ registrar: async (datos) => { recibidos.push(datos); return {}; } });
+    const e2 = await pintar({ registrar: async (datos) => { recibidos.push(datos); return {}; } });
     await Promise.all(llenarYEnviar(e2.raiz));
     await reposar();
     assert.equal(recibidos.length, 1);
@@ -407,7 +504,7 @@ test('U17 (17.8): el segundo campo NO viaja: el cuerpo tiene exactamente las 7 c
 test('U17 (17.8): "Mostrar" / "Ocultar" es un botón con TEXTO que alterna el tipo de los dos campos sin tocar el valor, y vuelve a ocultar al vaciar tras el 201', async () => {
   const e = conEntorno();
   try {
-    const { raiz } = pintar();
+    const { raiz } = await pintar();
     const boton = buscar(raiz, 'registro-mostrar');
     const clave = buscar(raiz, 'registro-contrasena'); const repite = buscar(raiz, 'registro-repite');
     assert.equal(boton.getAttribute('type'), 'button', 'no envía el formulario');
@@ -442,7 +539,7 @@ test('U20 (17.8): ni la repetición ni el botón dejan la contraseña en un alma
   for (const respuesta of [() => json(201, { estado: 'pendiente' }), () => json(422, [{ loc: ['body', 'contrasena'], msg: MSG_422_CLAVE }]), () => json(502, {}), () => new Response('<html>', { status: 500 })]) {
     const e = conEntorno({ responder: respuesta });
     try {
-      const { raiz } = pintar();
+      const { raiz } = await pintar();
       buscar(raiz, 'registro-mostrar').disparar('click');
       await Promise.all(llenarYEnviar(raiz, { contrasena: CLAVE2 }));
       await reposar();
@@ -457,7 +554,7 @@ test('U20 (17.8): ni la repetición ni el botón dejan la contraseña en un alma
 test('U19 (17.8): tras el 201 la pantalla "Registro enviado" ya no tiene los campos (con ellos se va la contraseña a la vista)', async () => {
   const e = conEntorno();
   try {
-    const { raiz } = pintar();
+    const { raiz } = await pintar();
     buscar(raiz, 'registro-mostrar').disparar('click');
     await Promise.all(llenarYEnviar(raiz));
     await reposar();

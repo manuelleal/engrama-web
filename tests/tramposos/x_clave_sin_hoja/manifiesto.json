@@ -1,0 +1,16 @@
+{
+  "descripcion": "ESPEC_regla_clave C2: el modulo diferido no pone su hoja (registro_regla.css): la linea queda como un parrafo suelto, sin icono alineado ni fondo, y nadie se entera.",
+  "archivos": {
+    "src/vistas/registro_regla.js": "registro_regla.js"
+  },
+  "comando": [
+    "node",
+    "--test",
+    "--test-reporter=tap",
+    "tests/e2e/registro.test.mjs"
+  ],
+  "espera_codigo_no_cero": true,
+  "espera_fallan_tests": [
+    "mientras se escribe, la línea \"qué falta\" cambia con ícono y texto"
+  ]
+}

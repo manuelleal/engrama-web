@@ -3,7 +3,7 @@
 // etiqueta, su mensaje junto al campo y su `aria-describedby`; la casilla de "Tengo 18 años o más", el aviso de datos dentro de la propia pantalla (para no
 // perder lo escrito al leerlo) y su casilla. `vistas/registro.js` los arma, lee lo escrito y manda; aquí no hay red ni estado de envío.
 // Nada de lo que se escribe aquí (la contraseña, el código de grupo, el correo) se guarda en un almacenamiento, va a la dirección o sale por la consola.
-import { h } from '../ui/dom.js';
+import { h, vaciar } from '../ui/dom.js';
 import { textos } from '../textos.js';
 import { crearTextoAviso } from './aviso_datos.js';
 
@@ -45,11 +45,19 @@ function crearBloqueContrasena() {
   };
   verTodo(false);
   boton.addEventListener('click', () => verTodo(!visible));
+  // La línea "qué falta" (docs/ESPEC_regla_clave.md C2): la llena `vistas/registro_regla.js`, que es DIFERIDO; vacía no ocupa sitio. Es una región de estado (se lee sin quitar el foco
+  // del campo) y el campo la nombra, junto a la regla y al error.
+  const viva = h('p', { role: 'status', id: 'contrasena-falta', class: 'regla-viva', 'data-testid': 'registro-falta-contrasena', 'data-estado': '' });
+  clave.entrada.setAttribute('aria-describedby', 'contrasena-ayuda contrasena-falta contrasena-error');
   const delCampo = [...clave.nodos];
-  delCampo.splice(3, 0, boton); // etiqueta, regla, campo, [Mostrar], mensaje
+  delCampo.splice(3, 0, boton, viva); // etiqueta, regla, campo, [Mostrar], línea en vivo, mensaje
   return {
     nodos: [...delCampo, ...repite.nodos],
     zonas: { contrasena: clave.error, repite: repite.error },
+    /** Lo que el módulo diferido necesita para conectarse. */
+    regla: { entrada: clave.entrada, viva, error: clave.error },
+    /** Al enviar con la contraseña mal el mensaje va en el sitio del error: la línea calla hasta la próxima tecla (no repite el mismo texto). */
+    callarLinea() { vaciar(viva); viva.setAttribute('data-estado', ''); viva.setAttribute('data-mensaje', ''); },
     leer: () => ({ contrasena: clave.entrada.value, repite_contrasena: repite.entrada.value }),
     /** Vacía las dos y las vuelve a ocultar. */
     borrar() { clave.entrada.value = ''; repite.entrada.value = ''; verTodo(false); },
@@ -91,7 +99,10 @@ export function crearCamposDelRegistro(aviso) {
     /** Pone `mensajes` ({campo: texto}) junto a cada campo y borra los demás. @param {Record<string, string>} mensajes */
     marcar(mensajes) {
       for (const [campo, zona] of Object.entries(zonas)) if (zona) zona.textContent = mensajes[campo] ?? '';
+      if (mensajes.contrasena) contrasena.callarLinea();
     },
+    /** La conexión de la contraseña con su línea "qué falta" (`vistas/registro_regla.js`, diferido). */
+    regla: contrasena.regla,
     /** Vacía la contraseña y su repetición (al recibir el 201 ya no hacen falta en ningún lado). */
     borrarContrasena() { contrasena.borrar(); },
   };

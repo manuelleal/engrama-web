@@ -111,6 +111,8 @@ async function manejarEnvio(i) {
   const datos = i.campos.leer();
   const v = validarRegistro(datos);
   const mensajes = mensajesDeCampos(v.ok ? {} : v.errores, datos.acepto_aviso, motivoDeRepeticion(datos.contrasena, datos.repite_contrasena));
+  // Con el módulo de la regla cargado, la contraseña dice TODO lo que le falta (el mismo texto que la línea en vivo), no solo lo primero que encontró `validarRegistro`.
+  if (mensajes.contrasena && i.regla) mensajes.contrasena = i.regla.mensajeDeLoQueFalta(datos.contrasena) ?? mensajes.contrasena;
   i.campos.marcar(mensajes);
   // (roto) se envía aunque falte un campo o la persona no haya marcado que tiene 18 años o más
   const paraEnviar = { ...datos };
@@ -138,12 +140,12 @@ async function manejarEnvio(i) {
 /**
  * @param {HTMLElement} raiz
  * @param {{abierto: boolean, aviso: import('../aviso.js').Aviso, volver: () => void, registrar?: (datos: Record<string, unknown>) => Promise<unknown>,
- *   esperar?: (fn: () => void, ms: number) => () => void}} ctx
- *   `abierto`: `registroConCodigo(config)`; `volver`: de vuelta a la entrada; `registrar` y `esperar` se inyectan en las pruebas.
- * @returns {{detener: () => void}} apaga lo que quede vivo (la espera del 429 y la ligadura a la red)
+ *   esperar?: (fn: () => void, ms: number) => () => void, cargarRegla?: () => Promise<typeof import('./registro_regla.js')>}} ctx
+ *   `abierto`: `registroConCodigo(config)`; `volver`: de vuelta a la entrada; `registrar`, `esperar` y `cargarRegla` se inyectan en las pruebas.
+ * @returns {{detener: () => void, listo: Promise<void>}} apaga lo que quede vivo (la espera del 429 y la ligadura a la red); `listo` se cumple cuando el módulo de la regla cargó (o falló)
  */
 export function renderRegistro(raiz, ctx) {
-  if (!ctx.abierto) { pantallaNoAbierto(raiz, ctx); return { detener() {} }; }
+  if (!ctx.abierto) { pantallaNoAbierto(raiz, ctx); return { detener() {}, listo: Promise.resolve() }; }
   const campos = crearCamposDelRegistro(ctx.aviso);
   const boton = /** @type {HTMLButtonElement} */ (h('button', { type: 'submit', 'data-testid': 'registro-enviar' }, T.enviar));
   const zona = h('p', { role: 'alert', 'data-testid': 'registro-error' });
@@ -154,13 +156,18 @@ export function renderRegistro(raiz, ctx) {
   const detener = () => { estado.cancelarEspera?.(); estado.cancelarEspera = null; cancelarRed(); };
   const enviarUnaVez = accionUnica(async (datos) => (ctx.registrar ?? registrarse)(datos));
   const form = h('form', { 'data-testid': 'form-registro', novalidate: true }, ...campos.nodos, boton, zona, avisoRed);
-  const interno = { raiz, ctx, campos, boton, zona, estado, detener, reposo, enviarUnaVez, esperar: ctx.esperar ?? esperaDelNavegador };
+  /** @type {{regla: null|typeof import('./registro_regla.js')}} */
+  const interno = { raiz, ctx, campos, boton, zona, estado, detener, reposo, enviarUnaVez, esperar: ctx.esperar ?? esperaDelNavegador, regla: null };
   form.addEventListener('submit', (ev) => { ev.preventDefault(); manejarEnvio(interno); });
+  // La línea "qué falta" (docs/ESPEC_regla_clave.md): un módulo DIFERIDO. Si no carga, el formulario sigue como antes (regla a la vista, mensajes de siempre).
+  const listo = (ctx.cargarRegla ?? (() => import('./registro_regla.js')))()
+    .then((modulo) => { interno.regla = modulo; modulo.ligarRegla(campos.regla); })
+    .catch((e) => { console.warn('vistas/registro: sin la línea "qué falta" de la contraseña', e instanceof Error ? e.name : typeof e); });
   montar(raiz, h(
     'div', { 'data-testid': 'vista-registro' },
     crearDrako('presenta', T.drako), h('h1', {}, T.titulo), h('p', {}, T.ayuda), form,
     h('div', { class: 'acciones' }, botonVolver(ctx.volver)),
   ));
   document.body.dataset.listo = '1';
-  return { detener };
+  return { detener, listo };
 }

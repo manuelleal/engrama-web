@@ -1,0 +1,16 @@
+{
+  "descripcion": "ESPEC_regla_clave C2: queFalta/mensajeDeLoQueFalta vuelven a decir solo la primera carencia (el largo) aunque falten tambien la letra o el numero.",
+  "archivos": {
+    "src/vistas/registro_regla.js": "registro_regla.js"
+  },
+  "comando": [
+    "node",
+    "--test",
+    "--test-reporter=tap",
+    "tests/unit/registro_regla.test.mjs"
+  ],
+  "espera_codigo_no_cero": true,
+  "espera_fallan_tests": [
+    "mensajeDeLoQueFalta: dice exactamente qué falta, todo junto"
+  ]
+}

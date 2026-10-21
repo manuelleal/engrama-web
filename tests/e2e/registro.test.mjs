@@ -220,13 +220,55 @@ test('E12 (17.8): la regla de la contraseña se lee antes de enviar, sin desbord
       await llenar(sesion, { clave: 'solo-letras-aqui'.replace(/-/g, '').padEnd(12, 'x') });
       await enviar(sesion);
       await esperar(600);
-      assert.equal(await texto(sesion, 'registro-error-contrasena'), 'Usa al menos una letra y un número o un símbolo (- _ . ! @ # $ % & * +).');
+      assert.equal(await texto(sesion, 'registro-error-contrasena'), 'Te falta: un número o un símbolo (- _ . ! @ # $ % & * +).', 'dice exactamente qué falta (ESPEC_regla_clave C2)');
       assert.equal(peticionesDeRegistro(estado), 0, '0 peticiones');
       // con la letra ñ y un número, sí sale
       await llenar(sesion, { clave: 'contraseña1' });
       await enviar(sesion);
       assert.ok(await esperarVista(sesion, 'vista-registro-enviado'));
       assert.equal(peticionesDeRegistro(estado), 1);
+    } finally { await sesion.cerrar(); }
+  }, { estado, ...ABIERTO });
+});
+
+test('E12 (ESPEC_regla_clave C2): mientras se escribe, la línea "qué falta" cambia con ícono y texto, cabe a 375 px sin desbordar, con su hoja diferida puesta; escribir no pide nada y enviar con la contraseña corta dice lo mismo', { skip: OMITIR, timeout: 120_000 }, async () => {
+  const { estado } = estadoConCodigo();
+  await conAppCompleta(async (url) => {
+    const sesion = await abrirRegistro(url);
+    try {
+      assert.ok(await esperarVista(sesion, 'vista-registro'));
+      const escribir = (valor) => sesion.evaluar(`(() => { const e = document.querySelector('[data-testid="registro-contrasena"]'); e.value = ${JSON.stringify(valor)}; e.dispatchEvent(new Event('input', {bubbles: true})); })()`);
+      const linea = () => sesion.evaluar(`(() => { const v = document.querySelector('[data-testid="registro-falta-contrasena"]'); const r = v.getBoundingClientRect(); return {texto: v.textContent, estado: v.dataset.estado, iconos: v.querySelectorAll('svg').length, display: getComputedStyle(v).display, derecha: r.right, alto: r.height, rol: v.getAttribute('role')}; })()`);
+      // el módulo diferido tarda unos milisegundos en llegar: se espera a que la primera tecla ya tenga línea
+      const inicio = Date.now();
+      let l;
+      do { await escribir('abcdef'); await esperar(100); l = await linea(); } while (!l.texto && Date.now() - inicio < 6000);
+      assert.equal(l.texto, 'Te falta: llegar a 10 caracteres y un número o un símbolo (- _ . ! @ # $ % & * +).');
+      assert.equal(l.estado, 'falta');
+      assert.equal(l.rol, 'status');
+      assert.equal(l.iconos, 1, 'ícono + texto, no solo color');
+      assert.equal(l.display, 'flex', 'la hoja diferida (registro_regla.css) llegó: sin ella la línea sería un párrafo suelto');
+      assert.ok(l.derecha <= 375 && l.alto > 0, `la línea cabe en 375 px: ${JSON.stringify(l)}`);
+      assert.equal(await sesion.evaluar('document.documentElement.scrollWidth <= window.innerWidth'), true, 'sin scroll horizontal');
+      assert.equal(await sesion.evaluar(`Boolean(document.head.querySelector('link[href="/estilos/registro_regla.css"]'))`), true, 'la hoja la puso el módulo, no index.html');
+      await escribir('abcdefghij');
+      assert.equal((await linea()).texto, 'Te falta: un número o un símbolo (- _ . ! @ # $ % & * +).');
+      await escribir('abcdefghi1');
+      const ok = await linea();
+      assert.equal(ok.texto, 'Cumple la regla.');
+      assert.equal(ok.estado, 'ok');
+      assert.equal(ok.iconos, 1);
+      assert.equal(peticionesDeRegistro(estado), 0, 'escribir no pide nada');
+      // enviar con la contraseña corta: el mensaje junto al campo es el mismo que decía la línea
+      await escribir('abcdef');
+      const dicho = (await linea()).texto;
+      await llenar(sesion, { clave: 'abcdef' });
+      await enviar(sesion);
+      await esperar(600);
+      assert.equal(await texto(sesion, 'registro-error-contrasena'), dicho, 'el envío dice lo mismo que la línea');
+      assert.equal((await linea()).texto, '', 'y la línea calla para no repetirlo');
+      assert.equal(peticionesDeRegistro(estado), 0, '0 peticiones');
+      assert.equal(await sesion.evaluar('JSON.stringify([localStorage, sessionStorage])'), '[{},{}]', 'nada guardado');
     } finally { await sesion.cerrar(); }
   }, { estado, ...ABIERTO });
 });
