@@ -34,7 +34,7 @@ export const textosAviso = {
     otrasPartesTitulo: 'Clase en vivo y Examen de nivel',
     otrasPartes: 'Entras desde ENGRAMA y el resultado vuelve a tu perfil. El Examen de nivel (SET) te muestra además su propio aviso: si tiene escritura, la califica con ayuda de una inteligencia artificial de un tercero, fuera de Colombia, y te pide tu autorización aparte.',
     cuantoTitulo: 'Cuánto tiempo',
-    cuanto: 'Los guardamos mientras dure este ejercicio educativo en tu curso. Cuando termine, o antes si tú lo pides, se suprimen. Las copias de seguridad de la base se guardan cifradas y fuera del servidor durante 14 días (el servidor conserva además copias propias hasta 7 días): un dato suprimido desaparece de ellas al vencer ese plazo.',
+    cuanto: 'Los guardamos mientras dure este ejercicio educativo en tu curso. Cuando termine, o antes si tú lo pides, se suprimen. Las copias de seguridad de la base se guardan en el mismo servidor, sin cifrar, durante 7 días: un dato suprimido desaparece de ellas al vencer ese plazo.',
     conexionesTitulo: 'Registro de conexiones',
     conexiones: 'Nuestro servidor guarda durante 14 días tu dirección IP, la fecha y hora, la página que pediste (sin tu contraseña, tu sesión ni lo que escribes) y si funcionó. Solo sirve para detectar abusos y fallas de seguridad, y se borra solo al pasar ese plazo.',
     voluntarioTitulo: 'Es voluntario',

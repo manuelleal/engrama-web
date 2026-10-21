@@ -34,7 +34,7 @@ export const textosAviso = {
     otrasPartesTitulo: 'Clase en vivo y Examen de nivel',
     otrasPartes: 'Entras desde ENGRAMA y el resultado vuelve a tu perfil. El Examen de nivel (SET) te muestra además su propio aviso: si tiene escritura, la califica con ayuda de una inteligencia artificial de un tercero, fuera de Colombia, y te pide tu autorización aparte.',
     cuantoTitulo: 'Cuánto tiempo',
-    cuanto: 'Los guardamos mientras dure este ejercicio educativo en tu curso. Cuando termine, o antes si tú lo pides, se suprimen.',
+    cuanto: 'Los guardamos mientras dure el ejercicio educativo de tu curso. Cuando termine, o antes si tú lo pides, se suprimen.',
     conexionesTitulo: 'Registro de conexiones',
     conexiones: 'Nuestro servidor guarda tu dirección IP.',
     voluntarioTitulo: 'Es voluntario',

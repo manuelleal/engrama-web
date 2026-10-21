@@ -49,10 +49,12 @@ test('aviso v2: es VERAZ: dice que el nombre y el correo SÍ se guardan (lo anon
   assert.doesNotMatch(t, /no guardamos tu (nombre|correo)|no (se )?guarda(mos)? (tu )?(nombre|correo)|datos anónimos desde|nadie (puede )?ve(r)? tu nombre/i, 'no promete lo que el sistema no hace');
 });
 
-test('aviso v2: dice cuánto tiempo (copias cifradas 14 días, copias propias del servidor 7, registro de conexiones 14) y que se suprimen', () => {
+test('aviso v2: dice cuánto tiempo (copias de seguridad en el mismo servidor, sin cifrar, 7 días; registro de conexiones 14) y que se suprimen', () => {
   const t = textoLeido();
   assert.match(t, /Los guardamos mientras dure este ejercicio educativo en tu curso\. Cuando termine, o antes si tú lo pides, se suprimen\./);
-  assert.match(t, /copias de seguridad de la base se guardan cifradas y fuera del servidor durante 14 días \(el servidor conserva además copias propias hasta 7 días\)/);
+  // H-1 (auditoría): hoy solo corre el servicio `respaldo`: mismo servidor, sin cifrar, 7 días. El cifrado fuera del servidor aún no está activo.
+  assert.match(t, /Las copias de seguridad de la base se guardan en el mismo servidor, sin cifrar, durante 7 días/);
+  assert.doesNotMatch(t, /cifradas|fuera del servidor|14 días de copias|durante 14 días \(el servidor/i, 'no promete un cifrado ni una copia externa que hoy no existen');
   assert.match(t, /Nuestro servidor guarda durante 14 días tu dirección IP, la fecha y hora, la página que pediste \(sin tu contraseña, tu sesión ni lo que escribes\) y si funcionó/);
   assert.match(t, /Solo sirve para detectar abusos y fallas de seguridad, y se borra solo al pasar ese plazo/);
   assert.doesNotMatch(t, /se borran? (al instante|de inmediato|ya)|inmediatamente/i, 'suprimir no es inmediato: el respaldo guarda 7 días');

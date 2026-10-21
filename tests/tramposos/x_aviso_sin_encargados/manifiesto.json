@@ -1,5 +1,5 @@
 {
-  "descripcion": "Aviso v2: dice que nadie más ve los datos pero calla a Cloudflare (EE. UU.) y a Brevo, que sí los ven.",
+  "descripcion": "Aviso v2: calla a Cloudflare y a Brevo (los servicios que sí ven datos).",
   "archivos": {
     "src/textos_aviso.js": "textos_aviso.js"
   },

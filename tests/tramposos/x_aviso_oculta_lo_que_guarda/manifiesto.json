@@ -1,5 +1,5 @@
 {
-  "descripcion": "Aviso v2: promete que no se guarda el nombre ni el correo (falso: la app los guarda para funcionar).",
+  "descripcion": "Aviso v2: promete que no se guarda nombre ni correo (falso: la app los necesita para funcionar).",
   "archivos": {
     "src/textos_aviso.js": "textos_aviso.js"
   },

@@ -1,0 +1,16 @@
+{
+  "descripcion": "Auditoría H-1: el texto vuelve a prometer copias cifradas y fuera del servidor durante 14 días, que hoy no existen (solo corre el servicio `respaldo`: mismo servidor, sin cifrar, 7 días).",
+  "archivos": {
+    "src/textos_aviso.js": "textos_aviso.js"
+  },
+  "comando": [
+    "node",
+    "--test",
+    "--test-reporter=tap",
+    "tests/unit/aviso_texto.test.mjs"
+  ],
+  "espera_codigo_no_cero": true,
+  "espera_fallan_tests": [
+    "aviso v2: dice cuánto tiempo (copias de seguridad en el mismo servidor, sin cifrar, 7 días; registro de conexiones 14) y que se suprimen"
+  ]
+}
