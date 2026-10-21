@@ -1,0 +1,17 @@
+{
+  "descripcion": "Auditoría H-5 (Ley 1581): los derechos vuelven a ser los cinco de antes (sin prueba de la autorización, sin ser informado, sin quejas ante la SIC, sin gratuidad ni plazos), \"Es voluntario\" aunque sin aceptar no hay cuenta, y la retención sin tope.",
+  "archivos": {
+    "src/textos_aviso.js": "textos_aviso.js"
+  },
+  "comando": [
+    "node",
+    "--test",
+    "--test-reporter=tap",
+    "tests/unit/aviso_texto.test.mjs"
+  ],
+  "espera_codigo_no_cero": true,
+  "espera_fallan_tests": [
+    "aviso v2: derechos de la Ley 1581 completos, plazos, responsable, retención y \"tu decisión\"; mayores de 18; no se vende; encargados nombrados",
+    "aviso v2: dice cuánto tiempo (copias de seguridad en el mismo servidor, sin cifrar, 7 días; registro de conexiones 14) y que se suprimen"
+  ]
+}

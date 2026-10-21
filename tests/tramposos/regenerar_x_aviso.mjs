@@ -36,7 +36,7 @@ const SOLO = (/** @type {string} */ nombre) => `aviso v2: ${nombre}`;
 const T_MEDIR = SOLO('dice lo que pidió Christiam: ejercicio educativo, anonimizados, para medir la plataforma');
 const T_GUARDA = SOLO('es VERAZ: dice que el nombre y el correo SÍ se guardan (lo anonimizado es el análisis) y la IP');
 const T_TIEMPO = SOLO('dice cuánto tiempo (copias de seguridad en el mismo servidor, sin cifrar, 7 días; registro de conexiones 14) y que se suprimen');
-const T_DERECHOS = SOLO('derechos (conocer, actualizar, corregir, suprimir, retirar) con la pantalla "Mis solicitudes sobre mis datos"; voluntario; mayores de 18; no se vende');
+const T_DERECHOS = SOLO('derechos de la Ley 1581 completos, plazos, responsable, retención y "tu decisión"; mayores de 18; no se vende; encargados nombrados');
 const T_CORTO = SOLO('es CORTO (menos de 520 palabras) y la pantalla obligatoria trae el mismo texto con su casilla');
 
 const V_NO_COINCIDE = 'aviso versión: si no coincide, NO ofrece la casilla ni el botón y recarga UNA vez (marca en sessionStorage)';
@@ -100,6 +100,14 @@ const TRAMPOSOS = [
     contenido: cambiar(vista, "    if (almacen.getItem(MARCA_RECARGA) === '1') return 'distinta';\n", ''),
     falla: [V_SEGUNDA],
     comando: PRUEBA_VERSION,
+  },
+  {
+    nombre: 'x_aviso_derechos_incompletos', destino: 'src/textos_aviso.js', archivo: 'textos_aviso.js',
+    descripcion: 'Auditoría H-5 (Ley 1581): los derechos vuelven a ser los cinco de antes (sin prueba de la autorización, sin ser informado, sin quejas ante la SIC, sin gratuidad ni plazos), "Es voluntario" aunque sin aceptar no hay cuenta, y la retención sin tope.',
+    contenido: propiedad(propiedad(propiedad(textos, 'derechos', "'Puedes conocer tus datos, actualizarlos, corregirlos, pedir que se supriman y retirar tu autorización. Hazlo en tu Perfil, en «Mis solicitudes sobre mis datos», o escribiendo al contacto.'"),
+      'voluntario', "'Tú decides si aceptas. Si no aceptas, no podrás usar ENGRAMA: habla con tu docente.'"),
+    'cuanto', "'Los guardamos mientras dure este ejercicio educativo en tu curso. Cuando termine, o antes si tú lo pides, se suprimen. Las copias de seguridad de la base se guardan en el mismo servidor, sin cifrar, durante 7 días: un dato suprimido desaparece de ellas al vencer ese plazo.'"),
+    falla: [T_DERECHOS, T_TIEMPO],
   },
   {
     nombre: 'x_aviso_no_dibuja_medir', destino: 'src/vistas/aviso_datos.js', archivo: 'aviso_datos.js',

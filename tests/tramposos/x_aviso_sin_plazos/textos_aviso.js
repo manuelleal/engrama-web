@@ -44,10 +44,10 @@ export const textosAviso = {
     cuanto: 'Los guardamos mientras dure el ejercicio educativo de tu curso. Cuando termine, o antes si tú lo pides, se suprimen.',
     conexionesTitulo: 'Registro de conexiones',
     conexiones: 'Nuestro servidor guarda tu dirección IP.',
-    voluntarioTitulo: 'Es voluntario',
-    voluntario: 'Tú decides si aceptas. Si no aceptas, no podrás usar ENGRAMA: habla con tu docente.',
+    voluntarioTitulo: 'Tu decisión',
+    voluntario: 'Aceptar es tu decisión. Sin esta autorización no podemos darte una cuenta en ENGRAMA; si no aceptas, habla con tu docente.',
     derechosTitulo: 'Tus derechos',
-    derechos: 'Puedes conocer tus datos, actualizarlos, corregirlos, pedir que se supriman y retirar tu autorización. Hazlo en tu Perfil, en «Mis solicitudes sobre mis datos», o escribiendo al contacto.',
+    derechos: 'Tienes derecho a conocer tus datos, actualizarlos, rectificarlos, pedir prueba de la autorización que nos diste, ser informado del uso que les damos, revocar tu autorización y pedir la supresión de tus datos, y presentar quejas ante la Superintendencia de Industria y Comercio. Ejercer tus derechos es gratis: respondemos las consultas en 10 días hábiles y los reclamos en 15 días hábiles. Hazlo en tu Perfil, en «Mis solicitudes sobre mis datos», o escribiendo al contacto.',
     /** @param {string} contacto */
     contacto: (contacto) => `Para ejercer tus derechos, escribe a ${contacto}.`,
     contactoPrefijo: 'Para ejercer tus derechos, escribe a ',

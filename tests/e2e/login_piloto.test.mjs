@@ -326,8 +326,8 @@ test(
         // Aviso v2 (docs/ESPEC_aviso_datos.md): ejercicio educativo, datos anonimizados para medir, plazos y encargados.
         for (const frase of ['Tratamiento de tus datos', 'Tu nombre y tu correo', 'Tu código estudiantil', 'Tus respuestas', 'Tu asistencia', 'Tus monedas',
           'practiques', 'seguimiento', 'ejercicio educativo', 'anonimizados', 'Tu docente, la coordinación de tu institución', 'Nadie de otra institución',
-          'no se venden ni se comparten', 'Cloudflare', 'Brevo', '14 días', 'Es voluntario',
-          'conocer', 'actualizarlos', 'corregirlos', 'se supriman','Responsable de Prueba \\(UIS, demostración\\)']) {
+          'no se venden ni se comparten', 'Cloudflare', 'Brevo', '14 días', 'Tu decisión',
+          'conocer', 'actualizarlos', 'rectificarlos', 'supresión de tus datos', 'Superintendencia de Industria y Comercio','Responsable de Prueba \\(UIS, demostración\\)']) {
           assert.match(t, new RegExp(frase), `el aviso dice: ${frase}`);
         }
         assert.equal(await texto(sesion, 'aviso-contacto'), 'Para ejercer tus derechos, escribe a datos@piloto.test.', 'el contacto sale de config.json');

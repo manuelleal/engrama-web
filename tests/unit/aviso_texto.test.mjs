@@ -9,7 +9,7 @@ import { entornoDeFotos, crearRaiz, buscar, textoDe } from './foto_vistas.mjs';
 import { configurarAviso, leerAviso } from '../../src/aviso.js';
 import { renderLeerAviso, renderConsentimiento } from '../../src/vistas/aviso_datos.js';
 
-const CONFIG = { AVISO_RESPONSABLE: 'Christiam Puentes (ENGRAMA)', AVISO_CONTACTO: 'datos@piloto.test', AVISO_VERSION: '2026-10-v2' };
+const CONFIG = { AVISO_RESPONSABLE: 'Christiam Puentes (creador de ENGRAMA), con la institución de tu curso', AVISO_CONTACTO: 'datos@piloto.test', AVISO_VERSION: '2026-10-v2' };
 
 /** Pinta con el DOM de mentira de foto_vistas.mjs y lo devuelve a su sitio. @param {(raiz: any) => void} pintar */
 function pintando(pintar) {
@@ -29,7 +29,7 @@ function textoLeido() {
 
 test('aviso v2: dice quién es el responsable, el contacto y la versión (los de config.json, no los del código)', () => {
   const t = textoLeido();
-  assert.match(t, /Responsable de tus datos: Christiam Puentes \(ENGRAMA\)\./);
+  assert.match(t, /Responsable de tus datos: Christiam Puentes \(creador de ENGRAMA\), con la institución de tu curso\./);
   assert.match(t, /escribe a datos@piloto\.test\./);
   assert.match(t, /Versión del aviso: 2026-10-v2/);
 });
@@ -51,7 +51,7 @@ test('aviso v2: es VERAZ: dice que el nombre y el correo SÍ se guardan (lo anon
 
 test('aviso v2: dice cuánto tiempo (copias de seguridad en el mismo servidor, sin cifrar, 7 días; registro de conexiones 14) y que se suprimen', () => {
   const t = textoLeido();
-  assert.match(t, /Los guardamos mientras dure este ejercicio educativo en tu curso\. Cuando termine, o antes si tú lo pides, se suprimen\./);
+  assert.match(t, /Los guardamos mientras dure el ejercicio educativo de tu curso, y como máximo hasta el 31 de diciembre de 2027\. Cuando termine, o antes si tú lo pides, se suprimen\./);
   // H-1 (auditoría): hoy solo corre el servicio `respaldo`: mismo servidor, sin cifrar, 7 días. El cifrado fuera del servidor aún no está activo.
   assert.match(t, /Las copias de seguridad de la base se guardan en el mismo servidor, sin cifrar, durante 7 días/);
   assert.doesNotMatch(t, /cifradas|fuera del servidor|14 días de copias|durante 14 días \(el servidor/i, 'no promete un cifrado ni una copia externa que hoy no existen');
@@ -62,11 +62,20 @@ test('aviso v2: dice cuánto tiempo (copias de seguridad en el mismo servidor, s
   assert.doesNotMatch(t, /se borran? (al instante|de inmediato|ya)|inmediatamente/i, 'suprimir no es inmediato: el respaldo guarda 7 días');
 });
 
-test('aviso v2: derechos (conocer, actualizar, corregir, suprimir, retirar) con la pantalla "Mis solicitudes sobre mis datos"; voluntario; mayores de 18; no se vende', () => {
+test('aviso v2: derechos de la Ley 1581 completos, plazos, responsable, retención y "tu decisión"; mayores de 18; no se vende; encargados nombrados', () => {
   const t = textoLeido();
-  for (const d of [/conocer tus datos/, /actualizarlos/, /corregirlos/, /pedir que se supriman/, /retirar tu autorización/]) assert.match(t, d);
+  // H-5 (auditoría, Ley 1581 art. 8 y 14): los siete derechos, gratis, y los plazos de consulta y de reclamo.
+  for (const d of [/conocer tus datos/, /actualizarlos/, /rectificarlos/, /pedir prueba de la autorización que nos diste/, /ser informado del uso que les damos/,
+    /revocar tu autorización y pedir la supresión de tus datos/, /presentar quejas ante la Superintendencia de Industria y Comercio/]) assert.match(t, d);
+  assert.match(t, /Ejercer tus derechos es gratis/);
+  assert.match(t, /consultas en 10 días hábiles y los reclamos en 15 días hábiles/);
   assert.match(t, /«Mis solicitudes sobre mis datos»/);
-  assert.match(t, /Tú decides si aceptas\. Si no aceptas, no podrás usar ENGRAMA: habla con tu docente\./);
+  // El responsable sale de config.json (AVISO_RESPONSABLE); esta es la redacción que se despliega.
+  // "Es voluntario" no era coherente: sin la autorización no hay cuenta.
+  assert.match(t, /Aceptar es tu decisión\. Sin esta autorización no podemos darte una cuenta en ENGRAMA; si no aceptas, habla con tu docente\./);
+  assert.doesNotMatch(t, /voluntario|Tú decides si aceptas/i, 'no dice "voluntario" si sin aceptar no hay cuenta');
+  // Retención con tope.
+  assert.match(t, /mientras dure el ejercicio educativo de tu curso, y como máximo hasta el 31 de diciembre de 2027/);
   assert.match(t, /solo para personas mayores de 18 años/);
   assert.match(t, /no se venden ni se comparten con nadie más/);
   assert.match(t, /Cloudflare \(la red por la que pasa el tráfico; sus servidores están en EE\. UU\.\) y Brevo \(el servicio de correo con el que te enviamos el enlace si pides recuperar tu contraseña; ve tu correo\)/, 'los encargados que ven datos, nombrados');
