@@ -103,11 +103,11 @@ export const textosAnillo = {
     etiquetaNombre: 'Tu nombre completo',
     etiquetaCorreo: 'Tu correo',
     etiquetaCodigoEstudiantil: 'Tu código estudiantil',
-    etiquetaContrasena: 'Crea una contraseña (mínimo 10 caracteres)',
+    etiquetaContrasena: 'Crea una contraseña',
     etiquetaRepite: 'Repite tu contraseña',
     mostrar: 'Mostrar', // botón de texto, no solo ícono: muestra las dos contraseñas (adenda 17.8)
     ocultar: 'Ocultar',
-    reglaContrasena: 'Mínimo 10 caracteres. Máximo 72 (la ñ y las letras con tilde cuentan doble). Debe tener una letra y un número o un símbolo: - _ . ! @ # $ % & * +', // la regla COMPLETA del backend, escrita ANTES de escribir (adenda 17.8; docs/ESPEC_regla_clave.md C1)
+    reglaContrasena: 'Mínimo 10 caracteres. Máximo 72 bytes (la ñ y las letras con tilde cuentan doble). Debe tener una letra y un número o un símbolo: - _ . ! @ # $ % & * +', // la regla COMPLETA del backend, escrita ANTES de escribir (adenda 17.8; docs/ESPEC_regla_clave.md C1)
     mayor: 'Tengo 18 años o más', // dictamen 03, G5
     menorAyuda: 'Si tienes menos de 18, no puedes crear la cuenta tú mismo: tu institución te inscribe con su lista. Dile a tu profe.',
     avisoLeer: 'Leer el aviso de tratamiento de datos',

@@ -8,7 +8,7 @@
 // x_registro_avisa_lo_que_no_sabe (todos sobre src/vistas/registro.js); x_registro_con_campo_de_mas está en api_registro.test.mjs.
 import test from 'node:test';
 import assert from 'node:assert/strict';
-import { entornoDeFotos, crearRaiz, buscar, textoDe, ponerSvgFalso, iconosDe } from './foto_vistas.mjs';
+import { entornoDeFotos, crearRaiz, buscar, textoDe, ponerSvgFalso, iconosDe, elementos } from './foto_vistas.mjs';
 import { renderRegistro } from '../../src/vistas/registro.js';
 import { renderEntrada } from '../../src/vistas/entrada.js';
 import { registroConCodigo } from '../../src/config.js';
@@ -297,7 +297,7 @@ test('U17 (17.8, ESPEC_regla_clave C1): la regla COMPLETA de la contraseña est�
   try {
     const { raiz } = await pintar();
     const regla = textoDe(buscar(raiz, 'registro-ayuda-contrasena'));
-    assert.equal(regla, 'Mínimo 10 caracteres. Máximo 72 (la ñ y las letras con tilde cuentan doble). Debe tener una letra y un número o un símbolo: - _ . ! @ # $ % & * +');
+    assert.equal(regla, 'Mínimo 10 caracteres. Máximo 72 bytes (la ñ y las letras con tilde cuentan doble). Debe tener una letra y un número o un símbolo: - _ . ! @ # $ % & * +');
     assert.equal(regla, textos.registro.reglaContrasena);
     for (const parte of [/10 caracteres/, /72/, /letra/, /número o un símbolo/, /- _ \. ! @ # \$ % & \* \+/]) assert.match(regla, parte, `la regla dice ${parte}`);
     // El orden en la pantalla: etiqueta, REGLA, campo (antes: la regla iba debajo del campo, después de empezar a escribir).
@@ -308,6 +308,18 @@ test('U17 (17.8, ESPEC_regla_clave C1): la regla COMPLETA de la contraseña est�
     assert.match(buscar(raiz, 'registro-contrasena').getAttribute('aria-describedby'), /contrasena-ayuda/);
     assert.match(buscar(raiz, 'registro-contrasena').getAttribute('aria-describedby'), /contrasena-error/);
     assert.equal(e.llamadas.length, 0, 'solo mirar la pantalla no pide nada');
+  } finally { e.restaurar(); }
+});
+
+test('U17 (ESPEC_regla_clave K3, compuerta 28): el mínimo se dice UNA sola vez (la etiqueta no lo repite) y el máximo lleva su unidad: "Máximo 72 bytes"', async () => {
+  const e = conEntorno();
+  try {
+    const { raiz } = await pintar();
+    const etiqueta = textoDe(elementos(raiz).find((n) => n.tagName === 'label' && n.getAttribute('for') === 'contrasena'));
+    const regla = textoDe(buscar(raiz, 'registro-ayuda-contrasena'));
+    assert.equal(etiqueta, 'Crea una contraseña', 'la etiqueta no trae el mínimo entre paréntesis');
+    assert.match(regla, /Máximo 72 bytes \(la ñ y las letras con tilde cuentan doble\)/, 'el máximo dice su unidad');
+    assert.equal(`${etiqueta} ${regla}`.match(/10 caracteres/g).length, 1, 'el mínimo aparece una sola vez entre la etiqueta y la regla');
   } finally { e.restaurar(); }
 });
 
@@ -446,7 +458,7 @@ test('U19 (17.8): si igual llega el 422 de la contraseña, su mensaje (sin "Valu
   } finally { e.restaurar(); }
 });
 
-const REGLA_COMPLETA = 'Mínimo 10 caracteres. Máximo 72 (la ñ y las letras con tilde cuentan doble). Debe tener una letra y un número o un símbolo: - _ . ! @ # $ % & * +';
+const REGLA_COMPLETA = 'Mínimo 10 caracteres. Máximo 72 bytes (la ñ y las letras con tilde cuentan doble). Debe tener una letra y un número o un símbolo: - _ . ! @ # $ % & * +';
 
 test('U19 (ESPEC_regla_clave C3): el 422 de la contraseña se traduce: con lo escrito cumpliendo la regla, "el servidor no aceptó esa contraseña" y la regla completa; NUNCA el texto del servidor, en español o en inglés', async () => {
   for (const cuerpo of [

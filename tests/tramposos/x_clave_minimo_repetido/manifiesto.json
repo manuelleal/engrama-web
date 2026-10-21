@@ -1,0 +1,17 @@
+{
+  "descripcion": "ESPEC_regla_clave K3 (compuerta 28): la etiqueta vuelve a decir '(minimo 10 caracteres)' justo encima de la regla que ya lo dice, y la regla vuelve a decir 'Maximo 72' sin la unidad.",
+  "archivos": {
+    "src/textos_anillo.js": "textos_anillo.js"
+  },
+  "comando": [
+    "node",
+    "--test",
+    "--test-reporter=tap",
+    "tests/unit/vista_registro.test.mjs"
+  ],
+  "espera_codigo_no_cero": true,
+  "espera_fallan_tests": [
+    "U17 (ESPEC_regla_clave K3, compuerta 28): el mínimo se dice UNA sola vez (la etiqueta no lo repite) y el máximo lleva su unidad: \"Máximo 72 bytes\"",
+    "U17 (17.8, ESPEC_regla_clave C1): la regla COMPLETA de la contraseña está escrita ANTES del campo (se lee antes de escribir): el mínimo, el máximo en bytes, una letra, un número o un símbolo y la lista; y el campo la nombra en aria-describedby"
+  ]
+}
