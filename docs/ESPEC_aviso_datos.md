@@ -45,3 +45,31 @@ Las fotos R4 (`entrada_aviso_leer`, `aviso_consentimiento`) y R9 (`aviso_leer`) 
 - Revisión de un abogado (el texto es un aviso claro, no un concepto jurídico).
 - Plazo de retención: hoy es "mientras dure el ejercicio"; Christiam decide la fecha de cierre.
 - El análisis anonimizado como exportación: no existe todavía; se arma antes de medir.
+
+---
+
+## Adenda 2026-10-20 (noche): correcciones de la auditoría independiente (NO LISTO → corregir)
+
+La auditoría dijo que el texto afirmaba cosas que el **servidor de la casa** (https://engramaingles.com) no hace hoy. Regla:
+el texto dice SOLO lo que hoy es cierto allí. Versión del texto: se mantiene `2026-10-v2` (el texto aún no se ha
+publicado a nadie).
+
+| Hallazgo | Corrección | Tramposo (`tests/tramposos/`) |
+|---|---|---|
+| H-1 (bloquea) copias de seguridad | `cuanto` dice lo que corre hoy: servicio `respaldo`, en el mismo servidor, sin cifrar, 7 días. Se quita "cifradas y fuera del servidor" y los 14 días de copias. | `x_aviso_copias_cifradas_fuera` |
+| H-2 registro de conexiones | Se mantiene (Caddy con `registro`, `client_ip` real detrás del túnel, 14 días; la poda diaria se instala esta noche). Se agrega que el servicio de inicio de sesión (GoTrue) guarda la IP de tus ingresos mientras dure tu cuenta (H-7); también en la lista "Qué datos guardamos". | `x_aviso_sin_ip_de_ingresos` |
+| H-3 Brevo | En condicional y veraz: "Brevo (el servicio de correo con el que te enviamos el enlace si pides recuperar tu contraseña; ve tu correo)". | `x_aviso_brevo_sin_condicional` |
+| H-4 versión del texto | `textos_aviso.js` exporta `VERSION_TEXTO = '2026-10-v2'`. Si `config.AVISO_VERSION` no coincide, `renderConsentimiento` NO ofrece la casilla: hace `location.reload()` UNA sola vez (marca en `sessionStorage`, con try/catch; si el almacenamiento falla, no recarga: sin bucle) y, si tras recargar sigue sin coincidir, muestra "hay una actualización pendiente" con salida. Sin casilla no se acepta un texto que no es el de la versión. | `x_aviso_version_sin_guardia`, `x_aviso_recarga_en_bucle` |
+| H-5 Ley 1581 | "Tus derechos" completos (art. 8: conocer, actualizar, rectificar, prueba de la autorización, ser informado del uso, revocar y pedir supresión, quejas ante la SIC); gratis; consultas 10 días hábiles y reclamos 15 (art. 14). Responsable (de `config.json`): "Christiam Puentes (creador de ENGRAMA), con la institución de tu curso". "Es voluntario" pasa a "Aceptar es tu decisión. Sin esta autorización no podemos darte una cuenta en ENGRAMA; si no aceptas, habla con tu docente." Retención: "mientras dure el ejercicio educativo de tu curso, y como máximo hasta el 31 de diciembre de 2027". | `x_aviso_derechos_incompletos` |
+
+**Efectos colaterales (y cómo se tratan).** (1) El límite de palabras de `aviso_texto.test.mjs` sube de 420 a 520: la Ley
+1581 obliga a nombrar los derechos y los plazos; la nota queda en la prueba. (2) Las fixtures que fijaban `2026-10-v1`
+(`CONFIG_PILOTO`, `AVISO_FIJO`, las instantáneas) pasan a `2026-10-v2`, porque con H-4 una configuración de otra versión ya
+no muestra la casilla; la prueba G (cambio de versión) ahora parte de quien aceptó `v1` y la configuración vigente es `v2`.
+(3) Las copias rotas `x_aviso_*` de `textos_aviso.js` se rehacen con `tests/tramposos/regenerar_x_aviso.mjs` (copia rota =
+archivo bueno de hoy + su defecto). (4) Despliegue: el responsable cambia en `config.json` (`AVISO_RESPONSABLE`), no en el código;
+`despliegue/aviso_v2/config_aviso.json` y `LEEME.md` quedan al día, con el paso previo "comprobar la poda del registro de
+accesos en el cron" antes de publicar el cliente.
+
+**Fuera de alcance (para después).** El cifrado de las copias fuera del servidor (cuando se active, el texto cambia y la
+versión sube); revisión de un abogado; SET no se toca esta noche.
