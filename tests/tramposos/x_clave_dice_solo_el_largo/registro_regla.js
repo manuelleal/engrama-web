@@ -1,9 +1,9 @@
 // @ts-check
-// vistas/registro_regla.js · Qué le falta a la contraseña del registro, mientras se escribe y al enviar (docs/ESPEC_regla_clave.md, C2).
+// vistas/registro_regla.js · Qué le falta a la contraseña del registro, mientras se escribe, al enviar y cuando el backend dice 422 (docs/ESPEC_regla_clave.md, C2 y C3).
 // Módulo DIFERIDO: `vistas/registro.js` lo carga con `import()` y va en la lista `DIFERIDOS` de sw.js (el shell tiene techo de peso, U59). Si no carga, el formulario es el de
 // antes (la regla completa a la vista, los mensajes de siempre al enviar, el 422 con el texto del servidor): esta línea es una mejora, no un requisito.
 //
-// UNA sola función decide qué falta (`queFalta`) y de ella salen la línea en vivo y el mensaje del envío, así que la línea nunca aprueba lo que el envío rechaza ni dice otra cosa. Es el espejo de
+// UNA sola función decide qué falta (`queFalta`) y de ella salen la línea en vivo, el mensaje del envío y el del 422, así que la línea nunca aprueba lo que el envío rechaza ni dice otra cosa que el 422. Es el espejo de
 // `validarRegistro` de api/registro.js (que a su vez espeja `politica_clave.py` del backend): lo vigila tests/unit/registro_regla.test.mjs con un corpus.
 //
 // Nada de lo escrito sale de la página: la línea se calcula con el valor del campo, sin peticiones, sin consola y sin almacenamientos, y ningún texto repite la contraseña.
@@ -52,6 +52,16 @@ export function mensajeDeLoQueFalta(clave) {
   else if (f.sinNumeroOSimbolo) partes.push(T.numeroOSimbolo(SIMBOLOS_A_LA_VISTA));
   const dicho = [f.larga ? textos.registro.errores.contrasenaLarga : '', partes.length > 0 ? T.falta(unir(partes)) : ''].filter(Boolean);
   return dicho.length > 0 ? dicho.join(' ') : null;
+}
+
+/**
+ * C3: el mensaje junto al campo cuando el backend responde 422 sobre la contraseña. Es lo que falta de lo escrito (el mismo texto de la línea y del envío); si lo escrito
+ * cumple la regla local, "el servidor no aceptó esa contraseña" con la regla completa. Nunca el texto del servidor. Pura.
+ * @param {unknown} clave @returns {string}
+ */
+export function mensajeDeRechazo(clave) {
+  if (queFalta(clave).vacia) return textos.registro.errores.contrasenaVacia;
+  return mensajeDeLoQueFalta(clave) ?? T.noAceptada(textos.registro.reglaContrasena);
 }
 
 /** La hoja de esta línea (DIFERIDA: va en sw.js, no en index.html). Una sola vez; sin `document.head` (pruebas) no hace nada. */

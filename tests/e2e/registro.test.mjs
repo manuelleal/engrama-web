@@ -273,6 +273,29 @@ test('E12 (ESPEC_regla_clave C2): mientras se escribe, la línea "qué falta" ca
   }, { estado, ...ABIERTO });
 });
 
+test('E12 (ESPEC_regla_clave C3): si el backend responde 422 sobre la contraseña, la pantalla dice "el servidor no aceptó esa contraseña" con la regla completa (nunca el texto del servidor), cabe a 375 px y conserva lo escrito', { skip: OMITIR, timeout: 120_000 }, async () => {
+  const { estado } = estadoConCodigo();
+  await conAppCompleta(async (url) => {
+    const sesion = await abrirRegistro(url);
+    try {
+      assert.ok(await esperarVista(sesion, 'vista-registro'));
+      await esperar(500); // el módulo diferido de la regla ya llegó
+      // El 422 que el backend 539a06a daría (FastAPI: `detail` con `loc`, `msg`, `type`, sin `input`); la página lo recibe en lugar del mock.
+      await sesion.evaluar(`(() => { const f = window.fetch; window.fetch = (u, i) => String(u).includes('/auth/registro') ? Promise.resolve(new Response(JSON.stringify({ detail: [{ type: 'value_error', loc: ['body', 'contrasena'], msg: 'Value error, la contraseña debe tener al menos una letra y al menos un número o un símbolo (- _ . ! @ # $ % & * +)' }] }), { status: 422, headers: { 'Content-Type': 'application/json' } })) : f(u, i); })()`);
+      await llenar(sesion);
+      await enviar(sesion);
+      await esperar(700);
+      const dicho = await texto(sesion, 'registro-error-contrasena');
+      assert.match(dicho, /^El servidor no aceptó esa contraseña\. Recuerda la regla: Mínimo 10 caracteres\. Máximo 72/);
+      assert.doesNotMatch(await sesion.evaluar('document.body.innerText'), /Value error|La contraseña debe tener al menos una letra y al menos/);
+      assert.equal(await sesion.evaluar('document.documentElement.scrollWidth <= window.innerWidth'), true, 'sin scroll horizontal');
+      assert.equal(await sesion.evaluar(`document.querySelector('[data-testid="registro-contrasena"]').value`), NUEVA.clave, 'conserva lo escrito');
+      assert.equal(await hay(sesion, 'vista-registro-enviado'), false, 'no entra: el formulario sigue');
+      assert.equal(await sesion.evaluar('JSON.stringify([localStorage, sessionStorage])'), '[{},{}]', 'nada guardado');
+    } finally { await sesion.cerrar(); }
+  }, { estado, ...ABIERTO });
+});
+
 test('E12 (17.8): "Mostrar" / "Ocultar" alterna los dos campos sin tocar el valor (blanco táctil de 44 px, sin desbordar); una repetición distinta no sale (0 peticiones) y el cuerpo que sale tiene las 7 claves', { skip: OMITIR, timeout: 120_000 }, async () => {
   const { estado } = estadoConCodigo();
   await conAppCompleta(async (url) => {

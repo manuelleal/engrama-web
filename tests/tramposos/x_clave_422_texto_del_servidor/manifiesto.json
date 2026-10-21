@@ -1,0 +1,19 @@
+{
+  "descripcion": "ESPEC_regla_clave C3: el 422 del backend sobre la contrasena no se traduce al mensaje de la linea en vivo: sale el texto del servidor (otra redaccion) o el generico.",
+  "archivos": {
+    "src/vistas/registro.js": "registro.js"
+  },
+  "comando": [
+    "node",
+    "--test",
+    "--test-reporter=tap",
+    "tests/unit/vista_registro.test.mjs",
+    "tests/e2e/registro.test.mjs"
+  ],
+  "espera_codigo_no_cero": true,
+  "espera_fallan_tests": [
+    "el 422 de la contraseña se traduce",
+    "si lo que hay en el campo cuando llega el 422 no cumple la regla",
+    "si el backend responde 422 sobre la contraseña"
+  ]
+}

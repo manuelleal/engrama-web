@@ -63,7 +63,8 @@ function pantallaEnviada(raiz, ctx) {
 
 /**
  * Los mensajes que el servidor dijo para sus campos malos, con el texto de siempre de cada campo. Pura.
- * La contraseña es la excepción: si el servidor escribió su propio mensaje en español (la regla de composición), ese va junto al campo (adenda 17.8).
+ * La contraseña es la excepción: si el servidor escribió su propio mensaje en español (la regla de composición), ese va junto al campo (adenda 17.8); con el módulo de la regla
+ * cargado, `mostrarFallo` lo cambia por el texto de la línea en vivo (ESPEC_regla_clave C3).
  * @param {string[]} campos @param {Record<string, string>} [delServidor] los `mensajes` de `clasificarFalloDeRegistro`
  */
 function mensajesDelServidor(campos, delServidor = {}) {
@@ -85,6 +86,9 @@ function mostrarFallo(fallo, i) {
   if (fallo.tipo === 'sin_red') { i.zona.textContent = textos.red.sinConexionAccion(T.accionEnviar); return; }
   if (fallo.tipo === 'campos') {
     const { mensajes, conocidos } = mensajesDelServidor(fallo.campos ?? [], fallo.mensajes);
+    // C3 (docs/ESPEC_regla_clave.md): con el módulo de la regla cargado, el 422 sobre la contraseña se traduce al mismo texto de la línea en vivo y del envío (lo que falta de lo
+    // escrito, o "no aceptó" + la regla completa); el texto del servidor no se muestra. Sin el módulo, el de siempre (el del servidor, ya sin su prefijo).
+    if (i.regla && (fallo.campos ?? []).includes('contrasena')) mensajes.contrasena = i.regla.mensajeDeRechazo(i.campos.leer().contrasena);
     i.campos.marcar(mensajes);
     if (conocidos === 0) i.zona.textContent = T.errores.revisa;
     return;

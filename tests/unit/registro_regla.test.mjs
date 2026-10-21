@@ -6,7 +6,7 @@
 // Tramposo: x_clave_dice_solo_el_largo (src/vistas/registro_regla.js que vuelve a decir solo la primera carencia).
 import test from 'node:test';
 import assert from 'node:assert/strict';
-import { queFalta, mensajeDeLoQueFalta } from '../../src/vistas/registro_regla.js';
+import { queFalta, mensajeDeLoQueFalta, mensajeDeRechazo } from '../../src/vistas/registro_regla.js';
 import { validarRegistro, SIMBOLOS_CLAVE } from '../../src/api/registro.js';
 import { textos } from '../../src/textos.js';
 
@@ -82,6 +82,16 @@ test('coincide con validarRegistro en un corpus: "no falta nada" ⇔ el envío n
 
 test('ningún mensaje repite lo escrito', () => {
   for (const clave of ['Zq9mxwk', 'Qw3rty', 'mnbvcxz', 'Hola Mundo Nuevo', 'Zq9mxwkLpo']) {
-    for (const texto of [mensajeDeLoQueFalta(clave)]) assert.ok(texto === null || !texto.includes(clave), `"${clave}" no está en el mensaje`);
+    for (const texto of [mensajeDeLoQueFalta(clave), mensajeDeRechazo(clave)]) assert.ok(texto === null || !texto.includes(clave), `"${clave}" no está en el mensaje`);
   }
+});
+
+test('C3: el rechazo del backend dice lo mismo que la línea cuando algo falta; si lo escrito cumple, "no aceptó" + la regla completa; nunca el texto del servidor', () => {
+  assert.equal(mensajeDeRechazo('abcdef'), mensajeDeLoQueFalta('abcdef'));
+  assert.equal(mensajeDeRechazo('abcdefghij'), mensajeDeLoQueFalta('abcdefghij'));
+  assert.equal(mensajeDeRechazo(''), textos.registro.errores.contrasenaVacia);
+  const noAceptada = mensajeDeRechazo('abcdefghi1');
+  assert.equal(noAceptada, `El servidor no aceptó esa contraseña. Recuerda la regla: ${textos.registro.reglaContrasena}`);
+  assert.match(noAceptada, /Mínimo 10 caracteres\. Máximo 72/);
+  assert.doesNotMatch(noAceptada, /Value error/);
 });

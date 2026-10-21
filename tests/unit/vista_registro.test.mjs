@@ -428,9 +428,10 @@ test('U17 (ESPEC_regla_clave C2): al enviar con la contraseña mal, el mensaje d
 });
 
 test('U19 (17.8): si igual llega el 422 de la contraseña, su mensaje (sin "Value error, ") va junto al campo de la contraseña y no como error general; lo escrito se conserva', async () => {
+  // Sin el módulo diferido de la regla (no cargó): el de siempre, el texto del servidor sin su prefijo.
   const e = conEntorno({ responder: () => json(422, { detail: [{ type: 'value_error', loc: ['body', 'contrasena'], msg: MSG_422_CLAVE, input: null }] }) });
   try {
-    const { raiz } = await pintar();
+    const { raiz } = await pintar({ cargarRegla: () => Promise.reject(new Error('no cargó')) });
     await Promise.all(llenarYEnviar(raiz));
     await reposar();
     assert.equal(e.posts.length, 1, 'la petición salió (el cliente la dejó pasar)');
@@ -445,14 +446,47 @@ test('U19 (17.8): si igual llega el 422 de la contraseña, su mensaje (sin "Valu
   } finally { e.restaurar(); }
 });
 
-test('U19 (17.8): un 422 de la contraseña en inglés (pydantic) no se muestra tal cual: queda el texto local de siempre', async () => {
-  const e = conEntorno({ responder: () => json(422, [{ type: 'string_too_short', loc: ['body', 'contrasena'], msg: 'String should have at least 10 characters' }]) });
+const REGLA_COMPLETA = 'Mínimo 10 caracteres. Máximo 72 (la ñ y las letras con tilde cuentan doble). Debe tener una letra y un número o un símbolo: - _ . ! @ # $ % & * +';
+
+test('U19 (ESPEC_regla_clave C3): el 422 de la contraseña se traduce: con lo escrito cumpliendo la regla, "el servidor no aceptó esa contraseña" y la regla completa; NUNCA el texto del servidor, en español o en inglés', async () => {
+  for (const cuerpo of [
+    { detail: [{ type: 'value_error', loc: ['body', 'contrasena'], msg: MSG_422_CLAVE, input: null }] },
+    [{ type: 'string_too_short', loc: ['body', 'contrasena'], msg: 'String should have at least 10 characters' }],
+  ]) {
+    const e = conEntorno({ responder: () => json(422, cuerpo) });
+    try {
+      const { raiz } = await pintar();
+      await Promise.all(llenarYEnviar(raiz));
+      await reposar();
+      assert.equal(e.posts.length, 1, 'la petición salió (el cliente la dejó pasar)');
+      assert.equal(mensaje(raiz, 'contrasena'), `El servidor no aceptó esa contraseña. Recuerda la regla: ${REGLA_COMPLETA}`);
+      assert.doesNotMatch(textoDe(buscar(raiz, 'vista-registro')), /Value error|String should|La contraseña debe tener al menos una letra y al menos un número/);
+      assert.equal(textoDe(buscar(raiz, 'registro-error')), '', 'no es el error general');
+      assert.equal(buscar(raiz, 'registro-contrasena').value, CLAVE, 'conserva lo escrito');
+      assert.equal(textoDe(buscar(raiz, 'registro-falta-contrasena')), '', 'la línea calla: el mensaje va en el sitio del error');
+      assert.equal(buscar(raiz, 'registro-enviar').disabled, false, 'se puede reintentar');
+      assert.ok(!e.consola.join('\n').includes(CLAVE), 'la consola no lleva la contraseña');
+    } finally { e.restaurar(); }
+  }
+});
+
+test('U19 (ESPEC_regla_clave C3): si lo que hay en el campo cuando llega el 422 no cumple la regla, el mensaje es EL MISMO que diría la línea en vivo', async () => {
+  let suelta = () => {};
+  const e = conEntorno({ responder: () => new Promise((r) => { suelta = () => r(json(422, [{ type: 'value_error', loc: ['body', 'contrasena'], msg: MSG_422_CLAVE }])); }) });
   try {
     const { raiz } = await pintar();
-    await Promise.all(llenarYEnviar(raiz));
+    const pendientes = llenarYEnviar(raiz);
     await reposar();
-    assert.equal(mensaje(raiz, 'contrasena'), textos.registro.errores.contrasenaCorta);
-    assert.doesNotMatch(textoDe(buscar(raiz, 'vista-registro')), /String should/);
+    assert.equal(e.posts.length, 1);
+    // la persona sigue tecleando mientras la petición vuela
+    const campo = buscar(raiz, 'registro-contrasena');
+    campo.value = 'abcdef'; campo.disparar('input');
+    const enLaLinea = textoDe(buscar(raiz, 'registro-falta-contrasena'));
+    assert.match(enLaLinea, /^Te falta: llegar a 10 caracteres y un número o un símbolo/);
+    suelta();
+    await Promise.all(pendientes); await reposar();
+    assert.equal(mensaje(raiz, 'contrasena'), enLaLinea, 'el 422 dice lo mismo que la línea');
+    assert.equal(campo.value, 'abcdef');
   } finally { e.restaurar(); }
 });
 
