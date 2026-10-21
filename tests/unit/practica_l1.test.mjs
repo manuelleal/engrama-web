@@ -155,7 +155,7 @@ test('U79: pinta las preguntas de /attempt (nunca las del detalle) y antes de Co
     await tocar(raiz, 'opcion-A');
     assert.match(textoDe(buscar(raiz, 'panel-respuesta')), /Elegiste A: go/);
     const texto = textoDe(raiz);
-    for (const clave of ['goes to school every day.', EXPLICACION_ES.regla, 'Esta vez no', 'Correcta']) assert.ok(!texto.includes(clave), `antes de comprobar ya se ve "${clave}"`);
+    for (const clave of ['goes to school every day.', EXPLICACION_ES.regla, 'Esta vez no', 'Correcta', '¡Bien hecho!', 'La correcta']) assert.ok(!texto.includes(clave), `antes de comprobar ya se ve "${clave}"`);
     assert.equal(buscar(raiz, 'explicacion'), null);
     assert.equal(contar(llamadas, 'POST', '/answers'), 0, 'elegir no manda nada');
   } finally { cerrar(); }
@@ -173,7 +173,8 @@ test('U79: Comprobar manda la label una sola vez por toque y la banda dice el ve
     const banda = buscar(raiz, 'explicacion');
     assert.ok(banda, 'la banda');
     assert.ok(hayIcono(banda));
-    assert.equal(textoDe(buscar(banda, 'explicacion-veredicto')), 'Esta vez no');
+    // Sprint de la magia (docs/ESPEC_avatar_fluidez.md §1): en el reto, la franja dice "La correcta: <la opción>" (antes "Esta vez no"; se declara).
+    assert.equal(textoDe(buscar(banda, 'explicacion-veredicto')), 'La correcta: goes');
     assert.match(textoDe(buscar(banda, 'explicacion-oracion')), /She goes to school every day\./);
     assert.match(textoDe(buscar(banda, 'explicacion-porQue')), /Go es para I/);
     assert.ok(buscar(banda, 'explicacion-regla') && buscar(banda, 'explicacion-ejemplo'));
@@ -222,7 +223,7 @@ test('U79: Ver resultado cierra con /finish una vez (dos toques) y muestra la re
   try {
     await tocar(raiz, 'opcion-B');
     await tocar(raiz, 'boton-comprobar');
-    assert.equal(textoDe(buscar(raiz, 'explicacion-veredicto')), 'Correcta');
+    assert.equal(textoDe(buscar(raiz, 'explicacion-veredicto')), '¡Bien hecho!'); // sprint de la magia (antes "Correcta"; se declara)
     assert.equal(buscar(raiz, 'explicacion-porQue'), null, 'al acertar no hay "por qué no la tuya"');
     await tocar(raiz, 'boton-terminar', { esperar: false });
     await tocar(raiz, 'boton-terminar');
@@ -241,7 +242,7 @@ test('U79: al recargar retoma donde iba (lo respondido llega en GET …/answers)
   const todo = await abrir(servidor({ respondidas: [{ ...RESPUESTAS.q1, repetida: true }, { ...RESPUESTAS.q2, repetida: true }] }).rutas);
   try {
     assert.equal(textoDe(buscar(todo.raiz, 'contador-pregunta')), 'Pregunta 2 de 2');
-    assert.equal(textoDe(buscar(todo.raiz, 'explicacion-veredicto')), 'Correcta');
+    assert.equal(textoDe(buscar(todo.raiz, 'explicacion-veredicto')), '¡Bien hecho!'); // sprint de la magia (antes "Correcta"; se declara)
     assert.ok(buscar(todo.raiz, 'boton-terminar'));
   } finally { todo.cerrar(); }
 });

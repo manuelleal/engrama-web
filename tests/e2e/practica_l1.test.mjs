@@ -72,10 +72,11 @@ test('E35: un reto A2 pregunta por pregunta: nada antes de Comprobar, la banda e
       assert.equal(colores.letraElegida, colores.primario, 'su letra, rellena de navy');
       for (const c of [colores.elegida, colores.letraElegida, colores.letra]) assert.notEqual(c, colores.oro, 'nada de oro en la pregunta');
       const antes = await sesion.evaluar('document.body.textContent');
-      for (const clave of ['She goes to school every day.', 'Con he, she o it', 'Esta vez no']) assert.ok(!antes.includes(clave), `antes de comprobar se ve "${clave}"`);
+      for (const clave of ['She goes to school every day.', 'Con he, she o it', 'Esta vez no', 'La correcta', '¡Bien hecho!']) assert.ok(!antes.includes(clave), `antes de comprobar se ve "${clave}"`);
 
       const mal = await responder(sesion, 'A');
-      assert.equal(mal.veredicto, 'Esta vez no');
+      // Sprint de la magia (docs/ESPEC_avatar_fluidez.md §1): en el reto, la franja dice "La correcta: <la opción>" y "¡Bien hecho!" (antes "Esta vez no" / "Correcta"; se declara).
+      assert.equal(mal.veredicto, 'La correcta: goes');
       assert.equal(mal.icono, 'equis', 'el veredicto con su ícono SVG (tanda visual 2: antes, el glifo ✗)');
       assert.deepEqual(mal.estados, [['opcion-A', 'Tu respuesta', 'equis'], ['opcion-B', 'Correcta', 'visto'], ['opcion-C', null, null]], 'tras comprobar, las opciones dicen el resultado con ícono y palabra');
       // H-4 (docs/ESPEC_correcciones_practica.md): la oración y el ejemplo son frases en inglés (lang="en"); la regla y el "por qué", en español.
@@ -90,7 +91,7 @@ test('E35: un reto A2 pregunta por pregunta: nada antes de Comprobar, la banda e
       assert.equal(await sesion.evaluar('document.querySelector(\'[data-testid="contador-pregunta"]\').textContent'), 'Pregunta 2 de 3', 'retoma en la primera sin responder');
 
       const bien = await responder(sesion, 'B');
-      assert.equal(bien.veredicto, 'Correcta');
+      assert.equal(bien.veredicto, '¡Bien hecho!');
       assert.equal(bien.icono, 'visto');
       assert.deepEqual(bien.estados.filter(([, t]) => t), [['opcion-B', 'Correcta', 'visto']], 'al acertar, solo la tuya: Correcta');
       assert.deepEqual(bien.partes.map(([p]) => p), ['oracion', 'regla', 'ejemplo'], 'al acertar, sin "por qué no la tuya"');
@@ -125,7 +126,7 @@ test('E35: un reto B1: la explicación y sus rótulos en inglés (lang="en"), co
       await sesion.recargar();
       assert.ok(await esperarTestid(sesion, 'enunciado'));
       const mal = await responder(sesion, 'A');
-      assert.equal(mal.veredicto, 'Esta vez no');
+      assert.equal(mal.veredicto, 'La correcta: have worked'); // sprint de la magia (antes "Esta vez no"; se declara)
       assert.deepEqual(mal.partes.map(([p, lang]) => [p, lang]), [['oracion', 'en'], ['regla', 'en'], ['porQue', 'en'], ['ejemplo', 'en']]);
       assert.match(mal.partes[0][2], /The right answer: I have worked here since 2020\./);
       assert.match(mal.partes[1][2], /The rule: Use the present perfect/);

@@ -1,0 +1,312 @@
+/* estilos/magia.css · Sprint de la magia (docs/ESPEC_avatar_fluidez.md): la franja del reto, el avatar y las insignias. DIFERIDO en sw.js.
+   Solo var(--token) o color-mix() con white/black/transparent; solo se anima transform y opacity; con reduced-motion el apagador de base.css
+   deja todo en su estado final (la franja, el chip y la vitrina se leen igual sin movimiento). */
+
+/* ---------- 1. La lección: el chip de aciertos junto a la barra, el salto de la correcta y el latido de la franja ---------- */
+.fila-avance {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  margin: 8px 0 12px;
+}
+.fila-avance > .progreso-reto {
+  flex: 1 1 auto;
+  margin: 0;
+}
+.aciertos-reto {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  min-width: 52px;
+  min-height: 32px;
+  margin: 0;
+  padding: 2px 10px;
+  border-radius: 999px;
+  background: color-mix(in srgb, var(--oro) 18%, white);
+  color: var(--oro-texto);
+  font-family: var(--fuente-titulos);
+  font-weight: 800;
+  font-size: 1.0625rem;
+  justify-content: center;
+}
+.aciertos-reto .sx-icono {
+  width: 18px;
+  height: 18px;
+}
+.juego .es-correcta.salta {
+  animation: magia-salta 420ms cubic-bezier(.35, 1.8, .35, .83) 1;
+}
+@keyframes magia-salta {
+  0% { transform: translateY(0); }
+  45% { transform: translateY(-8px) scale(1.02); }
+  100% { transform: translateY(0); }
+}
+.juego .banda-explicacion.late .sx-banda__icono {
+  animation: magia-late 400ms cubic-bezier(.35, 1.8, .35, .83) 1;
+}
+@keyframes magia-late {
+  0% { transform: scale(0.6); }
+  60% { transform: scale(1.18); }
+  100% { transform: scale(1); }
+}
+
+/* ---------- 2. El avatar ---------- */
+.avatar-svg {
+  display: block;
+  border-radius: 50%;
+  overflow: hidden;
+}
+#vista [data-testid="vista-inicio"] > .encabezado-reto > a.avatar-inicio[data-testid] {
+  flex: 0 0 auto;
+  display: block;
+  width: 44px;
+  height: 44px;
+  min-height: 0;
+  padding: 0;
+  border-radius: 50%;
+  background: color-mix(in srgb, var(--primario) 10%, white);
+  box-shadow: 0 0 0 2px var(--superficie), 0 0 0 4px var(--oro);
+}
+/* "Mis insignias" va en el renglón de "Ver mis movimientos" (a la izquierda): sube lo que este mide menos su margen de abajo, así Inicio no crece
+   (E31: los tres botones de "Ahora" sobre la barra, también a 360 × 640). */
+#vista [data-testid="vista-inicio"] > a.enlace-insignias[data-testid] {
+  display: flex;
+  align-items: center;
+  width: fit-content;
+  min-height: 44px;
+  margin: -36px auto -8px 0;
+  padding: 0 12px 0 0;
+  background: none;
+  border: 0;
+  box-shadow: none;
+  color: var(--primario);
+  font-weight: 800;
+  text-decoration: none;
+}
+#vista a.enlace-insignias[data-testid]::after {
+  content: "\203A";
+  margin-left: 6px;
+}
+.avatar-escena {
+  display: flex;
+  justify-content: center;
+  padding: 12px 0 16px;
+}
+.avatar-grande {
+  width: 168px;
+  height: 168px;
+  border-radius: 50%;
+  box-shadow: 0 0 0 4px var(--superficie), 0 0 0 7px var(--oro), 0 10px 24px -10px color-mix(in srgb, var(--primario) 40%, transparent);
+}
+.avatar-grande.avatar-pop {
+  animation: magia-late 360ms cubic-bezier(.35, 1.8, .35, .83) 1;
+}
+.avatar-pestanas {
+  display: flex;
+  gap: 8px;
+  overflow-x: auto;
+  padding: 2px 2px 10px;
+}
+.avatar-pestanas .sx-btn {
+  flex: 0 0 auto;
+}
+.avatar-piezas {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(96px, 1fr));
+  gap: 10px;
+  margin: 0 0 16px;
+  padding: 0;
+  list-style: none;
+}
+#vista .avatar-pieza {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 4px;
+  width: 100%;
+  min-height: 132px;
+  padding: 10px 6px 8px;
+  border: 2px solid color-mix(in srgb, var(--primario) 16%, white);
+  border-radius: var(--radio-md);
+  box-shadow: 0 2px 0 color-mix(in srgb, var(--primario) 16%, white);
+  background: var(--superficie);
+  color: var(--texto);
+  font: inherit;
+  cursor: pointer;
+  transition: transform 100ms ease;
+}
+#vista .avatar-pieza:active {
+  transform: translateY(2px);
+}
+#vista .avatar-pieza.es-puesta {
+  border-color: var(--primario);
+  box-shadow: 0 2px 0 var(--primario);
+  background: color-mix(in srgb, var(--primario) 8%, white);
+}
+#vista .avatar-pieza.es-bloqueada {
+  cursor: default;
+  background: color-mix(in srgb, var(--fondo) 94%, black);
+  box-shadow: none;
+  transform: translateY(2px);
+}
+#vista .avatar-pieza.es-bloqueada .avatar-miniatura {
+  opacity: 0.45;
+}
+.avatar-miniatura .avatar-svg {
+  width: 64px;
+  height: 64px;
+}
+.avatar-pieza-nombre {
+  font-weight: 800;
+  font-size: 0.9375rem;
+}
+.avatar-pieza-estado {
+  display: inline-flex;
+  align-items: center;
+  gap: 3px;
+  font-size: 0.8125rem;
+  font-weight: 700;
+  line-height: 1.2;
+  text-align: center;
+  color: var(--primario);
+}
+.avatar-pieza-estado.es-candado {
+  color: color-mix(in srgb, var(--texto) 78%, transparent);
+}
+.avatar-pieza-estado .sx-icono {
+  flex: 0 0 auto;
+  width: 14px;
+  height: 14px;
+}
+.avatar-aviso {
+  margin: 10px 0;
+  text-align: center;
+}
+.avatar-vista .enlace-insignias {
+  display: flex;
+  justify-content: center;
+  min-height: 44px;
+  align-items: center;
+  margin-top: 8px;
+  font-weight: 800;
+  color: var(--primario);
+}
+.insignias-vista .sx-btn {
+  margin-top: 8px;
+}
+
+/* ---------- 3. Las insignias ---------- */
+.marca-nueva {
+  display: inline-flex;
+  align-items: center;
+  gap: 3px;
+  margin-right: 6px;
+  padding: 1px 8px;
+  border-radius: 999px;
+  background: var(--oro);
+  color: var(--oro-texto);
+  font-size: 0.8125rem;
+}
+.marca-nueva .sx-icono {
+  width: 14px;
+  height: 14px;
+}
+.insignias-intro {
+  margin: 8px 0 14px;
+}
+.vitrina {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(150px, 1fr));
+  gap: 12px;
+  margin: 0 0 16px;
+  padding: 0;
+  list-style: none;
+}
+.insignia {
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  text-align: center;
+  padding: 16px 10px 14px;
+  border-radius: var(--radio-md);
+  background: var(--superficie);
+  box-shadow: 0 0 0 1px color-mix(in srgb, var(--primario) 10%, transparent), 0 6px 14px -8px color-mix(in srgb, var(--primario) 30%, transparent);
+}
+.insignia.es-por-ganar {
+  background: color-mix(in srgb, var(--fondo) 96%, black);
+}
+.insignia p {
+  margin: 0;
+}
+.insignia-medalla {
+  display: block;
+  margin-bottom: 6px;
+}
+.insignia.es-nueva .insignia-medalla {
+  animation: magia-sello 700ms cubic-bezier(.35, 1.8, .35, .83) 200ms 1 both;
+}
+@keyframes magia-sello {
+  0% { transform: scale(2.2) rotate(-14deg); opacity: 0; }
+  60% { transform: scale(0.92) rotate(3deg); opacity: 1; }
+  100% { transform: scale(1) rotate(0); opacity: 1; }
+}
+.insignia-nueva {
+  position: absolute;
+  top: -10px;
+  left: 50%;
+  transform: translateX(-50%);
+  white-space: nowrap;
+}
+.insignia .insignia-nombre,
+.insignia .insignia-valor {
+  color: var(--texto);
+}
+.insignia-nombre {
+  font-family: var(--fuente-titulos);
+  font-weight: 800;
+  font-size: 1.125rem;
+}
+.insignia-nivel {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 2px;
+  font-weight: 800;
+  font-size: 0.8125rem;
+  letter-spacing: 0.05em;
+  text-transform: uppercase;
+  color: var(--primario);
+}
+.insignia-puntos {
+  display: inline-flex;
+  gap: 3px;
+}
+.insignia-puntos .punto {
+  width: 8px;
+  height: 8px;
+  border-radius: 50%;
+  background: color-mix(in srgb, var(--texto) 16%, transparent);
+}
+.insignia-puntos .punto.es-lleno {
+  background: var(--oro);
+  box-shadow: 0 0 0 1px color-mix(in srgb, var(--oro) 70%, black);
+}
+.insignia-valor {
+  margin-top: 6px !important;
+  font-size: 0.9375rem;
+}
+.insignia-pie,
+.insignia-abre {
+  font-size: 0.8125rem;
+  color: color-mix(in srgb, var(--texto) 78%, transparent);
+}
+.insignias-nota {
+  margin: 12px 0 0;
+  text-align: center;
+}
+@media (min-width: 900px) {
+  .vitrina {
+    grid-template-columns: repeat(5, 1fr);
+  }
+}

@@ -24,7 +24,9 @@ import { retomarIntento, responderPregunta, terminarIntento, ErrorTransitorio } 
 import { planDeExplicacion, crearBanda } from '../../ui/explicacion.js';
 import { preguntaContestable } from '../../ui/practica.js';
 import { crearLectura } from '../../ui/lectura.js';
+import { despejarBanda } from '../../ui/despejar_banda.js';
 import { renderRevision, textoDeOpcion } from './revision.js';
+import { retitularFranja, aciertosDe, crearChipAciertos, celebrarAcierto } from '../../ui/fluidez.js';
 import { crearSalir, nodoOpciones, pintarErrorFlujo, nodoRevisando } from './reto_flujo.js';
 
 const T = textosPractica.l1;
@@ -182,7 +184,7 @@ function pintar(raiz, estado, entrada = 'desliza', recien = null) {
   const nodo = h(
     'div', { 'data-testid': 'vista-reto-flujo', 'data-modo': 'por-pregunta', class: `juego juego-${entrada}${respuesta ? ' con-banda' : ''}` },
     estado.encabezado = crearCabecera({ piezas: [estado.salir, h('h1', { class: 'titulo-reto' }, tituloLegible(challenge.title))], sonido: true }),
-    barra,
+    h('div', { class: 'fila-avance' }, barra, crearChipAciertos(aciertosDe(estado.respondidas))), // la barra y el chip de aciertos
     estado.esRepaso ? h('p', { role: 'status', class: 'aviso-corto', 'data-testid': 'banner-repaso' }, textos.retoFlujo.bannerRepaso) : null,
     crearLectura(challenge), // W84: el texto de un reto de Lectura, arriba de la afirmación (null si no es de Lectura)
     h('div', { class: 'presenta-pregunta' },
@@ -193,7 +195,11 @@ function pintar(raiz, estado, entrada = 'desliza', recien = null) {
       respuesta ? barraRespondida(raiz, estado, pregunta, respuesta) : barraComprobar(raiz, estado, pregunta, recien)] : [barraNoContestable(raiz, estado)]),
   );
   montar(raiz, nodo);
+  // Sprint de la magia (docs/ESPEC_avatar_fluidez.md §1): la franja dice "¡Bien hecho!" o "La correcta: …", con el mismo ícono de siempre.
+  if (respuesta) retitularFranja(nodo, respuesta, respuesta.correct_answer ? textoDeOpcion(pregunta, respuesta.correct_answer) : null);
   document.body.dataset.listo = '1';
+  // Adenda 1 de ESPEC_visual_reto_tanda2: con la banda puesta, la app deja ver juntos el enunciado, lo marcado y la banda (un cuadro después: ya con su alto).
+  if (respuesta) globalThis.requestAnimationFrame?.(() => despejarBanda(nodo));
 }
 
 /** Un toque de Comprobar = una petición (un segundo toque recibe la misma); la banda sale con lo que el servidor guardó. */
@@ -209,6 +215,7 @@ async function comprobar(raiz, estado, pregunta, boton) {
     estado.respondidas.set(pregunta.id, r);
     senal(r.is_correct ? 'acierto' : 'fallo');
     pintar(raiz, estado, 'quieta');
+    if (r.is_correct) celebrarAcierto(raiz, { esRepaso: estado.esRepaso }); // solo recién comprobada: al retomar no se celebra de nuevo
   } catch (e) {
     estado.enVuelo = false;
     console.warn('reto_l1: no se pudo comprobar', e);
@@ -239,6 +246,7 @@ function avisoDeCierre(raiz, estado, fijo = null) {
 function siguiente(raiz, estado) {
   estado.indice = Math.min(estado.indice + 1, estado.challenge.questions.length - 1);
   pintar(raiz, estado);
+  globalThis.scrollTo?.(0, 0); // la pregunta nueva abre arriba, no donde la app dejó la anterior para ver su banda
 }
 
 /** "Ver resultado": `/finish` una vez y la revisión de siempre, con lo que el servidor guardó. */

@@ -10,7 +10,7 @@
 //
 // Súbelo un número cada vez que cambie la lista de precarga o la estrategia; la `activate`
 // borra cualquier caché con otro nombre.
-const VERSION = 'engrama-shell-v69';
+const VERSION = 'engrama-shell-v76';
 
 // Cada encargo agrega los suyos en su propio commit (W7: Inicio + api/cliente,core,retos + los
 // SVG de Drako que usa el estudiante; W10: profe/grupos,grupo,sesion_asistencia + api/profe). El
@@ -155,6 +155,9 @@ const APARTE = [
 // U59 exige además que todo lo que un diferido importa de forma estática esté aquí o en PRECARGA.
 const DIFERIDOS = [
   '/estilos/practica.css',
+  '/estilos/magia.css', // sprint de la magia (docs/ESPEC_avatar_fluidez.md): avatar, insignias y la franja del reto
+  '/src/textos_magia.js',
+  '/src/ui/fluidez.js',
   '/src/textos_practica.js',
   '/src/api/practica.js',
   '/src/ui/explicacion.js',
