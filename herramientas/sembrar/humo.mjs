@@ -23,8 +23,9 @@ export const SEMILLA_HUMO = 20261014;
 export const SEMILLA_REPLICA = 7;
 // La predicción de la espec (§3), contada leyendo contenido/ en `bb6a571` SIN el mapeo. Si el banco cambia, se actualiza aquí y se declara.
 export const PREDICCION = {
-  A1: { unidades: 10, retos: 80, en_feed: 40, solo_refuerzo: 40, solo_gemela: 20, preguntas: 179, sin_explicacion: 0, errores: 0 },
-  A2: { unidades: 10, retos: 80, en_feed: 40, solo_refuerzo: 40, solo_gemela: 20, preguntas: 180, sin_explicacion: 0, errores: 0 },
+  // W90 (docs/ESPEC_camino_y_tu_palabra.md §1, declarado): +3 retos Escríbela por unidad (1 al feed, 2 solo_refuerzo) y sus 6 preguntas.
+  A1: { unidades: 10, retos: 110, en_feed: 50, solo_refuerzo: 60, solo_gemela: 30, preguntas: 239, sin_explicacion: 0, errores: 0 },
+  A2: { unidades: 10, retos: 110, en_feed: 50, solo_refuerzo: 60, solo_gemela: 30, preguntas: 240, sin_explicacion: 0, errores: 0 },
 };
 const ROLES_REFUERZO = ['gemela', 'repaso'];
 

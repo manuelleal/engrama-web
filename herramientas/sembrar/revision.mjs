@@ -42,6 +42,20 @@ function revisarMarcas(q, ruta, vigentes, errores) {
   }
 }
 
+const MAX_ACEPTADAS = 10; // ChallengeQuestionIn.accepted_answers: maxItems 10, cada una de 1 a 200
+const TOLERANCIAS = ['exacta', '1_letra'];
+
+/** W90 (docs/ESPEC_camino_y_tu_palabra.md §1): una pregunta escrita como la aceptaría el backend. @param {any} q @param {string} ruta @param {string[]} errores */
+function revisarEscrita(q, ruta, errores) {
+  if ('accepted_answers' in q && (!Array.isArray(q.accepted_answers) || q.accepted_answers.length > MAX_ACEPTADAS
+    || !q.accepted_answers.every((a) => textoEntre(a, 200)))) errores.push(`${ruta}.accepted_answers: no es una lista de hasta ${MAX_ACEPTADAS} textos de 1 a 200`);
+  if ('tolerancia' in q && !TOLERANCIAS.includes(q.tolerancia)) errores.push(`${ruta}.tolerancia: "${q.tolerancia}" no es exacta ni 1_letra`);
+  if ('pista_inicial' in q && typeof q.pista_inicial !== 'boolean') errores.push(`${ruta}.pista_inicial no es booleano`);
+  if (q.question_type !== 'fill_blank') return;
+  if (Array.isArray(q.options_json) && q.options_json.length) errores.push(`${ruta}: una pregunta escrita no lleva opciones`);
+  if (!textoEntre(q.correct_answer, 200)) errores.push(`${ruta}.correct_answer: vacía o de más de 200`);
+}
+
 /** @param {any} q @param {string} ruta @param {boolean} esLectura @param {{errores: string[], faltas: string[]}} r */
 function revisarFaltas(q, ruta, esLectura, r) {
   if (!('explanation' in q)) r.faltas.push(`${ruta}: sin explanation`);
@@ -74,6 +88,7 @@ export function revisarCuerpo(cuerpo, { vigentes } = {}) {
     const ruta = `${cuerpo.title} · pregunta ${i + 1}`;
     if ('explanation' in q) revisarExplicacion(q.explanation, ruta, r.errores);
     revisarMarcas(q, ruta, vigentes, r.errores);
+    revisarEscrita(q, ruta, r.errores);
     revisarFaltas(q, ruta, esLectura, r);
   });
   revisarReto(cuerpo, r.errores);

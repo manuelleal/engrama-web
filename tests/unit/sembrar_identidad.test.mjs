@@ -23,7 +23,8 @@ const sin = (objeto, claves) => Object.fromEntries(Object.entries(objeto).filter
 
 /** Los cuerpos de una unidad sin los campos nuevos (lo que ya se mandaba). */
 function proyeccionVieja(cuerpos) {
-  return cuerpos.map(({ cuerpo }) => ({ ...sin(cuerpo, NUEVOS_POR_RETO), questions: cuerpo.questions.map((q) => sin(q, NUEVOS_POR_PREGUNTA)) }));
+  // W90 (docs/ESPEC_camino_y_tu_palabra.md §1, declarado): los retos Escríbela son NUEVOS y van al final; lo de antes, idéntico.
+  return cuerpos.filter(({ tipo }) => tipo !== 'escrita').map(({ cuerpo }) => ({ ...sin(cuerpo, NUEVOS_POR_RETO), questions: cuerpo.questions.map((q) => sin(q, NUEVOS_POR_PREGUNTA)) }));
 }
 
 const leer = (nombre) => JSON.parse(readFileSync(`${RAIZ}tests/fixtures/sembrar/${nombre}.json`, 'utf8'));
