@@ -21,7 +21,7 @@ export const textosAviso = {
       'Tus respuestas y resultados en los retos',
       'Tu asistencia a clase',
       'Tus monedas, tu racha y tu nivel',
-      'Tu dirección IP, en el registro de conexiones del servidor',
+      'Tu dirección IP: en el registro de conexiones del servidor y en tus ingresos a la cuenta',
     ],
     paraQueTitulo: 'Para qué los usamos',
     paraQue: 'Para que ENGRAMA funcione en tu curso: que entres, practiques y veas tu avance, y que tu docente te haga seguimiento.',

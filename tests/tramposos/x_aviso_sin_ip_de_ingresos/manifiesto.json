@@ -1,0 +1,17 @@
+{
+  "descripcion": "Auditoría H-2/H-7: el texto calla que el servicio de inicio de sesión (GoTrue) guarda la IP de tus ingresos mientras dure tu cuenta.",
+  "archivos": {
+    "src/textos_aviso.js": "textos_aviso.js"
+  },
+  "comando": [
+    "node",
+    "--test",
+    "--test-reporter=tap",
+    "tests/unit/aviso_texto.test.mjs"
+  ],
+  "espera_codigo_no_cero": true,
+  "espera_fallan_tests": [
+    "aviso v2: es VERAZ: dice que el nombre y el correo SÍ se guardan (lo anonimizado es el análisis) y la IP",
+    "aviso v2: dice cuánto tiempo (copias de seguridad en el mismo servidor, sin cifrar, 7 días; registro de conexiones 14) y que se suprimen"
+  ]
+}

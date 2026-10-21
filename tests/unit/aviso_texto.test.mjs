@@ -45,7 +45,7 @@ test('aviso v2: dice lo que pidió Christiam: ejercicio educativo, anonimizados,
 test('aviso v2: es VERAZ: dice que el nombre y el correo SÍ se guardan (lo anonimizado es el análisis) y la IP', () => {
   const t = textoLeido();
   assert.match(t, /Tu nombre y tu correo sí se guardan, porque la plataforma los necesita para funcionar; lo que se anonimiza es ese análisis/);
-  for (const dato of [/Tu nombre y tu correo/, /Tu código estudiantil/, /Tus respuestas y resultados/, /Tu asistencia/, /Tus monedas/, /Tu dirección IP, en el registro de conexiones/]) assert.match(t, dato);
+  for (const dato of [/Tu nombre y tu correo/, /Tu código estudiantil/, /Tus respuestas y resultados/, /Tu asistencia/, /Tus monedas/, /Tu dirección IP: en el registro de conexiones del servidor y en tus ingresos a la cuenta/]) assert.match(t, dato);
   assert.doesNotMatch(t, /no guardamos tu (nombre|correo)|no (se )?guarda(mos)? (tu )?(nombre|correo)|datos anónimos desde|nadie (puede )?ve(r)? tu nombre/i, 'no promete lo que el sistema no hace');
 });
 
@@ -57,6 +57,8 @@ test('aviso v2: dice cuánto tiempo (copias de seguridad en el mismo servidor, s
   assert.doesNotMatch(t, /cifradas|fuera del servidor|14 días de copias|durante 14 días \(el servidor/i, 'no promete un cifrado ni una copia externa que hoy no existen');
   assert.match(t, /Nuestro servidor guarda durante 14 días tu dirección IP, la fecha y hora, la página que pediste \(sin tu contraseña, tu sesión ni lo que escribes\) y si funcionó/);
   assert.match(t, /Solo sirve para detectar abusos y fallas de seguridad, y se borra solo al pasar ese plazo/);
+  // H-2/H-7 (auditoría): además del registro de conexiones (Caddy, 14 días), el servicio de inicio de sesión (GoTrue) guarda la IP de los ingresos mientras dure la cuenta.
+  assert.match(t, /Aparte, el servicio de inicio de sesión guarda la dirección IP de tus ingresos mientras dure tu cuenta/);
   assert.doesNotMatch(t, /se borran? (al instante|de inmediato|ya)|inmediatamente/i, 'suprimir no es inmediato: el respaldo guarda 7 días');
 });
 
@@ -71,10 +73,11 @@ test('aviso v2: derechos (conocer, actualizar, corregir, suprimir, retirar) con 
   assert.match(t, /Examen de nivel \(SET\) te muestra además su propio aviso/);
 });
 
-test('aviso v2: es CORTO (menos de 420 palabras) y la pantalla obligatoria trae el mismo texto con su casilla', () => {
+test('aviso v2: es CORTO (menos de 520 palabras) y la pantalla obligatoria trae el mismo texto con su casilla', () => {
   const t = textoLeido();
   const palabras = t.split(' ').filter(Boolean).length;
-  assert.ok(palabras < 420, `el aviso tiene ${palabras} palabras`);
+  // El tope subió de 420 a 520 (adenda de la auditoría, H-2/H-5): la Ley 1581 obliga a nombrar todos los derechos y los plazos, y se agregó la IP de los ingresos.
+  assert.ok(palabras < 520, `el aviso tiene ${palabras} palabras`);
   const raiz = pintando((r) => renderConsentimiento(r, { aviso: leerAviso(), aceptar: async () => {}, salir: async () => {} }));
   assert.match(textoDe(buscar(raiz, 'aviso-medir')), /anonimiz|sin tu nombre/);
   assert.match(textoDe(buscar(raiz, 'aviso-cuanto')), /7 días/);
