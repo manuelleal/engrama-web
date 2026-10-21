@@ -66,3 +66,69 @@ test('U52: en Inicio, "Tu reto de hoy" dice "Hasta N monedas" con el coins_rewar
     } finally { entorno.restaurar(); }
   }
 });
+
+// U122 (docs/ESPEC_titulos_unidad.md): la lista dice de qué unidad es cada fila. Los retos sembrados traen la unidad dentro del título
+// ("[BORRADOR] a1-u10 · I Don't Feel Well · Lectura 2"): una sección por unidad (h2 con su nombre) y filas "Lectura 2"; ni "[BORRADOR]" ni el id llegan a la
+// pantalla; los retos del profe (sin unidad) siguen viéndose como siempre. Tramposos: x_retos_sin_agrupar y x_retos_muestra_id (src/vistas/estudiante/retos.js).
+const SEMBRADOS = [
+  { id: 'r1', title: "[BORRADOR] a1-u10 · I Don't Feel Well · Lectura 2" },
+  { id: 'r2', title: "[BORRADOR] a1-u10 · I Don't Feel Well · Lectura 1" },
+  { id: 'r3', title: '[BORRADOR] a1-u11 · At the Restaurant · Lectura 2' },
+  { id: 'r4', title: '[BORRADOR] a1-u11 · At the Restaurant · Gramática 1 · original' },
+];
+
+/** Pinta la lista con esos retos y devuelve la raíz. @param {{id: string, title: string}[]} retos */
+async function pintarConRetos(retos) {
+  const { entornoDeFotos, crearRaiz } = await import('./foto_vistas.mjs');
+  const entorno = entornoDeFotos({ 'GET /challenges/': retos, 'GET /challenges/attempts/history': [{ challenge_id: 'r2', status: 'completed', is_correct: true, completed_at: '2026-10-01T00:00:00Z' }] });
+  try {
+    const raiz = crearRaiz();
+    await renderRetos(raiz, { token: 't', sesion: { rol: 'student' } });
+    return raiz;
+  } finally { entorno.restaurar(); }
+}
+
+test('U122: con retos sembrados, una sección por unidad con su nombre como h2 y filas "Lectura 2", "Gramática 1"; el estado de cada reto no cambia', async () => {
+  const { elementos, textoDe, buscar } = await import('./foto_vistas.mjs');
+  const raiz = await pintarConRetos(SEMBRADOS);
+  const secciones = elementos(raiz).filter((n) => n.tagName?.toLowerCase() === 'section' && /unidad-retos-\d/.test(n.getAttribute('data-testid') || ''));
+  assert.equal(secciones.length, 2, 'una sección por unidad');
+  const encabezados = secciones.map((s) => textoDe(elementos(s).find((n) => n.tagName?.toLowerCase() === 'h2')));
+  assert.deepEqual(encabezados, ["I Don't Feel Well", 'At the Restaurant']);
+  const filasDe = (s) => elementos(s).filter((n) => n.className === 'fila-titulo').map(textoDe);
+  assert.deepEqual(secciones.map(filasDe), [['Lectura 2', 'Lectura 1'], ['Lectura 2', 'Gramática 1']]);
+  for (const s of secciones) {
+    const h2 = elementos(s).find((n) => n.tagName?.toLowerCase() === 'h2');
+    assert.equal(s.getAttribute('aria-labelledby'), h2.getAttribute('id'), 'el lector de pantalla oye el nombre de la unidad antes de sus filas');
+  }
+  assert.ok(buscar(raiz, 'reto-r2-repasar') && buscar(raiz, 'reto-r2-estado'), 'el ganado sigue siendo un repaso');
+  assert.ok(buscar(raiz, 'reto-r1-jugar'), 'los demás siguen ofreciendo Jugar');
+});
+
+test('U122: ni "[BORRADOR]" ni el id interno de la unidad llegan a la pantalla (texto, atributos ni testids)', async () => {
+  const { elementos, textoDe, fotografiar } = await import('./foto_vistas.mjs');
+  const raiz = await pintarConRetos(SEMBRADOS);
+  assert.doesNotMatch(textoDe(raiz), /BORRADOR|\[|a1-u1\d/i);
+  assert.doesNotMatch(fotografiar(raiz).join('\n'), /BORRADOR|a1-u1\d/i, 'tampoco en un atributo');
+  assert.ok(elementos(raiz).length > 10);
+});
+
+test('U122: sin ningún título con unidad (retos del profe a mano) la lista es la de siempre: un ul, sin secciones ni encabezados, con el título entero', async () => {
+  const { elementos, textoDe } = await import('./foto_vistas.mjs');
+  const raiz = await pintarConRetos([{ id: 'r1', title: 'Reto de prueba' }, { id: 'r2', title: 'Daily Routines · Reto 1' }, { id: 'r3', title: '[BORRADOR] Mi reto' }]);
+  const etiquetas = elementos(raiz).map((n) => n.tagName?.toLowerCase());
+  assert.ok(!etiquetas.includes('section') && !etiquetas.includes('h2'), 'sin secciones ni encabezados');
+  assert.equal(etiquetas.filter((e) => e === 'ul').length, 1, 'un solo ul');
+  const titulos = elementos(raiz).filter((n) => n.className === 'fila-titulo').map(textoDe);
+  assert.deepEqual(titulos, ['Reto de prueba', 'Daily Routines · Reto 1', 'Mi reto']);
+});
+
+test('U122: unidades y un reto del profe juntos: el del profe va en su propia sección "Otros retos", con su título de siempre', async () => {
+  const { elementos, textoDe } = await import('./foto_vistas.mjs');
+  const raiz = await pintarConRetos([...SEMBRADOS, { id: 'r9', title: 'Reto de la semana' }]);
+  const secciones = elementos(raiz).filter((n) => n.tagName?.toLowerCase() === 'section' && /unidad-retos-\d/.test(n.getAttribute('data-testid') || ''));
+  assert.equal(secciones.length, 3);
+  const ultima = secciones[2];
+  assert.equal(textoDe(elementos(ultima).find((n) => n.tagName?.toLowerCase() === 'h2')), textos.retos.otros);
+  assert.deepEqual(elementos(ultima).filter((n) => n.className === 'fila-titulo').map(textoDe), ['Reto de la semana']);
+});
