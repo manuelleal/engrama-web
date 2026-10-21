@@ -13,6 +13,7 @@ import { crearEstado, ADMIN_BOOTSTRAP_TOKEN, DOCENTE_BOOTSTRAP_TOKEN } from './m
 import { crearGrupo, asignarDocente, importarCsv } from './mock/rutas_admin.mjs';
 import { crearChallenge } from './mock/rutas_challenges.mjs';
 import { abrirSesion } from './mock/rutas_teachers.mjs';
+import { sembrarEconomia } from './mock/sembrar_economia.mjs';
 
 const reqAdmin = () => ({ headers: { authorization: `Bearer ${ADMIN_BOOTSTRAP_TOKEN}` } });
 const reqDocente = () => ({ headers: { authorization: `Bearer ${DOCENTE_BOOTSTRAP_TOKEN}` } });
@@ -38,6 +39,7 @@ export function sembrarDemo(estado) {
     });
   }
   const { cuerpo: sesion } = abrirSesion(estado, reqDocente(), grupo.id, {});
+  sembrarEconomia(estado, { grupoId: grupo.id }); // Lingo Coins: saldos, tienda, presupuesto del docente (el docente lanza la puja)
   return { grupoId: grupo.id, codigoAsistencia: sesion.session_code };
 }
 
