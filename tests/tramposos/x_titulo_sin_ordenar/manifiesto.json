@@ -1,0 +1,18 @@
+{
+  "descripcion": "agruparPorUnidad deja las filas dentro de la unidad en el orden de la API: \"Lectura 2\" antes que \"Lectura 1\"",
+  "archivos": {
+    "src/ui/titulo.js": "titulo.js"
+  },
+  "comando": [
+    "node",
+    "--test",
+    "--test-reporter=tap",
+    "tests/unit/ui_titulo_unidad.test.mjs"
+  ],
+  "espera_codigo_no_cero": true,
+  "espera_fallan_tests": [
+    "U121: agruparPorUnidad: una sección por unidad, en el orden de la primera aparición; dentro, destreza y número ascendente; y el rótulo es el bloque",
+    "U121: agruparPorUnidad ordena dentro de la unidad: la destreza por su primera aparición, el número como número (\"Lectura 2\" antes que \"Lectura 10\") y el empate en el orden de la API",
+    "U121: agruparPorUnidad ordena cada unidad por su cuenta y no reordena el grupo sin unidad ni el orden de las unidades"
+  ]
+}

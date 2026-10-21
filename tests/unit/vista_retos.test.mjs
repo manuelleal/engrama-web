@@ -96,7 +96,7 @@ test('U122: con retos sembrados, una sección por unidad con su nombre como h2 y
   const encabezados = secciones.map((s) => textoDe(elementos(s).find((n) => n.tagName?.toLowerCase() === 'h2')));
   assert.deepEqual(encabezados, ["I Don't Feel Well", 'At the Restaurant']);
   const filasDe = (s) => elementos(s).filter((n) => n.className === 'fila-titulo').map(textoDe);
-  assert.deepEqual(secciones.map(filasDe), [['Lectura 2', 'Lectura 1'], ['Lectura 2', 'Gramática 1']]);
+  assert.deepEqual(secciones.map(filasDe), [['Lectura 1', 'Lectura 2'], ['Lectura 2', 'Gramática 1']]);
   for (const s of secciones) {
     const h2 = elementos(s).find((n) => n.tagName?.toLowerCase() === 'h2');
     assert.equal(s.getAttribute('aria-labelledby'), h2.getAttribute('id'), 'el lector de pantalla oye el nombre de la unidad antes de sus filas');

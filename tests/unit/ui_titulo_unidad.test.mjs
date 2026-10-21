@@ -81,11 +81,11 @@ const FEED = [
   { id: 'r6', title: '[BORRADOR] a1-u11 · At the Restaurant · Vocabulario 1 · original' },
 ];
 
-test('U121: agruparPorUnidad: una sección por unidad, en el orden de la primera aparición; dentro, el orden de la API; y el rótulo es el bloque', () => {
+test('U121: agruparPorUnidad: una sección por unidad, en el orden de la primera aparición; dentro, destreza y número ascendente; y el rótulo es el bloque', () => {
   const g = agruparPorUnidad(FEED);
   assert.deepEqual(g.map((x) => x.unidad), ["I Don't Feel Well", 'At the Restaurant', null]);
-  assert.deepEqual(g.map((x) => x.filas.map((f) => f.reto.id)), [['r1', 'r2', 'r5'], ['r3', 'r6'], ['r4']], 'r5 se junta con su unidad aunque llegó después');
-  assert.deepEqual(g[0].filas.map((f) => f.rotulo), ['Lectura 2', 'Lectura 1', 'Gramática 1']);
+  assert.deepEqual(g.map((x) => x.filas.map((f) => f.reto.id)), [['r2', 'r1', 'r5'], ['r3', 'r6'], ['r4']], 'r5 se junta con su unidad aunque llegó después; Lectura 1 (r2) va antes que Lectura 2 (r1)');
+  assert.deepEqual(g[0].filas.map((f) => f.rotulo), ['Lectura 1', 'Lectura 2', 'Gramática 1']);
   assert.deepEqual(g[2].filas.map((f) => f.rotulo), ['Reto de la semana'], 'el del profe conserva su título entero');
 });
 
@@ -114,4 +114,31 @@ test('U121: agruparPorUnidad agrupa por el id, no por el nombre: dos unidades co
 test('U121: ningún texto de ningún grupo lleva "[BORRADOR]" ni un id de unidad', () => {
   const todo = agruparPorUnidad(FEED).flatMap((g) => [g.unidad, ...g.filas.map((f) => f.rotulo)]).filter(Boolean).join('\n');
   assert.doesNotMatch(todo, /BORRADOR|a1-u1\d/i);
+});
+
+test('U121: agruparPorUnidad ordena dentro de la unidad: la destreza por su primera aparición, el número como número ("Lectura 2" antes que "Lectura 10") y el empate en el orden de la API', () => {
+  const g = agruparPorUnidad([
+    { id: 'a', title: 'a1-u01 · Hello · Lectura 10' },
+    { id: 'b', title: 'a1-u01 · Hello · Gramática 2 · original' },
+    { id: 'c', title: 'a1-u01 · Hello · Lectura 2' },
+    { id: 'd', title: 'a1-u01 · Hello · Gramática 1 · gemela' },
+    { id: 'e', title: 'a1-u01 · Hello · Gramática 1 · original' },
+    { id: 'f', title: 'a1-u01 · Hello · Lectura 1' },
+  ]);
+  assert.equal(g.length, 1);
+  assert.deepEqual(g[0].filas.map((f) => f.rotulo), ['Lectura 1', 'Lectura 2', 'Lectura 10', 'Gramática 1', 'Gramática 1', 'Gramática 2']);
+  assert.deepEqual(g[0].filas.map((f) => f.reto.id), ['f', 'c', 'a', 'd', 'e', 'b'], 'Lectura salió primero en la API, así que va primero; el empate "Gramática 1" queda d, e como llegaron');
+});
+
+test('U121: agruparPorUnidad ordena cada unidad por su cuenta y no reordena el grupo sin unidad ni el orden de las unidades', () => {
+  const g = agruparPorUnidad([
+    { id: 'p', title: 'Reto B del profe' },
+    { id: 'a', title: 'b1-u02 · Zoo · Lectura 2' },
+    { id: 'q', title: 'Reto A del profe' },
+    { id: 'b', title: 'a1-u01 · Hello · Lectura 2' },
+    { id: 'c', title: 'b1-u02 · Zoo · Lectura 1' },
+    { id: 'd', title: 'a1-u01 · Hello · Lectura 1' },
+  ]);
+  assert.deepEqual(g.map((x) => x.unidad), [null, 'Zoo', 'Hello'], 'el orden de las unidades es el de la primera aparición');
+  assert.deepEqual(g.map((x) => x.filas.map((f) => f.reto.id)), [['p', 'q'], ['c', 'a'], ['d', 'b']], 'el grupo sin unidad conserva su orden');
 });

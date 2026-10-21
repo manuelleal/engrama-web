@@ -12,6 +12,6 @@
   "espera_codigo_no_cero": true,
   "espera_fallan_tests": [
     "U120: el título de la base da la unidad (\"I Don't Feel Well\") y el bloque (\"Lectura 2\"), sin borrador ni id",
-    "U121: agruparPorUnidad: una sección por unidad, en el orden de la primera aparición; dentro, el orden de la API; y el rótulo es el bloque"
+    "U121: agruparPorUnidad: una sección por unidad, en el orden de la primera aparición; dentro, destreza y número ascendente; y el rótulo es el bloque"
   ]
 }

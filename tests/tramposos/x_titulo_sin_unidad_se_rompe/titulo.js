@@ -72,9 +72,12 @@ export function partesDeTitulo(tituloCrudo) {
 }
 
 /**
- * Los retos de la lista agrupados por unidad: una sección por unidad en el orden de su primera aparición y, dentro de cada una, el orden de la API. La fila
- * dice su `rotulo`: el bloque ("Lectura 2") si hay unidad (el nombre de la unidad es el encabezado de la sección) y, si no, el título de siempre. Los retos
- * sin unidad van juntos en un grupo con `clave` y `unidad` en null. Pura: no cambia los retos.
+ * Los retos de la lista agrupados por unidad: una sección por unidad en el orden de su primera aparición y, dentro de cada una, ordenadas por destreza y número
+ * ascendente ("Lectura 1" antes que "Lectura 2"; docs/ESPEC_titulos_unidad.md §7). La destreza va en el orden de su primera aparición dentro de la unidad (no se
+ * impone un orden de destrezas) y, dentro de ella, el número como NÚMERO ("Lectura 2" antes que "Lectura 10"); el empate (original y gemela de "Gramática 1")
+ * conserva el orden de la API. El grupo sin unidad no se reordena: sus filas quedan como llegaron. La fila dice su `rotulo`: el bloque ("Lectura 2") si hay
+ * unidad (el nombre de la unidad es el encabezado de la sección) y, si no, el título de siempre. Los retos sin unidad van juntos en un grupo con `clave` y
+ * `unidad` en null. Pura: no cambia los retos.
  * @template {{title?: string|null}} R
  * @param {R[]} retos
  * @returns {{clave: string|null, unidad: string|null, filas: {reto: R, rotulo: string}[]}[]}
@@ -88,5 +91,20 @@ export function agruparPorUnidad(retos) {
     if (!grupo) { grupo = { clave: p.clave, unidad: p.unidad, filas: [] }; grupos.set(p.clave, grupo); }
     grupo.filas.push({ reto, rotulo: p.bloque ?? p.texto });
   }
+  for (const grupo of grupos.values()) if (grupo.clave !== null) ordenarFilas(grupo.filas);
   return [...grupos.values()];
+}
+
+/** Ordena in situ las filas de una unidad: destreza por primera aparición, número ascendente; estable (Array.prototype.sort lo es). El rótulo siempre es un bloque válido ("Destreza N"). */
+function ordenarFilas(filas) {
+  /** @type {Map<string, number>} */
+  const posicionDeDestreza = new Map();
+  const claves = filas.map((f) => {
+    const m = RE_BLOQUE.exec(f.rotulo);
+    const destreza = m ? m[1].toLowerCase() : f.rotulo.toLowerCase();
+    if (!posicionDeDestreza.has(destreza)) posicionDeDestreza.set(destreza, posicionDeDestreza.size);
+    return { f, d: /** @type {number} */ (posicionDeDestreza.get(destreza)), n: m ? Number(m[2]) : 0 };
+  });
+  claves.sort((a, b) => a.d - b.d || a.n - b.n);
+  filas.splice(0, filas.length, ...claves.map((c) => c.f));
 }

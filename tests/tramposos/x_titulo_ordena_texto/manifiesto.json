@@ -1,0 +1,16 @@
+{
+  "descripcion": "agruparPorUnidad compara el número como texto: \"Lectura 10\" queda antes que \"Lectura 2\"",
+  "archivos": {
+    "src/ui/titulo.js": "titulo.js"
+  },
+  "comando": [
+    "node",
+    "--test",
+    "--test-reporter=tap",
+    "tests/unit/ui_titulo_unidad.test.mjs"
+  ],
+  "espera_codigo_no_cero": true,
+  "espera_fallan_tests": [
+    "U121: agruparPorUnidad ordena dentro de la unidad: la destreza por su primera aparición, el número como número (\"Lectura 2\" antes que \"Lectura 10\") y el empate en el orden de la API"
+  ]
+}
