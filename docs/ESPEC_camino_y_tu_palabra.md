@@ -148,5 +148,25 @@ La tanda y su orden, el repaso (sigue sin lo escrito), el flujo viejo con `/subm
 3. El ítem con 12 aceptadas (`b2-u04-f05-3`): ¿recortar el banco a 11 o subir el máximo del backend? Hoy queda fuera.
 4. Los textos del camino (provisionales).
 
-## 8. Medido
-(se llena al cerrar)
+## 8. Medido (2026-10-21, modo rápido por la decisión 017 de Christiam: se despliega hoy)
+| Qué | Cifra |
+|---|---|
+| Suite en `d9dbf85` (antes) | 939 pruebas: 934 bien, 1 saltada, 4 rojas que NO eran del código: 2 SR9 por editar el sembrador a mitad de la corrida y G y E15 bajo carga (con la suite del backend corriendo a la vez; en la corrida final pasan) |
+| Suite final (`1c861e4` + tramposos `9348f2f`) | 949 pruebas: 948 bien, 1 saltada, **0 rojas** (la primera corrida dio 2 rojas, W75: el humo de navegación cuenta la ruta nueva, 11 → 12; declarado y corregido en `1c861e4`) |
+| Precarga servida | **756.000 bytes**, margen 74.000 (antes 754.532; +1.468, predicción < 3.000), `engrama-shell-v74` |
+| Sembrador sobre `contenido/` | 132 retos Escríbela, 278 preguntas, 1 excluida (`b2-u04-f05-3`), 0 errores (ST4) |
+| Tramposos nuevos | `x_palabra_sin_aceptadas`, `x_escrita_no_contestable`, `x_camino_enlaza_bloqueada`: rojos por su razón. Rehechos y rojos: los 11 `x_sembrador_*`, `x15`, `x_l1_sin_opciones_muda` |
+| Humo | `salida/humo_camino.json` (3 retos, 0 errores, "Her " acierta contra el doble, plan del camino) |
+| Capturas | `ENGRAMA/despliegue/salida/camino/`: 4 "antes" (web `d9dbf85`) y 14 "después", a 375 y 1280 |
+
+**Declarado y cambiado (fuera de lo nuevo):** SR5 filtra los Escríbela; SR8 160 → 220; SR2 filtra los Escríbela; la predicción del humo del sembrador
+(A1 y A2: 80 → 110 retos, 179/180 → 239/240 preguntas); U90 (H-3) prueba con un `listening` (el `fill_blank` ya se contesta); R4 de Inicio declara
+`ir-a-camino`; U61/U62/U69 conocen `/camino`; el humo de navegación, 12 rutas del estudiante. **Cambio de lugar respecto a esta espec:** el enlace de
+Inicio va justo **después** de "Ahora" y no dentro (dentro rompía U66 y la regla de las tres acciones de E31). El aviso del camino sin ruta no lleva
+"Volver a Inicio" propio (V8: un solo volver, el del encabezado).
+
+**No hecho por el modo rápido (va a "Después"):** UE2 con su tramposo `x_escrita_manda_otra_cosa`, `x_escrita_solo_color`, `x_escrita_revision_local`,
+`x_camino_sin_recomendada`, `x_camino_bloqueo_duro`, `x_camino_oro_en_completada`, `x_camino_pide_post`, `x_palabra_gemela_en_feed`,
+`x_palabra_once_aceptadas`, `x_palabra_oracion_ffamily` (las pruebas que vigilan eso existen; falta su copia rota); el repaso con lo escrito; E2E del
+campo escrito en el navegador (solo capturas). El doble califica lo escrito sin la tolerancia de una letra: "famly" sale incorrecta en las capturas y
+el backend la daría correcta.
