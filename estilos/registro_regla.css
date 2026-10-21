@@ -1,7 +1,11 @@
 /* registro_regla.css · La línea "qué falta" de la contraseña del registro (docs/ESPEC_regla_clave.md C2). DIFERIDA: la pone vistas/registro_regla.js y va en `DIFERIDOS` de sw.js.
-   Siempre ícono + texto (el color no es lo único que informa), solo tokens. Vacía no ocupa sitio. */
+   Siempre ícono + texto (el color no es lo único que informa), solo tokens. Vacía no ocupa sitio, pero NUNCA sale del árbol de accesibilidad (K2, compuerta 28): una región
+   `role="status"` que pasa de `display:none` a visible en el mismo instante en que recibe su texto no se anuncia en algunos lectores de pantalla. Vacía es un bloque de alto 0; el margen
+   negativo de abajo cancela el `gap` del formulario (sin él, vacía abriría 8 px de más entre "Mostrar" y lo que sigue). */
 #vista form .regla-viva:empty {
-  display: none;
+  margin: 0 0 -8px;
+  padding: 0;
+  min-height: 0;
 }
 #vista form .regla-viva:not(:empty) {
   display: flex;

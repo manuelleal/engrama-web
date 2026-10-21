@@ -38,6 +38,19 @@ async function esperarVista(sesion, testid, limiteMs = 7000) {
 }
 const tocar = (sesion, testid) => sesion.evaluar(`document.querySelector('[data-testid="${testid}"]').click()`);
 
+/** ¿Está la región `#contrasena-falta` (role=status) en el árbol de accesibilidad del navegador, sin ignorar? (K2, compuerta 28: `display:none` la saca del árbol.) */
+async function regionDeEstadoEnElArbol(sesion) {
+  await sesion.enviar('Accessibility.enable');
+  const { nodes } = await sesion.enviar('Accessibility.getFullAXTree');
+  const estados = nodes.filter((n) => n.role?.value === 'status' && !n.ignored && n.backendDOMNodeId);
+  for (const n of estados) {
+    const { node } = await sesion.enviar('DOM.describeNode', { backendNodeId: n.backendDOMNodeId });
+    const atributos = node.attributes ?? [];
+    if (atributos[atributos.indexOf('id') + 1] === 'contrasena-falta') return true;
+  }
+  return false;
+}
+
 /** El mock de siempre + las cuentas del piloto + un código de grupo activo. */
 function estadoConCodigo() {
   const estado = estadoConEstudiantesSembrados();
@@ -268,6 +281,15 @@ test('E12 (ESPEC_regla_clave C2): mientras se escribe, la línea "qué falta" ca
       await esperar(600);
       assert.equal(await texto(sesion, 'registro-error-contrasena'), dicho, 'el envío dice lo mismo que la línea');
       assert.equal((await linea()).texto, '', 'y la línea calla para no repetirlo');
+      // K2 (compuerta 28): la línea vacía NO sale del árbol de accesibilidad (sin `display:none`) y sin alto; así, al recibir texto no cambia de "no existe" a "existe" en el mismo instante
+      const vacia = await sesion.evaluar(`(() => { const v = document.querySelector('[data-testid="registro-falta-contrasena"]'); const c = getComputedStyle(v); return {texto: v.textContent, display: c.display, visibilidad: c.visibility, alto: v.getBoundingClientRect().height, rol: v.getAttribute('role'), hidden: v.hidden, ariaHidden: v.getAttribute('aria-hidden')}; })()`);
+      assert.equal(vacia.texto, '');
+      assert.notEqual(vacia.display, 'none', `K2: vacía no se saca con display:none: ${JSON.stringify(vacia)}`);
+      assert.equal(vacia.visibilidad, 'visible');
+      assert.equal(vacia.alto, 0, 'K2: vacía no ocupa alto');
+      assert.equal(vacia.rol, 'status');
+      assert.ok(!vacia.hidden && vacia.ariaHidden === null, 'K2: ni hidden ni aria-hidden');
+      assert.equal(await regionDeEstadoEnElArbol(sesion), true, 'K2: la región role=status vacía sigue en el árbol de accesibilidad (la ve un lector de pantalla)');
       // K1 (compuerta 28): el error del envío se lee como error: ícono + texto, en el color y el fondo de --incorrecto (no solo texto suelto)
       const err = await sesion.evaluar(`(() => {
         const z = document.querySelector('[data-testid="registro-error-contrasena"]');

@@ -1,0 +1,16 @@
+{
+  "descripcion": "ESPEC_regla_clave K2 (compuerta 28): la linea 'que falta' vacia vuelve a salir del arbol con display:none y entra en el mismo instante en que recibe su texto (algunos lectores no la anuncian).",
+  "archivos": {
+    "estilos/registro_regla.css": "registro_regla.css"
+  },
+  "comando": [
+    "node",
+    "--test",
+    "--test-reporter=tap",
+    "tests/e2e/registro.test.mjs"
+  ],
+  "espera_codigo_no_cero": true,
+  "espera_fallan_tests": [
+    "E12 (ESPEC_regla_clave C2): mientras se escribe, la línea \"qué falta\" cambia con ícono y texto, cabe a 375 px sin desbordar, con su hoja diferida puesta; escribir no pide nada y enviar con la contraseña corta dice lo mismo"
+  ]
+}

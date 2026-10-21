@@ -1,0 +1,29 @@
+/* registro_regla.css · La línea "qué falta" de la contraseña del registro (docs/ESPEC_regla_clave.md C2). DIFERIDA: la pone vistas/registro_regla.js y va en `DIFERIDOS` de sw.js.
+   Siempre ícono + texto (el color no es lo único que informa), solo tokens. Vacía no ocupa sitio. */
+#vista form .regla-viva:empty {
+  display: none;
+}
+#vista form .regla-viva:not(:empty) {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  margin: 0;
+  padding: 10px 14px;
+  border-radius: var(--radio-sm);
+  font-weight: 700;
+}
+/* Falta algo: neutro (mientras se escribe no es un error), en el azul de la marca. */
+#vista form .regla-viva[data-estado="falta"] {
+  background: color-mix(in srgb, var(--primario) 8%, white);
+  color: var(--primario-oscuro);
+}
+/* Cumple: el color de "correcto" del sistema. */
+#vista form .regla-viva[data-estado="ok"] {
+  background: var(--correcto-fondo);
+  color: var(--correcto);
+}
+#vista form .regla-viva .sx-icono {
+  width: 20px;
+  height: 20px;
+  flex: none;
+}
