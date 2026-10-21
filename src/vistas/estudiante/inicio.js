@@ -118,9 +118,12 @@ async function sesionFresca(ctx) {
 // W79 y W81 (docs/ESPEC_practica_del_dia.md): la práctica de hoy y la racha semanal, de un módulo diferido; si no carga, null e Inicio como antes.
 const cargarPractica = (ctx) => import('./inicio_practica.js').then((m) => m.cargar(ctx)).catch((e) => { console.warn('inicio: sin práctica', e); return null; });
 
+// Lingo Coins (decisión 017): la tarjeta de la puja en vivo y la entrada a la tienda, de un módulo diferido; si no carga o no hay tienda, null e Inicio como antes.
+const cargarEconomia = (ctx) => import('./inicio_economia.js').then((m) => m.cargar(ctx)).catch((e) => { console.warn('inicio: sin economía', e); return null; });
+
 async function cargarDatos(ctx) {
-  const [saldo, retos, historialRetos, historialAsistencia, sesion, practica] = await Promise.all([
-    leerSaldo(ctx), listarRetos(ctx), historialDeIntentos(ctx), leerHistorialAsistencia(ctx), sesionFresca(ctx), cargarPractica(ctx),
+  const [saldo, retos, historialRetos, historialAsistencia, sesion, practica, economia] = await Promise.all([
+    leerSaldo(ctx), listarRetos(ctx), historialDeIntentos(ctx), leerHistorialAsistencia(ctx), sesionFresca(ctx), cargarPractica(ctx), cargarEconomia(ctx),
   ]);
   return {
     balance: saldo.balance,
@@ -131,6 +134,7 @@ async function cargarDatos(ctx) {
     intentos: historialRetos, asistencias: historialAsistencia, // W51: "Tu semana" se arma con esto mismo, sin pedir nada más
     nivelConfirmado: sesion.nivelConfirmado ?? null, // el que dice el servidor, nunca derivado de level, xp ni monedas (X7)
     practica,
+    economia,
   };
 }
 
@@ -234,11 +238,12 @@ function tarjetasDelAnillo(ctx, invitaLaPrimera) {
 }
 
 /** "Ahora": lo que se hace en cada clase, en orden fijo (reto, clase en vivo, examen de nivel), antes que el resumen de la semana. */
-function seccionAhora({ pendiente, numRetos, practica: p }, ctx) {
+function seccionAhora({ pendiente, numRetos, practica: p, economia }, ctx) {
   const hoy = p?.tarjeta({ pendiente, numRetos, respaldo: () => tarjetaRetoDeHoy(pendiente) }); // W79: la práctica de hoy es la primera
   return h(
     'section', { class: 'ahora', 'data-testid': 'ahora', 'aria-labelledby': 'ahora-titulo' },
     h('h2', { id: 'ahora-titulo' }, textos.ahora.titulo),
+    economia?.puja, // una puja en vivo es lo más urgente: va arriba (solo cuando la hay)
     hoy || tarjetaRetoDeHoy(pendiente),
     tarjetasDelAnillo(ctx, !pendiente && !hoy),
     p?.aviso,
@@ -273,6 +278,7 @@ function pintarContenido(raiz, ctx, datos) {
     crearEscudo({ nivelConfirmado: datos.nivelConfirmado, animar: nivel.animar }), // W30: el de /auth/me; sin él, "Por confirmar"
     nivel.aviso,
     seccionAhora(datos, ctx),
+    datos.economia?.tienda, // la entrada a la tienda (solo si el backend la tiene)
     // W48: la racha bajó (desde 3 o más): una línea neutra, una vez. Va DESPUÉS de "Ahora": arriba empujaba el tercer botón bajo la barra en 360 × 640.
     racha.neutro ? crearDeNuevo(datos.mejorConstancia) : rs?.nueva,
     // Si subió, su aviso va en ese mismo sitio, en el flujo: flotando tapaba el saludo y el enlace a Mis monedas (ESPEC_visual_sistema1 §2b).
