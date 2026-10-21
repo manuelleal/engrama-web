@@ -10,7 +10,7 @@
 //
 // Súbelo un número cada vez que cambie la lista de precarga o la estrategia; la `activate`
 // borra cualquier caché con otro nombre.
-const VERSION = 'engrama-shell-v69';
+const VERSION = 'engrama-shell-v73';
 
 // Cada encargo agrega los suyos en su propio commit (W7: Inicio + api/cliente,core,retos + los
 // SVG de Drako que usa el estudiante; W10: profe/grupos,grupo,sesion_asistencia + api/profe). El
@@ -189,6 +189,10 @@ const DIFERIDOS = [
   '/src/api/profe.js',
   '/src/api/admin.js',
   '/estilos/entrada.css', // la entrada con marca (docs/ESPEC_visual_entrada.md): sin ella, la entrada se ve como antes
+  // "¿Olvidaste tu contraseña?" (despliegue/docs/ESPEC_correo_recuperacion.md): app.js la carga con import() solo si config.json trae RECUPERAR_CLAVE.
+  '/src/vistas/recuperar.js',
+  '/src/textos_recuperar.js',
+  '/src/auth/cambio_contrasena.js', // lo importa recuperar.js (POST /api/auth/contrasena con la sesión del enlace)
 ];
 
 // Cuánto se espera a CADA recurso de la precarga. Antes era `cache.addAll(PRECARGA)`: todo o nada, sin límite de tiempo. Un solo recurso

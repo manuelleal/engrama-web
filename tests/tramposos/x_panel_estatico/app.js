@@ -20,7 +20,7 @@ import { renderVivo } from './vistas/estudiante/vivo.js';
 import { renderNivel } from './vistas/estudiante/nivel.js';
 import { renderSolicitudesDatos } from './vistas/datos_solicitudes.js';
 import { renderErrorConfig } from './vistas/error_config.js';
-import { cargarConfig, modoDeAuth, registroConCodigo } from './config.js';
+import { cargarConfig, modoDeAuth, registroConCodigo, recuperarClave } from './config.js';
 import { renderLeerAviso, renderErrorAviso } from './vistas/aviso_datos.js';
 import { configurarAviso, leerAviso, debePedirConsentimiento } from './aviso.js';
 import { textos } from './textos.js';
@@ -32,6 +32,7 @@ import { crearPanelDiferido } from './panel_diferido.js';
 import { renderGrupos } from './vistas/profe/grupos.js';
 
 const HASH_REGISTRO = '#/registro';
+const HASH_RECUPERAR = '#/recuperar'; // el enlace del correo trae `?token_hash=` detrás (despliegue/correo/recuperacion.html)
 
 // Las 10 pantallas del profe y del admin NO se importan aquí de forma estática: van en un módulo diferido (docs/ESPEC_margen_precarga.md),
 // fuera de la precarga del shell, que el estudiante descarga sin necesitarlas. `panel` lo carga una vez y envuelve sus rutas.
@@ -128,13 +129,29 @@ function arrancarSinSesion(modo) {
   // Estaba esperando a su profe y, al recargar, ya no hay sesión que recuperar (rechazar borra la cuenta): se lo decimos, sin culpa.
   if (estabaEsperando()) { bloquear(BLOQUEO_YA_NO_ESTA); return; }
   if (modo === 'supabase' && location.hash === HASH_REGISTRO) { abrirRegistro(); return; }
+  const recuperar = modo === 'supabase' && recuperarClave(configActual);
+  if (recuperar && (location.hash === HASH_RECUPERAR || location.hash.startsWith(`${HASH_RECUPERAR}?`))) { abrirRecuperar(); return; }
   // accionUnica (§7.2 regla 5): un segundo toque de "Entrar" mientras el primero vuela no dispara
   // una segunda petición de login.
   const entrarUnaVez = accionUnica(async (metodoEntrada, datos) => {
     const nuevaSesion = await authActivo.entrar(metodoEntrada, datos);
     entrarConSesion(nuevaSesion);
   });
-  renderEntrada(vistaRaiz, modo, entrarUnaVez, modo === 'supabase' ? { crearCuenta: abrirRegistro } : {});
+  renderEntrada(vistaRaiz, modo, entrarUnaVez, modo === 'supabase' ? { crearCuenta: abrirRegistro, olvide: recuperar ? abrirRecuperar : undefined } : {});
+}
+
+// "¿Olvidaste tu contraseña?" y el enlace del correo (despliegue/docs/ESPEC_correo_recuperacion.md §5). Solo con RECUPERAR_CLAVE en config.json.
+// El token del enlace se lee UNA vez y se borra de la dirección y del historial ANTES de pintar; la pantalla es diferida (sw.js DIFERIDOS) y,
+// si no carga, se vuelve a la entrada. "Ir a la entrada" recarga en la dirección limpia, como el registro.
+function abrirRecuperar() {
+  vistaRaiz = reemplazarRaiz(vistaRaiz);
+  const raiz = vistaRaiz;
+  const tokenHash = new URLSearchParams(location.hash.split('?')[1] || '').get('token_hash');
+  history.replaceState(null, '', location.pathname + location.search);
+  const aEntrada = () => location.replace(location.pathname + location.search);
+  import('./vistas/recuperar.js').then((m) => m.renderRecuperar(raiz, {
+    tokenHash, aEntrada, pedir: authActivo.pedirEnlaceDeRecuperacion, canjear: authActivo.canjearEnlaceDeRecuperacion, cerrar: authActivo.cerrarSesionDeRecuperacion,
+  })).catch((e) => { console.error('app: no cargó la pantalla de recuperar la contraseña', e); aEntrada(); });
 }
 
 // W31 (§4.1): el registro con código de grupo. Con `REGISTRO_CON_CODIGO` distinto de `true` en config.json dice "Todavía no está abierto", sin formulario

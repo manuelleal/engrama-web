@@ -88,7 +88,7 @@ function mensajeDeErrorAuth(status, contexto) {
 
 /**
  * @param {string} ruta empieza con "/auth/v1/"
- * @param {{metodo?: string, token?: string, cuerpo?: unknown, contexto: 'login'|'refresh'|'logout'}} opciones
+ * @param {{metodo?: string, token?: string, cuerpo?: unknown, contexto: 'login'|'refresh'|'logout'|'recuperar'}} opciones
  */
 async function peticionAuth(ruta, opciones) {
   const { metodo = 'POST', token, cuerpo, contexto } = opciones;
@@ -233,5 +233,47 @@ export async function salir() {
     await peticionAuth('/auth/v1/logout', { token: t, contexto: 'logout' });
   } catch (e) {
     console.error('auth/supabase_rest: logout en el servidor falló (la sesión local ya se borró)', e); // nunca mudo
+  }
+}
+
+// --- Recuperar la contraseña (despliegue/docs/ESPEC_correo_recuperacion.md §5) -----------------------------------------
+// Tres llamadas para vistas/recuperar.js (diferida). Ninguna toca la sesión de la pestaña: ni el access token en memoria, ni
+// el refresh token de sessionStorage. La sesión del enlace es de UN solo uso y la guarda solo quien la canjeó (un cierre).
+
+/** Pide a GoTrue el correo con el enlace (`POST /auth/v1/recover`). NO dice si la cuenta existe: Caddy contesta 200 también al
+ * 429 o 5xx de GoTrue, y aquí un 429 o 5xx que llegara igual (sin Caddy delante) se trata como enviado. Lanza solo sin red (0) o
+ * con un correo mal escrito (400/422). @param {string} correo */
+export async function pedirEnlaceDeRecuperacion(correo) {
+  try {
+    await peticionAuth('/auth/v1/recover', { cuerpo: { email: correo }, contexto: 'recuperar' });
+  } catch (e) {
+    const status = e instanceof ErrorAuth ? e.status : null;
+    if (status === 0 || status === 400 || status === 422) throw e;
+    console.error('auth/supabase_rest: /recover no respondió 2xx; se dice lo mismo que si se envió', status); // nunca el correo
+  }
+}
+
+/** Canjea el enlace (`POST /auth/v1/verify` con `type: recovery` y `token_hash`) y devuelve el access token de esa sesión.
+ * Lanza `ErrorAuth` con el status de GoTrue (403 si venció, se usó o se alteró; 429 por límite; 0 sin red).
+ * @param {string} tokenHash @returns {Promise<string>} */
+export async function canjearEnlaceDeRecuperacion(tokenHash) {
+  let datos;
+  try {
+    datos = await peticionAuth('/auth/v1/verify', { cuerpo: { type: 'recovery', token_hash: tokenHash }, contexto: 'recuperar' });
+  } catch (e) {
+    if (e instanceof ErrorAuth) throw e;
+    throw new ErrorAuth(502, textos.auth.errorCambiarContrasena); // una respuesta que no es JSON (p. ej. el 404 de texto de Caddy si la ruta no está abierta)
+  }
+  if (!datos || typeof datos.access_token !== 'string') throw new ErrorAuth(502, textos.auth.errorCambiarContrasena);
+  return datos.access_token;
+}
+
+/** Cierra la sesión del enlace (`POST /auth/v1/logout`, que en GoTrue cierra TODAS las de la cuenta). Nunca lanza.
+ * @param {string} tokenDelEnlace */
+export async function cerrarSesionDeRecuperacion(tokenDelEnlace) {
+  try {
+    await peticionAuth('/auth/v1/logout', { token: tokenDelEnlace, contexto: 'logout' });
+  } catch (e) {
+    console.error('auth/supabase_rest: no se pudo cerrar la sesión del enlace (vence sola)', e instanceof ErrorAuth ? e.status : 'error');
   }
 }

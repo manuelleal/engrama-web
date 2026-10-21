@@ -1,0 +1,16 @@
+{
+  "descripcion": "ESPEC_correo_recuperacion §5: recuperar.js canjea el enlace (POST /auth/v1/verify) al PINTAR la pantalla, no al tocar Guardar: un escáner de correo que abre el enlace lo gastaría.",
+  "archivos": {
+    "src/vistas/recuperar.js": "recuperar.js"
+  },
+  "comando": [
+    "node",
+    "--test",
+    "--test-reporter=tap",
+    "tests/unit/vista_recuperar.test.mjs"
+  ],
+  "espera_codigo_no_cero": true,
+  "espera_fallan_tests": [
+    "RC4: el enlace: pintar no gasta nada; Guardar canjea, cambia con ESE Bearer, cierra esa sesión y dice Listo"
+  ]
+}

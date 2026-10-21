@@ -1,0 +1,16 @@
+{
+  "descripcion": "ESPEC_correo_recuperacion §5: si el canje del enlace falla (alterado, vencido o usado), recuperar.js sigue igual y pide POST /api/auth/contrasena sin sesión del enlace, y dice Listo.",
+  "archivos": {
+    "src/vistas/recuperar.js": "recuperar.js"
+  },
+  "comando": [
+    "node",
+    "--test",
+    "--test-reporter=tap",
+    "tests/unit/vista_recuperar.test.mjs"
+  ],
+  "espera_codigo_no_cero": true,
+  "espera_fallan_tests": [
+    "RC5: el enlace alterado, vencido o usado: \"Este enlace ya no sirve\" y la contraseña no se cambia"
+  ]
+}
