@@ -72,8 +72,7 @@ export function preguntaDeAfirmacion(afirmacion, ordenIndex) {
 
 /**
  * Agrupa los `piensalo` de una unidad por (rol, destreza) — "un reto por (unidad, rol, destreza)"
- * (§8). EXCLUSIONES: `tu_palabra` (solo entra con L1, §4.1 — hoy el backend acepta una sola
- * respuesta y `tu_palabra` trae varias en `aceptadas`), `conecta` y `oido` (fuera del MVP, §4.4).
+ * (§8). EXCLUSIONES: `tu_palabra` (va en su propio reto, Escríbela: `bloquesDeTuPalabra`, W90), `conecta` y `oido` (fuera del MVP, §4.4).
  * @returns {Map<string, {rol: string, destreza: string, items: object[]}>}
  */
 export function agruparPiensalo(unidad) {
@@ -131,6 +130,79 @@ export function retosDeLectura(unidad) {
   }));
 }
 
+// ---------- W90 (docs/ESPEC_camino_y_tu_palabra.md §1): `tu_palabra`, la palabra escrita ----------
+
+/** Lo más que cabe en `ChallengeQuestionIn.accepted_answers` (openapi_f7f7aeb: maxItems 10). La primera aceptada va en `correct_answer`. */
+export const MAX_ACEPTADAS_EXTRA = 10;
+// El tramo de huecos de un enunciado: "___", con la inicial delante ("f___") o varios seguidos ("f___ t___"). Lo que no es letra delante.
+const RE_TRAMO_HUECO = /(?<![A-Za-z])[A-Za-z]?_{2,}(?:\s+[A-Za-z]?_{2,})*/g;
+const RE_HUECO = /(?<![A-Za-z])([A-Za-z])?_{2,}/g;
+
+/** La oración correcta del banco: el enunciado con su ÚNICO tramo de huecos relleno con la primera aceptada; si no hay exactamente uno, null
+ * (el servidor pone el texto de la correcta). Hace falta porque el servidor, con la inicial delante, rellena "f___" como "ffamily". Pura. */
+export function oracionDeTuPalabra(enunciado, aceptada) {
+  const tramos = enunciado.match(RE_TRAMO_HUECO) || [];
+  if (tramos.length !== 1) return null;
+  // Al empezar la oración, con mayúscula ("our school…" -> "Our school…"): la aceptada viene en minúscula.
+  return enunciado.replace(RE_TRAMO_HUECO, (_m, i) => (/^\s*$|[.!?]\s+$/.test(enunciado.slice(0, i)) ? aceptada.charAt(0).toUpperCase() + aceptada.slice(1) : aceptada));
+}
+
+/** ¿El enunciado muestra la inicial de la respuesta ("f___" con "family")? Solo con UN hueco. Entonces "amily" también vale. Pura. */
+export function muestraLaInicial(enunciado, aceptada) {
+  const huecos = [...enunciado.matchAll(RE_HUECO)];
+  return huecos.length === 1 && Boolean(huecos[0][1]) && huecos[0][1].toLowerCase() === aceptada.charAt(0).toLowerCase();
+}
+
+/** ¿El ítem cabe en el contrato? Más de 1 + 10 aceptadas daría 422: no se recorta (una correcta quedaría mal); se deja fuera. */
+export function caben(item) {
+  return Array.isArray(item.aceptadas) && item.aceptadas.length >= 1 && item.aceptadas.length <= 1 + MAX_ACEPTADAS_EXTRA;
+}
+
+/** `tu_palabra` -> pregunta escrita (`fill_blank`, sin opciones): la primera aceptada es la clave y las demás `accepted_answers`; la tolerancia
+ * del banco; la pista con inicial si el enunciado la muestra; y la explicación del banco con su oración correcta. */
+export function preguntaDeTuPalabra(item, ordenIndex, { familia, nodos } = {}) {
+  const [clave, ...otras] = item.aceptadas;
+  const oracion = oracionDeTuPalabra(item.enunciado, clave);
+  const marcas = marcasDelBanco({ ...item, explicacion: item.explicacion ? { ...item.explicacion, ...(oracion ? { oracion_correcta: oracion } : {}) } : undefined }, familia, nodos);
+  return {
+    question_type: 'fill_blank', question_text: item.enunciado, correct_answer: clave, accepted_answers: otras,
+    tolerancia: item.tolerancia === '1_letra' ? '1_letra' : 'exacta', pista_inicial: muestraLaInicial(item.enunciado, clave), order_index: ordenIndex,
+    ...marcas,
+  };
+}
+
+/** Título de un reto Escríbela: "<id unidad> · <título> · Escríbela <n> · <rol>" (como Gramática: así lo resume ui/titulo.js). */
+export function tituloEscribela(unidad, numero, rol) {
+  return `${unidad.id} · ${unidad.titulo} · Escríbela ${numero} · ${rol}`;
+}
+
+/**
+ * Los retos Escríbela de la unidad: uno por rol con sus `tu_palabra`, en el orden de `practicas`. `skill`: vocabulary si tiene alguna familia de
+ * vocabulario (escribir la palabra es recuperación léxica, y la tanda lo sirve después de Gramática); si no, grammar. Lo que no cabe en el
+ * contrato va a `excluidas` con su motivo.
+ * @param {object} unidad @param {{nodosPorFamilia?: Record<string, string[]>}} [opciones]
+ */
+export function bloquesDeTuPalabra(unidad, { nodosPorFamilia = {} } = {}) {
+  const familias = unidad.practicas.filter((f) => f.items?.some((it) => it.formato === 'tu_palabra'));
+  const salida = [];
+  let numero = 0;
+  for (const rol of ORDEN_ROLES) {
+    const deRol = familias.flatMap((f) => f.items.filter((it) => it.formato === 'tu_palabra' && it.rol === rol).map((item) => ({ item, familia: f })));
+    if (!deRol.length) continue;
+    const entran = deRol.filter(({ item }) => caben(item));
+    const excluidas = deRol.filter(({ item }) => !caben(item)).map(({ item }) => ({ item_ref: item.id, motivo: Array.isArray(item.aceptadas) ? `${item.aceptadas.length} aceptadas; el backend acepta hasta ${1 + MAX_ACEPTADAS_EXTRA}` : 'sin aceptadas' }));
+    if (!entran.length) { salida.push({ rol, excluidas, vacio: true }); continue; }
+    numero += 1;
+    const destreza = entran.some(({ familia }) => destrezaDeEstructura(familia.estructura) === 'vocabulary') ? 'vocabulary' : 'grammar';
+    salida.push({
+      destreza, rol, soloRefuerzo: ROLES_SOLO_REFUERZO.includes(rol), tipoReto: 'fill_blank', excluidas,
+      titulo: tituloEscribela(unidad, numero, rol),
+      questions: entran.map(({ item, familia }, qi) => preguntaDeTuPalabra(item, qi + 1, { familia: familia.familia, nodos: nodosPorFamilia[familia.familia] })),
+    });
+  }
+  return salida;
+}
+
 /**
  * Rechazo sin firma (§8): sin `revisado_por`, el script se niega salvo `--borrador` contra una
  * API local. Pura: recibe ya resuelto si la API es local (`esApiLocal`, más abajo, sí toca la
@@ -168,11 +240,11 @@ function conPrefijoBorrador(titulo, borrador) {
  * que le cabe a este contenido: todo lo que siembra F8 (piensalo y lo_dice) son preguntas de
  * opción múltiple. 'practice' no es un valor válido — era el bug F8 (encargo B).
  */
-export function challengeCreate(unidad, { titulo, destreza, description = '', questions, soloRefuerzo = false }, { groupId, borrador }) {
+export function challengeCreate(unidad, { titulo, destreza, description = '', questions, soloRefuerzo = false, tipoReto = 'multiple_choice' }, { groupId, borrador }) {
   return {
     // ESPEC_sembrador_refuerzo §1.3: solo en los bloques de gemelas y repasos; el original y las lecturas van sin el campo (como antes).
     ...(soloRefuerzo ? { solo_refuerzo: true } : {}),
-    title: conPrefijoBorrador(titulo, borrador), description, challenge_type: 'multiple_choice',
+    title: conPrefijoBorrador(titulo, borrador), description, challenge_type: tipoReto, // W90: 'fill_blank' en los retos Escríbela
     cefr_level: unidad.nivel, skill: destreza, topic: unidad.titulo,
     // W43: el cuerpo NO lleva `max_winners`. Lo resuelve el servidor (el tamaño del grupo, con piso): mandarlo con un grupo vacío daba 0 y un 422.
     coins_reward: COINS_REWARD, max_attempts: MAX_ATTEMPTS,

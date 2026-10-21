@@ -91,7 +91,7 @@ export const TRAMPOSOS = {
       ['preguntaDePiensalo(item, qi + 1, {', 'preguntaDePiensalo(item, qi, {'],
       ['preguntaDeAfirmacion(a, qi + 1)', 'preguntaDeAfirmacion(a, qi)'],
       ["{ titulo, destreza, description = '', questions,", '{ titulo, destreza, description = null, questions,'],
-      ["description, challenge_type: 'multiple_choice',", "description, challenge_type: 'practice',"],
+      ["tipoReto = 'multiple_choice' }", "tipoReto = 'practice' }"], // W90: el tipo del reto ahora es un parámetro (fill_blank en Escríbela)
     ],
   },
   x_sembrador_reto_de_5: {
