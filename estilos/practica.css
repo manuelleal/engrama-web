@@ -185,3 +185,31 @@
   max-height: none;
   overflow: visible;
 }
+
+/* W91 (docs/ESPEC_camino_y_tu_palabra.md §2): la pregunta que se responde ESCRIBIENDO (retos "Escríbela"). El campo es `sx-entrada` del sistema; ya
+   respondida, el resultado va con ícono y palabra (`.opcion-estado`), y el borde lo acompaña (nunca solo color). */
+.respuesta-escrita {
+  margin: 12px 0 16px;
+}
+.respuesta-escrita__fila {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+.respuesta-escrita .campo-escrito {
+  flex: 1 1 auto;
+  min-width: 0;
+  font-size: 1.25rem;
+}
+.respuesta-escrita.es-correcta .campo-escrito {
+  border-color: var(--sx-ok-borde);
+  background: var(--sx-ok-fondo);
+  color: var(--sx-ok);
+}
+.respuesta-escrita.es-incorrecta .campo-escrito {
+  border-color: var(--sx-mal-borde);
+  background: var(--sx-mal-fondo);
+  color: var(--sx-mal);
+}
+.respuesta-escrita.es-correcta .opcion-estado { color: var(--sx-ok); }
+.respuesta-escrita.es-incorrecta .opcion-estado { color: var(--sx-mal); }

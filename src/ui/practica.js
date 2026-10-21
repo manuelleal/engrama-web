@@ -26,6 +26,14 @@ export function preguntaContestable(q) {
 }
 
 /**
+ * W91 (docs/ESPEC_camino_y_tu_palabra.md §2): ¿se responde ESCRIBIENDO? Un `fill_blank` sin opciones (los retos "Escríbela"). Solo lo usa el reto
+ * pregunta por pregunta (reto_l1.js); `preguntaContestable` no cambia: el repaso y la tanda siguen saltando lo escrito. Pura; nunca lanza. @param {any} q
+ */
+export function preguntaEscrita(q) {
+  return esObjeto(q) && q.question_type === 'fill_blank' && !(Array.isArray(q.options_json) && q.options_json.length > 0);
+}
+
+/**
  * ¿La respuesta de `/challenges/tanda` (TandaDeHoyOut) trae lo que la tarjeta usa, con su tipo? Nunca lanza. Pura.
  * @param {any} t
  */

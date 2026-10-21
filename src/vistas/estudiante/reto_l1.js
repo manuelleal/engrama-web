@@ -22,7 +22,8 @@ import { senal } from '../../ui/sonido.js';
 import { accionUnica, ErrorApi } from '../../api/cliente.js';
 import { retomarIntento, responderPregunta, terminarIntento, ErrorTransitorio } from '../../api/practica.js';
 import { planDeExplicacion, crearBanda } from '../../ui/explicacion.js';
-import { preguntaContestable } from '../../ui/practica.js';
+import { preguntaContestable, preguntaEscrita } from '../../ui/practica.js';
+import { crearCampoEscrito, hayTexto } from '../../ui/respuesta_escrita.js';
 import { crearLectura } from '../../ui/lectura.js';
 import { despejarBanda } from '../../ui/despejar_banda.js';
 import { renderRevision, textoDeOpcion } from './revision.js';
@@ -130,10 +131,13 @@ function opcionesDe(raiz, estado, pregunta, respuesta) {
 /** Antes de comprobar: el panel neutro de siempre ("Elegiste B: …") y el botón Comprobar, que despierta al elegir. */
 function barraComprobar(raiz, estado, pregunta, recien) {
   const elegida = estado.elegidas[pregunta.id];
+  const escrita = preguntaEscrita(pregunta);
   const boton = h('button', {
-    'data-testid': 'boton-comprobar', class: `boton-principal${recien ? ' despierta' : ''}`, disabled: !elegida,
+    'data-testid': 'boton-comprobar', class: `boton-principal${recien ? ' despierta' : ''}`, disabled: escrita ? !hayTexto(elegida) : !elegida,
     onClick: () => comprobar(raiz, estado, pregunta, boton),
   }, T.comprobar);
+  estado.botonComprobar = boton;
+  if (escrita) return h('div', { class: 'barra-accion' }, h('p', { class: 'texto-apoyo', 'data-testid': 'panel-respuesta' }, estado.error ?? T.antesDeComprobarEscrita), boton);
   const panel = crearPanelResultado({
     tipo: 'neutro', visible: Boolean(elegida), sube: Boolean(recien), testid: 'panel-respuesta',
     texto: elegida ? textos.retoFlujo.elegiste(elegida, textoDeOpcion(pregunta, elegida)) : '',
@@ -167,8 +171,36 @@ function barraNoContestable(raiz, estado) {
 function barraRespondida(raiz, estado, pregunta, respuesta) {
   const boton = botonQueSigue(raiz, estado);
   const elegida = estado.elegidas[pregunta.id];
-  const nota = elegida && elegida !== respuesta.answer ? T.quedoGuardada(respuesta.answer, textoDeOpcion(pregunta, respuesta.answer)) : null;
-  return h('div', { class: 'barra-accion con-banda' }, crearBanda(planDeExplicacion(respuesta, { opciones: pregunta.options_json, skill: estado.challenge.skill }), { accion: boton, nota }));
+  const escrita = preguntaEscrita(pregunta);
+  const nota = !elegida || elegida === respuesta.answer ? null
+    : escrita ? T.quedoGuardadaEscrita(respuesta.answer) : T.quedoGuardada(respuesta.answer, textoDeOpcion(pregunta, respuesta.answer));
+  return h('div', { class: 'barra-accion con-banda' }, crearBanda(planDeExplicacion(respuesta, { opciones: pregunta.options_json, skill: estado.challenge.skill, escrita }), { accion: boton, nota }));
+}
+
+/** Lo que va bajo el enunciado: el campo para escribir (W91), las opciones, o el aviso de "aún no se puede contestar aquí". */
+function cuerpoDeLaPregunta(raiz, estado, pregunta, respuesta, recien) {
+  if (preguntaEscrita(pregunta)) return [campoDe(raiz, estado, pregunta, respuesta), respuesta ? barraRespondida(raiz, estado, pregunta, respuesta) : barraComprobar(raiz, estado, pregunta, recien)];
+  if (respuesta || preguntaContestable(pregunta)) return [opcionesDe(raiz, estado, pregunta, respuesta), respuesta ? barraRespondida(raiz, estado, pregunta, respuesta) : barraComprobar(raiz, estado, pregunta, recien)];
+  return [barraNoContestable(raiz, estado)];
+}
+
+/**
+ * W91: el campo de una pregunta escrita. Escribir NO repinta: guarda el texto y despierta (o duerme) "Comprobar" y el panel neutro; Enter comprueba.
+ * Ya respondida, el campo queda de solo lectura con lo que guardó el servidor y su marca.
+ */
+function campoDe(raiz, estado, pregunta, respuesta) {
+  const campo = crearCampoEscrito({
+    id: pregunta.id, valor: estado.elegidas[pregunta.id] ?? '', respuesta,
+    alCambiar: (texto) => {
+      if (estado.enVuelo) return;
+      estado.elegidas[pregunta.id] = texto;
+      if (estado.botonComprobar) estado.botonComprobar.disabled = !hayTexto(texto);
+    },
+    alEnviar: () => { if (estado.botonComprobar && !estado.botonComprobar.disabled) comprobar(raiz, estado, pregunta, estado.botonComprobar); },
+  });
+  estado.opciones = null;
+  estado.campo = respuesta ? null : campo.entrada;
+  return campo.nodo;
 }
 
 function pintar(raiz, estado, entrada = 'desliza', recien = null) {
@@ -190,8 +222,7 @@ function pintar(raiz, estado, entrada = 'desliza', recien = null) {
       crearDrako('presenta', textos.retoFlujo.drakoPresenta, { estatico: true }),
       h('p', { class: 'texto-apoyo', 'data-testid': 'contador-pregunta' }, textos.retoFlujo.pregunta(indice + 1, total))),
     h('p', { class: 'enunciado', 'data-testid': 'enunciado' }, pregunta.question_text),
-    ...(respuesta || preguntaContestable(pregunta) ? [opcionesDe(raiz, estado, pregunta, respuesta),
-      respuesta ? barraRespondida(raiz, estado, pregunta, respuesta) : barraComprobar(raiz, estado, pregunta, recien)] : [barraNoContestable(raiz, estado)]),
+    ...cuerpoDeLaPregunta(raiz, estado, pregunta, respuesta, recien),
   );
   montar(raiz, nodo);
   document.body.dataset.listo = '1';
@@ -201,10 +232,11 @@ function pintar(raiz, estado, entrada = 'desliza', recien = null) {
 
 /** Un toque de Comprobar = una petición (un segundo toque recibe la misma); la banda sale con lo que el servidor guardó. */
 async function comprobar(raiz, estado, pregunta, boton) {
-  const label = estado.elegidas[pregunta.id];
-  if (!label) return;
+  const label = estado.elegidas[pregunta.id]; // en una escrita, el texto TAL CUAL (el servidor normaliza y califica)
+  if (preguntaEscrita(pregunta) ? !hayTexto(label) : !label) return;
   boton.disabled = true; marcarCargando(boton, true); boton.textContent = T.comprobando;
-  estado.enVuelo = true; quietas(estado.opciones); // H-6: mientras vuela, la que se ve elegida es la que se envía
+  estado.enVuelo = true; quietas(estado.opciones);
+  if (estado.campo) estado.campo.readOnly = true; // W91: mientras vuela, lo que se ve es lo que se envía // H-6: mientras vuela, la que se ve elegida es la que se envía
   try {
     const r = await estado.comprobar(pregunta.id, label); // la label que guardó nodoOpciones (valorAlGuardar), nunca el texto
     estado.enVuelo = false;
@@ -253,7 +285,9 @@ async function terminar(raiz, estado, boton) {
   try {
     const resultado = await estado.terminar();
     const respuestasDadas = Object.fromEntries([...estado.respondidas].map(([qid, r]) => [qid, r.answer]));
-    renderRevision(raiz, { challenge: estado.challenge, resultado, respuestasDadas, rol: estado.rol, esRepaso: estado.esRepaso, historialPrevio: estado.historialPrevio,
+    // W91: el acierto de cada pregunta es el que YA dijo el servidor (con lo escrito, "Family" acierta aunque no sea igual a "family").
+    const aciertos = Object.fromEntries([...estado.respondidas].map(([qid, r]) => [qid, r.is_correct]));
+    renderRevision(raiz, { challenge: estado.challenge, resultado, respuestasDadas, aciertos, rol: estado.rol, esRepaso: estado.esRepaso, historialPrevio: estado.historialPrevio,
       lectura: crearLectura(estado.challenge, true) });
   } catch (e) {
     if (e instanceof ErrorApi && e.status === 409) { avisoDeCierre(raiz, estado); return; } // H-2: ya estaba cerrado (nunca se cobra dos veces)

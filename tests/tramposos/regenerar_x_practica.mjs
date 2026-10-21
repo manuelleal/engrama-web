@@ -230,7 +230,7 @@ export const TRAMPOSOS = {
     cambios: [["console.warn('api/practica: la tanda llegó mal formada; Inicio queda como antes', camposDe(datos));", "console.warn('api/practica: la tanda llegó mal formada; Inicio queda como antes', datos);"]],
   },
   x_l1_sin_opciones_muda: {
-    archivo: 'src/vistas/estudiante/reto_l1.js', prueba: CORR, tests: ['U90: en el reto, una pregunta fill_blank'],
+    archivo: 'src/vistas/estudiante/reto_l1.js', prueba: CORR, tests: ['U90: en el reto, una pregunta que no se puede contestar aquí'],
     descripcion: 'U90 (H-3): una pregunta que no es de opción múltiple se pinta sin opciones y con un Comprobar muerto: el estudiante queda atascado',
     cambios: [['    ...(respuesta || preguntaContestable(pregunta) ? [', '    ...(true ? [']],
   },

@@ -22,10 +22,11 @@ const ETIQUETAS_VF = new Set(['V', 'F', 'ND']);
  * El tipo de rótulos de una pregunta — pura; nunca lanza. Primero las opciones (V/F/ND que manda el sembrador en una afirmación de lectura: sirve
  * también en el repaso, que no trae el reto), después el `skill` del reto (`vocabulary`); lo demás, y lo desconocido, es `gramatica` (los de hoy).
  * `question_type` no distingue: toda pregunta que la web contesta es `multiple_choice`.
- * @param {{opciones?: unknown, skill?: unknown}} [c]
- * @returns {'verdadero'|'vocabulario'|'gramatica'}
+ * @param {{opciones?: unknown, skill?: unknown, escrita?: boolean}} [c]
+ * @returns {'verdadero'|'vocabulario'|'gramatica'|'escrita'}
  */
-export function tipoDeRotulos({ opciones, skill } = {}) {
+export function tipoDeRotulos({ opciones, skill, escrita } = {}) {
+  if (escrita === true) return 'escrita'; // W91: la que se respondió escribiendo (tu_palabra): "La respuesta correcta" / "Por qué"
   const labels = Array.isArray(opciones) ? opciones.map((o) => (o && typeof o === 'object' ? /** @type {any} */ (o).label : undefined)) : [];
   if (labels.length >= 2 && labels.every((l) => typeof l === 'string' && ETIQUETAS_VF.has(l)) && labels.includes('V') && labels.includes('F')) return 'verdadero';
   return skill === 'vocabulary' ? 'vocabulario' : 'gramatica';
@@ -34,8 +35,8 @@ export function tipoDeRotulos({ opciones, skill } = {}) {
 /**
  * Qué dice la banda — pura, sin DOM.
  * @param {{is_correct: boolean, oracion_correcta?: string|null, explanation?: {idioma?: string, regla?: string|null, por_opcion?: string|null, ejemplo?: string|null}|null}} r
- * @param {{opciones?: unknown, skill?: unknown}} [contexto] la pregunta (`options_json`) y el reto (`skill`) de esta respuesta, para el tipo de rótulos
- * @returns {{ok: boolean, titulo: string, icono: 'visto'|'equis', idioma: 'es'|'en', tipo: 'verdadero'|'vocabulario'|'gramatica', partes: Array<{clave: 'oracion'|'regla'|'porQue'|'ejemplo', rotulo: string, texto: string, lang: 'es'|'en'}>}}
+ * @param {{opciones?: unknown, skill?: unknown, escrita?: boolean}} [contexto] la pregunta (`options_json`) y el reto (`skill`) de esta respuesta, para el tipo de rótulos
+ * @returns {{ok: boolean, titulo: string, icono: 'visto'|'equis', idioma: 'es'|'en', tipo: 'verdadero'|'vocabulario'|'gramatica'|'escrita', partes: Array<{clave: 'oracion'|'regla'|'porQue'|'ejemplo', rotulo: string, texto: string, lang: 'es'|'en'}>}}
  */
 export function planDeExplicacion(r, contexto = {}) {
   const ok = r.is_correct === true;

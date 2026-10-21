@@ -11,6 +11,6 @@
   ],
   "espera_codigo_no_cero": true,
   "espera_fallan_tests": [
-    "U90: en el reto, una pregunta fill_blank"
+    "U90: en el reto, una pregunta que no se puede contestar aquí"
   ]
 }
