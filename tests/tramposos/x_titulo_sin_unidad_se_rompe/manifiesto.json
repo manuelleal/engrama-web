@@ -1,0 +1,16 @@
+{
+  "descripcion": "un título sin unidad (el del profe) sale vacío en vez de verse como siempre",
+  "archivos": {
+    "src/ui/titulo.js": "titulo.js"
+  },
+  "comando": [
+    "node",
+    "--test",
+    "--test-reporter=tap",
+    "tests/unit/ui_titulo_unidad.test.mjs"
+  ],
+  "espera_codigo_no_cero": true,
+  "espera_fallan_tests": [
+    "U120: un título SIN unidad (el que crea el profe a mano) se ve como siempre: sin unidad ni bloque, y el texto es el de tituloLegible"
+  ]
+}

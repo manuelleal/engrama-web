@@ -1,0 +1,17 @@
+{
+  "descripcion": "partesDeTitulo descarta el nombre de la unidad (como hacía tituloLegible): la lista de Retos vuelve a decir \"Lectura 2\" sin unidad",
+  "archivos": {
+    "src/ui/titulo.js": "titulo.js"
+  },
+  "comando": [
+    "node",
+    "--test",
+    "--test-reporter=tap",
+    "tests/unit/ui_titulo_unidad.test.mjs"
+  ],
+  "espera_codigo_no_cero": true,
+  "espera_fallan_tests": [
+    "U120: el título de la base da la unidad (\"I Don't Feel Well\") y el bloque (\"Lectura 2\"), sin borrador ni id",
+    "U121: agruparPorUnidad: una sección por unidad, en el orden de la primera aparición; dentro, el orden de la API; y el rótulo es el bloque"
+  ]
+}

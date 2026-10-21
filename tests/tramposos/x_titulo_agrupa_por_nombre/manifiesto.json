@@ -1,0 +1,16 @@
+{
+  "descripcion": "agruparPorUnidad agrupa por el nombre y no por el id: dos unidades con el mismo nombre se funden en una sección",
+  "archivos": {
+    "src/ui/titulo.js": "titulo.js"
+  },
+  "comando": [
+    "node",
+    "--test",
+    "--test-reporter=tap",
+    "tests/unit/ui_titulo_unidad.test.mjs"
+  ],
+  "espera_codigo_no_cero": true,
+  "espera_fallan_tests": [
+    "U121: agruparPorUnidad agrupa por el id, no por el nombre: dos unidades con el mismo nombre son dos secciones, y el id con otra mayúscula es la misma unidad"
+  ]
+}
