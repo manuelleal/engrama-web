@@ -36,11 +36,19 @@ import { renderRetosProfe } from '../../src/vistas/profe/retos.js';
 import { renderCrearGrupo } from '../../src/vistas/admin/crear_grupo.js';
 import { renderAsignarDocente } from '../../src/vistas/admin/asignar_docente.js';
 import { renderImportarCsv } from '../../src/vistas/admin/importar_csv.js';
+// Lingo Coins (decisión 017): las pantallas de la economía también entran a la tabla de navegación.
+import { renderTienda } from '../../src/vistas/estudiante/tienda.js';
+import { renderMochila } from '../../src/vistas/estudiante/mochila.js';
+import { renderPuja } from '../../src/vistas/estudiante/puja.js';
+import { renderTiendaGrupo } from '../../src/vistas/profe/tienda_grupo.js';
+import { renderPujaProfe } from '../../src/vistas/profe/puja_profe.js';
+import { renderProfesores } from '../../src/vistas/admin/profesores.js';
 
 const CODIGO = 'SINT-B1-01';
 const P = { gid: GID };
 const LIBRO = { wallet: { id: 'w-1', balance: 120 }, entries: [{ id: 'a-1', amount: 10, action: 'attendance', to_wallet_id: 'w-1', metadata: { base: 5, puntualidad: 5 }, created_at: '2026-10-20T23:00:00Z' }], total: 1 }; // W47: lo que pide "Mis monedas"
-const SERVIDOR = { ...RUTAS_NAV, 'GET /core/coins/balance': { balance: 120, currency: 'COIN' }, 'GET /core/coins/history': LIBRO, 'GET /core/attendance/history': [], 'GET /teachers/groups/g2/solicitudes': [] };
+const SERVIDOR = { ...RUTAS_NAV, 'GET /core/coins/balance': { balance: 120, currency: 'COIN' }, 'GET /core/coins/history': LIBRO, 'GET /core/attendance/history': [], 'GET /teachers/groups/g2/solicitudes': [],
+  'GET /core/shop': [], 'GET /core/inventory': [], 'GET /subastas/activa': null, 'GET /teachers/shop-items': [], 'GET /teachers/deliveries': [], 'GET /admin/budgets': { pool_balance: 0, pool_emitted: 0, pockets: [] } };
 const todas = (valor) => Object.fromEntries(Object.keys(SERVIDOR).map((k) => [k, valor]));
 const ESTADOS = {
   contenido: SERVIDOR,
@@ -59,6 +67,9 @@ const PANTALLAS = /** @type {Record<string, (r: any) => unknown>} */ ({
   '/vivo': (r) => renderVivo(r, {}, est()),
   '/nivel': (r) => renderNivel(r, {}, est()),
   '/monedas': (r) => renderMonedas(r, est()),
+  '/tienda': (r) => renderTienda(r, est()),
+  '/mochila': (r) => renderMochila(r, est()),
+  '/puja': (r) => renderPuja(r, est()),
   '/repaso': (r) => renderRepaso(r, est()), // W80 (módulo diferido): sin la ruta de la tanda en este servidor, "No hay repaso por ahora."
   '/asistencia': (r) => renderAsistencia(r, {}, est()),
   '/retos': (r) => renderRetos(r, est()),
@@ -68,10 +79,13 @@ const PANTALLAS = /** @type {Record<string, (r: any) => unknown>} */ ({
   '/profe/grupo/:gid/inscripcion': (r) => renderInscripcion(r, P, ctxProfe()),
   '/profe/grupo/:gid/logro': (r) => renderLogro(r, P, ctxProfe()),
   '/profe/grupo/:gid/errores': (r) => renderErrores(r, P, ctxProfe()),
+  '/profe/grupo/:gid/tienda': (r) => renderTiendaGrupo(r, P, ctxProfe()),
+  '/profe/grupo/:gid/puja': (r) => renderPujaProfe(r, P, ctxProfe()),
   '/profe/retos': (r) => renderRetosProfe(r, ctxProfe()),
   '/admin': (r) => renderCrearGrupo(r, ctxAdmin()),
   '/admin/asignar-docente/:gid': (r) => renderAsignarDocente(r, P, ctxAdmin()),
   '/admin/importar-csv/:gid': (r) => renderImportarCsv(r, P, ctxAdmin()),
+  '/admin/profesores': (r) => renderProfesores(r, ctxAdmin()),
 });
 
 test('U62: esta prueba pinta TODAS las rutas de la tabla (menos el reto en curso, que no lleva barra ni volver)', () => {
@@ -107,13 +121,15 @@ test('U62: cada pantalla trae la barra y, si la tabla dice que vuelve, EXACTAMEN
   }
 });
 
-const DE_UN_GRUPO = ['/profe/grupo/:gid', '/profe/grupo/:gid/sesion', '/profe/grupo/:gid/inscripcion', '/profe/grupo/:gid/logro', '/profe/grupo/:gid/errores', '/admin/asignar-docente/:gid', '/admin/importar-csv/:gid'];
+const DE_UN_GRUPO = ['/profe/grupo/:gid', '/profe/grupo/:gid/sesion', '/profe/grupo/:gid/inscripcion', '/profe/grupo/:gid/logro', '/profe/grupo/:gid/errores', '/profe/grupo/:gid/tienda', '/profe/grupo/:gid/puja', '/admin/asignar-docente/:gid', '/admin/importar-csv/:gid'];
 const TITULOS = {
   '/profe/grupo/:gid': ['Grupo SINT-B1-01', 'Grupo'],
   '/profe/grupo/:gid/sesion': ['Asistencia · SINT-B1-01', 'Asistencia'],
   '/profe/grupo/:gid/inscripcion': ['Inscripciones · SINT-B1-01', 'Inscripciones'],
   '/profe/grupo/:gid/logro': ['Logro por eje · SINT-B1-01', 'Logro por eje'],
   '/profe/grupo/:gid/errores': ['Errores por ítem · SINT-B1-01', 'Errores por ítem'],
+  '/profe/grupo/:gid/tienda': ['Tienda del grupo · SINT-B1-01', 'Tienda del grupo'],
+  '/profe/grupo/:gid/puja': ['Lanzar puja · SINT-B1-01', 'Lanzar puja'],
   '/admin/asignar-docente/:gid': ['Asignar docente · SINT-B1-01', 'Asignar docente'],
   '/admin/importar-csv/:gid': ['Importar estudiantes (CSV) · SINT-B1-01', 'Importar estudiantes (CSV)'],
 };

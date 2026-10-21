@@ -261,3 +261,16 @@ Cómo se prueba (en esta máquina):
   e imprimen su sha256 (idéntico en dos corridas); `tests/unit/humo_pantallas.test.mjs` fija las tablas de §9.1 y §9.4. R4 (`tests/unit/regresion_vistas.test.mjs`) fotografía
   las vistas existentes; R5 (`tests/unit/regresion_humo.test.mjs`) vigila que el humo anterior no cambie.
 - Las claves de `config.json` que el despliegue debe poner: `docs/PEDIDO_claves_config_anillo.md`.
+
+## Lingo Coins dentro de ENGRAMA: tienda, mochila, Puja, Dar y presupuesto (2026-10-21, decisión 017, modo rápido)
+
+Pantallas de la economía que se perdió. **Todo es DIFERIDO** (`DIFERIDOS` de `sw.js`, `engrama-shell-v75`; el shell no crece): `api/economia.js`, `textos_economia.js` (los títulos de las rutas, en `textos_nav.js`),
+`ui/economia.js` (moneda, modal, campo numérico, mensaje de rechazo), `estilos/economia.css`, y las vistas. Contrato FINAL del backend `juego/ola1-economia` (ADENDA 1 de `docs/ESPEC_ola1_economia.md` de `engrama-backend-ola1`,
+§A.1 a §A.5): `/economia/tienda` (GET, POST, PATCH), `/economia/tienda/{id}/comprar`, `/economia/mochila`, `/economia/grupo/{gid}/mochila`, `/economia/mochila/{id}/entregar`, `/economia/grupo/{gid}/saldos`, `/economia/presupuesto`,
+`/economia/dar`, `/economia/corregir`, `/admin/presupuestos` (+ `/{teacher_id}/recargar`) y `/subastas/activa|""|{id}/pujar|{id}/cerrar`. JSON en español, `llave` de idempotencia, errores `{"detail": "<mensaje en español>"}` que la web muestra tal cual.
+- Estudiante: `#/tienda`, `#/mochila`, `#/puja` (sondeo cada 2 s, se apaga al cambiar de ruta) y, en Inicio, la tarjeta de la puja en vivo y la entrada a la tienda (`vistas/estudiante/inicio_economia.js`: sin `GET /economia/tienda` Inicio queda como antes).
+- Profe: en "Ver el grupo" la sección de monedas se agrega sola si el backend trae las rutas (`profe/economia_grupo.js`: presupuesto, saldos, Dar, Corregir); `#/profe/grupo/:gid/tienda` (catálogo y mochila del grupo con "Entregado") y `#/profe/grupo/:gid/puja`. Admin: `#/admin/profesores` (enlace en su panel, solo si hay presupuestos).
+- Reglas: el saldo, el cupo y el presupuesto son del servidor (la web nunca resta); toda escritura lleva su llave (`nuevaLlave`, una por intento) y `accionUnica`; el rechazo se dice con el mensaje del backend (`mensajeDeRechazo`); sin red, "Sin conexión.". La Puja: `monto` es la puja TOTAL, la primera ≥ mínima y después +5, +10 o +25; el servidor retiene lo pujado.
+- Doble: `herramientas/mock/tienda.mjs`, `subastas.mjs`, `sembrar_economia.mjs` (estado en `estado.juego`; `npm run demo` ya trae la tienda sembrada). Pruebas: `tests/unit/economia_pantallas.test.mjs` (E-T1 a E-T9). Capturas: `node herramientas/capturas_economia.mjs <carpeta>`.
+- Huecos del contrato (van a "Después" o al backend): `GET /subastas/activa` pide el UUID del grupo y `/auth/me` solo da `group_code` (la web manda `sesion.grupoId ?? sesion.grupo`: el doble acepta el código, el backend no); `/admin/presupuestos` no manda el nombre de cada profe (se dice "Profesor N");
+  no hecho en la web: editar objetos (`PATCH`), devolver presupuesto (`/devolver`), objeto de texto libre en la puja.

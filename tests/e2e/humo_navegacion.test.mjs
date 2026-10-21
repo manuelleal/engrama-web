@@ -20,11 +20,11 @@ const SALIDA = (nombre) => `${RAIZ}salida/${nombre}`;
 /** §10.1, tal cual la fijó la espec (antes de cualquier código). */
 const ESPERADO_DESARROLLO = {
   semilla: 20261008,
-  rutas: { student: 11, teacher: 10, admin: 6 }, // W47 (ESPEC_juego_oleada1 17.1.4): el estudiante gana #/monedas (9 -> 10); W80 (ESPEC_practica_del_dia): gana #/repaso (10 -> 11)
+  rutas: { student: 13, teacher: 12, admin: 7 }, // Lingo Coins (decisión 017): el estudiante gana la tienda y la mochila (11 -> 13), el profe la tienda y la puja del grupo (10 -> 12), el admin Profesores (6 -> 7); W47 (ESPEC_juego_oleada1 17.1.4): el estudiante gana #/monedas (9 -> 10); W80 (ESPEC_practica_del_dia): gana #/repaso (10 -> 11)
   barra: { student: ['Inicio', 'Retos', 'Asistencia', 'Perfil'], teacher: ['Mis grupos', 'Retos', 'Perfil'], admin: ['Grupos', 'Perfil'] },
   sin_barra: ['/retos/:id'],
   sin_salida: [],
-  huerfanas: [],
+  huerfanas: ['student:/puja'], // como el reto en curso y el repaso, La Puja solo se enlaza cuando hay una puja viva (la tarjeta de Inicio); sin ella no hay toque que llegue
   formas_de_volver: 1,
   pestanas_activas_a_la_vez_max: 1,
   al_inicio_max_toques: 2,
