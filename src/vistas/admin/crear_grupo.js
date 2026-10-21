@@ -73,14 +73,17 @@ async function pintarVista(raiz, ctx, mensajePrevio) {
   const { form, cancelarRed } = crearFormulario(
     (campoCodigo, campoCupo, boton, zonaMensaje) => manejarCrear(raiz, ctx, crearUnaVez, campoCodigo, campoCupo, boton, zonaMensaje, cancelarRed),
   );
-  montar(raiz, h(
+  const vista = h(
     'div', { 'data-testid': 'vista-admin-crear-grupo' },
     h('h1', {}, textos.admin.grupos.titulo),
     crearSelectorColegio(ctx), // en su propio renglón; solo con más de una institución
     form,
     listaDeGrupos(grupos),
     barra(ctx),
-  ));
+  );
+  montar(raiz, vista);
+  // Lingo Coins (decisión 017): el enlace a "Profesores" (presupuestos y recarga), de un módulo diferido; solo aparece si el backend trae los presupuestos.
+  import('./profesores.js').then((m) => m.agregarEnlaceDeProfesores(vista, form, ctx)).catch((e) => console.warn('vistas/admin/crear_grupo: sin el enlace a Profesores', e));
   if (mensajePrevio) { const z = form.querySelector('[data-testid="crear-grupo-mensaje"]'); if (z) z.textContent = mensajePrevio; }
   document.body.dataset.listo = '1';
   window.addEventListener('hashchange', cancelarRed, { once: true });

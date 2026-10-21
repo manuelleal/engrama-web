@@ -13,3 +13,6 @@ export { renderRetosProfe } from './profe/retos.js';
 export { renderCrearGrupo } from './admin/crear_grupo.js';
 export { renderAsignarDocente } from './admin/asignar_docente.js';
 export { renderImportarCsv } from './admin/importar_csv.js';
+export { renderTiendaGrupo } from './profe/tienda_grupo.js'; // Lingo Coins (decisión 017)
+export { renderPujaProfe } from './profe/puja_profe.js';
+export { renderProfesores } from './admin/profesores.js';

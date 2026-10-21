@@ -70,6 +70,7 @@ function tablaRoster(estudiantes) {
 
 function pintarGrupo(raiz, gid, codigo, estudiantes, ctx) {
   const enc = crearEncabezado(RUTA, { gid }, codigo);
+  const barraDeAbajo = barra(ctx);
   const nodo = h(
     'div', { 'data-testid': 'vista-profe-grupo' },
     enc.volver,
@@ -82,10 +83,14 @@ function pintarGrupo(raiz, gid, codigo, estudiantes, ctx) {
       h('a', { href: `#/profe/grupo/${gid}/inscripcion`, 'data-testid': 'ir-a-inscripcion' }, textos.inscripcion.enlace), // W32
     ),
     tablaRoster(estudiantes),
-    barra(ctx),
+    barraDeAbajo,
   );
   montar(raiz, nodo);
   document.body.dataset.listo = '1';
+  // Lingo Coins (decisión 017): el presupuesto del profe y el saldo de cada estudiante con "Dar" y "Corregir", de un módulo diferido. Solo se pinta si el backend
+  // trae las rutas de la economía: si no (404, sin red, sin el módulo), "Ver el grupo" queda exactamente como antes.
+  import('./economia_grupo.js').then((m) => m.montarEconomiaDelGrupo(nodo, barraDeAbajo, gid, ctx))
+    .catch((e) => console.warn('vistas/profe/grupo: sin la sección de monedas', e));
 }
 
 /**
