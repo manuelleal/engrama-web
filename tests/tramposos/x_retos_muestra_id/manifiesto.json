@@ -1,0 +1,16 @@
+{
+  "descripcion": "el encabezado de la unidad lleva el id interno (\"a1-u10 · I Don't Feel Well\"): jerga de fábrica al estudiante",
+  "archivos": {
+    "src/vistas/estudiante/retos.js": "retos.js"
+  },
+  "comando": [
+    "node",
+    "--test",
+    "--test-reporter=tap",
+    "tests/unit/vista_retos.test.mjs"
+  ],
+  "espera_codigo_no_cero": true,
+  "espera_fallan_tests": [
+    "U122: ni \"[BORRADOR]\" ni el id interno de la unidad llegan a la pantalla (texto, atributos ni testids)"
+  ]
+}
