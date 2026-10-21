@@ -8,6 +8,7 @@
 import { h, montar } from '../ui/dom.js';
 import { crearDrako } from '../ui/drako.js';
 import { textos } from '../textos.js';
+import { VERSION_TEXTO } from '../textos_aviso.js';
 import { accionUnica } from '../api/cliente.js';
 import { crearNavInferior } from '../ui/nav_inferior.js';
 import { crearCabecera } from '../ui/cabecera.js';
@@ -59,13 +60,51 @@ export function crearTextoAviso(aviso) {
   );
 }
 
+/** La marca de "ya recargué una vez por una versión que no coincide". No dice nada del consentimiento: eso solo lo sabe el servidor. */
+export const MARCA_RECARGA = 'engrama.aviso_recarga_por_version';
+
+/**
+ * ¿El texto que trae este cliente es el de la versión que pide el servidor (H-4)? 'ok' si coinciden; si no, 'recargar' la PRIMERA vez (deja la marca
+ * en sessionStorage) y 'distinta' las siguientes. Si sessionStorage falla al leer o al marcar no se puede garantizar UNA sola recarga: 'distinta'
+ * (nunca un bucle). Al coincidir se borra la marca. Pura salvo por el almacén.
+ * @param {{version: string}} aviso
+ * @param {{getItem: (k: string) => string|null, setItem: (k: string, v: string) => void, removeItem?: (k: string) => void}} [almacen]
+ * @returns {'ok'|'recargar'|'distinta'}
+ */
+export function estadoDelTexto(aviso, almacen = globalThis.sessionStorage) {
+  try {
+    if (aviso.version === VERSION_TEXTO) { almacen.removeItem?.(MARCA_RECARGA); return 'ok'; }
+    if (almacen.getItem(MARCA_RECARGA) === '1') return 'distinta';
+    almacen.setItem(MARCA_RECARGA, '1');
+    return 'recargar';
+  } catch (e) {
+    console.warn('vistas/aviso_datos: sin sessionStorage no se recarga por versión', e);
+    return 'distinta';
+  }
+}
+
+/** La pantalla cuando el texto de este cliente no es el de la versión que pide el servidor: sin casilla, con salida. @param {HTMLElement} raiz @param {() => Promise<void>} [salir] */
+function renderTextoDesactualizado(raiz, salir) {
+  const noAcepto = h('button', { type: 'button', class: 'boton-secundario', 'data-testid': 'aviso-no-acepto' }, T.noAcepto);
+  noAcepto.addEventListener('click', () => { noAcepto.disabled = true; Promise.resolve(salir?.()).catch((e) => { console.error('vistas/aviso_datos: no se pudo cerrar sesión', e); noAcepto.disabled = false; }); });
+  montar(raiz, h('div', { 'data-testid': 'vista-aviso-consentimiento' }, h('h1', {}, T.desactualizadoTitulo), h('p', { role: 'alert', 'data-testid': 'aviso-texto-desactualizado' }, T.desactualizado), noAcepto));
+  document.body.dataset.listo = '1';
+}
+
 /**
  * @param {HTMLElement} raiz
- * @param {{aviso: import('../aviso.js').Aviso, aceptar: () => Promise<void>, salir?: () => Promise<void>, verSolicitudes?: () => void}} ctx
+ * @param {{aviso: import('../aviso.js').Aviso, aceptar: () => Promise<void>, salir?: () => Promise<void>, verSolicitudes?: () => void, recargar?: () => void}} ctx
  *   `aceptar` registra el consentimiento en el servidor y entra; si lanza, se muestra `e.mensaje`. `verSolicitudes` (W33): las solicitudes sobre
- *   mis datos se pueden usar antes de aceptar; si viene, el aviso ofrece el botón.
+ *   mis datos se pueden usar antes de aceptar; si viene, el aviso ofrece el botón. `recargar` (H-4): por omisión `location.reload()`; se inyecta en las pruebas.
  */
 export function renderConsentimiento(raiz, ctx) {
+  // H-4: solo se ofrece la casilla si el texto que se ve es el de la versión que se va a registrar.
+  const estado = estadoDelTexto(ctx.aviso);
+  if (estado !== 'ok') {
+    renderTextoDesactualizado(raiz, ctx.salir);
+    if (estado === 'recargar') (ctx.recargar ?? (() => location.reload()))();
+    return;
+  }
   const casilla = h('input', { type: 'checkbox', id: 'aviso-acepto', 'data-testid': 'aviso-casilla' });
   const boton = h('button', { type: 'submit', 'data-testid': 'aviso-aceptar' }, T.aceptar);
   const noAcepto = h('button', { type: 'button', class: 'boton-secundario', 'data-testid': 'aviso-no-acepto' }, T.noAcepto);

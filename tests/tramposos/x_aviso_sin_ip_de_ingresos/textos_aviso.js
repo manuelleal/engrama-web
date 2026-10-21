@@ -1,6 +1,13 @@
 // @ts-check
 // textos_aviso.js · El aviso de tratamiento de datos (vistas/aviso_datos.js), en su propio archivo para que textos.js no pase del límite
 // de líneas. Mismas reglas: es el texto del cliente; el responsable, el contacto y la versión salen de config.json (src/aviso.js).
+/**
+ * La versión de ESTE texto (docs/ESPEC_aviso_datos.md, adenda H-4). El servidor pide `AVISO_VERSION` (config.json); si no coincide con esta, la
+ * pantalla de aceptar no ofrece la casilla (src/vistas/aviso_datos.js): no se acepta un texto que no es el de esa versión. Se sube junto con
+ * `AVISO_VERSION` y con `AVISO_VERSIONES_VALIDAS` del backend cada vez que cambia lo que el texto afirma.
+ */
+export const VERSION_TEXTO = '2026-10-v2';
+
 export const textosAviso = {
   // El aviso de tratamiento de datos personales (vistas/aviso_datos.js, Ley 1581 de 2012). Es un aviso
   // CLARO para el estudiante, NO un concepto jurídico: hay que hacerlo revisar antes de usarlo con
@@ -46,6 +53,8 @@ export const textosAviso = {
     contactoPrefijo: 'Para ejercer tus derechos, escribe a ',
     /** @param {string} version */
     version: (version) => `Versión del aviso: ${version}`,
+    desactualizadoTitulo: 'Hay una actualización pendiente',
+    desactualizado: 'El aviso que te toca aceptar cambió y tu aplicación todavía trae la versión anterior, así que por ahora no puedes aceptarlo. Cierra ENGRAMA y vuelve a abrirlo en unos minutos; si sigue igual, avisa a quien administra ENGRAMA.',
     acepto: 'He leído y acepto el tratamiento de mis datos',
     aceptar: 'Aceptar y continuar',
     guardando: 'Guardando…',

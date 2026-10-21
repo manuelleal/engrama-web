@@ -23,7 +23,7 @@ export const CONFIG_PILOTO = {
   ENGRAMA_AUTH: 'supabase',
   AVISO_RESPONSABLE: 'Responsable de Prueba (UIS, demostración)',
   AVISO_CONTACTO: 'datos@piloto.test',
-  AVISO_VERSION: '2026-10-v1',
+  AVISO_VERSION: '2026-10-v2',
 };
 
 export const CLAVE_DEMO = 'demo-clave-2026';

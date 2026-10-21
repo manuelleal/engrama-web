@@ -329,7 +329,7 @@
       "            \"datos@piloto.test\"",
       "          \".\"",
       "      p class=\"texto-apoyo\" data-testid=\"aviso-version\"",
-      "        \"Versión del aviso: 2026-10-v1\"",
+      "        \"Versión del aviso: 2026-10-v2\"",
       "    a data-testid=\"aviso-ver-solicitudes\" href=\"#/datos/solicitudes\"",
       "      \"Mis solicitudes sobre mis datos\"",
       "    button class=\"boton-secundario\" data-testid=\"aviso-volver\" type=\"button\"",

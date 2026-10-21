@@ -9,6 +9,7 @@ import { fileURLToPath } from 'node:url';
 const RAIZ = fileURLToPath(new URL('../../', import.meta.url));
 const AQUI = fileURLToPath(new URL('.', import.meta.url));
 const PRUEBA = ['node', '--test', '--test-reporter=tap', 'tests/unit/aviso_texto.test.mjs'];
+const PRUEBA_VERSION = ['node', '--test', '--test-reporter=tap', 'tests/unit/aviso_version_texto.test.mjs'];
 
 /** Siempre sobre LF (en Windows el árbol de trabajo puede traer CRLF). */
 const leer = (/** @type {string} */ ruta) => readFileSync(`${RAIZ}${ruta}`, 'utf8').split(String.fromCharCode(13)).join('');
@@ -37,6 +38,10 @@ const T_GUARDA = SOLO('es VERAZ: dice que el nombre y el correo SÍ se guardan (
 const T_TIEMPO = SOLO('dice cuánto tiempo (copias de seguridad en el mismo servidor, sin cifrar, 7 días; registro de conexiones 14) y que se suprimen');
 const T_DERECHOS = SOLO('derechos (conocer, actualizar, corregir, suprimir, retirar) con la pantalla "Mis solicitudes sobre mis datos"; voluntario; mayores de 18; no se vende');
 const T_CORTO = SOLO('es CORTO (menos de 520 palabras) y la pantalla obligatoria trae el mismo texto con su casilla');
+
+const V_NO_COINCIDE = 'aviso versión: si no coincide, NO ofrece la casilla ni el botón y recarga UNA vez (marca en sessionStorage)';
+const V_SEGUNDA = 'aviso versión: tras la recarga, si sigue sin coincidir NO vuelve a recargar (sin bucle) y avisa con una salida';
+const V_SIN_ALMACEN = 'aviso versión: si sessionStorage falla (privado, bloqueado), no recarga: sin poder marcar, un bucle sería posible';
 
 /** @type {Array<{nombre: string, destino: string, archivo: string, descripcion: string, contenido: string, falla: string[], comando?: string[]}>} */
 const TRAMPOSOS = [
@@ -81,6 +86,20 @@ const TRAMPOSOS = [
     descripcion: 'Auditoría H-3: Brevo vuelve a aparecer como si enviara el correo siempre ("envía el correo para recuperar tu contraseña, por eso ve tu correo"), sin el condicional "si pides recuperar".',
     contenido: cambiar(textos, 'Brevo (el servicio de correo con el que te enviamos el enlace si pides recuperar tu contraseña; ve tu correo).', 'Brevo (envía el correo para recuperar tu contraseña, por eso ve tu correo).'),
     falla: [T_DERECHOS],
+  },
+  {
+    nombre: 'x_aviso_version_sin_guardia', destino: 'src/vistas/aviso_datos.js', archivo: 'aviso_datos.js',
+    descripcion: 'Auditoría H-4: la pantalla de aceptar ignora la versión del texto y ofrece la casilla aunque AVISO_VERSION no sea la de este texto (se acepta un texto que no es el de esa versión).',
+    contenido: cambiar(vista, 'const estado = estadoDelTexto(ctx.aviso);', "const estado = 'ok';"),
+    falla: [V_NO_COINCIDE, V_SEGUNDA, V_SIN_ALMACEN],
+    comando: PRUEBA_VERSION,
+  },
+  {
+    nombre: 'x_aviso_recarga_en_bucle', destino: 'src/vistas/aviso_datos.js', archivo: 'aviso_datos.js',
+    descripcion: 'Auditoría H-4: la guarda recarga SIEMPRE que la versión no coincide, sin mirar la marca de "ya recargué": bucle infinito de recargas.',
+    contenido: cambiar(vista, "    if (almacen.getItem(MARCA_RECARGA) === '1') return 'distinta';\n", ''),
+    falla: [V_SEGUNDA],
+    comando: PRUEBA_VERSION,
   },
   {
     nombre: 'x_aviso_no_dibuja_medir', destino: 'src/vistas/aviso_datos.js', archivo: 'aviso_datos.js',

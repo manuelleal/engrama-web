@@ -191,7 +191,7 @@ test('U27: el mensaje no se guarda en ningún almacenamiento ni sale por consola
 test('U28: desde el aviso SIN ACEPTAR se llega a las solicitudes (en el mismo sitio, con Volver), y con "suprimir" aparece la nota', async () => {
   const s = conServidor({ lista: [solicitud(5)] });
   try {
-    configurarAviso({ AVISO_RESPONSABLE: 'Responsable de Prueba', AVISO_CONTACTO: 'datos@piloto.test', AVISO_VERSION: '2026-10-v1' });
+    configurarAviso({ AVISO_RESPONSABLE: 'Responsable de Prueba', AVISO_CONTACTO: 'datos@piloto.test', AVISO_VERSION: '2026-10-v2' });
     const raiz = crearRaiz();
     pintarBloqueo(BLOQUEO_CONSENTIMIENTO, raiz, {
       salir: async () => {}, aviso: leerAviso(), aceptarAviso: async () => {}, cambiarContrasena: async () => {}, alTerminar: async () => {},
@@ -214,7 +214,7 @@ test('U28: desde el aviso SIN ACEPTAR se llega a las solicitudes (en el mismo si
 test('U28: sin contexto de API (antes de tener sesión) el aviso no ofrece las solicitudes', () => {
   const s = conServidor();
   try {
-    configurarAviso({ AVISO_RESPONSABLE: 'Responsable de Prueba', AVISO_CONTACTO: 'datos@piloto.test', AVISO_VERSION: '2026-10-v1' });
+    configurarAviso({ AVISO_RESPONSABLE: 'Responsable de Prueba', AVISO_CONTACTO: 'datos@piloto.test', AVISO_VERSION: '2026-10-v2' });
     const raiz = crearRaiz();
     pintarBloqueo(BLOQUEO_CONSENTIMIENTO, raiz, {
       salir: async () => {}, aviso: leerAviso(), aceptarAviso: async () => {}, cambiarContrasena: async () => {}, alTerminar: async () => {},

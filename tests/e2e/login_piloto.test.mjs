@@ -331,7 +331,7 @@ test(
           assert.match(t, new RegExp(frase), `el aviso dice: ${frase}`);
         }
         assert.equal(await texto(sesion, 'aviso-contacto'), 'Para ejercer tus derechos, escribe a datos@piloto.test.', 'el contacto sale de config.json');
-        assert.equal(await texto(sesion, 'aviso-version'), 'Versión del aviso: 2026-10-v1');
+        assert.equal(await texto(sesion, 'aviso-version'), 'Versión del aviso: 2026-10-v2');
 
         // Sin marcar la casilla no se entra ni sale nada hacia el servidor.
         await pulsar(sesion, 'aviso-aceptar');
@@ -343,14 +343,14 @@ test(
         await marcarYAceptar(sesion);
         assert.ok(await esperarVista(sesion, 'vista-inicio'), 'aceptado: entra a Inicio');
         // Lo registró el BACKEND (versión y fecha), y el cliente volvió a pedir /auth/me para confirmarlo.
-        assert.equal(estado.profiles.get(ids.nuevo).consent_version, '2026-10-v1');
+        assert.equal(estado.profiles.get(ids.nuevo).consent_version, '2026-10-v2');
         assert.ok(estado.profiles.get(ids.nuevo).consent_at);
         const trazas = estado.registro.map((r) => `${r.metodo} ${r.ruta} ${r.estado}`);
         const i = trazas.indexOf('POST /auth/consentimiento 200');
         assert.ok(i >= 0 && trazas.slice(i + 1).includes('GET /auth/me 200'), trazas.join(' | '));
         // Nunca por el navegador: ni localStorage ni sessionStorage guardan el consentimiento.
         const guardado = await sesion.evaluar('JSON.stringify([Object.entries(localStorage), Object.entries(sessionStorage)])');
-        assert.doesNotMatch(guardado, /2026-10-v1|consent|acepto/i);
+        assert.doesNotMatch(guardado, /2026-10-v2|consent|acepto/i);
 
         // Recargar: el servidor ya lo sabe, entra directo (sin volver a pedirlo).
         await sesion.recargar();
@@ -388,17 +388,19 @@ test(
   { skip: OMITIR },
   async () => {
     const { estado, ids } = estadoPiloto();
+    // H-4 (auditoría del aviso): la configuración vigente es la del texto que trae el cliente (2026-10-v2); quien aceptó la anterior es quien ya había aceptado v1.
+    estado.profiles.get(ids.estudiante).consent_version = '2026-10-v1';
     await conAppCompleta(async (url) => {
       const sesion = await abrirEntrada(url);
       try {
         await entrarCon(sesion, CORREOS_PILOTO.estudiante, CLAVE_DEMO); // aceptó 2026-10-v1
         assert.ok(await esperarVista(sesion, 'vista-aviso-consentimiento'));
-        assert.equal(await texto(sesion, 'aviso-version'), 'Versión del aviso: 2026-11-v2');
+        assert.equal(await texto(sesion, 'aviso-version'), 'Versión del aviso: 2026-10-v2');
         await marcarYAceptar(sesion);
         assert.ok(await esperarVista(sesion, 'vista-inicio'));
-        assert.equal(estado.profiles.get(ids.estudiante).consent_version, '2026-11-v2');
+        assert.equal(estado.profiles.get(ids.estudiante).consent_version, '2026-10-v2');
       } finally { await sesion.cerrar(); }
-    }, { estado, authConfig: { ...CONFIG_PILOTO, AVISO_VERSION: '2026-11-v2' } });
+    }, { estado, ...MODO_SUPABASE });
   },
 );
 

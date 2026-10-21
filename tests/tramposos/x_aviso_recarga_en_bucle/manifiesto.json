@@ -1,0 +1,16 @@
+{
+  "descripcion": "Auditoría H-4: la guarda recarga SIEMPRE que la versión no coincide, sin mirar la marca de \"ya recargué\": bucle infinito de recargas.",
+  "archivos": {
+    "src/vistas/aviso_datos.js": "aviso_datos.js"
+  },
+  "comando": [
+    "node",
+    "--test",
+    "--test-reporter=tap",
+    "tests/unit/aviso_version_texto.test.mjs"
+  ],
+  "espera_codigo_no_cero": true,
+  "espera_fallan_tests": [
+    "aviso versión: tras la recarga, si sigue sin coincidir NO vuelve a recargar (sin bucle) y avisa con una salida"
+  ]
+}

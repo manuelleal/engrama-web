@@ -1,0 +1,18 @@
+{
+  "descripcion": "Auditoría H-4: la pantalla de aceptar ignora la versión del texto y ofrece la casilla aunque AVISO_VERSION no sea la de este texto (se acepta un texto que no es el de esa versión).",
+  "archivos": {
+    "src/vistas/aviso_datos.js": "aviso_datos.js"
+  },
+  "comando": [
+    "node",
+    "--test",
+    "--test-reporter=tap",
+    "tests/unit/aviso_version_texto.test.mjs"
+  ],
+  "espera_codigo_no_cero": true,
+  "espera_fallan_tests": [
+    "aviso versión: si no coincide, NO ofrece la casilla ni el botón y recarga UNA vez (marca en sessionStorage)",
+    "aviso versión: tras la recarga, si sigue sin coincidir NO vuelve a recargar (sin bucle) y avisa con una salida",
+    "aviso versión: si sessionStorage falla (privado, bloqueado), no recarga: sin poder marcar, un bucle sería posible"
+  ]
+}

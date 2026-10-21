@@ -13,7 +13,7 @@ import { configurarRaizApi, fijarColegios } from '../../src/api/cliente.js';
 export const AVISO_FIJO = {
   AVISO_RESPONSABLE: 'Responsable de Prueba (UIS, demostración)',
   AVISO_CONTACTO: 'datos@piloto.test',
-  AVISO_VERSION: '2026-10-v1',
+  AVISO_VERSION: '2026-10-v2',
 };
 
 /** Una Response de verdad (la misma que usa el navegador): cuerpo JSON, status y encabezados. */
