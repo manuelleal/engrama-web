@@ -69,7 +69,7 @@ test('U52: en Inicio, "Tu reto de hoy" dice "Hasta N monedas" con el coins_rewar
 
 // U122 (docs/ESPEC_titulos_unidad.md): la lista dice de qué unidad es cada fila. Los retos sembrados traen la unidad dentro del título
 // ("[BORRADOR] a1-u10 · I Don't Feel Well · Lectura 2"): una sección por unidad (h2 con su nombre) y filas "Lectura 2"; ni "[BORRADOR]" ni el id llegan a la
-// pantalla; los retos del profe (sin unidad) siguen viéndose como siempre. Tramposos: x_retos_sin_agrupar y x_retos_muestra_id (src/vistas/estudiante/retos.js).
+// pantalla; los retos del profe (sin unidad) siguen viéndose como siempre. Tramposos: x_retos_sin_agrupar, x_retos_muestra_id y x_retos_h2_sin_lang (src/vistas/estudiante/retos.js).
 const SEMBRADOS = [
   { id: 'r1', title: "[BORRADOR] a1-u10 · I Don't Feel Well · Lectura 2" },
   { id: 'r2', title: "[BORRADOR] a1-u10 · I Don't Feel Well · Lectura 1" },
@@ -100,6 +100,7 @@ test('U122: con retos sembrados, una sección por unidad con su nombre como h2 y
   for (const s of secciones) {
     const h2 = elementos(s).find((n) => n.tagName?.toLowerCase() === 'h2');
     assert.equal(s.getAttribute('aria-labelledby'), h2.getAttribute('id'), 'el lector de pantalla oye el nombre de la unidad antes de sus filas');
+    assert.equal(h2.getAttribute('lang'), 'en', 'el nombre de la unidad es inglés dentro de una pantalla en español: el lector lo pronuncia en inglés');
   }
   assert.ok(buscar(raiz, 'reto-r2-repasar') && buscar(raiz, 'reto-r2-estado'), 'el ganado sigue siendo un repaso');
   assert.ok(buscar(raiz, 'reto-r1-jugar'), 'los demás siguen ofreciendo Jugar');
@@ -131,4 +132,5 @@ test('U122: unidades y un reto del profe juntos: el del profe va en su propia se
   const ultima = secciones[2];
   assert.equal(textoDe(elementos(ultima).find((n) => n.tagName?.toLowerCase() === 'h2')), textos.retos.otros);
   assert.deepEqual(elementos(ultima).filter((n) => n.className === 'fila-titulo').map(textoDe), ['Reto de la semana']);
+  assert.equal(elementos(ultima).find((n) => n.tagName?.toLowerCase() === 'h2').getAttribute('lang'), null, '"Otros retos" es texto de la interfaz (español): sin lang=en');
 });

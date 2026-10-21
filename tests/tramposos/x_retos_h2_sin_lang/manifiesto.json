@@ -1,0 +1,16 @@
+{
+  "descripcion": "el h2 con el nombre de la unidad (inglés) no lleva lang=\"en\": el lector de pantalla lo pronuncia con voz española",
+  "archivos": {
+    "src/vistas/estudiante/retos.js": "retos.js"
+  },
+  "comando": [
+    "node",
+    "--test",
+    "--test-reporter=tap",
+    "tests/unit/vista_retos.test.mjs"
+  ],
+  "espera_codigo_no_cero": true,
+  "espera_fallan_tests": [
+    "U122: con retos sembrados, una sección por unidad con su nombre como h2 y filas \"Lectura 2\", \"Gramática 1\"; el estado de cada reto no cambia"
+  ]
+}

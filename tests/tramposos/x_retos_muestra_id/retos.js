@@ -59,7 +59,7 @@ function filaDeReto(reto, ganado, rotulo) {
 /**
  * La lista (docs/ESPEC_titulos_unidad.md): sin ningún título con unidad (los retos que crea el profe a mano) es la lista de siempre, un `ul` sin encabezados. Si
  * alguno trae unidad, una sección por unidad (h2 con su nombre, nunca el id ni "[BORRADOR]") y debajo sus filas ("Lectura 2"); los que no la traen, juntos en
- * "Otros retos". El `data-testid` y el `id` de cada sección salen de su posición: el id interno de la unidad no llega al DOM.
+ * "Otros retos". El nombre de la unidad es inglés dentro de una pantalla en español: su `h2` lleva `lang="en"` (el de "Otros retos", no). El `data-testid` y el `id` de cada sección salen de su posición: el id interno de la unidad no llega al DOM.
  */
 function cuerpoDeLaLista(retos, ganados) {
   const grupos = agruparPorUnidad(retos);
@@ -67,7 +67,7 @@ function cuerpoDeLaLista(retos, ganados) {
   if (!grupos.some((g) => g.unidad)) return h('ul', {}, ...grupos.flatMap(filas));
   return h('div', { class: 'retos-por-unidad', 'data-testid': 'retos-por-unidad' }, ...grupos.map((g, i) => h(
     'section', { class: 'unidad-retos', 'data-testid': `unidad-retos-${i}`, 'aria-labelledby': `unidad-retos-titulo-${i}` },
-    h('h2', { id: `unidad-retos-titulo-${i}` }, g.clave ? `${g.clave} · ${g.unidad}` : textos.retos.otros),
+    h('h2', { id: `unidad-retos-titulo-${i}`, lang: 'en' }, g.clave ? `${g.clave} · ${g.unidad}` : textos.retos.otros),
     h('ul', {}, ...filas(g)))));
 }
 
