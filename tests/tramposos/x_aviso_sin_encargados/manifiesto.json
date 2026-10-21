@@ -1,0 +1,16 @@
+{
+  "descripcion": "Aviso v2: dice que nadie más ve los datos pero calla a Cloudflare (EE. UU.) y a Brevo, que sí los ven.",
+  "archivos": {
+    "src/textos_aviso.js": "textos_aviso.js"
+  },
+  "comando": [
+    "node",
+    "--test",
+    "--test-reporter=tap",
+    "tests/unit/aviso_texto.test.mjs"
+  ],
+  "espera_codigo_no_cero": true,
+  "espera_fallan_tests": [
+    "aviso v2: derechos (conocer, actualizar, corregir, suprimir, retirar) con la pantalla \"Mis solicitudes sobre mis datos\"; voluntario; mayores de 18; no se vende"
+  ]
+}

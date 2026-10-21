@@ -151,7 +151,10 @@ const RESULTADO_B1 = { revision: ['revision-q1-resultado', 'revision-q2-resultad
 const CHIP_DE_LOGRO = { etiqueta: 'span', clase: 'chip-estado' };
 const GLIFOS_B1 = { solicitudes: ['solicitud-7-estado'], retos: ['reto-reto-0-estado'], profe_logro: [CHIP_DE_LOGRO] };
 
-const CAPAS = [HASTA_W70, VOLVER_W71, SALIR_W73, SONIDO_S1, NUMEROS_S1, CABECERA_S1, RETO_T2, RESULTADO_B1, GLIFOS_B1];
+// Aviso de datos v2 (docs/ESPEC_aviso_datos.md): cambia SOLO el texto del aviso (`aviso-texto`); su contenido lo vigila tests/unit/aviso_texto.test.mjs.
+const AVISO_V2 = { aviso_leer: ['aviso-texto'] };
+
+const CAPAS = [HASTA_W70, VOLVER_W71, SALIR_W73, SONIDO_S1, NUMEROS_S1, CABECERA_S1, RETO_T2, RESULTADO_B1, GLIFOS_B1, AVISO_V2];
 /** @type {Record<string, Array<string|{etiqueta: string, clase?: string}>>} */
 export const DECLARADAS_NAV = Object.fromEntries([...new Set(CAPAS.flatMap((c) => Object.keys(c)))].map((nombre) => [nombre, [...new Set(CAPAS.flatMap((c) => c[nombre] || []))]]));
 

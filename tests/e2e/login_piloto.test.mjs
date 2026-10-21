@@ -323,9 +323,11 @@ test(
 
         // El texto: lo que se guarda, para qué, quién lo ve, que no se vende, los derechos y a quién escribir.
         const t = await texto(sesion, 'vista-aviso-consentimiento');
-        for (const frase of ['Tratamiento de tus datos', 'Tu nombre', 'Tu correo institucional', 'Tu código', 'Tus respuestas', 'Tu asistencia', 'Tus monedas',
-          'practiques inglés', 'seguimiento', 'Tu docente y la coordinación de tu institución', 'Nadie de otra institución', 'no se venden ni se comparten',
-          'conocer', 'actualizarlos', 'rectificarlos', 'se supriman', 'Responsable de Prueba \\(UIS, demostración\\)']) {
+        // Aviso v2 (docs/ESPEC_aviso_datos.md): ejercicio educativo, datos anonimizados para medir, plazos y encargados.
+        for (const frase of ['Tratamiento de tus datos', 'Tu nombre y tu correo', 'Tu código estudiantil', 'Tus respuestas', 'Tu asistencia', 'Tus monedas',
+          'practiques', 'seguimiento', 'ejercicio educativo', 'anonimizados', 'Tu docente, la coordinación de tu institución', 'Nadie de otra institución',
+          'no se venden ni se comparten', 'Cloudflare', 'Brevo', '14 días', 'Es voluntario',
+          'conocer', 'actualizarlos', 'corregirlos', 'se supriman','Responsable de Prueba \\(UIS, demostración\\)']) {
           assert.match(t, new RegExp(frase), `el aviso dice: ${frase}`);
         }
         assert.equal(await texto(sesion, 'aviso-contacto'), 'Para ejercer tus derechos, escribe a datos@piloto.test.', 'el contacto sale de config.json');

@@ -1,0 +1,16 @@
+{
+  "descripcion": "Aviso v2: promete que no se guarda el nombre ni el correo (falso: la app los guarda para funcionar).",
+  "archivos": {
+    "src/textos_aviso.js": "textos_aviso.js"
+  },
+  "comando": [
+    "node",
+    "--test",
+    "--test-reporter=tap",
+    "tests/unit/aviso_texto.test.mjs"
+  ],
+  "espera_codigo_no_cero": true,
+  "espera_fallan_tests": [
+    "aviso v2: es VERAZ: dice que el nombre y el correo SÍ se guardan (lo anonimizado es el análisis) y la IP"
+  ]
+}

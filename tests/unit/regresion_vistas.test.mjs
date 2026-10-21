@@ -82,6 +82,10 @@ export const DECLARADAS = {
   // dos secundarios dejan de ser chips (`boton-secundario`) y van juntos en `div.entrada-enlaces`. La raíz, el título (su texto, en
   // TEXTOS_DECLARADOS), el formulario, los campos, sus etiquetas y la zona del error no cambian.
   entrada_supabase: ['entrada-marca', 'boton-entrar', 'entrada-ver-aviso', 'entrada-crear-cuenta', { etiqueta: 'div', clase: 'entrada-enlaces' }],
+  // Aviso de datos v2 (docs/ESPEC_aviso_datos.md): cambia SOLO el texto del aviso (`aviso-texto`) en sus dos formas de abrirlo; su contenido lo vigila
+  // tests/unit/aviso_texto.test.mjs. El título, la casilla y los botones no cambian.
+  entrada_aviso_leer: ['aviso-texto'],
+  aviso_consentimiento: ['aviso-texto'],
 };
 
 test('R4: lo que declara la entrada con marca cambió de verdad: la franja con el nombre y la frase abre la pantalla, "Entrar" es el botón del sistema a todo el ancho, los secundarios son discretos y van juntos al final; el formulario no cambió', async () => {

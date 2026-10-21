@@ -1,0 +1,18 @@
+{
+  "descripcion": "Aviso v2: la vista no pinta las secciones \"medir\" ni \"cuánto tiempo\" aunque los textos existan.",
+  "archivos": {
+    "src/vistas/aviso_datos.js": "aviso_datos.js"
+  },
+  "comando": [
+    "node",
+    "--test",
+    "--test-reporter=tap",
+    "tests/unit/aviso_texto.test.mjs"
+  ],
+  "espera_codigo_no_cero": true,
+  "espera_fallan_tests": [
+    "aviso v2: dice lo que pidió Christiam: ejercicio educativo, anonimizados, para medir la plataforma",
+    "aviso v2: dice cuánto tiempo (copias cifradas 14 días, copias propias del servidor 7, registro de conexiones 14) y que se suprimen",
+    "aviso v2: es CORTO (menos de 420 palabras) y la pantalla obligatoria trae el mismo texto con su casilla"
+  ]
+}

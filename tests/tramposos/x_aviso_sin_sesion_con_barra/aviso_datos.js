@@ -47,8 +47,13 @@ export function crearTextoAviso(aviso) {
     h('p', {}, T.intro(aviso.responsable)),
     seccion(T.queDatosTitulo, h('ul', {}, ...T.queDatos.map((d) => h('li', {}, d)))),
     seccion(T.paraQueTitulo, h('p', {}, T.paraQue)),
+    seccion(T.medirTitulo, h('p', { 'data-testid': 'aviso-medir' }, T.medir)),
     seccion(T.quienLosVeTitulo, h('p', {}, T.quienLosVe)),
     seccion(T.noSeVendenTitulo, h('p', {}, T.noSeVenden)),
+    seccion(T.otrasPartesTitulo, h('p', {}, T.otrasPartes)),
+    seccion(T.cuantoTitulo, h('p', { 'data-testid': 'aviso-cuanto' }, T.cuanto)),
+    seccion(T.conexionesTitulo, h('p', { 'data-testid': 'aviso-conexiones' }, T.conexiones)),
+    seccion(T.voluntarioTitulo, h('p', {}, T.voluntario)),
     seccion(T.derechosTitulo, h('p', {}, T.derechos), h('p', { 'data-testid': 'aviso-contacto' }, T.contactoPrefijo, ...nodosDeContacto(aviso.contacto), '.')),
     h('p', { class: 'texto-apoyo', 'data-testid': 'aviso-version' }, T.version(aviso.version)),
   );

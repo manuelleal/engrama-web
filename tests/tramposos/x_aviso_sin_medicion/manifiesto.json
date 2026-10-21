@@ -1,0 +1,16 @@
+{
+  "descripcion": "Aviso v2: el texto deja de decir que los datos se anonimizan para medir la plataforma (lo que pidió Christiam).",
+  "archivos": {
+    "src/textos_aviso.js": "textos_aviso.js"
+  },
+  "comando": [
+    "node",
+    "--test",
+    "--test-reporter=tap",
+    "tests/unit/aviso_texto.test.mjs"
+  ],
+  "espera_codigo_no_cero": true,
+  "espera_fallan_tests": [
+    "aviso v2: dice lo que pidió Christiam: ejercicio educativo, anonimizados, para medir la plataforma"
+  ]
+}
