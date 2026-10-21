@@ -119,6 +119,10 @@ async function sesionFresca(ctx) {
 // W79 y W81 (docs/ESPEC_practica_del_dia.md): la práctica de hoy y la racha semanal, de un módulo diferido; si no carga, null e Inicio como antes.
 const cargarPractica = (ctx) => import('./inicio_practica.js').then((m) => m.cargar(ctx)).catch((e) => { console.warn('inicio: sin práctica', e); return null; });
 
+// Sprint de la magia (docs/ESPEC_avatar_fluidez.md): el avatar junto al saludo y la marca "Nueva" en "Mis insignias", de un módulo diferido; si no
+// carga, quedan los dos enlaces sin adorno.
+const adornar = (o) => import('../../ui/magia_inicio.js').then((m) => m.adornarInicio(o)).catch((e) => console.warn('inicio: sin avatar ni insignias', e));
+
 async function cargarDatos(ctx) {
   const [saldo, retos, historialRetos, historialAsistencia, sesion, practica] = await Promise.all([
     leerSaldo(ctx), listarRetos(ctx), historialDeIntentos(ctx), leerHistorialAsistencia(ctx), sesionFresca(ctx), cargarPractica(ctx),
@@ -263,13 +267,17 @@ function pintarContenido(raiz, ctx, datos) {
   const nivel = prepararNivel(ctx, datos.nivelConfirmado);
   const semana = rs ? rs.semana(quienVe(ctx.sesion)) : semanaDe(ctx, datos);
   const drako = crearDrako('presenta', textos.inicio.drakoBienvenida, { saludar: true, desde: 'reposo' });
+  const avatar = h('a', { href: '#/avatar', class: 'avatar-inicio', 'data-testid': 'ir-a-avatar', 'aria-label': textos.magia.avatarInicio });
+  const insignias = h('a', { href: '#/insignias', class: 'enlace-insignias', 'data-testid': 'ir-a-insignias' }, textos.magia.enlaceInsignias);
   const nodo = h(
     'div', { 'data-testid': 'vista-inicio', class: 'juego' },
     barra,
     h('a', { href: '#/monedas', class: 'enlace-monedas', 'data-testid': 'ir-a-monedas' }, textos.monedas.enlace), // W47: el único enlace de Inicio a "Mis monedas", fuera de todo nav
+    insignias, // sprint de la magia: en el mismo renglón, a la izquierda (magia.css), sin sumar alto
     h('div', { class: 'encabezado-reto' },
       drako,
-      h('h1', {}, textos.inicio.saludo(ctx.sesion.nombre))),
+      h('h1', {}, textos.inicio.saludo(ctx.sesion.nombre)),
+      avatar),
     crearSelectorColegio(ctx), // login piloto (B): solo si el estudiante está en más de una institución
     crearEscudo({ nivelConfirmado: datos.nivelConfirmado, animar: nivel.animar || Boolean(nivel.aviso) }), // W30: el de /auth/me; sin él, "Por confirmar"
     nivel.aviso,
@@ -282,6 +290,7 @@ function pintarContenido(raiz, ctx, datos) {
     crearNavInferior('/inicio', ctx.sesion?.rol), // W68: la ÚNICA navegación de Inicio (salió la fila de enlaces repetidos; "Cerrar sesión" vive en Perfil)
   );
   montar(raiz, nodo);
+  adornar({ avatar, insignias, ctx, datos });
   animarSaldo(nodoSaldo, datos.balance, ctx);
   if (racha.celebrar) celebrarRacha({ contador: constancia, plan: racha });
   if (semana.celebrar) celebrarSemana(drako, ctx, semana);

@@ -46,6 +46,14 @@ function enlacesDeDatos(ctx) {
   );
 }
 
+/** Sprint de la magia: solo el estudiante ve "Mi avatar" y "Mis insignias" (el profe y el admin siguen sobrios). */
+function enlacesDeJuego(sesion) {
+  if (sesion?.rol !== 'student') return null;
+  return h('div', { class: 'perfil-enlaces', 'data-testid': 'perfil-enlaces-juego' },
+    h('a', { href: '#/avatar', 'data-testid': 'perfil-ir-avatar' }, textos.magia.enlaceAvatar),
+    h('a', { href: '#/insignias', 'data-testid': 'perfil-ir-insignias' }, textos.magia.enlaceInsignias));
+}
+
 /**
  * @param {HTMLElement} raiz
  * @param {{sesion?: {nombre?: string, rol?: string, colegio?: {nombre?: string}}, cambiarContrasena?: (nueva: string) => Promise<void>, avisoDatos?: boolean, salir?: () => Promise<void>}} ctx
@@ -56,6 +64,7 @@ export function renderPerfil(raiz, ctx) {
     h('a', { href: '#/inicio', class: 'volver', 'data-testid': 'volver' }, '‹ Inicio'), // TRAMPOSO: una pestaña con volver...
     crearCabecera({ patron: '/perfil', rol: ctx.sesion?.rol ?? null }),
     quienSoy(ctx.sesion),
+    enlacesDeJuego(ctx.sesion),
     seccionContrasena(ctx),
     enlacesDeDatos(ctx),
     h('a', { href: '#/inicio', 'data-testid': 'perfil-volver' }, 'Volver a Inicio'), // ...y otro más abajo, como antes de W69

@@ -25,6 +25,8 @@ import { renderVivo } from '../../src/vistas/estudiante/vivo.js';
 import { renderNivel } from '../../src/vistas/estudiante/nivel.js';
 import { renderAsistencia } from '../../src/vistas/estudiante/asistencia.js';
 import { renderMonedas } from '../../src/vistas/estudiante/monedas.js';
+import { renderAvatar } from '../../src/vistas/estudiante/avatar.js';
+import { renderInsignias } from '../../src/vistas/estudiante/insignias.js';
 import { renderRetos } from '../../src/vistas/estudiante/retos.js';
 import { renderGrupos } from '../../src/vistas/profe/grupos.js';
 import { renderGrupo } from '../../src/vistas/profe/grupo.js';
@@ -59,6 +61,8 @@ const PANTALLAS = /** @type {Record<string, (r: any) => unknown>} */ ({
   '/vivo': (r) => renderVivo(r, {}, est()),
   '/nivel': (r) => renderNivel(r, {}, est()),
   '/monedas': (r) => renderMonedas(r, est()),
+  '/avatar': (r) => renderAvatar(r, est()), // sprint de la magia (diferidos)
+  '/insignias': (r) => renderInsignias(r, est()),
   '/repaso': (r) => renderRepaso(r, est()), // W80 (módulo diferido): sin la ruta de la tanda en este servidor, "No hay repaso por ahora."
   '/asistencia': (r) => renderAsistencia(r, {}, est()),
   '/retos': (r) => renderRetos(r, est()),

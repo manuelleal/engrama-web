@@ -157,7 +157,12 @@ const DIFERIDOS = [
   '/estilos/practica.css',
   '/estilos/magia.css', // sprint de la magia (docs/ESPEC_avatar_fluidez.md): avatar, insignias y la franja del reto
   '/src/textos_magia.js',
+  '/src/ui/avatar.js',
+  '/src/ui/insignias.js',
   '/src/ui/fluidez.js',
+  '/src/ui/magia_inicio.js',
+  '/src/vistas/estudiante/avatar.js',
+  '/src/vistas/estudiante/insignias.js',
   '/src/textos_practica.js',
   '/src/api/practica.js',
   '/src/ui/explicacion.js',

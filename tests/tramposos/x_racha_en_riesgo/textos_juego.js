@@ -92,4 +92,14 @@ export const textosJuego = {
     'repaso-cumplido': 'Insignia: repaso cumplido',
     'nivel-confirmado': 'Insignia: nivel confirmado',
   },
+  // Sprint de la magia (docs/ESPEC_avatar_fluidez.md): lo poco que pinta el shell; lo demás vive en textos_magia.js (diferido).
+  magia: {
+    avatarTitulo: 'Tu avatar',
+    insigniasTitulo: 'Tus insignias',
+    enlaceAvatar: 'Mi avatar',
+    enlaceInsignias: 'Mis insignias',
+    avatarInicio: 'Tu avatar. Tócalo para cambiarlo',
+    insigniaNueva: 'Mis insignias: tienes una nueva',
+    nueva: 'Nueva',
+  },
 };

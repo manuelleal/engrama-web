@@ -39,7 +39,7 @@ test('W44: textos.js esparce textos_juego.js y ninguna clave suya pisa una de te
   assert.deepEqual(Object.keys(textosJuego).filter((k) => k in textosAnillo), [], 'ni una de textos_anillo.js');
   assert.deepEqual(Object.keys(textosJuego).filter((k) => k in textosNav), [], 'ni una de textos_nav.js');
   for (const [clave, valor] of Object.entries(textosJuego)) assert.equal(textos[clave], valor, `textos.${clave}`);
-  assert.deepEqual(Object.keys(textosJuego).sort(), ['finDeReto', 'insignias', 'llama', 'merito', 'monedas', 'premioDelReto', 'semana']);
+  assert.deepEqual(Object.keys(textosJuego).sort(), ['finDeReto', 'insignias', 'llama', 'magia', 'merito', 'monedas', 'premioDelReto', 'semana']);
   assert.ok(FUENTE.split('\n').length <= 400, 'textos.js sigue en 400 líneas o menos');
 });
 
