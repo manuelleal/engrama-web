@@ -15,6 +15,7 @@ import { RUTAS_NAV, GID, ctxEstudiante, ctxProfe, ctxAdmin, CONFIG_NAV, asentar 
 import { pintar, enOrden, volveres, vaAntes, primero, barraDe, error500, nuncaResponde } from './apoyo_nav.mjs';
 import { RUTAS, tituloDe, vueltaDe } from '../../src/navegacion.js';
 import { renderRepaso } from '../../src/vistas/estudiante/repaso.js';
+import { renderCamino } from '../../src/vistas/estudiante/camino.js';
 import { leerAviso } from '../../src/aviso.js';
 import { ruta, iniciar, detener, reiniciarRutas } from '../../src/rutas.js';
 import { renderInicio } from '../../src/vistas/estudiante/inicio.js';
@@ -60,6 +61,7 @@ const PANTALLAS = /** @type {Record<string, (r: any) => unknown>} */ ({
   '/nivel': (r) => renderNivel(r, {}, est()),
   '/monedas': (r) => renderMonedas(r, est()),
   '/repaso': (r) => renderRepaso(r, est()), // W80 (módulo diferido): sin la ruta de la tanda en este servidor, "No hay repaso por ahora."
+  '/camino': (r) => renderCamino(r, est()), // W92 (módulo diferido): sin la ruta del camino en este servidor, el aviso con la vuelta a Inicio
   '/asistencia': (r) => renderAsistencia(r, {}, est()),
   '/retos': (r) => renderRetos(r, est()),
   '/profe/grupos': (r) => renderGrupos(r, ctxProfe()),

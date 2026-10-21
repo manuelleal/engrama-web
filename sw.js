@@ -166,6 +166,10 @@ const DIFERIDOS = [
   '/src/ui/despejar_banda.js', // adenda 1 de ESPEC_visual_reto_tanda2: la banda de resultado no tapa lo que explica
   '/src/ui/lectura.js', // W84: el texto de un reto de Lectura (docs/ESPEC_lectura_texto.md)
   '/src/ui/respuesta_escrita.js', // W91: el campo de la pregunta escrita (docs/ESPEC_camino_y_tu_palabra.md §2)
+  '/src/vistas/estudiante/camino.js', // W92: `#/camino`, el camino de nivel (docs/ESPEC_camino_y_tu_palabra.md §3)
+  '/src/ui/camino.js',
+  '/src/api/camino.js',
+  '/src/textos_camino.js',
   // El panel del profe y del admin (docs/ESPEC_margen_precarga.md): 91.513 bytes que el estudiante descargaba en el shell sin pintarlos nunca.
   // app.js lo pide con UN import() (src/panel_diferido.js) en cuanto entra alguien que no es estudiante, así que sus pantallas quedan en memoria
   // como antes. Sin red, recargar no llega a ninguna pantalla con rol (config.json va siempre a la red, H-6): lo de aquí se guarda para abrir rápido.

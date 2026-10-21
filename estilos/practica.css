@@ -213,3 +213,119 @@
 }
 .respuesta-escrita.es-correcta .opcion-estado { color: var(--sx-ok); }
 .respuesta-escrita.es-incorrecta .opcion-estado { color: var(--sx-mal); }
+
+/* W92 (docs/ESPEC_camino_y_tu_palabra.md §3): `#/camino`, las unidades como estaciones en orden. Una línea las une; cada una lleva su número en un
+   círculo, su estado con ícono y texto (nunca solo color) y su acción. La recomendada, en el color de acción (no oro); el oro, SOLO para Dominada. */
+.camino-cabecera {
+  margin: 12px 0 16px;
+  display: grid;
+  gap: 4px;
+}
+.lista-camino {
+  list-style: none;
+  margin: 0 0 24px;
+  padding: 0;
+  display: grid;
+  gap: 12px;
+}
+.estacion-camino {
+  position: relative;
+  display: grid;
+  grid-template-columns: 40px 1fr;
+  gap: 12px;
+  padding: 14px 14px 14px 10px;
+  border: 2px solid var(--sx-borde-2);
+  border-radius: var(--radio-md);
+  background: var(--sx-superficie);
+}
+.estacion-camino + .estacion-camino::before {
+  content: "";
+  position: absolute;
+  left: 29px;
+  top: -14px;
+  height: 14px;
+  border-left: 3px solid var(--sx-borde-3);
+}
+.estacion-camino__marca {
+  width: 40px;
+  height: 40px;
+  border-radius: 50%;
+  display: grid;
+  place-items: center;
+  font: 800 1.125rem/1 var(--fuente-titulos);
+  background: var(--sx-superficie-alta);
+  color: var(--sx-tinta-2);
+  border: 2px solid var(--sx-borde-3);
+}
+.estacion-camino__cuerpo {
+  display: grid;
+  gap: 6px;
+  min-width: 0;
+}
+.estacion-camino__nombre {
+  margin: 0;
+  font: 800 1.0625rem/1.25 var(--fuente-titulos);
+  color: var(--sx-tinta);
+}
+.estado-camino,
+.camino-recomendada {
+  margin: 0;
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  font-weight: 700;
+  color: var(--sx-tinta-2);
+}
+.estado-camino .sx-icono,
+.camino-recomendada .sx-icono {
+  width: 20px;
+  height: 20px;
+  flex: none;
+}
+.camino-recomendada {
+  color: var(--sx-accion-tinta);
+  text-transform: uppercase;
+  font-size: 0.8125rem;
+  letter-spacing: 0.04em;
+}
+.estacion-camino.es-recomendada {
+  border-color: var(--sx-accion-borde);
+  box-shadow: 0 0 0 3px var(--sx-accion-suave);
+}
+.estacion-camino.es-recomendada .estacion-camino__marca {
+  background: var(--sx-accion);
+  color: var(--sx-superficie);
+  border-color: var(--sx-accion);
+}
+.estacion-camino.estacion--completada .estacion-camino__marca {
+  border-color: var(--sx-ok-borde);
+  color: var(--sx-ok);
+}
+.estado-camino.es-oro {
+  color: var(--oro-texto);
+}
+.estacion-camino.estacion--dominada {
+  border-color: var(--sx-oro);
+  background: var(--sx-oro-suave);
+}
+.estacion-camino.estacion--dominada .estacion-camino__marca {
+  background: var(--sx-oro);
+  border-color: var(--sx-oro-labio);
+  color: var(--sx-tinta);
+}
+.estacion-camino.acceso--bloqueada {
+  background: var(--sx-superficie-alta);
+}
+.estacion-camino.acceso--bloqueada .estacion-camino__nombre {
+  color: var(--sx-tinta-2);
+}
+.estacion-camino .sx-btn,
+.estacion-camino .boton-chico {
+  justify-self: start;
+}
+.enlace-camino {
+  display: inline-block;
+  margin: 8px 0 4px;
+  font-weight: 700;
+  color: var(--sx-accion-tinta);
+}

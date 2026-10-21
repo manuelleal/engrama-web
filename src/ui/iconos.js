@@ -29,6 +29,11 @@ const FORMAS = {
   estrella: ['M12 3.8l2.5 5.2 5.7.8-4.1 4 1 5.7-5.1-2.7-5.1 2.7 1-5.7-4.1-4 5.7-.8z'],
   pausa: ['M9 6v12M15 6v12'],
   guion: ['M7 12h10'],
+  // W92 (docs/ESPEC_camino_y_tu_palabra.md §3): los estados del camino. La corona es el único logro (oro); el anillo a medias, "en curso".
+  candado: [[5.5, 11, 13, 9.5, 2], 'M8.5 11V8a3.5 3.5 0 0 1 7 0v3'],
+  corona: ['M4 18.5h16M5 18.5L3.5 8.5l5 4L12 5.5l3.5 7 5-4L19 18.5'],
+  jugar: ['M8.5 5.5v13l10-6.5z'],
+  en_curso: [[12, 12, 2.5], 'M12 3.5a8.5 8.5 0 1 1-8.5 8.5'],
 };
 
 /** Los nombres que existen. */
