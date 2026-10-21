@@ -321,6 +321,8 @@ function arrancarConSesion(desdeElPrincipio = false) {
   ruta('/vivo', conCtx((raiz, params, query, ctx) => renderVivo(raiz, query, ctx))); // W35: la sala de EVA
   ruta('/nivel', conCtx((raiz, params, query, ctx) => renderNivel(raiz, query, ctx))); // W35: el examen de SET
   ruta('/monedas', conCtx((raiz, params, query, ctx) => renderMonedas(raiz, ctx))); // W47: "Mis monedas"
+  ruta('/avatar', conCtx((raiz, params, query, ctx) => import('./vistas/estudiante/avatar.js').then((m) => m.renderAvatar(raiz, ctx)))); // diferido
+  ruta('/insignias', conCtx((raiz, params, query, ctx) => import('./vistas/estudiante/insignias.js').then((m) => m.renderInsignias(raiz, ctx)))); // diferido
   ruta('/repaso', conCtx((raiz, params, query, ctx) => import('./vistas/estudiante/repaso.js').then((m) => m.renderRepaso(raiz, ctx)))); // W80: diferido
   ruta('/asistencia', conCtx((raiz, params, query, ctx) => renderAsistencia(raiz, query, ctx)));
   ruta('/retos', conCtx((raiz, params, query, ctx) => renderRetos(raiz, ctx)));

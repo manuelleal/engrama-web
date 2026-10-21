@@ -44,6 +44,18 @@ const tocar = (sesion, testid) => sesion.evaluar(`(async () => {
 const escribir = (sesion, texto) => sesion.evaluar(`(() => { const c = document.querySelector('[data-testid="campo-escrito"]'); if (!c) return;
   c.focus(); c.value = ${JSON.stringify(texto)}; c.dispatchEvent(new Event('input', { bubbles: true })); })()`);
 
+/** Las fotos de la Escribela ya abierta: escrita, acertada y fallada. */
+async function fotosEscribela(sesion, /** @type {(nombre: string) => Promise<void>} */ foto) {
+  await escribir(sesion, 'Her'); await esperar(300);
+  await foto('05-escribela-escrita');
+  await tocar(sesion, 'boton-comprobar'); await esperar(1000);
+  await foto('06-escribela-acertada');
+  await tocar(sesion, 'boton-siguiente'); await esperar(700);
+  await escribir(sesion, 'famly'); await esperar(200);
+  await tocar(sesion, 'boton-comprobar'); await esperar(1000);
+  await foto('07-escribela-fallada');
+}
+
 async function serie(ventana, hechas) {
   const { conAppCompleta } = await mod('tests/e2e/ayudante_servidor.mjs');
   const { abrirSesion } = await mod('herramientas/cdp.mjs');
@@ -75,16 +87,7 @@ async function serie(ventana, hechas) {
       }
       await sesion.navegar(`${url}#/retos/${reto.id}`); await esperar(1500);
       await foto('04-escribela-vacia');
-      if (PREFIJO !== 'antes') {
-        await escribir(sesion, 'Her'); await esperar(300);
-        await foto('05-escribela-escrita');
-        await tocar(sesion, 'boton-comprobar'); await esperar(1000);
-        await foto('06-escribela-acertada');
-        await tocar(sesion, 'boton-siguiente'); await esperar(700);
-        await escribir(sesion, 'famly'); await esperar(200);
-        await tocar(sesion, 'boton-comprobar'); await esperar(1000);
-        await foto('07-escribela-fallada');
-      }
+      if (PREFIJO !== 'antes') await fotosEscribela(sesion, foto);
     } finally { await sesion.cerrar(); }
   });
 }

@@ -10,7 +10,7 @@
 //
 // Súbelo un número cada vez que cambie la lista de precarga o la estrategia; la `activate`
 // borra cualquier caché con otro nombre.
-const VERSION = 'engrama-shell-v69';
+const VERSION = 'engrama-shell-v77';
 
 // Cada encargo agrega los suyos en su propio commit (W7: Inicio + api/cliente,core,retos + los
 // SVG de Drako que usa el estudiante; W10: profe/grupos,grupo,sesion_asistencia + api/profe). El
@@ -156,6 +156,14 @@ const APARTE = [
 // U59 exige además que todo lo que un diferido importa de forma estática esté aquí o en PRECARGA.
 const DIFERIDOS = [
   '/estilos/practica.css',
+  '/estilos/magia.css', // sprint de la magia (docs/ESPEC_avatar_fluidez.md): avatar, insignias y la franja del reto
+  '/src/textos_magia.js',
+  '/src/ui/avatar.js',
+  '/src/ui/insignias.js',
+  '/src/ui/fluidez.js',
+  '/src/ui/magia_inicio.js',
+  '/src/vistas/estudiante/avatar.js',
+  '/src/vistas/estudiante/insignias.js',
   '/src/textos_practica.js',
   '/src/api/practica.js',
   '/src/ui/explicacion.js',
@@ -166,6 +174,11 @@ const DIFERIDOS = [
   '/src/ui/racha_semanal.js',
   '/src/ui/despejar_banda.js', // adenda 1 de ESPEC_visual_reto_tanda2: la banda de resultado no tapa lo que explica
   '/src/ui/lectura.js', // W84: el texto de un reto de Lectura (docs/ESPEC_lectura_texto.md)
+  '/src/ui/respuesta_escrita.js', // W91: el campo de la pregunta escrita (docs/ESPEC_camino_y_tu_palabra.md §2)
+  '/src/vistas/estudiante/camino.js', // W92: `#/camino`, el camino de nivel (docs/ESPEC_camino_y_tu_palabra.md §3)
+  '/src/ui/camino.js',
+  '/src/api/camino.js',
+  '/src/textos_camino.js',
   // El panel del profe y del admin (docs/ESPEC_margen_precarga.md): 91.513 bytes que el estudiante descargaba en el shell sin pintarlos nunca.
   // app.js lo pide con UN import() (src/panel_diferido.js) en cuanto entra alguien que no es estudiante, así que sus pantallas quedan en memoria
   // como antes. Sin red, recargar no llega a ninguna pantalla con rol (config.json va siempre a la red, H-6): lo de aquí se guarda para abrir rápido.

@@ -20,7 +20,7 @@ const SALIDA = (nombre) => `${RAIZ}salida/${nombre}`;
 /** §10.1, tal cual la fijó la espec (antes de cualquier código). */
 const ESPERADO_DESARROLLO = {
   semilla: 20261008,
-  rutas: { student: 12, teacher: 10, admin: 6 }, // W47 (ESPEC_juego_oleada1 17.1.4): el estudiante gana #/monedas (9 -> 10); W80 (ESPEC_practica_del_dia): gana #/repaso (10 -> 11); W92 (ESPEC_camino_y_tu_palabra §3, declarado): gana #/camino (11 -> 12)
+  rutas: { student: 14, teacher: 10, admin: 6 }, // W47 (ESPEC_juego_oleada1 17.1.4): el estudiante gana #/monedas (9 -> 10); W80 (ESPEC_practica_del_dia): gana #/repaso (10 -> 11); W92 (ESPEC_camino_y_tu_palabra §3, declarado): gana #/camino (11 -> 12); sprint de la magia (ESPEC_avatar_fluidez, declarado): #/avatar y #/insignias (12 -> 14)
   barra: { student: ['Inicio', 'Retos', 'Asistencia', 'Perfil'], teacher: ['Mis grupos', 'Retos', 'Perfil'], admin: ['Grupos', 'Perfil'] },
   sin_barra: ['/retos/:id'],
   sin_salida: [],

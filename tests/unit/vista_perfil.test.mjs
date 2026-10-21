@@ -29,6 +29,9 @@ const huella = (raiz) => enOrden(raiz).filter((e) => e.getAttribute?.('data-test
 const HUELLA_BASE = ['div:vista-perfil', 'section:perfil-datos', 'p:perfil-nombre', 'p:perfil-rol', 'p:perfil-institucion'];
 const HUELLA_CONTRASENA = ['section:perfil-contrasena', 'form:form-cambiar-contrasena', 'input:campo-contrasena-nueva', 'input:campo-contrasena-confirmar', 'button:boton-cambiar-contrasena', 'p:perfil-mensaje'];
 const HUELLA_FINAL = ['div:perfil-enlaces', 'a:perfil-ver-aviso', 'a:perfil-ver-solicitudes', 'button:boton-cerrar-sesion'];
+// Sprint de la magia (docs/ESPEC_avatar_fluidez.md §2, se declara): SOLO el estudiante gana "Mi avatar" y "Mis insignias", después de quién soy.
+const HUELLA_JUEGO = ['div:perfil-enlaces-juego', 'a:perfil-ir-avatar', 'a:perfil-ir-insignias'];
+const juego = (/** @type {string} */ nombre) => (nombre === 'estudiante' ? HUELLA_JUEGO : []);
 
 test('U67: Perfil se titula "Tu perfil" y dice nombre, rol e institución, para el estudiante, el docente y el admin', async () => {
   for (const [nombre, ctx, persona, rol] of ROLES) {
@@ -73,14 +76,14 @@ test('U67: "Cambiar tu contraseña" es una sección de Perfil y solo sale si el 
       assert.ok(seccion, `${nombre}: la sección está`);
       assert.deepEqual(enOrden(seccion).filter((e) => e.tagName === 'h2').map(textoDe), ['Cambiar tu contraseña'], `${nombre}: es una sección (h2), no el título`);
       assert.ok(enOrden(seccion).includes(buscar(con.raiz, 'form-cambiar-contrasena')), `${nombre}: el formulario va dentro`);
-      assert.deepEqual(huella(con.raiz), [...HUELLA_BASE, ...HUELLA_CONTRASENA, ...HUELLA_FINAL], `${nombre}: la huella de Perfil (con contraseña)`);
+      assert.deepEqual(huella(con.raiz), [...HUELLA_BASE, ...juego(nombre), ...HUELLA_CONTRASENA, ...HUELLA_FINAL], `${nombre}: la huella de Perfil (con contraseña)`);
     } finally { con.cerrar(); }
     const sin = await pintar({}, (r) => renderPerfil(r, ctx()));
     try {
       assert.equal(buscar(sin.raiz, 'perfil-contrasena'), null, `${nombre}: sin soporte no hay sección`);
       assert.equal(buscar(sin.raiz, 'form-cambiar-contrasena'), null, `${nombre}: ni formulario`);
       assert.ok(!textoDe(sin.raiz).includes('contraseña'), `${nombre}: ni una palabra de la contraseña`);
-      assert.deepEqual(huella(sin.raiz), [...HUELLA_BASE, ...HUELLA_FINAL], `${nombre}: la huella de Perfil (sin contraseña)`);
+      assert.deepEqual(huella(sin.raiz), [...HUELLA_BASE, ...juego(nombre), ...HUELLA_FINAL], `${nombre}: la huella de Perfil (sin contraseña)`);
     } finally { sin.cerrar(); }
   }
 });
@@ -88,9 +91,9 @@ test('U67: "Cambiar tu contraseña" es una sección de Perfil y solo sale si el 
 test('U67: la huella de Perfil es EXACTA (ni un nodo con testid de más ni de menos): quién soy → contraseña → aviso y solicitudes → cerrar sesión', async () => {
   const { raiz, cerrar } = await pintar({}, (r) => renderPerfil(r, { ...ctxEstudiante(), cambiarContrasena: sinHacer }));
   try {
-    assert.deepEqual(huella(raiz), [...HUELLA_BASE, ...HUELLA_CONTRASENA, ...HUELLA_FINAL]);
+    assert.deepEqual(huella(raiz), [...HUELLA_BASE, ...HUELLA_JUEGO, ...HUELLA_CONTRASENA, ...HUELLA_FINAL]);
     const enlaces = enOrden(raiz).filter((e) => e.tagName === 'a' && !enOrden(barraDe(raiz)).includes(e)).map((a) => a.getAttribute('href'));
-    assert.deepEqual(enlaces, ['#/datos', '#/datos/solicitudes'], 'fuera de la barra, solo esos dos enlaces');
+    assert.deepEqual(enlaces, ['#/avatar', '#/insignias', '#/datos', '#/datos/solicitudes'], 'fuera de la barra, solo esos cuatro enlaces (el avatar y las insignias, del sprint de la magia)');
     assert.deepEqual(enOrden(raiz).filter((e) => e.tagName === 'button').map((b) => b.getAttribute('data-testid')), ['boton-cambiar-contrasena', 'boton-cerrar-sesion'], 'y solo esos dos botones');
   } finally { cerrar(); }
   const sinSesion = await pintar({}, (r) => renderPerfil(r, { avisoDatos: true, salir: sinHacer }));

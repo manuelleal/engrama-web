@@ -46,6 +46,14 @@ function enlacesDeDatos(ctx) {
   );
 }
 
+/** Sprint de la magia: solo el estudiante ve "Mi avatar" y "Mis insignias" (el profe y el admin siguen sobrios). */
+function enlacesDeJuego(sesion) {
+  if (sesion?.rol !== 'student') return null;
+  return h('div', { class: 'perfil-enlaces', 'data-testid': 'perfil-enlaces-juego' },
+    h('a', { href: '#/avatar', 'data-testid': 'perfil-ir-avatar' }, textos.magia.enlaceAvatar),
+    h('a', { href: '#/insignias', 'data-testid': 'perfil-ir-insignias' }, textos.magia.enlaceInsignias));
+}
+
 /**
  * @param {HTMLElement} raiz
  * @param {{sesion?: {nombre?: string, rol?: string, colegio?: {nombre?: string}}, cambiarContrasena?: (nueva: string) => Promise<void>, avisoDatos?: boolean, salir?: () => Promise<void>}} ctx
@@ -55,6 +63,7 @@ export function renderPerfil(raiz, ctx) {
     'div', { 'data-testid': 'vista-perfil' },
     crearCabecera({ patron: '/perfil', rol: ctx.sesion?.rol ?? null }),
     quienSoy(ctx.sesion),
+    enlacesDeJuego(ctx.sesion),
     seccionContrasena(ctx),
     enlacesDeDatos(ctx), // TRAMPOSO: Perfil sin "Cerrar sesión"
     crearNavInferior('/perfil', ctx.sesion?.rol),

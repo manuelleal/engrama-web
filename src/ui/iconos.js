@@ -19,6 +19,7 @@ const FORMAS = {
   moneda: [[12, 12, 8.5], 'M12 7.5a4.5 4.5 0 1 0 4.5 4.5'],
   visto: ['M5 12.5l4.5 4.5L19 7.5'],
   equis: ['M6.5 6.5l11 11M17.5 6.5l-11 11'],
+  candado: [[5, 11, 14, 9.5, 2], 'M8 11V8a4 4 0 0 1 8 0v3'], // una pieza del avatar que se gana con una insignia
   lapiz: ['M5 19l1-4.5L15.5 5a2 2 0 0 1 3 3L9 17.5zM13.5 7l3 3'],
   // B1 (compuerta 24, H1): los que antes eran glifos de texto (reloj de arena, flecha, alerta, info, sobre, estrella, pausa), ahora de la misma familia.
   reloj: [[12, 12, 8.5], 'M12 7.5V12l3 2'],
