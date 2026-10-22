@@ -1,0 +1,16 @@
+{
+  "descripcion": "sprint web (decision 017): sw.js intercepta /magia/* (el prototipo de respaldo que sirve Caddy): lo guarda en cache y lo sirve de lo guardado; la prueba exige que lo deje pasar sin respondWith",
+  "archivos": {
+    "sw.js": "sw.js"
+  },
+  "comando": [
+    "node",
+    "--test",
+    "--test-reporter=tap",
+    "tests/unit/sw_magia.test.mjs"
+  ],
+  "espera_codigo_no_cero": true,
+  "espera_fallan_tests": [
+    "sw (magia): /magia/* no pasa por el service worker: ni lo pide a la red por él, ni lo guarda, ni lo sirve de lo guardado"
+  ]
+}

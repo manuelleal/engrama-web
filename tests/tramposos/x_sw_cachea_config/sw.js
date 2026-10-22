@@ -277,6 +277,8 @@ self.addEventListener('fetch', (ev) => {
   // no la sirve nunca de respaldo. (Las cachés viejas, que SÍ la guardaban, se borran en `activate`.)
   if (url.pathname.startsWith('/api/')) return;
   // H-6: la configuración del despliegue siempre de la red, nunca de este service worker.
+  // El prototipo de respaldo de la magia (`/magia/*`, lo sirve Caddy tal cual): ni se precarga ni se intercepta; este service worker no lo ve.
+  if (url.pathname === '/magia' || url.pathname.startsWith('/magia/')) return;
   ev.respondWith(cachePrimeroConRed(request));
 });
 

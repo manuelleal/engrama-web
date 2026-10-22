@@ -55,6 +55,9 @@ const TRAMPOSOS = {
   // Adenda 1 de docs/ESPEC_margen_precarga.md: el service worker no quita `?intento=N` del reintento del panel: sin red no lo sirve aunque el panel
   // esté guardado, y con red guarda una entrada por reintento.
   x_sw_reintento_duplica: cambiar(sw, '  const clave = sinReintento(request);\n', '  const clave = request; // TRAMPOSO x_sw_reintento_duplica: busca y guarda con la consulta del reintento\n'),
+  // Sprint web (decisión 017): el prototipo de respaldo de la magia (`/magia/*`, servido por Caddy) pasa por el service worker: lo guarda y, sin red,
+  // lo sirve de caché vieja. sw.js deja de apartarse de `/magia`.
+  x_sw_intercepta_magia: cambiar(sw, "  if (url.pathname === '/magia' || url.pathname.startsWith('/magia/')) return;\n", ''),
 };
 
 for (const [nombre, contenido] of Object.entries(TRAMPOSOS)) {

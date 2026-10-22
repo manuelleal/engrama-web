@@ -273,6 +273,8 @@ self.addEventListener('fetch', (ev) => {
   if (url.pathname.startsWith('/api/')) return;
   // H-6: la configuración del despliegue siempre de la red, nunca de este service worker.
   if (url.pathname === '/config.json') return;
+  // El prototipo de respaldo de la magia (`/magia/*`, lo sirve Caddy tal cual): ni se precarga ni se intercepta; este service worker no lo ve.
+  if (url.pathname === '/magia' || url.pathname.startsWith('/magia/')) return;
   ev.respondWith(cachePrimeroConRed(request));
 });
 
