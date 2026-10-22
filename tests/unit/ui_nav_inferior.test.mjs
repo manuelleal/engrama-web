@@ -14,6 +14,7 @@ import { RUTAS } from '../../src/navegacion.js';
 /** La pestaña activa de §5.6 para cada ruta del estudiante (null = la pantalla no lleva barra). */
 const ACTIVA_DEL_ESTUDIANTE = {
   '/inicio': 'inicio', '/vivo': 'inicio', '/nivel': 'inicio', '/repaso': 'inicio', // W80: el repaso se abre desde Inicio
+  '/tienda': 'inicio', '/mochila': 'inicio', '/puja': 'inicio', // Lingo Coins (decisión 017): se abren desde Inicio
   '/retos': 'retos',
   '/asistencia': 'asistencia',
   '/perfil': 'perfil', '/datos': 'perfil', '/datos/solicitudes': 'perfil',
@@ -77,9 +78,10 @@ test('U60: en las pantallas del profe queda activa Mis grupos (Retos en sus reto
   const DEL_PROFE = {
     '/profe/grupos': 'misGrupos', '/profe/grupo/:gid': 'misGrupos', '/profe/grupo/:gid/sesion': 'misGrupos', '/profe/grupo/:gid/inscripcion': 'misGrupos',
     '/profe/grupo/:gid/logro': 'misGrupos', '/profe/grupo/:gid/errores': 'misGrupos', '/profe/retos': 'retosProfe',
+    '/profe/grupo/:gid/tienda': 'misGrupos', '/profe/grupo/:gid/puja': 'misGrupos', // Lingo Coins (decisión 017)
     '/perfil': 'perfil', '/datos': 'perfil', '/datos/solicitudes': 'perfil',
   };
-  const DEL_ADMIN = { '/admin': 'grupos', '/admin/asignar-docente/:gid': 'grupos', '/admin/importar-csv/:gid': 'grupos', '/perfil': 'perfil', '/datos': 'perfil', '/datos/solicitudes': 'perfil' };
+  const DEL_ADMIN = { '/admin': 'grupos', '/admin/asignar-docente/:gid': 'grupos', '/admin/importar-csv/:gid': 'grupos', '/admin/profesores': 'grupos', '/perfil': 'perfil', '/datos': 'perfil', '/datos/solicitudes': 'perfil' };
   for (const [patron, esperada] of Object.entries(DEL_PROFE)) assert.deepEqual(activas(entradasNav('teacher', patron)), [esperada], `profe en ${patron}`);
   for (const [patron, esperada] of Object.entries(DEL_ADMIN)) assert.deepEqual(activas(entradasNav('admin', patron)), [esperada], `admin en ${patron}`);
   const deTabla = RUTAS.filter((r) => r.roles.includes('teacher')).map((r) => r.patron).sort();
@@ -90,7 +92,7 @@ test('U60: en las pantallas del profe queda activa Mis grupos (Retos en sus reto
 
 test('U60: el admin que abre una pantalla del profe por la dirección ve SU barra (Grupos · Perfil) y ninguna pestaña activa', () => {
   const porDireccion = RUTAS.filter((r) => (r.porDireccion || []).includes('admin'));
-  assert.equal(porDireccion.length, 7, 'las 7 pantallas del profe');
+  assert.equal(porDireccion.length, 9, 'las 9 pantallas del profe (7 y la tienda y la puja del grupo)');
   for (const r of porDireccion) {
     const e = entradasNav('admin', r.patron);
     assert.deepEqual(ids(e), ['grupos', 'perfil'], `${r.patron}: la barra del admin`);

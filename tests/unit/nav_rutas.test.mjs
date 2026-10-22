@@ -18,9 +18,9 @@ import { ruta, iniciar, detener, reiniciarRutas, definirPorDefecto, definirGuard
 
 const ROLES = /** @type {const} */ (['student', 'teacher', 'admin']);
 const DE_TODOS = ['/perfil', '/datos', '/datos/solicitudes'];
-const DEL_ESTUDIANTE = ['/inicio', '/vivo', '/nivel', '/monedas', '/repaso', '/camino', '/avatar', '/insignias', '/asistencia', '/retos', '/retos/:id']; // W47: "Mis monedas" es del estudiante; W80: el repaso; W92: el camino; sprint de la magia: el avatar y las insignias
-const DEL_PROFE = ['/profe/grupos', '/profe/grupo/:gid', '/profe/grupo/:gid/sesion', '/profe/grupo/:gid/inscripcion', '/profe/grupo/:gid/logro', '/profe/grupo/:gid/errores', '/profe/retos'];
-const DEL_ADMIN = ['/admin', '/admin/asignar-docente/:gid', '/admin/importar-csv/:gid'];
+const DEL_ESTUDIANTE = ['/inicio', '/vivo', '/nivel', '/monedas', '/repaso', '/camino', '/avatar', '/insignias', '/asistencia', '/retos', '/retos/:id', '/tienda', '/mochila', '/puja']; // W47: "Mis monedas" es del estudiante; W80: el repaso; W92: el camino; sprint de la magia: el avatar y las insignias; Lingo Coins: la tienda, la mochila y la puja
+const DEL_PROFE = ['/profe/grupos', '/profe/grupo/:gid', '/profe/grupo/:gid/sesion', '/profe/grupo/:gid/inscripcion', '/profe/grupo/:gid/logro', '/profe/grupo/:gid/errores', '/profe/grupo/:gid/tienda', '/profe/grupo/:gid/puja', '/profe/retos'];
+const DEL_ADMIN = ['/admin', '/admin/asignar-docente/:gid', '/admin/importar-csv/:gid', '/admin/profesores'];
 
 test('U69: de quién es cada ruta (§5.8): Inicio, Retos, el reto, Asistencia, la clase y el examen son del estudiante; /profe/…, del profe; /admin…, del admin; Perfil, el aviso y las solicitudes, de todos', () => {
   assert.deepEqual([...DE_TODOS, ...DEL_ESTUDIANTE, ...DEL_PROFE, ...DEL_ADMIN].sort(), RUTAS.map((r) => r.patron).sort(), 'esta prueba nombra TODAS las rutas de la tabla');

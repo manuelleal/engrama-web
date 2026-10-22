@@ -69,4 +69,13 @@ export const textosNav = {
     ultimoRecurso: 'Si tienes conexión y sigue sin abrir, recarga la página.',
     recargar: 'Recargar la página',
   },
+  // Lingo Coins dentro de ENGRAMA (decisión 017): los títulos de las pantallas de la economía. Los textos de adentro viven en textos_economia.js (diferido).
+  economiaNav: {
+    tienda: 'La tienda',
+    mochila: 'Tu mochila',
+    puja: 'La Puja',
+    tiendaGrupo: 'Tienda del grupo',
+    lanzarPuja: 'Lanzar puja',
+    profesores: 'Profesores',
+  },
 };

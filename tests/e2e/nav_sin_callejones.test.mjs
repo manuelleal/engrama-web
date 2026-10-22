@@ -74,7 +74,8 @@ function exigirSinCallejones(rol, paginas) {
   }
   // W80 (docs/ESPEC_practica_del_dia.md §3): como el reto en curso, el repaso solo se enlaza cuando la tanda de hoy trae repaso (desde "Tu práctica
   // de hoy"); con estas entradas no lo trae. Su barra y su volver los miden U62 (las cuatro pantallas) y el humo de navegación (por su dirección).
-  const deLaTabla = RUTAS.filter((r) => r.roles.includes(rol) && r.patron !== ES_RETO && r.patron !== '/repaso').map((r) => r.patron).sort();
+  // Lingo Coins (decisión 017): igual La Puja: solo se enlaza (la tarjeta "¡Hay una puja en vivo!" de Inicio) cuando hay una puja viva; la miden U62 y E-T3.
+  const deLaTabla = RUTAS.filter((r) => r.roles.includes(rol) && r.patron !== ES_RETO && r.patron !== '/repaso' && r.patron !== '/puja').map((r) => r.patron).sort();
   assert.deepEqual([...paginas.keys()].filter((p) => deLaTabla.includes(p)).sort(), deLaTabla, `${rol}: toda ruta de la tabla para ese rol se alcanza por toques (huérfanas: ${deLaTabla.filter((p) => !paginas.has(p)).join(', ') || 'ninguna'})`);
   assert.deepEqual([...paginas.keys()].filter((p) => !deLaTabla.includes(p)), [], `${rol}: ningún enlace lleva a una pantalla que no es de su rol`);
 }
@@ -102,25 +103,25 @@ test('E30: el estudiante recorre tocando sus 9 pantallas: ninguna es un callejó
   });
 });
 
-test('E30: el profe recorre tocando sus 10 pantallas: ninguna es un callejón y Mis grupos queda a 2 toques o menos (también de la asistencia y de los retos)', { skip: OMITIR, timeout: 240_000 }, async (t) => {
+test('E30: el profe recorre tocando sus 12 pantallas (con la tienda y la puja del grupo): ninguna es un callejón y Mis grupos queda a 2 toques o menos (también de la asistencia y de los retos)', { skip: OMITIR, timeout: 240_000 }, async (t) => {
   await conNavegacion(async (url) => {
     const sesion = await abrirComo(url, 'teacher');
     try {
       const paginas = await recorrerTocando(sesion, 'teacher');
       exigirSinCallejones('teacher', paginas);
-      assert.equal(paginas.size, 10);
+      assert.equal(paginas.size, 12);
       t.diagnostic(`profe: ${[...paginas].map(([p, x]) => `${p} (${x.camino.length})`).join(', ')}`);
     } finally { await sesion.cerrar(); }
   });
 });
 
-test('E30: el admin recorre tocando sus 6 pantallas: ninguna es un callejón y Grupos queda a 2 toques o menos', { skip: OMITIR, timeout: 240_000 }, async (t) => {
+test('E30: el admin recorre tocando sus 7 pantallas (con Profesores): ninguna es un callejón y Grupos queda a 2 toques o menos', { skip: OMITIR, timeout: 240_000 }, async (t) => {
   await conNavegacion(async (url) => {
     const sesion = await abrirComo(url, 'admin');
     try {
       const paginas = await recorrerTocando(sesion, 'admin');
       exigirSinCallejones('admin', paginas);
-      assert.equal(paginas.size, 6);
+      assert.equal(paginas.size, 7);
       t.diagnostic(`admin: ${[...paginas].map(([p, x]) => `${p} (${x.camino.length})`).join(', ')}`);
     } finally { await sesion.cerrar(); }
   });

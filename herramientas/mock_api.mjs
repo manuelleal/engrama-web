@@ -35,6 +35,12 @@ import {
   leerSaldo, leerHistorialMonedas, checkIn, historialAsistenciaPropio, historialAsistenciaDeEstudiante,
 } from './mock/rutas_core.mjs';
 
+import {
+  listarTienda, comprarObjeto, leerMochila, leerMochilaDelGrupo, crearObjeto, entregarCompra, leerMiPresupuesto,
+  leerSaldosDelGrupo, darMonedas, corregirEntrega, leerPresupuestosDelAdmin, recargarBolsillo,
+} from './mock/tienda.mjs';
+import { leerPujaActiva, crearPuja, pujarPor, cerrarPuja } from './mock/subastas.mjs';
+
 const RUTAS = construirRutas();
 
 /** /auth (con el login piloto) y el GoTrue de mentira (mock/gotrue.mjs): el servidor de desarrollo lo ve como ENGRAMA_AUTH_URL=<mock>/gotrue. */
@@ -84,6 +90,28 @@ function rutasDeLaPractica(r) {
   ];
 }
 
+/** Lingo Coins dentro de ENGRAMA (decisión 017): la tienda, la mochila, Dar y Corregir, el presupuesto, la recarga (mock/tienda.mjs) y la Puja (mock/subastas.mjs). */
+function rutasDeLaEconomia(r) {
+  return [
+    r('GET', '/economia/tienda', (estado, req) => listarTienda(estado, req)),
+    r('POST', '/economia/tienda', (estado, req, p, body) => crearObjeto(estado, req, body)),
+    r('POST', '/economia/tienda/:item_id/comprar', (estado, req, p, body) => comprarObjeto(estado, req, p.item_id, body)),
+    r('GET', '/economia/mochila', (estado, req) => leerMochila(estado, req)),
+    r('GET', '/economia/grupo/:gid/mochila', (estado, req, p) => leerMochilaDelGrupo(estado, req, p.gid)),
+    r('POST', '/economia/mochila/:inventory_id/entregar', (estado, req, p) => entregarCompra(estado, req, p.inventory_id)),
+    r('GET', '/economia/grupo/:gid/saldos', (estado, req, p) => leerSaldosDelGrupo(estado, req, p.gid)),
+    r('GET', '/economia/presupuesto', (estado, req) => leerMiPresupuesto(estado, req)),
+    r('POST', '/economia/dar', (estado, req, p, body) => darMonedas(estado, req, body)),
+    r('POST', '/economia/corregir', (estado, req, p, body) => corregirEntrega(estado, req, body)),
+    r('GET', '/admin/presupuestos', (estado, req) => leerPresupuestosDelAdmin(estado, req)),
+    r('POST', '/admin/presupuestos/:tid/recargar', (estado, req, p, body) => recargarBolsillo(estado, req, p.tid, body)),
+    r('GET', '/subastas/activa', (estado, req, p, body, url) => leerPujaActiva(estado, req, url.searchParams.get('grupo'))),
+    r('POST', '/subastas', (estado, req, p, body) => crearPuja(estado, req, body)),
+    r('POST', '/subastas/:id/pujar', (estado, req, p, body) => pujarPor(estado, req, p.id, body)),
+    r('POST', '/subastas/:id/cerrar', (estado, req, p) => cerrarPuja(estado, req, p.id)),
+  ];
+}
+
 function construirRutas() {
   const r = (metodo, patron, manejador, { textoCrudo = false } = {}) => ({ metodo, patron: compilar(patron), manejador, textoCrudo });
   return [
@@ -91,6 +119,7 @@ function construirRutas() {
     ...rutasDeAuth(r),
     ...rutasDelAnillo(r),
     ...rutasDeLaPractica(r),
+    ...rutasDeLaEconomia(r),
 
     r('POST', '/admin/groups', (estado, req, p, body) => crearGrupo(estado, req, body)),
     r('POST', '/admin/groups/:gid/teachers', (estado, req, p, body) => asignarDocente(estado, req, p.gid, body)),

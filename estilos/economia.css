@@ -1,0 +1,119 @@
+/* estilos/economia.css · Lingo Coins dentro de ENGRAMA (decisión 017): la tienda, la mochila, la Puja y los paneles de Dar, tienda del grupo, lanzar puja y recarga.
+   Va FUERA de la precarga del shell (lista DIFERIDOS de sw.js). Solo tokens y las clases `sx-` del sistema; lo que se anima lo hace con transform y opacity
+   y solo dentro de `.juego` (el estudiante). El oro es SOLO de las monedas. El profe y el admin quedan sobrios: sin animación. */
+
+/* ---------- lo común ---------- */
+.eco-contenido { display: grid; gap: 16px; width: min(100% - 32px, 60rem); margin-inline: auto; padding-block: 16px 24px; }
+.eco-columna { display: grid; gap: 16px; align-content: start; }
+.eco-monedas { white-space: nowrap; }
+.eco-aviso { margin: 0; padding: 12px 16px; border-radius: var(--sx-radio-control); background: var(--sx-mal-fondo); color: var(--sx-mal);
+  font: 700 var(--sx-t-apoyo)/1.4 var(--fuente-cuerpo); }
+.eco-ok { margin: 0; padding: 12px 16px; border-radius: var(--sx-radio-control); background: var(--sx-ok-fondo); color: var(--sx-ok);
+  font: 700 var(--sx-t-apoyo)/1.4 var(--fuente-cuerpo); display: flex; align-items: center; gap: 8px; }
+.eco-titulo-seccion { margin: 8px 0 0; font: 800 var(--sx-t-sub)/1.2 var(--fuente-titulos); }
+.eco-apoyo { margin: 0; font: 500 var(--sx-t-apoyo)/1.4 var(--fuente-cuerpo); color: var(--sx-tinta-2); }
+.eco-fila-acciones { display: flex; flex-wrap: wrap; gap: 8px; }
+
+/* ---------- el campo numérico y el modal ---------- */
+.eco-numero-fila { display: grid; grid-template-columns: 48px 1fr 48px; gap: 8px; align-items: center; }
+.eco-numero { text-align: center; font: 800 1.5rem/1 var(--fuente-titulos); font-variant-numeric: tabular-nums; }
+.eco-paso { width: 48px; height: 48px; }
+.eco-modal { display: grid; gap: 12px; max-height: calc(100dvh - 48px); overflow-y: auto; }
+.eco-velo { overflow-y: auto; }
+.eco-modal textarea.sx-entrada { min-height: 84px; padding-block: 10px; font: 500 var(--sx-t-cuerpo)/1.4 var(--fuente-cuerpo); resize: vertical; }
+
+/* ---------- el estudiante: la tienda ---------- */
+.eco-saldo { display: flex; align-items: center; justify-content: space-between; gap: 12px; flex-wrap: wrap; }
+.eco-saldo-numero { display: flex; align-items: center; gap: 10px; margin: 0; font: 800 2.25rem/1 var(--fuente-titulos); font-variant-numeric: tabular-nums; }
+.eco-saldo-numero .sx-moneda { width: 1.1em; height: 1.1em; }
+.eco-saldo-rotulo { display: block; font: 800 var(--sx-t-etiqueta)/1 var(--fuente-cuerpo); text-transform: uppercase; letter-spacing: .05em; opacity: .85; margin-bottom: 6px; }
+.eco-objetos { list-style: none; margin: 0; padding: 0; display: grid; gap: 16px; grid-template-columns: 1fr; }
+.eco-objeto { display: grid; gap: 12px; align-content: space-between; }
+.eco-objeto-cabeza { display: grid; gap: 8px; justify-items: start; }
+.eco-objeto-nombre { margin: 0; font: 800 1.375rem/1.2 var(--fuente-titulos); }
+.eco-objeto-desc { margin: 0; font: 500 var(--sx-t-cuerpo)/1.4 var(--fuente-cuerpo); color: var(--sx-tinta-2); }
+.eco-objeto-pie { display: flex; align-items: center; justify-content: space-between; gap: 8px; flex-wrap: wrap; }
+.eco-objeto .eco-monedas { font-size: 1.25rem; min-height: 36px; padding-inline: 14px; }
+.eco-objeto.es-agotado { opacity: .72; }
+.eco-compra-ok { display: grid; gap: 10px; }
+
+/* ---------- el estudiante: la mochila ---------- */
+.eco-mochila { list-style: none; margin: 0; padding: 0; display: grid; gap: 12px; }
+.eco-mochila-fila { display: grid; gap: 4px; align-content: start; }
+.eco-mochila-cabeza { display: flex; align-items: center; justify-content: space-between; gap: 8px; flex-wrap: wrap; }
+.eco-mochila-nombre { margin: 0; font: 800 1.1875rem/1.25 var(--fuente-titulos); }
+
+/* ---------- el estudiante: la Puja ---------- */
+.eco-puja-prota { display: grid; gap: 12px; justify-items: center; text-align: center; padding-block: 24px; }
+.eco-puja-objeto { margin: 0; font: 800 1.5rem/1.2 var(--fuente-titulos); }
+.eco-puja-desc { margin: 0; font: 500 var(--sx-t-cuerpo)/1.4 var(--fuente-cuerpo); opacity: .9; }
+.eco-cuenta { margin: 0; font: 800 clamp(4rem, 22vw, 5.5rem)/1 var(--fuente-titulos); letter-spacing: -.02em; font-variant-numeric: tabular-nums; }
+.eco-cuenta.es-urgente { color: var(--sx-oro); }
+.juego .eco-cuenta.es-urgente { animation: eco-latido 1000ms ease-in-out infinite; }
+.eco-puja-actual { display: grid; gap: 4px; justify-items: center; }
+.eco-puja-actual .eco-monedas { font-size: 2rem; min-height: 52px; padding-inline: 22px; }
+.eco-puja-estado { display: inline-flex; align-items: center; gap: 8px; }
+.eco-puja-estado .sx-pildora { font-size: 1.125rem; min-height: 40px; padding-inline: 18px; }
+.eco-subidas { display: grid; grid-template-columns: repeat(3, 1fr); gap: 10px; }
+.eco-subida { flex-direction: column; min-height: 72px; gap: 2px; }
+.eco-subida-mas { font: 800 1.5rem/1 var(--fuente-titulos); }
+.eco-subida-total { font: 700 .9375rem/1 var(--fuente-cuerpo); opacity: .9; }
+.eco-puja-fin { display: grid; gap: 12px; justify-items: center; text-align: center; }
+
+/* ---------- Inicio: la tarjeta de la puja en vivo y la entrada a la tienda ---------- */
+.eco-inicio-puja { display: flex; align-items: center; justify-content: space-between; gap: 12px; flex-wrap: wrap; }
+.eco-inicio-texto { display: grid; gap: 2px; min-width: 0; flex: 1 1 14rem; }
+.eco-inicio-titulo { margin: 0; font: 800 1.25rem/1.2 var(--fuente-titulos); }
+.eco-inicio-puja .eco-punto { width: 12px; height: 12px; border-radius: 50%; background: var(--sx-oro); display: inline-block; margin-inline-end: 8px; }
+.juego .eco-inicio-puja .eco-punto { animation: eco-latido 1200ms ease-in-out infinite; }
+
+/* ---------- el profe y el admin: sobrios ---------- */
+.eco-seccion { display: grid; gap: 12px; margin-block: 16px; }
+.eco-presupuesto { display: grid; gap: 4px; }
+.eco-presupuesto-numero { margin: 0; font: 800 1.75rem/1.2 var(--fuente-titulos); font-variant-numeric: tabular-nums; }
+.eco-saldos { list-style: none; margin: 0; padding: 0; }
+.eco-saldos > li + li { box-shadow: inset 0 1px 0 var(--sx-borde-1); }
+.eco-saldo-fila { display: grid; grid-template-columns: 1fr auto; gap: 8px 12px; align-items: center; padding: 12px 16px; }
+.eco-saldo-fila .eco-fila-acciones { grid-column: 1 / -1; }
+.eco-saldo-nombre { font: 700 1.0625rem/1.3 var(--fuente-cuerpo); }
+.eco-saldo-valor { display: inline-flex; align-items: center; gap: 6px; font: 800 1.125rem/1 var(--fuente-titulos); font-variant-numeric: tabular-nums; }
+.eco-saldo-semana { grid-column: 1 / -1; font: 500 .9375rem/1.3 var(--fuente-cuerpo); color: var(--sx-tinta-2); }
+.eco-form { display: grid; gap: 12px; }
+.eco-tipos, .eco-precios { display: flex; flex-wrap: wrap; gap: 8px; }
+.eco-opcion { min-width: 88px; }
+.eco-opcion[aria-pressed="true"] { background: var(--sx-accion-suave); color: var(--sx-accion-tinta); box-shadow: inset 0 0 0 2px var(--sx-accion-borde); }
+.eco-lista-obj { list-style: none; margin: 0; padding: 0; display: grid; gap: 8px; }
+.eco-fila-obj { display: grid; gap: 8px; padding: 12px 16px; border-radius: var(--sx-radio-caja); background: var(--sx-superficie); box-shadow: var(--sx-elev-1); }
+.eco-fila-obj-cabeza { display: flex; align-items: center; justify-content: space-between; gap: 8px; flex-wrap: wrap; }
+.eco-fila-obj-nombre { margin: 0; font: 700 1.0625rem/1.3 var(--fuente-cuerpo); }
+.eco-en-vivo { display: grid; gap: 8px; text-align: center; justify-items: center; }
+.eco-en-vivo .eco-cuenta { font-size: clamp(3rem, 12vw, 4.5rem); }
+.eco-bolsa { display: grid; gap: 4px; }
+.eco-bolsa-numero { margin: 0; font: 800 2rem/1.1 var(--fuente-titulos); font-variant-numeric: tabular-nums; }
+
+@media (min-width: 640px) {
+  .eco-objetos { grid-template-columns: repeat(auto-fill, minmax(17rem, 1fr)); }
+  .eco-saldo-fila { grid-template-columns: 1fr auto auto auto; }
+  .eco-saldo-fila .eco-fila-acciones { grid-column: auto; }
+  .eco-saldo-semana { grid-column: auto; text-align: end; }
+  .eco-subidas { max-width: 28rem; margin-inline: auto; width: 100%; }
+}
+
+@keyframes eco-latido {
+  0%, 100% { transform: scale(1); opacity: 1; }
+  50% { transform: scale(1.08); opacity: .85; }
+}
+@keyframes eco-entra {
+  from { transform: translateY(8px); opacity: 0; }
+  to { transform: translateY(0); opacity: 1; }
+}
+.juego .eco-compra-ok, .juego .eco-puja-fin { animation: eco-entra var(--sx-dur-3) var(--sx-curva) both; }
+
+/* El blanco táctil mínimo es de 44 px también en los botones chicos de estas pantallas. */
+.eco-saldo .sx-btn, .eco-saldo-fila .sx-btn, .eco-fila-obj .sx-btn, .eco-fila-acciones .sx-btn { min-height: 44px; }
+
+/* Aire: las pantallas de la economía dejan lugar a la barra de abajo, y las tarjetas de Inicio no se pegan a la de al lado. */
+.eco-contenido { padding-bottom: 104px; }
+.eco-inicio-puja { margin-block: 12px; }
+
+.eco-saldo-nombre .sx-pildora { margin-inline-start: 8px; }
