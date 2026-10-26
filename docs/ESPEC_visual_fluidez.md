@@ -25,7 +25,7 @@ Objeto que caracteriza la pantalla: la barra de la sesión, que es la misma de l
 │ ┌ A  go ──────────────────────┐ │ 56 px  │ ┌ A  go          ✕ TU RESPUESTA┐ │ tiembla 4 px, una vez
 │ └ B  goes ────────────────────┘ │        │ └ B  goes          ✓ CORRECTA ┘ │
 │                                 │        ├─────────────────────────────────┤
-│ [ Elegiste A: go              ] │        │ (✕) La correcta: goes           │ la franja SUBE (220 ms)
+│ [ Elegiste A: go              ] │        │ (✕) La correcta: goes           │ la franja SUBE (200 ms)
 │ [         Comprobar           ] │        │ regla · por qué no la tuya · ej.│
 └─────────────────────────────────┘        │ [          Siguiente          ] │
                                            └─────────────────────────────────┘
@@ -33,10 +33,10 @@ Objeto que caracteriza la pantalla: la barra de la sesión, que es la misma de l
 
 - **Barra de la sesión:** 16 px (`--sx-alto-progreso`), color de acción (navy) con el brillo del sistema; antes era oro de 12 px (el oro es
   solo logro). Se llena con `transform: scaleX` en 400 ms con la curva del sistema (sin rebote). La barra, el chip de aciertos y la línea
-  "Pregunta N de M" **no se deslizan** al pasar de pregunta: solo entra el enunciado con sus opciones (`translateX` 32 px, 220 ms). Así la
+  "Pregunta N de M" **no se deslizan** al pasar de pregunta: solo entra el enunciado con sus opciones (`translateX` 32 px, 200 ms = `--sx-dur-2`). Así la
   barra se lee como una sola cosa que avanza.
 - **Opciones de 56 px** (alto de `sx-opcion`); el resto del cromo de la opción no cambia.
-- **La franja sube** desde abajo al comprobar (`translateY(100%)` → 0, 220 ms, curva del sistema), solo recién comprobada (al retomar un
+- **La franja sube** desde abajo al comprobar (`translateY(100%)` → 0, 200 ms = `--sx-dur-2`, curva del sistema), solo recién comprobada (al retomar un
   intento ya aparece en su sitio). Lleva ícono + texto de siempre ("¡Bien hecho!" / "La correcta: …"), la correcta y la explicación.
 - **Fallo:** la opción "Tu respuesta" tiembla una vez, 4 px, 300 ms (sin rojo nuevo, sin sonido de castigo, sin vidas).
 - **Acierto:** lo de hoy (la correcta salta, el ícono late, dos chispas al chip de aciertos).
@@ -131,3 +131,17 @@ Una cosa cambia: **la pantalla llega en 220 ms, no en casi un segundo.**
 - La racha en el cierre del reto (necesita una petición: método completo).
 - "Seguir" también para empezar el día (cambia la identidad de U66/U81/E31/E36: decisión de Christiam).
 - El botón del cierre fijo abajo, a la vista sin desplazar (toca la revisión y el orden de su línea de tiempo).
+
+## 7. Adenda 1: correcciones de la compuerta visual (2026-10-26, sobre `40e5803`)
+
+- **Tiempos del reto:** la franja y la entrada del enunciado duran 200 ms (`--sx-dur-2`, una de las tres duraciones del sistema); la espec decía
+  220 por error. La entrada de pantalla (§4) sí es de 220 ms (vive en `juego.css`, en el shell, que no puede depender de `sistema.css`).
+- **Tarjeta "Tu camino" de Inicio:** su regla sube a especificidad 1,4,1 para ganarle a la regla general de los enlaces con `data-testid`
+  (`componentes.css`, 1,2,1) y a la de `cara.css` (1,3,1); texto a 17 px, a todo el ancho y con chevron (`chevron` en `ui/iconos.js`).
+- **Camino:** sin `scrollBy`. Solo si el nodo de la recomendada no se ve, `scrollIntoView({block: 'nearest'})` con `scroll-margin-bottom` de 96 px.
+  Nodos de 56 px (la recomendada, 68) y separación de 20 px: la tercera unidad se ve sin desplazar a 375 y a 1280. Con la recomendada más abajo
+  (p. ej. la sexta), el camino sí baja y la cabecera sale de la vista: es lo mínimo para ver el siguiente paso.
+- **Nodos:** el de una estación con acción es un ENLACE a esa misma acción (56 px de toque, nombre accesible, foco del sistema, labio que se
+  hunde); el de una bloqueada o sin nada que jugar es plano, sin labio y `aria-hidden`.
+- **No se hizo (nit 6):** la barra "Paso N de M" y el aro de "Tu práctica de hoy" siguen en oro. Van sobre la tarjeta navy, donde una barra navy
+  no se ve; pasarlas a otro color pide decidir cuál (blanco del sistema o un token nuevo) y toca el aro de la invitación de la navegación (W65).
