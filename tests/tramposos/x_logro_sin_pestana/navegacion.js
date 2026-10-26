@@ -51,6 +51,10 @@ export const RUTAS = [
   { patron: '/avatar', roles: ['student'], pestana: 'inicio', barra: true, vuelve: '/inicio', titulo: () => textos.magia.avatarTitulo }, // sprint de la magia: se abre desde Inicio y Perfil
   { patron: '/insignias', roles: ['student'], pestana: 'inicio', barra: true, vuelve: '/inicio', titulo: () => textos.magia.insigniasTitulo },
   { patron: '/repaso', roles: ['student'], pestana: 'inicio', barra: true, vuelve: '/inicio', titulo: () => textos.nav.repaso }, // W80: el repaso de la tanda
+  { patron: '/camino', roles: ['student'], pestana: 'inicio', barra: true, vuelve: '/inicio', titulo: () => textos.nav.camino }, // W92: el camino de nivel
+  { patron: '/tienda', roles: ['student'], pestana: 'inicio', barra: true, vuelve: '/inicio', titulo: () => textos.economiaNav.tienda }, // Lingo Coins: se abre desde Inicio
+  { patron: '/mochila', roles: ['student'], pestana: 'inicio', barra: true, vuelve: '/tienda', titulo: () => textos.economiaNav.mochila },
+  { patron: '/puja', roles: ['student'], pestana: 'inicio', barra: true, vuelve: '/inicio', titulo: () => textos.economiaNav.puja },
   { patron: '/asistencia', roles: ['student'], pestana: 'asistencia', barra: true, vuelve: null, titulo: () => textos.asistencia.titulo },
   { patron: '/retos', roles: ['student'], pestana: 'retos', barra: true, vuelve: null, titulo: () => textos.retos.titulo },
   { patron: '/retos/:id', roles: ['student'], pestana: null, barra: false, vuelve: null, titulo: () => textos.retos.titulo }, // una tarea por pantalla (decisión 001)
@@ -60,8 +64,12 @@ export const RUTAS = [
   { patron: '/profe/grupo/:gid/inscripcion', roles: ['teacher'], porDireccion: ['admin'], pestana: 'misGrupos', barra: true, vuelve: '/profe/grupo/:gid', titulo: conGrupo(textos.titulos.inscripciones) },
   { patron: '/profe/grupo/:gid/logro', roles: ['teacher'], porDireccion: ['admin'], pestana: null /* TRAMPOSO */, barra: true, vuelve: '/profe/grupo/:gid', titulo: conGrupo(textos.profe.logro.titulo) },
   { patron: '/profe/grupo/:gid/errores', roles: ['teacher'], porDireccion: ['admin'], pestana: 'misGrupos', barra: true, vuelve: '/profe/grupo/:gid', titulo: conGrupo(textos.profe.errores.titulo) },
+  { patron: '/profe/grupo/:gid/tienda', roles: ['teacher'], porDireccion: ['admin'], pestana: 'misGrupos', barra: true, vuelve: '/profe/grupo/:gid', titulo: conGrupo(textos.economiaNav.tiendaGrupo) },
+  { patron: '/profe/grupo/:gid/puja', roles: ['teacher'], porDireccion: ['admin'], pestana: 'misGrupos', barra: true, vuelve: '/profe/grupo/:gid', titulo: conGrupo(textos.economiaNav.lanzarPuja) },
   { patron: '/profe/retos', roles: ['teacher'], porDireccion: ['admin'], pestana: 'retosProfe', barra: true, vuelve: null, titulo: () => textos.profe.retos.titulo },
   { patron: '/admin', roles: ['admin'], pestana: 'grupos', barra: true, vuelve: null, titulo: () => textos.admin.grupos.titulo },
+  { patron: '/admin/profesores', roles: ['admin'], pestana: 'grupos', barra: true, vuelve: '/admin', titulo: () => textos.economiaNav.profesores },
+  { patron: '/admin/invitar', roles: ['admin'], pestana: 'grupos', barra: true, vuelve: '/admin', titulo: () => textos.invitarNav.titulo }, // invitar profes por correo
   { patron: '/admin/asignar-docente/:gid', roles: ['admin'], pestana: 'grupos', barra: true, vuelve: '/admin', titulo: conGrupo(textos.admin.asignarDocente.titulo) },
   { patron: '/admin/importar-csv/:gid', roles: ['admin'], pestana: 'grupos', barra: true, vuelve: '/admin', titulo: conGrupo(textos.admin.importarCsv.titulo) },
 ];

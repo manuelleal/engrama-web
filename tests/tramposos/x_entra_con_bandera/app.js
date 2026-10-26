@@ -33,6 +33,8 @@ import { crearPanelDiferido } from './panel_diferido.js';
 
 const HASH_REGISTRO = '#/registro';
 const HASH_RECUPERAR = '#/recuperar'; // el enlace del correo trae `?token_hash=` detrás (despliegue/correo/recuperacion.html)
+const HASH_INVITACION = '#/invitacion'; // el del correo de invitación (despliegue/correo/invitacion.html), sin bandera: sin el backend nuevo nadie lo recibe
+const esHash = (h) => location.hash === h || location.hash.startsWith(`${h}?`);
 
 // Las 10 pantallas del profe y del admin NO se importan aquí de forma estática: van en un módulo diferido (docs/ESPEC_margen_precarga.md),
 // fuera de la precarga del shell, que el estudiante descarga sin necesitarlas. `panel` lo carga una vez y envuelve sus rutas.
@@ -130,28 +132,31 @@ function arrancarSinSesion(modo) {
   if (estabaEsperando()) { bloquear(BLOQUEO_YA_NO_ESTA); return; }
   if (modo === 'supabase' && location.hash === HASH_REGISTRO) { abrirRegistro(); return; }
   const recuperar = modo === 'supabase' && recuperarClave(configActual);
-  if (recuperar && (location.hash === HASH_RECUPERAR || location.hash.startsWith(`${HASH_RECUPERAR}?`))) { abrirRecuperar(); return; }
+  if (recuperar && esHash(HASH_RECUPERAR)) { abrirRecuperar(); return; }
+  if (modo === 'supabase' && esHash(HASH_INVITACION)) { abrirRecuperar(true); return; }
   // accionUnica (§7.2 regla 5): un segundo toque de "Entrar" mientras el primero vuela no dispara
   // una segunda petición de login.
   const entrarUnaVez = accionUnica(async (metodoEntrada, datos) => {
     const nuevaSesion = await authActivo.entrar(metodoEntrada, datos);
     entrarConSesion(nuevaSesion);
   });
-  renderEntrada(vistaRaiz, modo, entrarUnaVez, modo === 'supabase' ? { crearCuenta: abrirRegistro, olvide: recuperar ? abrirRecuperar : undefined } : {});
+  renderEntrada(vistaRaiz, modo, entrarUnaVez, modo === 'supabase' ? { crearCuenta: abrirRegistro, olvide: recuperar ? () => abrirRecuperar() : undefined } : {});
 }
 
 // "¿Olvidaste tu contraseña?" y el enlace del correo (despliegue/docs/ESPEC_correo_recuperacion.md §5). Solo con RECUPERAR_CLAVE en config.json.
 // El token del enlace se lee UNA vez y se borra de la dirección y del historial ANTES de pintar; la pantalla es diferida (sw.js DIFERIDOS) y,
 // si no carga, se vuelve a la entrada. "Ir a la entrada" recarga en la dirección limpia, como el registro.
-function abrirRecuperar() {
+// `invitacion` (engrama-backend ESPEC_invitar_profe §5): la misma pantalla, canjeando con `type: "invite"` y con los textos de bienvenida.
+function abrirRecuperar(invitacion = false) {
   vistaRaiz = reemplazarRaiz(vistaRaiz);
   const raiz = vistaRaiz;
   const tokenHash = new URLSearchParams(location.hash.split('?')[1] || '').get('token_hash');
   history.replaceState(null, '', location.pathname + location.search);
   const aEntrada = () => location.replace(location.pathname + location.search);
-  import('./vistas/recuperar.js').then((m) => m.renderRecuperar(raiz, {
-    tokenHash, aEntrada, pedir: authActivo.pedirEnlaceDeRecuperacion, canjear: authActivo.canjearEnlaceDeRecuperacion, cerrar: authActivo.cerrarSesionDeRecuperacion,
-  })).catch((e) => { console.error('app: no cargó la pantalla de recuperar la contraseña', e); aEntrada(); });
+  Promise.all([import('./vistas/recuperar.js'), invitacion ? import('./textos_invitar.js') : null]).then(([m, ti]) => m.renderRecuperar(raiz, {
+    tokenHash, aEntrada, pedir: authActivo.pedirEnlaceDeRecuperacion, cerrar: authActivo.cerrarSesionDeRecuperacion,
+    canjear: invitacion ? authActivo.canjearEnlaceDeInvitacion : authActivo.canjearEnlaceDeRecuperacion, textos: ti?.textosInvitar.aceptar,
+  })).catch((e) => { console.error('app: no cargó la pantalla del enlace del correo', e); aEntrada(); });
 }
 
 // W31 (§4.1): el registro con código de grupo. Con `REGISTRO_CON_CODIGO` distinto de `true` en config.json dice "Todavía no está abierto", sin formulario
@@ -342,6 +347,11 @@ function arrancarConSesion(desdeElPrincipio = false) {
   ruta('/avatar', conCtx((raiz, params, query, ctx) => import('./vistas/estudiante/avatar.js').then((m) => m.renderAvatar(raiz, ctx)))); // diferido
   ruta('/insignias', conCtx((raiz, params, query, ctx) => import('./vistas/estudiante/insignias.js').then((m) => m.renderInsignias(raiz, ctx)))); // diferido
   ruta('/repaso', conCtx((raiz, params, query, ctx) => import('./vistas/estudiante/repaso.js').then((m) => m.renderRepaso(raiz, ctx)))); // W80: diferido
+  ruta('/camino', conCtx((raiz, params, query, ctx) => import('./vistas/estudiante/camino.js').then((m) => m.renderCamino(raiz, ctx)))); // W92: diferido
+  // Lingo Coins dentro de ENGRAMA (decisión 017): la tienda, la mochila y la Puja, diferidas (no entran a la precarga).
+  ruta('/tienda', conCtx((raiz, params, query, ctx) => import('./vistas/estudiante/tienda.js').then((m) => m.renderTienda(raiz, ctx))));
+  ruta('/mochila', conCtx((raiz, params, query, ctx) => import('./vistas/estudiante/mochila.js').then((m) => m.renderMochila(raiz, ctx))));
+  ruta('/puja', conCtx((raiz, params, query, ctx) => import('./vistas/estudiante/puja.js').then((m) => m.renderPuja(raiz, ctx))));
   ruta('/asistencia', conCtx((raiz, params, query, ctx) => renderAsistencia(raiz, query, ctx)));
   ruta('/retos', conCtx((raiz, params, query, ctx) => renderRetos(raiz, ctx)));
   ruta('/retos/:id', conCtx((raiz, params, query, ctx) => renderRetoFlujo(raiz, params, query, ctx)));
@@ -365,8 +375,12 @@ function rutasDelPanel() {
   ruta('/profe/grupo/:gid/inscripcion', conCtx(panel.vista('/profe/grupo/:gid/inscripcion', (m, raiz, params, query, ctx) => m.renderInscripcion(raiz, params, ctx)))); // W32: el código de grupo y quién espera aprobación
   ruta('/profe/grupo/:gid/logro', conCtx(panel.vista('/profe/grupo/:gid/logro', (m, raiz, params, query, ctx) => m.renderLogro(raiz, params, ctx))));
   ruta('/profe/grupo/:gid/errores', conCtx(panel.vista('/profe/grupo/:gid/errores', (m, raiz, params, query, ctx) => m.renderErrores(raiz, params, ctx))));
+  ruta('/profe/grupo/:gid/tienda', conCtx(panel.vista('/profe/grupo/:gid/tienda', (m, raiz, params, query, ctx) => m.renderTiendaGrupo(raiz, params, ctx)))); // Lingo Coins
+  ruta('/profe/grupo/:gid/puja', conCtx(panel.vista('/profe/grupo/:gid/puja', (m, raiz, params, query, ctx) => m.renderPujaProfe(raiz, params, ctx))));
   ruta('/profe/retos', conCtx(panel.vista('/profe/retos', (m, raiz, params, query, ctx) => m.renderRetosProfe(raiz, ctx))));
   ruta('/admin', conCtx(panel.vista('/admin', (m, raiz, params, query, ctx) => m.renderCrearGrupo(raiz, ctx))));
+  ruta('/admin/profesores', conCtx(panel.vista('/admin/profesores', (m, raiz, params, query, ctx) => m.renderProfesores(raiz, ctx)))); // Lingo Coins
+  ruta('/admin/invitar', conCtx(panel.vista('/admin/invitar', (m, raiz, params, query, ctx) => m.renderInvitar(raiz, ctx)))); // invitar profes por correo
   ruta('/admin/asignar-docente/:gid', conCtx(panel.vista('/admin/asignar-docente/:gid', (m, raiz, params, query, ctx) => m.renderAsignarDocente(raiz, params, ctx))));
   ruta('/admin/importar-csv/:gid', conCtx(panel.vista('/admin/importar-csv/:gid', (m, raiz, params, query, ctx) => m.renderImportarCsv(raiz, params, ctx))));
 }

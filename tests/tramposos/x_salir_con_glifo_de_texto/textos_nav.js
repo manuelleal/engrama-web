@@ -7,6 +7,8 @@ export const textosNav = {
     // Los nombres de las pestañas son los títulos de sus pantallas (Retos y Asistencia reusan textos.retos.titulo y textos.asistencia.titulo).
     inicio: 'Inicio',
     repaso: 'Repaso', // W80: el repaso de la tanda
+    camino: 'Tu camino', // W92: las unidades del nivel (docs/ESPEC_camino_y_tu_palabra.md §3)
+    caminoEnlace: 'Tu camino: tus unidades y la que sigue',
     // W68 (§5.6): la entrada de la barra que lleva a "mi cuenta" (el aviso, las solicitudes y "Cerrar sesión" viven ahí).
     perfil: 'Perfil',
     // W70 (§5.6): las entradas de la barra del profe y del admin. Cada una dice lo mismo que el título de su pantalla.
@@ -66,5 +68,18 @@ export const textosNav = {
     reintentando: 'Reintentando…',
     ultimoRecurso: 'Si tienes conexión y sigue sin abrir, recarga la página.',
     recargar: 'Recargar la página',
+  },
+  // Lingo Coins dentro de ENGRAMA (decisión 017): los títulos de las pantallas de la economía. Los textos de adentro viven en textos_economia.js (diferido).
+  economiaNav: {
+    tienda: 'La tienda',
+    mochila: 'Tu mochila',
+    puja: 'La Puja',
+    tiendaGrupo: 'Tienda del grupo',
+    lanzarPuja: 'Lanzar puja',
+    profesores: 'Profesores',
+  },
+  // Invitar profes por correo (engrama-backend docs/ESPEC_invitar_profe.md §5): el título de la pantalla. Lo de adentro, en textos_invitar.js (diferido).
+  invitarNav: {
+    titulo: 'Profes: invitar',
   },
 };

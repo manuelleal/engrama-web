@@ -16,7 +16,11 @@ import { crearIcono } from '../ui/iconos.js';
 import { accionUnica } from '../api/cliente.js';
 import { cambiarContrasenaConToken } from '../auth/cambio_contrasena.js';
 import { crearFormularioContrasena } from './formulario_contrasena.js';
-import { textosRecuperar as T } from '../textos_recuperar.js';
+import { textosRecuperar } from '../textos_recuperar.js';
+
+// Los textos de ESTA pantalla: los de recuperar, o los de aceptar una invitación encima (ctx.textos, engrama-backend ESPEC_invitar_profe §5).
+// Una sola pantalla previa a la sesión a la vez: renderRecuperar los fija al pintar.
+let T = textosRecuperar;
 
 const SECUNDARIO = 'sx-btn sx-btn--fantasma sx-btn--chico';
 
@@ -28,6 +32,7 @@ const SECUNDARIO = 'sx-btn sx-btn--fantasma sx-btn--chico';
  *   cerrar: (token: string) => Promise<void>,
  *   cambiar?: (token: string, nueva: string) => Promise<void>,
  *   aEntrada: () => void,
+ *   textos?: Partial<typeof textosRecuperar>,
  * }} CtxRecuperar
  */
 
@@ -148,6 +153,7 @@ function pantallaNueva(raiz, ctx) {
  * @param {CtxRecuperar} ctx `tokenHash` es el del enlace (app.js ya lo quitó de la dirección) o null para pedir uno.
  */
 export function renderRecuperar(raiz, ctx) {
+  T = ctx.textos ? { ...textosRecuperar, ...ctx.textos } : textosRecuperar;
   if (ctx.tokenHash) pantallaNueva(raiz, ctx); else pantallaPedir(raiz, ctx);
   document.body.dataset.listo = '1';
 }
