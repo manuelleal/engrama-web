@@ -1,0 +1,16 @@
+{
+  "descripcion": "El medidor de activos usa el oro (el oro es solo para monedas).",
+  "archivos": {
+    "estilos/panel.css": "panel.css"
+  },
+  "comando": [
+    "node",
+    "--test",
+    "--test-reporter=tap",
+    "tests/unit/panel_super.test.mjs"
+  ],
+  "espera_codigo_no_cero": true,
+  "espera_fallan_tests": [
+    "PW4: en estilos/panel.css el oro solo pinta monedas (emitidas, gastadas y sus muestras)"
+  ]
+}

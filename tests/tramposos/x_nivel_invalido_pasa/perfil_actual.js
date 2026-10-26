@@ -58,6 +58,9 @@ export function perfilAJson(profileOut, tenantIdActivo) {
     // Lo que el servidor dice que aceptó del aviso de datos (null si nunca, o si el backend aún no lo informa: cierra).
     consentimiento: profileOut.consent_version ?? null,
     nivelConfirmado: nivelConfirmadoDe(profileOut.confirmed_level), // W30: el de la institución activa; null = "Por confirmar"
+    // El panel (docs/ESPEC_panel_super_admin.md §1.1): `role` en la raíz es el del PERFIL. Solo decide si se pinta el enlace a #/super; la puerta
+    // de verdad es el backend (403 a quien no es super admin), así que un cliente que se lo invente no ve nada.
+    superAdmin: profileOut.role === 'super_admin',
   };
 }
 

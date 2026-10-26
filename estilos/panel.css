@@ -1,0 +1,94 @@
+/* estilos/panel.css · El panel del super admin y el tablero del admin (docs/ESPEC_panel_super_admin.md §4; la maqueta de
+   diseno/arte/prototipos/super-admin/fuente/propio.css). DIFERIDO (sw.js DIFERIDOS). Sobrio: nada se anima. Solo var(--token) o color-mix() con
+   white/black/transparent (V3). El oro (--oro, --sx-oro) SOLO en lo que es moneda: .g-emitida, .g-gastada, .muestra--emitida, .muestra--gastada.
+   Todo cuelga de .panel-pagina: no toca otra pantalla. Móvil primero; desde 768 px, dos columnas. */
+
+.panel-pagina { display: grid; gap: 22px; padding-bottom: 96px; }
+.panel-pagina > *, .panel-cuerpo > *, .rejilla-2 > * { min-width: 0; }
+.panel-cab { display: flex; flex-wrap: wrap; align-items: end; justify-content: space-between; gap: 12px; }
+.panel-cab h1 { margin: 0; }
+.panel-cuerpo { display: grid; gap: 22px; }
+.panel-pagina .rejilla-2 { display: grid; gap: 22px; }
+.panel-pagina .seccion { display: grid; gap: 10px; align-content: start; }
+.panel-pagina .oculto { position: absolute; width: 1px; height: 1px; overflow: hidden; clip: rect(0 0 0 0); white-space: nowrap; }
+
+/* Cifras de arriba */
+.panel-pagina .kpis { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 10px; }
+.panel-pagina .kpi { display: grid; gap: 4px; align-content: start; padding: 14px 16px; background: var(--sx-superficie);
+  border-radius: var(--sx-radio-caja); box-shadow: var(--sx-caja); }
+.panel-pagina .kpi p { margin: 0; }
+.panel-pagina .kpi__valor { display: flex; align-items: center; gap: 8px; font: 800 1.625rem/1.05 var(--fuente-titulos);
+  font-variant-numeric: tabular-nums; padding-top: 3px; color: var(--sx-tinta); }
+.panel-pagina .kpi__valor .sx-moneda { font-size: 1.125rem; }
+.panel-pagina .kpi__rotulo { font: 600 .9375rem/1.3 var(--fuente-cuerpo); color: var(--sx-tinta-2); }
+
+/* La protagonista: registros por día (franja navy del sistema) */
+.panel-pagina .prota-reg { display: grid; gap: 12px; }
+.panel-pagina .prota-reg h2, .panel-pagina .prota-reg p { margin: 0; }
+.panel-pagina .prota-reg__cifra { display: flex; align-items: end; gap: 12px; flex-wrap: wrap; }
+.panel-pagina .prota-reg__numero { font: 800 3rem/.9 var(--fuente-titulos); letter-spacing: -.02em; font-variant-numeric: tabular-nums; padding-top: 6px; }
+
+/* Gráficas: SVG de caja fija que se estira al ancho */
+.panel-pagina .grafica { display: block; width: 100%; }
+.panel-pagina .grafica svg { display: block; width: 100%; height: auto; overflow: visible; }
+.panel-pagina .g-eje { font: 700 10px var(--fuente-cuerpo); fill: color-mix(in srgb, var(--texto) 68%, transparent); }
+.panel-pagina .g-rejilla { stroke: color-mix(in srgb, var(--texto) 10%, transparent); stroke-width: 1; }
+.panel-pagina .sx-prota--marca .g-eje { fill: color-mix(in srgb, white 80%, transparent); }
+.panel-pagina .sx-prota--marca .g-rejilla { stroke: color-mix(in srgb, white 18%, transparent); }
+.panel-pagina .g-area { fill: color-mix(in srgb, white 16%, transparent); }
+.panel-pagina .g-linea { fill: none; stroke: var(--superficie); stroke-width: 2.5; stroke-linejoin: round; stroke-linecap: round; }
+.panel-pagina .g-punto { fill: var(--superficie); }
+.panel-pagina .g-emitida { fill: var(--oro); }
+.panel-pagina .g-gastada { fill: color-mix(in srgb, var(--oro) 46%, black); }
+
+/* Tarjetas de gráfica */
+.panel-pagina .tarjeta-g { display: grid; gap: 12px; align-content: start; }
+.panel-pagina .tarjeta-g h2, .panel-pagina .tarjeta-g p { margin: 0; }
+.panel-pagina .tarjeta-g__cifras { display: flex; flex-wrap: wrap; gap: 8px 22px; }
+.panel-pagina .cifra-chica { display: grid; gap: 0; }
+.panel-pagina .cifra-chica b { display: flex; align-items: center; gap: 6px; font: 800 1.375rem/1.1 var(--fuente-titulos);
+  font-variant-numeric: tabular-nums; padding-top: 2px; }
+.panel-pagina .cifra-chica span { font: 600 .875rem/1.3 var(--fuente-cuerpo); color: var(--sx-tinta-2); }
+.panel-pagina .leyenda { display: grid; gap: 6px; margin: 0; padding: 0; list-style: none; font: 700 .875rem/1.3 var(--fuente-cuerpo); }
+.panel-pagina .leyenda li { display: flex; align-items: center; gap: 8px; }
+.panel-pagina .muestra { width: 14px; height: 14px; border-radius: 4px; flex: none; }
+.panel-pagina .muestra--emitida { background: var(--oro); }
+.panel-pagina .muestra--gastada { background: color-mix(in srgb, var(--oro) 46%, black); width: 8px; }
+
+/* Medidor de activos (azul de la marca, nunca oro). El ancho sale de una clase por decena: sin estilos en línea (CSP) */
+.panel-pagina .medidor { height: 12px; border-radius: var(--sx-radio-pildora); background: var(--sx-pista); overflow: hidden; }
+.panel-pagina .medidor__relleno { height: 100%; width: 0; border-radius: inherit; background: var(--primario); }
+.panel-pagina .medidor--10 { width: 10%; } .panel-pagina .medidor--20 { width: 20%; } .panel-pagina .medidor--30 { width: 30%; }
+.panel-pagina .medidor--40 { width: 40%; } .panel-pagina .medidor--50 { width: 50%; } .panel-pagina .medidor--60 { width: 60%; }
+.panel-pagina .medidor--70 { width: 70%; } .panel-pagina .medidor--80 { width: 80%; } .panel-pagina .medidor--90 { width: 90%; }
+.panel-pagina .medidor--100 { width: 100%; }
+
+/* Clientes */
+.panel-pagina .etiqueta-privada { display: inline-flex; align-items: center; gap: 6px; font: 600 .875rem/1.3 var(--fuente-cuerpo); color: var(--sx-tinta-2); }
+.panel-pagina .etiqueta-privada .sx-icono { width: 15px; height: 15px; }
+.panel-pagina .sx-fila { min-height: 64px; }
+.panel-pagina .selector-cliente { display: grid; gap: 6px; }
+.panel-pagina .selector-cliente select { min-height: 48px; width: 100%; }
+.panel-pagina .cliente-cab { display: flex; flex-wrap: wrap; align-items: center; gap: 8px 14px; margin-top: 6px; }
+.panel-pagina .panel-aviso { display: grid; gap: 12px; justify-items: start; }
+.panel-pagina .estado { display: flex; align-items: center; gap: 8px; margin: 0; font: 700 1rem/1.35 var(--fuente-cuerpo); }
+.panel-pagina .estado .sx-icono { width: 20px; height: 20px; flex: none; }
+.panel-pagina .estado--mal { color: var(--sx-mal); }
+.panel-pagina .sx-btn { min-height: 44px; }
+
+/* Las columnas dependen del ancho de la PÁGINA del panel (container query), no de la ventana: la hoja de la app mide 480 px hasta el escritorio. */
+.panel-pagina { container-type: inline-size; }
+@container (min-width: 720px) {
+  .panel-cuerpo { gap: 28px; }
+  .panel-pagina .kpis { grid-template-columns: repeat(4, minmax(0, 1fr)); gap: 14px; }
+  .panel-pagina .rejilla-2 { grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 28px; }
+  .panel-pagina .prota-reg__numero { font-size: 3.75rem; }
+  .panel-pagina .selector-cliente { max-width: 420px; }
+}
+
+/* En el escritorio el panel usa una hoja ancha (como la maqueta): la vista y su barra fija crecen solo cuando el hijo directo es el panel.
+   :has() sobre la raíz, permitido SOLO dentro de este @media de escritorio (css_cara.test.mjs). */
+@media (min-width: 1024px) {
+  #vista:has(> .panel-pagina) { max-width: 1120px; padding-inline: 32px; }
+  #vista:has(> .panel-pagina) .nav-inferior { max-width: 1120px; }
+}

@@ -16,3 +16,7 @@ export { renderImportarCsv } from './admin/importar_csv.js';
 export { renderTiendaGrupo } from './profe/tienda_grupo.js'; // Lingo Coins (decisión 017)
 export { renderPujaProfe } from './profe/puja_profe.js';
 export { renderProfesores } from './admin/profesores.js';
+// El panel del super admin y el tablero del admin (docs/ESPEC_panel_super_admin.md §4 y su adenda 1).
+export { renderTablero } from './admin/tablero.js';
+export { renderSuper } from './super/clientes.js';
+export { renderCliente } from './super/cliente.js';

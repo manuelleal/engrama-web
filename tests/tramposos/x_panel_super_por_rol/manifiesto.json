@@ -1,0 +1,16 @@
+{
+  "descripcion": "La sesión marca superAdmin a cualquier admin (por la membresía, no por el perfil).",
+  "archivos": {
+    "src/auth/perfil_actual.js": "perfil_actual.js"
+  },
+  "comando": [
+    "node",
+    "--test",
+    "--test-reporter=tap",
+    "tests/unit/panel_super.test.mjs"
+  ],
+  "espera_codigo_no_cero": true,
+  "espera_fallan_tests": [
+    "PW6: la sesión dice superAdmin SOLO si el PERFIL es super_admin (no por la membresía de admin)"
+  ]
+}

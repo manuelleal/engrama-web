@@ -1,0 +1,16 @@
+{
+  "descripcion": "ui/graficas.js dibuja al revés: más registros, más abajo (la curva del panel mentiría).",
+  "archivos": {
+    "src/ui/graficas.js": "graficas.js"
+  },
+  "comando": [
+    "node",
+    "--test",
+    "--test-reporter=tap",
+    "tests/unit/panel_super.test.mjs"
+  ],
+  "espera_codigo_no_cero": true,
+  "espera_fallan_tests": [
+    "PW1: la geometría de la línea va de izquierda (hace 29 días) a derecha (hoy), el máximo toca el tope y el cero la base"
+  ]
+}

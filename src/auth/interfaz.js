@@ -27,6 +27,7 @@
  * @property {{id: string, nombre: string, rol: string}[]} [colegios] las instituciones del usuario (sus membresías); sin ellas (modo mock) no se manda X-Tenant-ID
  * @property {string|null} [consentimiento] la versión del aviso de datos que el SERVIDOR dice que aceptó (`consent_version` de /auth/me), o null; sin la propiedad (modo mock) no se pide
  * @property {boolean} [debeCambiarContrasena] la contraseña es temporal (`must_change_password` de /auth/me): hay que crear la propia antes de seguir
+ * @property {boolean} [superAdmin] el PERFIL es super admin (`role` de /auth/me): solo pinta el enlace a #/super; la puerta es el backend
  * @property {{cefr: string, provisional: boolean, fuente: string|null, evaluadoEn: string|null}|null} [nivelConfirmado] el nivel que dice el SERVIDOR (`confirmed_level` de /auth/me, el de la institución activa), o null: "Por confirmar". Nunca se deriva de level, xp ni monedas (X7)
  */
 

@@ -40,6 +40,8 @@ const FORMAS = {
   tienda: [[4.5, 8, 15, 12, 2.5], 'M9 8V7a3 3 0 0 1 6 0v1'],
   mochila: [[5.5, 7, 13, 13, 3.5], 'M9.5 7V5.5a2.5 2.5 0 0 1 5 0V7M9 13h6'],
   puja: ['M13.5 4.5l6 6-3 3-6-6z', 'M11.5 11.5L5 18M4 20.5h8'],
+  // El panel (docs/ESPEC_panel_super_admin.md): la pestaña Tablero del admin, unas barras sobre su base.
+  tablero: ['M4 20h16', 'M7 16.5v-4M12 16.5V7M17 16.5v-6.5'],
 };
 
 /** Los nombres que existen. */

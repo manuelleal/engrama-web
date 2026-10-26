@@ -343,6 +343,11 @@ function arrancarConSesion(desdeElPrincipio = false) {
   ruta('/avatar', conCtx((raiz, params, query, ctx) => import('./vistas/estudiante/avatar.js').then((m) => m.renderAvatar(raiz, ctx)))); // diferido
   ruta('/insignias', conCtx((raiz, params, query, ctx) => import('./vistas/estudiante/insignias.js').then((m) => m.renderInsignias(raiz, ctx)))); // diferido
   ruta('/repaso', conCtx((raiz, params, query, ctx) => import('./vistas/estudiante/repaso.js').then((m) => m.renderRepaso(raiz, ctx)))); // W80: diferido
+  ruta('/camino', conCtx((raiz, params, query, ctx) => import('./vistas/estudiante/camino.js').then((m) => m.renderCamino(raiz, ctx)))); // W92: diferido
+  // Lingo Coins dentro de ENGRAMA (decisión 017): la tienda, la mochila y la Puja, diferidas (no entran a la precarga).
+  ruta('/tienda', conCtx((raiz, params, query, ctx) => import('./vistas/estudiante/tienda.js').then((m) => m.renderTienda(raiz, ctx))));
+  ruta('/mochila', conCtx((raiz, params, query, ctx) => import('./vistas/estudiante/mochila.js').then((m) => m.renderMochila(raiz, ctx))));
+  ruta('/puja', conCtx((raiz, params, query, ctx) => import('./vistas/estudiante/puja.js').then((m) => m.renderPuja(raiz, ctx))));
   ruta('/asistencia', conCtx((raiz, params, query, ctx) => renderAsistencia(raiz, query, ctx)));
   ruta('/retos', conCtx((raiz, params, query, ctx) => renderRetos(raiz, ctx)));
   ruta('/retos/:id', conCtx((raiz, params, query, ctx) => renderRetoFlujo(raiz, params, query, ctx)));
@@ -366,10 +371,17 @@ function rutasDelPanel() {
   ruta('/profe/grupo/:gid/inscripcion', conCtx(panel.vista('/profe/grupo/:gid/inscripcion', (m, raiz, params, query, ctx) => m.renderInscripcion(raiz, params, ctx)))); // W32: el código de grupo y quién espera aprobación
   ruta('/profe/grupo/:gid/logro', conCtx(panel.vista('/profe/grupo/:gid/logro', (m, raiz, params, query, ctx) => m.renderLogro(raiz, params, ctx))));
   ruta('/profe/grupo/:gid/errores', conCtx(panel.vista('/profe/grupo/:gid/errores', (m, raiz, params, query, ctx) => m.renderErrores(raiz, params, ctx))));
+  ruta('/profe/grupo/:gid/tienda', conCtx(panel.vista('/profe/grupo/:gid/tienda', (m, raiz, params, query, ctx) => m.renderTiendaGrupo(raiz, params, ctx)))); // Lingo Coins
+  ruta('/profe/grupo/:gid/puja', conCtx(panel.vista('/profe/grupo/:gid/puja', (m, raiz, params, query, ctx) => m.renderPujaProfe(raiz, params, ctx))));
   ruta('/profe/retos', conCtx(panel.vista('/profe/retos', (m, raiz, params, query, ctx) => m.renderRetosProfe(raiz, ctx))));
   ruta('/admin', conCtx(panel.vista('/admin', (m, raiz, params, query, ctx) => m.renderCrearGrupo(raiz, ctx))));
+  ruta('/admin/profesores', conCtx(panel.vista('/admin/profesores', (m, raiz, params, query, ctx) => m.renderProfesores(raiz, ctx)))); // Lingo Coins
   ruta('/admin/asignar-docente/:gid', conCtx(panel.vista('/admin/asignar-docente/:gid', (m, raiz, params, query, ctx) => m.renderAsignarDocente(raiz, params, ctx))));
   ruta('/admin/importar-csv/:gid', conCtx(panel.vista('/admin/importar-csv/:gid', (m, raiz, params, query, ctx) => m.renderImportarCsv(raiz, params, ctx))));
+  // El panel del super admin y el tablero del admin (docs/ESPEC_panel_super_admin.md §4 y su adenda 1): por el mismo panel diferido.
+  ruta('/admin/tablero', conCtx(panel.vista('/admin/tablero', (m, raiz, params, query, ctx) => m.renderTablero(raiz, ctx))));
+  ruta('/super', conCtx(panel.vista('/super', (m, raiz, params, query, ctx) => m.renderSuper(raiz, ctx))));
+  ruta('/super/cliente/:tid', conCtx(panel.vista('/super/cliente/:tid', (m, raiz, params, query, ctx) => m.renderCliente(raiz, params, ctx))));
 }
 
 iniciarApp();

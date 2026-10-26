@@ -40,6 +40,7 @@ import {
   leerSaldosDelGrupo, darMonedas, corregirEntrega, leerPresupuestosDelAdmin, recargarBolsillo,
 } from './mock/tienda.mjs';
 import { leerPujaActiva, crearPuja, pujarPor, cerrarPuja } from './mock/subastas.mjs';
+import { metricasDelAdmin, listarClientes, verCliente } from './mock/panel.mjs';
 
 const RUTAS = construirRutas();
 
@@ -112,6 +113,15 @@ function rutasDeLaEconomia(r) {
   ];
 }
 
+/** El panel del super admin y el tablero del admin (mock/panel.mjs, docs/ESPEC_panel_super_admin.md §1.4). */
+function rutasDelPanel(r) {
+  return [
+    r('GET', '/admin/metricas', (estado, req) => metricasDelAdmin(estado, req)),
+    r('GET', '/super/clientes', (estado, req) => listarClientes(estado, req)),
+    r('GET', '/super/clientes/:id', (estado, req, p) => verCliente(estado, req, p.id)),
+  ];
+}
+
 function construirRutas() {
   const r = (metodo, patron, manejador, { textoCrudo = false } = {}) => ({ metodo, patron: compilar(patron), manejador, textoCrudo });
   return [
@@ -120,6 +130,7 @@ function construirRutas() {
     ...rutasDelAnillo(r),
     ...rutasDeLaPractica(r),
     ...rutasDeLaEconomia(r),
+    ...rutasDelPanel(r),
 
     r('POST', '/admin/groups', (estado, req, p, body) => crearGrupo(estado, req, body)),
     r('POST', '/admin/groups/:gid/teachers', (estado, req, p, body) => asignarDocente(estado, req, p.gid, body)),

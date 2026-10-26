@@ -1,0 +1,16 @@
+{
+  "descripcion": "#/super ante un 403 pinta las cifras en cero en vez de decir que es solo del super admin.",
+  "archivos": {
+    "src/vistas/super/clientes.js": "clientes.js"
+  },
+  "comando": [
+    "node",
+    "--test",
+    "--test-reporter=tap",
+    "tests/unit/panel_super.test.mjs"
+  ],
+  "espera_codigo_no_cero": true,
+  "espera_fallan_tests": [
+    "PW3: la lista del super admin con 403 dice \"solo del super admin\" y no pinta una sola cifra; lo mismo el detalle"
+  ]
+}
