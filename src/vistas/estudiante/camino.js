@@ -25,15 +25,26 @@ function estacion(e, i) {
     class: `estacion-camino estacion--${e.estado} acceso--${e.acceso}${e.recomendada ? ' es-recomendada' : ''}`,
     'data-testid': `camino-unidad-${i + 1}`, 'data-estado': e.estado, 'data-acceso': e.acceso, 'aria-current': e.recomendada ? 'step' : null,
   },
-  // docs/ESPEC_visual_fluidez.md §3: el nodo lleva el ÍCONO del estado (la recomendada, la estrella); el número va en el nombre ("Unidad N"), y si no
-  // hay SVG en el entorno, el nodo cae al número. Es decorativo (`aria-hidden`): el estado se lee en su línea, con ícono y texto.
-  h('span', { class: 'estacion-camino__marca', 'aria-hidden': 'true' }, crearIcono(e.recomendada ? 'estrella' : e.icono) ?? String(i + 1)),
+  nodoDe(e, i),
   h('div', { class: 'estacion-camino__cuerpo' },
     e.recomendada ? h('p', { class: 'camino-recomendada', 'data-testid': 'camino-recomendada' }, crearIcono('estrella'), T.recomendada) : null,
     h('h2', { class: 'estacion-camino__nombre' }, e.nombre),
     h('p', { class: `estado-camino${e.oro ? ' es-oro' : ''}`, 'data-testid': `camino-estado-${i + 1}` }, crearIcono(e.icono), e.texto),
     e.nota ? h('p', { class: 'sx-t-apoyo', 'data-testid': `camino-nota-${i + 1}` }, e.nota) : null,
     e.accion ? h('a', { href: e.accion.href, class: e.recomendada ? 'sx-btn' : 'boton-chico', 'data-testid': `camino-accion-${i + 1}` }, e.accion.texto) : null));
+}
+
+/**
+ * El nodo de la estación (docs/ESPEC_visual_fluidez.md §3): lleva el ÍCONO del estado (la recomendada, la estrella); el número va en el nombre
+ * ("Unidad N") y, sin SVG en el entorno, el nodo cae al número. Si la estación tiene acción, el nodo es un ENLACE a esa misma acción (56 px o más
+ * de toque, con su nombre accesible y el foco del sistema); si no la tiene (bloqueada, o nada que jugar), es un dibujo plano y `aria-hidden`.
+ * Sin `data-testid`: la acción que miran las pruebas sigue siendo el botón (`camino-accion-N`).
+ * @param {import('../../ui/camino.js').EstacionVista} e @param {number} i
+ */
+function nodoDe(e, i) {
+  const dibujo = crearIcono(e.recomendada ? 'estrella' : e.icono) ?? String(i + 1);
+  if (!e.accion) return h('span', { class: 'estacion-camino__marca', 'aria-hidden': 'true' }, dibujo);
+  return h('a', { href: e.accion.href, class: 'estacion-camino__marca es-enlace', 'aria-label': `${e.accion.texto}: ${e.nombre}` }, dibujo);
 }
 
 /** Sin camino (backend anterior o error): lo dice (y "Reintentar" si fue un error). La vuelta a Inicio es la del encabezado (un solo volver, V8). */

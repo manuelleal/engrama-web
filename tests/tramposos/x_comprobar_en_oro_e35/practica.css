@@ -250,6 +250,8 @@
 .estacion-camino:nth-child(4n + 2) { --x: 24px; }
 .estacion-camino:nth-child(4n + 4) { --x: -24px; }
 .estacion-camino__marca {
+  --labio-nodo: var(--sx-labio-neutro);
+  --brillo-nodo: 0 0 0 transparent;
   position: relative;
   width: 56px;
   height: 56px;
@@ -260,13 +262,27 @@
   background: var(--sx-superficie);
   color: var(--sx-tinta-2);
   border: 3px solid var(--sx-borde-3);
-  box-shadow: 0 5px 0 var(--sx-labio-neutro);
   transform: translateX(var(--x));
   scroll-margin-bottom: 96px; /* al traerla a la vista, que quede sobre la barra de abajo */
 }
 .estacion-camino__marca .sx-icono {
   width: 26px;
   height: 26px;
+}
+/* Solo el nodo que se toca lleva labio (va a la misma acción que su botón, ver camino.js); el que no, es plano: no promete un toque. Presionar es
+   hundirse el alto del labio (solo transform); el foco, el del sistema. */
+#vista .estacion-camino__marca.es-enlace {
+  box-shadow: var(--brillo-nodo), 0 5px 0 var(--labio-nodo);
+  text-decoration: none;
+  transition: transform var(--sx-dur-1) var(--sx-curva);
+}
+#vista .estacion-camino__marca.es-enlace:active {
+  transform: translateX(var(--x)) translateY(5px);
+  box-shadow: var(--brillo-nodo);
+}
+#vista .estacion-camino__marca.es-enlace:focus-visible {
+  outline: 3px solid var(--sx-foco-color);
+  outline-offset: 2px;
 }
 .estacion-camino__cuerpo {
   display: grid;
@@ -306,12 +322,13 @@
   letter-spacing: 0.04em;
 }
 .estacion-camino.es-recomendada .estacion-camino__marca {
+  --labio-nodo: var(--sx-accion-labio);
+  --brillo-nodo: var(--sx-brillo);
   width: 68px;
   height: 68px;
   background: var(--sx-accion);
   color: var(--sx-sobre-accion);
   border-color: var(--sx-accion);
-  box-shadow: var(--sx-brillo), 0 6px 0 var(--sx-accion-labio);
 }
 .estacion-camino.es-recomendada .estacion-camino__marca .sx-icono {
   width: 32px;
@@ -332,10 +349,10 @@
   box-shadow: 0 0 0 2px var(--sx-accion-borde), var(--sx-elev-2);
 }
 .estacion-camino.estacion--completada .estacion-camino__marca {
+  --labio-nodo: color-mix(in srgb, var(--sx-ok-cara) 60%, black);
   background: var(--sx-ok-cara);
   color: var(--sx-sobre-ok);
   border-color: var(--sx-ok-cara);
-  box-shadow: 0 5px 0 color-mix(in srgb, var(--sx-ok-cara) 60%, black);
 }
 .estado-camino.es-oro {
   color: var(--oro-texto);
@@ -344,15 +361,15 @@
   background: var(--sx-oro-suave);
 }
 .estacion-camino.estacion--dominada .estacion-camino__marca {
+  --labio-nodo: var(--sx-oro-labio);
+  --brillo-nodo: var(--sx-brillo);
   background: var(--sx-oro);
   border-color: var(--sx-oro);
   color: var(--sx-sobre-oro);
-  box-shadow: var(--sx-brillo), 0 5px 0 var(--sx-oro-labio);
 }
 .estacion-camino.acceso--bloqueada .estacion-camino__marca {
   background: var(--sx-pozo);
   border-color: var(--sx-pozo);
-  box-shadow: 0 5px 0 var(--sx-labio-neutro);
 }
 .estacion-camino.acceso--bloqueada .estacion-camino__cuerpo {
   background: var(--sx-superficie-alta);
