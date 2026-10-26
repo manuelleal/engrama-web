@@ -371,6 +371,25 @@
   font-weight: 700;
   color: var(--sx-accion-tinta);
 }
+/* docs/ESPEC_visual_fluidez.md §3: con su dibujo (ui/magia_inicio.js), el enlace es una tarjeta-enlace a lo ancho: secundaria (no compite con "Seguir"). */
+#vista .enlace-camino.con-dibujo {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  margin: 12px 0 8px;
+  padding: 10px 14px;
+  border: 2px solid var(--sx-borde-2);
+  border-bottom-width: 4px;
+  border-radius: var(--radio-md);
+  background: var(--sx-superficie);
+  font: 800 1.0625rem/1.25 var(--fuente-titulos);
+  text-decoration: none;
+}
+.dibujo-camino {
+  flex: none;
+  width: 72px;
+  height: 40px;
+}
 /* TRAMPOSO x_glifo_en_css_content: un glifo de texto pintado desde CSS. */
 .opcion-estado::before {
   content: "✓";

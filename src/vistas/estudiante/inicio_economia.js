@@ -26,7 +26,7 @@ export function tarjetaDeTienda() {
     h('div', { class: 'eco-inicio-texto' },
       h('p', { class: 'eco-inicio-titulo' }, E.inicio.tiendaTitulo),
       h('span', { class: 'sx-t-apoyo' }, E.inicio.tiendaTexto)),
-    h('a', { href: '#/tienda', class: 'sx-btn', 'data-testid': 'ir-a-tienda' }, h('span', { 'aria-hidden': 'true' }, crearIcono('tienda')), E.inicio.irTienda));
+    h('a', { href: '#/tienda', class: 'sx-btn sx-btn--sec', 'data-testid': 'ir-a-tienda' }, h('span', { 'aria-hidden': 'true' }, crearIcono('tienda')), E.inicio.irTienda));
 }
 
 /**

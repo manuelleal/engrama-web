@@ -93,7 +93,7 @@ export function textoDelPaso(plan) {
     case 'repaso': return { titulo: T.repasoTitulo, apoyo: T.repasoApoyo(/** @type {number} */ (plan.cuantas)), boton: T.repasar };
     case 'reto': {
       const paga = /** @type {number} */ (plan.paga) > 0 ? ` · ${T.hasta(/** @type {number} */ (plan.paga))}` : '';
-      return { titulo: tituloLegible(plan.reto.title), apoyo: `${T.paso(/** @type {number} */ (plan.paso), /** @type {number} */ (plan.pasos))}${paga}`, boton: T.jugar };
+      return { titulo: tituloLegible(plan.reto.title), apoyo: `${T.paso(/** @type {number} */ (plan.paso), /** @type {number} */ (plan.pasos))}${paga}`, boton: T.seguir };
     }
     case 'otra': return { titulo: T.otraTitulo, apoyo: T.otraApoyo, boton: T.masPractica };
     default: return { titulo: T.listoTitulo, apoyo: T.listoApoyo, boton: null };

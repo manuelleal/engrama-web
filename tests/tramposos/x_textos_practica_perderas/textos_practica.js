@@ -29,6 +29,14 @@ export const textosPractica = {
     noContestableApoyo: 'Puedes seguir con el reto: esta queda sin responder.',
     // Tanda visual 2 (compuerta 18, hallazgo 3): tras comprobar, la opción que elegiste y no era. La correcta dice "Correcta" (textos.revision).
     tuRespuesta: 'Tu respuesta',
+    // W91 (docs/ESPEC_camino_y_tu_palabra.md §2): la pregunta que se responde escribiendo (PROVISIONALES).
+    campoRotulo: 'Tu respuesta',
+    escribePlaceholder: 'Escribe aquí',
+    antesDeComprobarEscrita: 'Escribe tu respuesta y toca Comprobar.',
+    /** @param {string} texto */
+    escribiste: (texto) => `Escribiste: ${texto}`,
+    /** @param {string} texto */
+    quedoGuardadaEscrita: (texto) => `Quedó guardada tu primera respuesta: ${texto}`,
     /** Los rótulos van en el idioma de la explicación (dictamen 04 §1.5: español en A1 y A2, inglés sencillo desde B1). La oración: tanda visual 2
      * (compuerta 18, hallazgo 8), antes "Así queda" / "The right sentence", que no leían bien en Verdadero/Falso ("Así queda: True"). */
     rotulos: {
@@ -41,6 +49,7 @@ export const textosPractica = {
     rotulosPorTipo: {
       verdadero: { es: { oracion: 'La respuesta', regla: 'Por qué' }, en: { oracion: 'The answer', regla: 'Why' } },
       vocabulario: { es: { regla: 'Significado' }, en: { regla: 'Meaning' } },
+      escrita: { es: { oracion: 'La respuesta correcta', regla: 'Por qué' }, en: { oracion: 'The right answer', regla: 'Why' } }, // W91
     },
     /** La que guardó el servidor (gana la primera) cuando no es la que se ve elegida. @param {string} label @param {string} texto */
     quedoGuardada: (label, texto) => `Quedó guardada tu primera respuesta: ${label}: ${texto}`,
@@ -52,6 +61,7 @@ export const textosPractica = {
     empezarTitulo: 'Repaso y retos de tu nivel',
     empezarApoyo: 'Unos 6 a 10 minutos',
     jugar: 'Jugar',
+    seguir: 'Seguir', // docs/ESPEC_visual_fluidez.md §3: con la tanda ya en marcha, el botón dice que se sigue (para empezar el día, "Jugar")
     repasar: 'Repasar',
     masPractica: 'Practicar más',
     pidiendo: 'Armando tu práctica…',

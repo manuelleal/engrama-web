@@ -61,6 +61,7 @@ export const textosPractica = {
     empezarTitulo: 'Repaso y retos de tu nivel',
     empezarApoyo: 'Unos 6 a 10 minutos',
     jugar: 'Jugar',
+    seguir: 'Seguir', // docs/ESPEC_visual_fluidez.md §3: con la tanda ya en marcha, el botón dice que se sigue (para empezar el día, "Jugar")
     repasar: 'Repasar',
     masPractica: 'Practicar más',
     pidiendo: 'Armando tu práctica…',
