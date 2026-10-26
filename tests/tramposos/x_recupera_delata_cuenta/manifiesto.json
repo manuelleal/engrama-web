@@ -1,0 +1,16 @@
+{
+  "descripcion": "ESPEC_correo_recuperacion §3 y §5: pedirEnlaceDeRecuperacion deja pasar el 429/5xx de GoTrue como error: la pantalla diría algo distinto para un correo que tiene cuenta (429 a la segunda petición) que para uno que no.",
+  "archivos": {
+    "src/auth/supabase_rest.js": "supabase_rest.js"
+  },
+  "comando": [
+    "node",
+    "--test",
+    "--test-reporter=tap",
+    "tests/unit/vista_recuperar.test.mjs"
+  ],
+  "espera_codigo_no_cero": true,
+  "espera_fallan_tests": [
+    "RC2: pedir el enlace: vacío o sin @ no pide nada; un correo pide recover y la pantalla es la MISMA con 200, 429 o 500"
+  ]
+}

@@ -55,7 +55,7 @@ async function manejarEntrarReal(alEntrar, campoCorreo, campoContrasena, boton, 
   }
 }
 
-function vistaReal(alEntrar, alVerAviso, alCrearCuenta) {
+function vistaReal(alEntrar, alVerAviso, alCrearCuenta, alOlvidar) {
   const campoCorreo = h('input', { type: 'email', id: 'entrada-correo', 'data-testid': 'campo-correo', autocomplete: 'username' });
   const campoContrasena = h('input', { type: 'password', id: 'entrada-contrasena', 'data-testid': 'campo-contrasena', autocomplete: 'current-password' });
   // Sereno: la entrada no es juego (sin labio).
@@ -76,11 +76,13 @@ function vistaReal(alEntrar, alVerAviso, alCrearCuenta) {
   // W31: crear cuenta con código de grupo; solo si app.js lo ofrece (modo supabase). Lleva a "Todavía no está abierto" si el despliegue no lo abrió.
   const crearCuenta = alCrearCuenta ? h('button', { type: 'button', class: SECUNDARIO, 'data-testid': 'entrada-crear-cuenta' }, textos.registro.crearCuenta) : null;
   if (crearCuenta) crearCuenta.addEventListener('click', () => alCrearCuenta());
+  // "¿Olvidaste tu contraseña?" (despliegue/docs/ESPEC_correo_recuperacion.md): solo si app.js lo ofrece (config.json con RECUPERAR_CLAVE).
+  const olvide = alOlvidar ? h('button', { type: 'button', class: SECUNDARIO, 'data-testid': 'entrada-olvide', onClick: () => alOlvidar() }, textos.entrada.olvide) : null;
   // La marca abre: nombre y frase en la franja navy (las formas, en entrada.css).
   const marca = h('div', { class: 'entrada-marca sx-sobre-marca', 'data-testid': 'entrada-marca' },
     h('p', { class: 'entrada-nombre' }, textos.entrada.marca), h('p', { class: 'sx-t-apoyo' }, textos.entrada.frase));
   return h('div', { 'data-testid': 'vista-entrada' }, marca, h('h1', {}, textos.entrada.tituloReal), form,
-    h('div', { class: 'entrada-enlaces' }, crearCuenta, verAviso));
+    h('div', { class: 'entrada-enlaces' }, olvide, crearCuenta, verAviso));
 }
 
 /**
@@ -89,11 +91,11 @@ function vistaReal(alEntrar, alVerAviso, alCrearCuenta) {
  * @param {(metodo: string, datos: object) => Promise<void>} alEntrar ya envuelto en `accionUnica`
  *   (app.js): una sola sesión de login en vuelo a la vez, igual que cualquier otro botón que
  *   escribe (§7.2 regla 5).
- * @param {{crearCuenta?: () => void}} [opciones] `crearCuenta` (W31): el botón "Crear cuenta con código de grupo" solo se pinta si app.js lo pasa, y solo en
- *   modo supabase; sin él, la pantalla es idéntica a la de antes (R4).
+ * @param {{crearCuenta?: () => void, olvide?: () => void}} [opciones] `crearCuenta` (W31): el botón "Crear cuenta con código de grupo" solo se pinta si app.js lo pasa, y solo en
+ *   modo supabase; sin él, la pantalla es idéntica a la de antes (R4). `olvide`: lo mismo para "¿Olvidaste tu contraseña?".
  */
 export function renderEntrada(raiz, modo, alEntrar, opciones = {}) {
   const alVerAviso = () => renderLeerAviso(raiz, { aviso: leerAviso(), alVolver: () => renderEntrada(raiz, modo, alEntrar, opciones) });
-  montar(raiz, modo === 'mock' ? vistaActores(alEntrar) : vistaReal(alEntrar, alVerAviso, opciones.crearCuenta));
+  montar(raiz, modo === 'mock' ? vistaActores(alEntrar) : vistaReal(alEntrar, alVerAviso, opciones.crearCuenta, opciones.olvide));
   document.body.dataset.listo = '1';
 }

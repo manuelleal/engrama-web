@@ -81,6 +81,7 @@ export const textos = {
     entrando: 'Entrando…',
     faltanDatos: 'Escribe tu correo y tu contraseña.',
     errorGeneral: 'No se pudo entrar. Intenta de nuevo.',
+    olvide: '¿Olvidaste tu contraseña?', // solo con RECUPERAR_CLAVE en config.json; lo demás vive en textos_recuperar.js (diferido)
   },
   auth: {
     sinSesion: 'No hay una sesión activa',

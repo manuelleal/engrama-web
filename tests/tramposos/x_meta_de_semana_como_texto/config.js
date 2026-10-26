@@ -28,6 +28,16 @@ export function registroConCodigo(config) {
   return Boolean(config) && typeof config === 'object' && /** @type {any} */ (config).REGISTRO_CON_CODIGO === true;
 }
 
+/**
+ * ¿Ofrece la entrada "¿Olvidaste tu contraseña?"? (despliegue/docs/ESPEC_correo_recuperacion.md §5). Solo si el despliegue lo dice con
+ * `RECUPERAR_CLAVE: true` (el booleano; ni "true", ni 1): sin SMTP configurado en GoTrue no llega ningún correo, así que el piloto sin
+ * correo no lo ofrece. Pura.
+ * @param {unknown} config
+ */
+export function recuperarClave(config) {
+  return Boolean(config) && typeof config === 'object' && /** @type {any} */ (config).RECUPERAR_CLAVE === true;
+}
+
 /** Las metas de "Tu semana" cuando el despliegue no dice otra cosa (C2 de la espec del juego, PROVISIONAL). */
 const META_DE_SEMANA = 2;
 
