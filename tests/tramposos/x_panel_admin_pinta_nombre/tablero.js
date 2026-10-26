@@ -30,7 +30,7 @@ async function pintar(cuerpo, apoyo, ctx) {
       h('div', { class: 'rejilla-2' }, tarjetaMonedas(d.metricas, d), tarjetaActivos(d.metricas))));
   } catch (e) {
     console.warn('vistas/admin/tablero: no se pudo cargar', e instanceof ErrorApi ? e.status : e);
-    pintarFallo(cuerpo, e, () => { void pintar(cuerpo, apoyo, ctx); });
+    pintarFallo(cuerpo, e, () => { void pintar(cuerpo, apoyo, ctx); }, null, T.tablero.sinPermiso); // H-6: un 403 aquí no es "solo del super admin"
   }
 }
 

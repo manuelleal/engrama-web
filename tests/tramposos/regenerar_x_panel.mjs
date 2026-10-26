@@ -38,6 +38,9 @@ const TRAMPOSOS = {
   x_panel_mock_otra_forma: {
     'panel.mjs': cambiar(leer('herramientas/mock/panel.mjs'), '  return { status: 200, cuerpo: { hoy: HOY, metricas: c.metricas,', '  return { status: 200, cuerpo: { hoy: HOY, cifras: c.metricas /* TRAMPOSO: otra forma que el backend */, metricas: c.metricas,'),
   },
+  x_panel_tablero_403_super: {
+    'tablero.js': cambiar(leer('src/vistas/admin/tablero.js'), ', null, T.tablero.sinPermiso); // H-6: un 403 aquí no es "solo del super admin"', '); // TRAMPOSO: el 403 del tablero dice "solo del super admin"'),
+  },
   x_panel_super_por_rol: {
     'perfil_actual.js': cambiar(leer('src/auth/perfil_actual.js'), "    superAdmin: profileOut.role === 'super_admin',",
       "    superAdmin: profileOut.role === 'super_admin' || membresia.role === 'admin', // TRAMPOSO"),

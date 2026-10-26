@@ -1,7 +1,7 @@
 // @ts-check
 // PW1-PW7 (docs/ESPEC_panel_super_admin.md §4): el panel del super admin y el tablero del admin en la web. Se pintan con el DOM de mentira y un
 // servidor fijo. Tramposos (tests/tramposos/, uno a la vez): x_panel_grafica_invertida (PW1), x_panel_admin_pinta_nombre (PW2),
-// x_panel_403_pinta_ceros (PW3), x_panel_oro_fuera_de_monedas (PW4), x_panel_super_por_rol (PW6).
+// x_panel_403_pinta_ceros (PW3), x_panel_oro_fuera_de_monedas (PW4), x_panel_super_por_rol (PW6), x_panel_tablero_403_super (PW7, H-6).
 import test from 'node:test';
 import assert from 'node:assert/strict';
 import { readFileSync } from 'node:fs';
@@ -96,6 +96,15 @@ test('PW3: la lista del super admin con 403 dice "solo del super admin" y no pin
       assert.ok(textoDe(raiz).includes('solo del super admin'));
     } finally { cerrar(); }
   }
+});
+
+test('PW7: un 403 en el tablero del admin dice que la cuenta no tiene permiso en esta institución, nunca "solo del super admin", y no pinta cifras', async () => {
+  const { raiz, cerrar } = await pintar({ 'GET /admin/metricas': prohibido(403, 'Admin role required') }, (r) => renderTablero(r, ctxAdmin()));
+  try {
+    const texto = textoDe(raiz);
+    const visto = { superAdmin: texto.includes('super admin'), propio: texto.includes('no tiene permiso para ver las cifras de esta institución'), cifras: conTestid(raiz, 'panel-kpis').length };
+    assert.deepEqual(visto, { superAdmin: false, propio: true, cifras: 0 }, `PW7: ${JSON.stringify(visto)}`);
+  } finally { cerrar(); }
 });
 
 test('PW3: un cliente que no existe (404) lo dice y ofrece la lista; sin red dice "Sin conexión" con Reintentar', async () => {

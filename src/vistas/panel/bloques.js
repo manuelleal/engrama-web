@@ -75,14 +75,15 @@ export function tarjetaActivos(m) {
 
 /**
  * Lo que se pinta si las cifras no llegan: sin red, sin permiso (403: solo el super admin) o error. Nunca una cifra vieja.
- * @param {HTMLElement} cuerpo @param {unknown} e @param {() => void} reintentar @param {{camino: string, texto: string}|null} [salida]
+ * `sinPermiso`: lo que dice un 403 (por omisión, "solo del super admin": el de las pantallas /super; el tablero del admin pasa el suyo, H-6).
+ * @param {HTMLElement} cuerpo @param {unknown} e @param {() => void} reintentar @param {{camino: string, texto: string}|null} [salida] @param {string} [sinPermiso]
  */
-export function pintarFallo(cuerpo, e, reintentar, salida = null) {
+export function pintarFallo(cuerpo, e, reintentar, salida = null, sinPermiso = T.soloSuper) {
   vaciar(cuerpo);
   const status = e instanceof ErrorApi ? e.status : -1;
   if (status === 403 || status === 404) {
     cuerpo.appendChild(h('div', { class: 'sx-tarjeta panel-aviso', role: 'alert', 'data-testid': status === 403 ? 'panel-sin-permiso' : 'panel-no-existe' },
-      h('p', { class: 'estado estado--mal' }, h('span', { 'aria-hidden': 'true' }, crearIcono('candado')), status === 403 ? T.soloSuper : T.noExiste),
+      h('p', { class: 'estado estado--mal' }, h('span', { 'aria-hidden': 'true' }, crearIcono('candado')), status === 403 ? sinPermiso : T.noExiste),
       salida ? h('a', { class: 'sx-btn sx-btn--sec', href: `#${salida.camino}` }, salida.texto) : null));
     return;
   }

@@ -28,6 +28,8 @@ export const textosPanel = {
     apoyo: (/** @type {number} */ profes, /** @type {number} */ grupos) => `${fmt(profes)} ${profes === 1 ? 'profe' : 'profes'} · ${fmt(grupos)} ${grupos === 1 ? 'grupo' : 'grupos'}`,
     todosLosClientes: 'Todos los clientes (super admin)',
     serie: 'Tu institución · últimos 30 días',
+    // H-6 (auditoría del panel): un 403 aquí no es "solo del super admin": la cuenta no es admin de ESTA institución.
+    sinPermiso: 'Tu cuenta no tiene permiso para ver las cifras de esta institución.',
   },
   // El super admin
   super: {

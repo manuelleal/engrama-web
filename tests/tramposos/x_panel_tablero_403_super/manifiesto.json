@@ -1,0 +1,16 @@
+{
+  "descripcion": "H-6: el tablero del admin, ante un 403, dice \"solo del super admin\" (no es lo que pasó: la cuenta no es admin de esta institución).",
+  "archivos": {
+    "src/vistas/admin/tablero.js": "tablero.js"
+  },
+  "comando": [
+    "node",
+    "--test",
+    "--test-reporter=tap",
+    "tests/unit/panel_super.test.mjs"
+  ],
+  "espera_codigo_no_cero": true,
+  "espera_fallan_tests": [
+    "PW7: un 403 en el tablero del admin dice que la cuenta no tiene permiso en esta institución, nunca \"solo del super admin\", y no pinta cifras"
+  ]
+}
