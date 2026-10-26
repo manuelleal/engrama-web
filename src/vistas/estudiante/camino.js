@@ -25,7 +25,9 @@ function estacion(e, i) {
     class: `estacion-camino estacion--${e.estado} acceso--${e.acceso}${e.recomendada ? ' es-recomendada' : ''}`,
     'data-testid': `camino-unidad-${i + 1}`, 'data-estado': e.estado, 'data-acceso': e.acceso, 'aria-current': e.recomendada ? 'step' : null,
   },
-  h('span', { class: 'estacion-camino__marca', 'aria-hidden': 'true' }, String(i + 1)),
+  // docs/ESPEC_visual_fluidez.md §3: el nodo lleva el ÍCONO del estado (la recomendada, la estrella); el número va en el nombre ("Unidad N"), y si no
+  // hay SVG en el entorno, el nodo cae al número. Es decorativo (`aria-hidden`): el estado se lee en su línea, con ícono y texto.
+  h('span', { class: 'estacion-camino__marca', 'aria-hidden': 'true' }, crearIcono(e.recomendada ? 'estrella' : e.icono) ?? String(i + 1)),
   h('div', { class: 'estacion-camino__cuerpo' },
     e.recomendada ? h('p', { class: 'camino-recomendada', 'data-testid': 'camino-recomendada' }, crearIcono('estrella'), T.recomendada) : null,
     h('h2', { class: 'estacion-camino__nombre' }, e.nombre),
@@ -51,12 +53,25 @@ export async function renderCamino(raiz, ctx) {
   if (r.tipo === 'sin_ruta') { aviso(raiz, ctx, T.noDisponible, false); return; }
   if (r.tipo === 'error') { aviso(raiz, ctx, T.noSePudo, true); return; }
   const plan = planDeCamino(r.camino);
+  // docs/ESPEC_visual_fluidez.md §3: el camino primero; las reglas, debajo (antes empujaban la recomendada fuera de la pantalla a 375 px).
   pintar(raiz, ctx,
     h('section', { class: 'camino-cabecera', 'data-testid': 'camino-cabecera' },
       h('p', { class: 'sx-t-tarjeta', 'data-testid': 'camino-nivel' }, plan.titulo),
-      ...plan.avisos.map((a) => h('p', { class: 'sx-t-apoyo' }, a)),
-      h('p', { class: 'sx-t-apoyo', 'data-testid': 'camino-reglas' }, plan.reglas)),
+      ...plan.avisos.map((a) => h('p', { class: 'sx-t-apoyo' }, a))),
     plan.estaciones.length
       ? h('ol', { class: 'lista-camino', 'data-testid': 'camino-lista', 'aria-label': T.lista }, ...plan.estaciones.map(estacion))
-      : h('p', { class: 'sx-vacio', role: 'status', 'data-testid': 'camino-vacio' }, T.vacio));
+      : h('p', { class: 'sx-vacio', role: 'status', 'data-testid': 'camino-vacio' }, T.vacio),
+    h('p', { class: 'sx-t-apoyo camino-reglas', 'data-testid': 'camino-reglas' }, plan.reglas));
+  globalThis.requestAnimationFrame?.(() => mostrarElSiguiente(raiz));
+}
+
+/**
+ * El siguiente paso, a la vista: si la recomendada queda debajo de la barra de abajo, la página baja LO MÍNIMO (sin animar el desplazamiento) para
+ * dejarla entera sobre la barra. Si ya se ve, no se mueve nada. @param {HTMLElement} raiz
+ */
+function mostrarElSiguiente(raiz) {
+  const paso = raiz.querySelector?.('[aria-current="step"]');
+  const alto = globalThis.innerHeight ?? 0;
+  const sobra = paso?.getBoundingClientRect ? paso.getBoundingClientRect().bottom - (alto - 96) : 0;
+  if (alto && sobra > 0) globalThis.scrollBy?.(0, sobra);
 }
