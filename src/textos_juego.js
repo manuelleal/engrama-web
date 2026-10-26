@@ -12,6 +12,7 @@ export const textosJuego = {
     /** @param {number} n */
     incluyeConstancia: (n) => (n > 0 ? `Incluye +${n} por tu constancia` : ''),
     bolsaAgotada: 'No pudimos guardar tu reto: la bolsa de monedas de tu institución se agotó. No es por tus respuestas. Avísale a tu profe.',
+    aciertos: 'Aciertos', // docs/ESPEC_visual_fluidez.md §2: el rótulo de la ficha de aciertos del resumen. PROVISIONAL
   },
   // W47: la pantalla "Mis monedas" (`#/monedas`) y su enlace desde Inicio.
   monedas: {

@@ -552,21 +552,38 @@ body {
   margin: 0;
   max-width: 34ch;
 }
+/* El resumen (docs/ESPEC_visual_fluidez.md §2): una fila de fichas del sistema (`sx-dato`), Aciertos y Monedas, del mismo ancho. */
+.hero-fichas {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 11rem));
+  justify-content: center;
+  gap: 12px;
+  width: 100%;
+  margin-top: 10px;
+}
+.hero-fichas--una {
+  grid-template-columns: minmax(0, 11rem);
+}
+.hero-fichas .sx-dato__rotulo {
+  min-height: 30px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 4px;
+}
+.ficha-aciertos .sx-icono {
+  width: 16px;
+  height: 16px;
+}
 .hero-puntaje {
-  margin: 4px 0 0;
-  font-family: var(--fuente-titulos);
-  font-weight: 800;
-  font-size: 2.4rem;
-  color: var(--primario);
+  margin: 0;
+  color: var(--sx-ok);
 }
 .hero-puntaje-num {
   display: inline-block;
   transform-origin: center;
 }
-/* La medalla es la tarjeta-dato del sistema (`sx-dato`): acá solo su ancho y su entrada. */
 .medalla-monedas {
-  min-width: 11rem;
-  margin-top: 8px;
   animation: medalla-pop 700ms cubic-bezier(0.2, 1.9, 0.4, 1) 450ms backwards;
 }
 .medalla-num {

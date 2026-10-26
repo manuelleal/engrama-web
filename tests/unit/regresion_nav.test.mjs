@@ -151,7 +151,11 @@ const RESULTADO_B1 = { revision: ['revision-q1-resultado', 'revision-q2-resultad
 const CHIP_DE_LOGRO = { etiqueta: 'span', clase: 'chip-estado' };
 const GLIFOS_B1 = { solicitudes: ['solicitud-7-estado'], retos: ['reto-reto-0-estado'], profe_logro: [CHIP_DE_LOGRO] };
 
-const CAPAS = [HASTA_W70, VOLVER_W71, SALIR_W73, SONIDO_S1, NUMEROS_S1, CABECERA_S1, RETO_T2, RESULTADO_B1, GLIFOS_B1];
+// La fluidez del ciclo (docs/ESPEC_visual_fluidez.md §2, rama diseno/fluidez): en la revisión, el puntaje y la medalla pasan a UNA fila de fichas del sistema
+// (`div.hero-fichas`: Aciertos, con su ícono y la palabra, y Monedas). Cambia SOLO esa fila (que ahora contiene `puntaje` y `div.medalla-monedas`, ya declarados).
+const FICHAS_FLUIDEZ = { revision: [{ etiqueta: 'div', clase: 'hero-fichas' }] };
+
+const CAPAS = [HASTA_W70, VOLVER_W71, SALIR_W73, SONIDO_S1, NUMEROS_S1, CABECERA_S1, RETO_T2, RESULTADO_B1, GLIFOS_B1, FICHAS_FLUIDEZ];
 /** @type {Record<string, Array<string|{etiqueta: string, clase?: string}>>} */
 export const DECLARADAS_NAV = Object.fromEntries([...new Set(CAPAS.flatMap((c) => Object.keys(c)))].map((nombre) => [nombre, [...new Set(CAPAS.flatMap((c) => c[nombre] || []))]]));
 
