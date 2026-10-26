@@ -84,6 +84,8 @@ async function pintarVista(raiz, ctx, mensajePrevio) {
   montar(raiz, vista);
   // Lingo Coins (decisión 017): el enlace a "Profesores" (presupuestos y recarga), de un módulo diferido; solo aparece si el backend trae los presupuestos.
   import('./profesores.js').then((m) => m.agregarEnlaceDeProfesores(vista, form, ctx)).catch((e) => console.warn('vistas/admin/crear_grupo: sin el enlace a Profesores', e));
+  // Invitar profes por correo (engrama-backend ESPEC_invitar_profe §5): el enlace solo aparece si el backend responde la lista de invitaciones.
+  import('./invitar.js').then((m) => m.agregarEnlaceDeInvitar(vista, form, ctx)).catch((e) => console.warn('vistas/admin/crear_grupo: sin el enlace a invitar', e));
   if (mensajePrevio) { const z = form.querySelector('[data-testid="crear-grupo-mensaje"]'); if (z) z.textContent = mensajePrevio; }
   document.body.dataset.listo = '1';
   window.addEventListener('hashchange', cancelarRed, { once: true });

@@ -46,12 +46,13 @@ import { renderPuja } from '../../src/vistas/estudiante/puja.js';
 import { renderTiendaGrupo } from '../../src/vistas/profe/tienda_grupo.js';
 import { renderPujaProfe } from '../../src/vistas/profe/puja_profe.js';
 import { renderProfesores } from '../../src/vistas/admin/profesores.js';
+import { renderInvitar } from '../../src/vistas/admin/invitar.js'; // invitar profes por correo (engrama-backend ESPEC_invitar_profe §5)
 
 const CODIGO = 'SINT-B1-01';
 const P = { gid: GID };
 const LIBRO = { wallet: { id: 'w-1', balance: 120 }, entries: [{ id: 'a-1', amount: 10, action: 'attendance', to_wallet_id: 'w-1', metadata: { base: 5, puntualidad: 5 }, created_at: '2026-10-20T23:00:00Z' }], total: 1 }; // W47: lo que pide "Mis monedas"
 const SERVIDOR = { ...RUTAS_NAV, 'GET /core/coins/balance': { balance: 120, currency: 'COIN' }, 'GET /core/coins/history': LIBRO, 'GET /core/attendance/history': [], 'GET /teachers/groups/g2/solicitudes': [],
-  'GET /core/shop': [], 'GET /core/inventory': [], 'GET /subastas/activa': null, 'GET /teachers/shop-items': [], 'GET /teachers/deliveries': [], 'GET /admin/budgets': { pool_balance: 0, pool_emitted: 0, pockets: [] } };
+  'GET /core/shop': [], 'GET /core/inventory': [], 'GET /subastas/activa': null, 'GET /teachers/shop-items': [], 'GET /teachers/deliveries': [], 'GET /admin/budgets': { pool_balance: 0, pool_emitted: 0, pockets: [] }, 'GET /admin/invitaciones': [] };
 const todas = (valor) => Object.fromEntries(Object.keys(SERVIDOR).map((k) => [k, valor]));
 const ESTADOS = {
   contenido: SERVIDOR,
@@ -92,6 +93,7 @@ const PANTALLAS = /** @type {Record<string, (r: any) => unknown>} */ ({
   '/admin/asignar-docente/:gid': (r) => renderAsignarDocente(r, P, ctxAdmin()),
   '/admin/importar-csv/:gid': (r) => renderImportarCsv(r, P, ctxAdmin()),
   '/admin/profesores': (r) => renderProfesores(r, ctxAdmin()),
+  '/admin/invitar': (r) => renderInvitar(r, ctxAdmin()),
 });
 
 test('U62: esta prueba pinta TODAS las rutas de la tabla (menos el reto en curso, que no lleva barra ni volver)', () => {

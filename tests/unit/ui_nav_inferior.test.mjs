@@ -81,7 +81,7 @@ test('U60: en las pantallas del profe queda activa Mis grupos (Retos en sus reto
     '/profe/grupo/:gid/tienda': 'misGrupos', '/profe/grupo/:gid/puja': 'misGrupos', // Lingo Coins (decisión 017)
     '/perfil': 'perfil', '/datos': 'perfil', '/datos/solicitudes': 'perfil',
   };
-  const DEL_ADMIN = { '/admin': 'grupos', '/admin/asignar-docente/:gid': 'grupos', '/admin/importar-csv/:gid': 'grupos', '/admin/profesores': 'grupos', '/perfil': 'perfil', '/datos': 'perfil', '/datos/solicitudes': 'perfil' };
+  const DEL_ADMIN = { '/admin': 'grupos', '/admin/asignar-docente/:gid': 'grupos', '/admin/importar-csv/:gid': 'grupos', '/admin/profesores': 'grupos', '/admin/invitar': 'grupos', '/perfil': 'perfil', '/datos': 'perfil', '/datos/solicitudes': 'perfil' };
   for (const [patron, esperada] of Object.entries(DEL_PROFE)) assert.deepEqual(activas(entradasNav('teacher', patron)), [esperada], `profe en ${patron}`);
   for (const [patron, esperada] of Object.entries(DEL_ADMIN)) assert.deepEqual(activas(entradasNav('admin', patron)), [esperada], `admin en ${patron}`);
   const deTabla = RUTAS.filter((r) => r.roles.includes('teacher')).map((r) => r.patron).sort();

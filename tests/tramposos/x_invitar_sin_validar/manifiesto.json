@@ -1,0 +1,16 @@
+{
+  "descripcion": "WI1: el formulario no valida nada (faltaParaInvitar siempre null): sale la petición con el nombre vacío o el correo mal escrito.",
+  "archivos": {
+    "src/vistas/admin/invitar.js": "invitar.js"
+  },
+  "comando": [
+    "node",
+    "--test",
+    "--test-reporter=tap",
+    "tests/unit/vista_invitar.test.mjs"
+  ],
+  "espera_codigo_no_cero": true,
+  "espera_fallan_tests": [
+    "WI1: invitar valida sin pedir nada; con datos manda un POST {nombre, correo, group_id} y vuelve a leer la lista"
+  ]
+}

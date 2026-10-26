@@ -20,7 +20,7 @@ const SALIDA = (nombre) => `${RAIZ}salida/${nombre}`;
 /** §10.1, tal cual la fijó la espec (antes de cualquier código). */
 const ESPERADO_DESARROLLO = {
   semilla: 20261008,
-  rutas: { student: 16, teacher: 12, admin: 7 }, // W47 (ESPEC_juego_oleada1 17.1.4): el estudiante gana #/monedas (9 -> 10); W80 (ESPEC_practica_del_dia): gana #/repaso (10 -> 11); W92 (ESPEC_camino_y_tu_palabra §3, declarado): gana #/camino (11 -> 12); sprint de la magia (ESPEC_avatar_fluidez, declarado): #/avatar y #/insignias (12 -> 14); Lingo Coins (decisión 017): el estudiante gana la tienda y la mochila (14 -> 16), el profe la tienda y la puja del grupo (10 -> 12), el admin Profesores (6 -> 7)
+  rutas: { student: 16, teacher: 12, admin: 8 }, // W47 (ESPEC_juego_oleada1 17.1.4): el estudiante gana #/monedas (9 -> 10); W80 (ESPEC_practica_del_dia): gana #/repaso (10 -> 11); W92 (ESPEC_camino_y_tu_palabra §3, declarado): gana #/camino (11 -> 12); sprint de la magia (ESPEC_avatar_fluidez, declarado): #/avatar y #/insignias (12 -> 14); Lingo Coins (decisión 017): el estudiante gana la tienda y la mochila (14 -> 16), el profe la tienda y la puja del grupo (10 -> 12), el admin Profesores (6 -> 7); invitar profes (engrama-backend ESPEC_invitar_profe §5, declarado): el admin gana Profes: invitar (7 -> 8)
   barra: { student: ['Inicio', 'Retos', 'Asistencia', 'Perfil'], teacher: ['Mis grupos', 'Retos', 'Perfil'], admin: ['Grupos', 'Perfil'] },
   sin_barra: ['/retos/:id'],
   sin_salida: [],

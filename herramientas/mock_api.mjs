@@ -40,6 +40,7 @@ import {
   leerSaldosDelGrupo, darMonedas, corregirEntrega, leerPresupuestosDelAdmin, recargarBolsillo,
 } from './mock/tienda.mjs';
 import { leerPujaActiva, crearPuja, pujarPor, cerrarPuja } from './mock/subastas.mjs';
+import { listarInvitaciones, invitarProfe, reenviarInvitacion } from './mock/invitaciones.mjs';
 
 const RUTAS = construirRutas();
 
@@ -125,6 +126,10 @@ function construirRutas() {
     r('POST', '/admin/groups/:gid/teachers', (estado, req, p, body) => asignarDocente(estado, req, p.gid, body)),
     r('POST', '/admin/groups/:gid/students', (estado, req, p, body) => inscribirUnEstudiante(estado, req, p.gid, body)),
     r('POST', '/admin/groups/:gid/students/import', (estado, req, p, body) => importarCsv(estado, req, p.gid, body), { textoCrudo: true }),
+    // Invitar profes por correo (engrama-backend ESPEC_invitar_profe §3; mock/invitaciones.mjs).
+    r('GET', '/admin/invitaciones', (estado, req) => listarInvitaciones(estado, req)),
+    r('POST', '/admin/invitaciones', (estado, req, p, body) => invitarProfe(estado, req, body)),
+    r('POST', '/admin/invitaciones/:id/reenviar', (estado, req, p) => reenviarInvitacion(estado, req, p.id)),
 
     r('GET', '/teachers/groups', (estado, req) => listarGrupos(estado, req)),
     r('GET', '/teachers/groups/:gid/students', (estado, req, p) => listarEstudiantes(estado, req, p.gid)),

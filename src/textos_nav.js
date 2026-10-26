@@ -78,4 +78,8 @@ export const textosNav = {
     lanzarPuja: 'Lanzar puja',
     profesores: 'Profesores',
   },
+  // Invitar profes por correo (engrama-backend docs/ESPEC_invitar_profe.md §5): el título de la pantalla. Lo de adentro, en textos_invitar.js (diferido).
+  invitarNav: {
+    titulo: 'Profes: invitar',
+  },
 };

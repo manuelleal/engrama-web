@@ -1,0 +1,16 @@
+{
+  "descripcion": "WI5: el enlace de la invitación se canjea con type \"recovery\" (medido en GoTrue v2.196.0: 403, el profe nunca podría entrar).",
+  "archivos": {
+    "src/auth/supabase_rest.js": "supabase_rest.js"
+  },
+  "comando": [
+    "node",
+    "--test",
+    "--test-reporter=tap",
+    "tests/unit/vista_invitar.test.mjs"
+  ],
+  "espera_codigo_no_cero": true,
+  "espera_fallan_tests": [
+    "WI5: el enlace de la invitación: pintar no gasta nada; Guardar canjea con type invite, cambia con ESE Bearer y cierra"
+  ]
+}

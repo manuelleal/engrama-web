@@ -69,6 +69,7 @@ export const RUTAS = [
   { patron: '/profe/retos', roles: ['teacher'], porDireccion: ['admin'], pestana: 'retosProfe', barra: true, vuelve: null, titulo: () => textos.profe.retos.titulo },
   { patron: '/admin', roles: ['admin'], pestana: 'grupos', barra: true, vuelve: null, titulo: () => textos.admin.grupos.titulo },
   { patron: '/admin/profesores', roles: ['admin'], pestana: 'grupos', barra: true, vuelve: '/admin', titulo: () => textos.economiaNav.profesores },
+  { patron: '/admin/invitar', roles: ['admin'], pestana: 'grupos', barra: true, vuelve: '/admin', titulo: () => textos.invitarNav.titulo }, // invitar profes por correo
   { patron: '/admin/asignar-docente/:gid', roles: ['admin'], pestana: 'grupos', barra: true, vuelve: '/admin', titulo: conGrupo(textos.admin.asignarDocente.titulo) },
   { patron: '/admin/importar-csv/:gid', roles: ['admin'], pestana: 'grupos', barra: true, vuelve: '/admin', titulo: conGrupo(textos.admin.importarCsv.titulo) },
 ];

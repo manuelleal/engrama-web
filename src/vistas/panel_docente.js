@@ -16,3 +16,4 @@ export { renderImportarCsv } from './admin/importar_csv.js';
 export { renderTiendaGrupo } from './profe/tienda_grupo.js'; // Lingo Coins (decisión 017)
 export { renderPujaProfe } from './profe/puja_profe.js';
 export { renderProfesores } from './admin/profesores.js';
+export { renderInvitar } from './admin/invitar.js'; // invitar profes por correo (engrama-backend ESPEC_invitar_profe)
