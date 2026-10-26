@@ -32,6 +32,26 @@ export function retitularFranja(nodo, r, textoCorrecta) {
   const titulo = tituloDeFranja(r, textoCorrecta);
   const veredicto = conTestid(nodo, 'explicacion-veredicto');
   if (titulo && veredicto) { vaciar(veredicto); veredicto.appendChild(texto(titulo)); }
+  if (recienComprobada(nodo)) anunciarResultado(nodo, r);
+}
+
+/**
+ * ¿Esta pantalla con banda es la de "acabo de comprobar"? reto_l1.js repinta QUIETA (`juego-quieta`) justo después de comprobar; al retomar un
+ * intento ya respondido, o al pasar de pregunta, pinta con `juego-desliza`. Así la franja solo sube cuando el estudiante acaba de tocar
+ * Comprobar, sin tocar reto_l1.js (docs/ESPEC_visual_fluidez.md §1). Pura sobre el nodo. @param {any} nodo
+ */
+export function recienComprobada(nodo) {
+  return String(nodo?.className ?? '').split(/\s+/).includes('juego-quieta');
+}
+
+/**
+ * La respuesta se siente al instante (docs/ESPEC_visual_fluidez.md §1): la franja sube desde abajo y, si falló, "Tu respuesta" tiembla una vez,
+ * apenas (sin sonido de castigo ni vidas). Solo clases: el movimiento es de magia.css (transform), y con reduced-motion el apagador de base.css
+ * lo deja en su sitio. El acierto lo sigue celebrando `celebrarAcierto`. @param {any} nodo @param {{is_correct?: boolean}} r
+ */
+function anunciarResultado(nodo, r) {
+  nodo.querySelector?.('.banda-explicacion')?.classList.add('sube');
+  if (r?.is_correct !== true) nodo.querySelector?.('.es-incorrecta')?.classList.add('tiembla');
 }
 
 /** El primer descendiente con ese data-testid, recorriendo los hijos (sirve también en el DOM de las pruebas, sin querySelector). @returns {any} */

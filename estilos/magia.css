@@ -33,6 +33,60 @@
   width: 18px;
   height: 18px;
 }
+/* docs/ESPEC_visual_fluidez.md §1: la barra de la sesión es UNA cosa que avanza. 16 px, color de acción (el oro es solo logro) con el brillo del
+   sistema, y se llena con la curva del sistema (sin rebote). Al pasar de pregunta, la barra, el chip y "Pregunta N de M" se quedan quietos: solo
+   entra el enunciado con sus opciones, desde 32 px. Las opciones, al alto de `sx-opcion` (56 px). */
+.fila-avance > .progreso-reto {
+  height: var(--sx-alto-progreso, 16px);
+  background: var(--sx-pista);
+}
+.fila-avance .progreso-relleno {
+  position: relative;
+  background: var(--sx-accion);
+  animation-duration: var(--sx-dur-3);
+  animation-timing-function: var(--sx-curva);
+}
+.fila-avance .progreso-relleno::after {
+  content: "";
+  display: var(--sx-ver-brillo, block);
+  position: absolute;
+  left: 2%;
+  right: 2%;
+  top: 25%;
+  height: 30%;
+  border-radius: 999px;
+  background: color-mix(in srgb, white 24%, transparent);
+}
+.juego-desliza > .fila-avance,
+.juego-desliza > .presenta-pregunta,
+.juego-desliza > [data-testid="banner-repaso"] {
+  animation: none;
+}
+.juego[data-modo="por-pregunta"].juego-desliza > :is(.enunciado, ul) {
+  animation: magia-entra var(--sx-dur-2) var(--sx-curva) backwards;
+}
+@keyframes magia-entra {
+  from { opacity: 0; transform: translateX(32px); }
+}
+#vista .juego[data-modo="por-pregunta"] [data-testid^="opcion-"] {
+  min-height: 56px;
+  font-size: var(--sx-t-opcion);
+}
+/* La franja sube desde abajo al comprobar (solo recién comprobada: ui/fluidez.js) y, si falló, "Tu respuesta" tiembla una vez, 4 px. */
+.juego .banda-explicacion.sube {
+  animation: magia-sube var(--sx-dur-2) var(--sx-curva) 1 backwards;
+}
+@keyframes magia-sube {
+  from { transform: translateY(100%); }
+}
+#vista .juego [data-testid^="opcion-"].es-incorrecta.tiembla {
+  animation: magia-tiembla 300ms ease-in-out 1;
+}
+@keyframes magia-tiembla {
+  0%, 100% { transform: translateX(0); }
+  25% { transform: translateX(-4px); }
+  75% { transform: translateX(4px); }
+}
 .juego .es-correcta.salta {
   animation: magia-salta 420ms cubic-bezier(.35, 1.8, .35, .83) 1;
 }
