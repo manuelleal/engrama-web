@@ -232,7 +232,7 @@
   margin: 0 0 24px;
   padding: 8px 0 0;
   display: grid;
-  gap: 28px;
+  gap: 20px;
 }
 .lista-camino::before {
   content: "";
@@ -248,7 +248,7 @@
   position: relative;
   display: grid;
   justify-items: center;
-  gap: 10px;
+  gap: 8px;
   text-align: center;
 }
 /* El nodo se mece 24 px: menos que su radio, así la vía del centro siempre lo atraviesa. */
@@ -256,8 +256,8 @@
 .estacion-camino:nth-child(4n + 4) { --x: -24px; }
 .estacion-camino__marca {
   position: relative;
-  width: 64px;
-  height: 64px;
+  width: 56px;
+  height: 56px;
   border-radius: 50%;
   display: grid;
   place-items: center;
@@ -267,10 +267,11 @@
   border: 3px solid var(--sx-borde-3);
   box-shadow: 0 5px 0 var(--sx-labio-neutro);
   transform: translateX(var(--x));
+  scroll-margin-bottom: 96px; /* al traerla a la vista, que quede sobre la barra de abajo */
 }
 .estacion-camino__marca .sx-icono {
-  width: 28px;
-  height: 28px;
+  width: 26px;
+  height: 26px;
 }
 .estacion-camino__cuerpo {
   display: grid;
@@ -310,21 +311,21 @@
   letter-spacing: 0.04em;
 }
 .estacion-camino.es-recomendada .estacion-camino__marca {
-  width: 80px;
-  height: 80px;
+  width: 68px;
+  height: 68px;
   background: var(--sx-accion);
   color: var(--sx-sobre-accion);
   border-color: var(--sx-accion);
   box-shadow: var(--sx-brillo), 0 6px 0 var(--sx-accion-labio);
 }
 .estacion-camino.es-recomendada .estacion-camino__marca .sx-icono {
-  width: 36px;
-  height: 36px;
+  width: 32px;
+  height: 32px;
 }
 .estacion-camino.es-recomendada .estacion-camino__marca::after {
   content: "";
   position: absolute;
-  inset: -10px;
+  inset: -9px;
   border-radius: 50%;
   border: 4px solid var(--sx-accion-borde);
   animation: camino-anillo var(--sx-dur-3) var(--sx-curva-rebote) 200ms backwards;

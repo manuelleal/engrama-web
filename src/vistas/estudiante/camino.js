@@ -66,12 +66,13 @@ export async function renderCamino(raiz, ctx) {
 }
 
 /**
- * El siguiente paso, a la vista: si la recomendada queda debajo de la barra de abajo, la página baja LO MÍNIMO (sin animar el desplazamiento) para
- * dejarla entera sobre la barra. Si ya se ve, no se mueve nada. @param {HTMLElement} raiz
+ * El siguiente paso, a la vista: SOLO si el nodo de la recomendada no se ve (queda bajo la barra de abajo), se trae con `block: 'nearest'` (lo
+ * mínimo; `scroll-margin-bottom` lo deja sobre la barra) y sin animar. Si ya se ve, no se mueve nada y la cabecera queda arriba.
+ * @param {HTMLElement} raiz
  */
 function mostrarElSiguiente(raiz) {
-  const paso = raiz.querySelector?.('[aria-current="step"]');
+  const nodo = raiz.querySelector?.('[aria-current="step"] .estacion-camino__marca');
   const alto = globalThis.innerHeight ?? 0;
-  const sobra = paso?.getBoundingClientRect ? paso.getBoundingClientRect().bottom - (alto - 96) : 0;
-  if (alto && sobra > 0) globalThis.scrollBy?.(0, sobra);
+  if (!alto || !nodo?.getBoundingClientRect) return;
+  if (nodo.getBoundingClientRect().bottom > alto - 96) nodo.scrollIntoView({ block: 'nearest' });
 }
