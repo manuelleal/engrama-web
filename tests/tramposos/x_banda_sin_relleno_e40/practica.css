@@ -371,9 +371,13 @@
   font-weight: 700;
   color: var(--sx-accion-tinta);
 }
-/* docs/ESPEC_visual_fluidez.md §3: con su dibujo (ui/magia_inicio.js), el enlace es una tarjeta-enlace a lo ancho: secundaria (no compite con "Seguir"). */
-#vista .enlace-camino.con-dibujo {
+/* docs/ESPEC_visual_fluidez.md §3: con su dibujo (ui/magia_inicio.js), el enlace es una tarjeta-enlace a lo ancho: secundaria (no compite con "Seguir").
+   Especificidad 1,4,1 (id, dos clases y dos atributos: es EL enlace del camino y es un enlace de verdad): tiene que ganarle a la regla general de los
+   enlaces con data-testid de componentes.css (1,2,1, que lo volvía un chip de 14,7 px) y a la de cara.css (1,3,1, que carga después). */
+#vista a.enlace-camino.con-dibujo[data-testid="ir-a-camino"][href] {
   display: flex;
+  box-sizing: border-box;
+  width: 100%;
   align-items: center;
   gap: 12px;
   margin: 12px 0 8px;
@@ -382,6 +386,7 @@
   border-bottom-width: 4px;
   border-radius: var(--radio-md);
   background: var(--sx-superficie);
+  color: var(--sx-accion-tinta);
   font: 800 1.0625rem/1.25 var(--fuente-titulos);
   text-decoration: none;
 }
@@ -389,4 +394,13 @@
   flex: none;
   width: 72px;
   height: 40px;
+}
+.enlace-camino__texto {
+  flex: 1 1 auto;
+  min-width: 0;
+}
+.enlace-camino.con-dibujo > .sx-icono {
+  flex: none;
+  width: 22px;
+  height: 22px;
 }

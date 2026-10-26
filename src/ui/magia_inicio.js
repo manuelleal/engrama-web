@@ -53,7 +53,10 @@ function adornarCamino(avatar) {
   const dibujo = enlace ? crearDibujoCamino() : null;
   if (!enlace || !dibujo) return;
   enlace.classList.add('con-dibujo');
-  enlace.insertBefore(dibujo, enlace.firstChild);
+  const texto = h('span', { class: 'enlace-camino__texto' }, ...[...enlace.childNodes]); // el texto de siempre, sin cambiar una letra
+  enlace.append(dibujo, texto);
+  const chevron = crearIcono('chevron');
+  if (chevron) enlace.appendChild(chevron);
 }
 
 /** @param {{avatar: HTMLElement, insignias: HTMLElement|null, ctx: any, datos: any}} o */
