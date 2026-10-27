@@ -1,0 +1,17 @@
+{
+  "descripcion": "El tablero del admin pinta el nombre del cliente si el servidor lo manda (api/panel.js lo deja pasar y la vista lo escribe).",
+  "archivos": {
+    "src/api/panel.js": "panel.js",
+    "src/vistas/admin/tablero.js": "tablero.js"
+  },
+  "comando": [
+    "node",
+    "--test",
+    "--test-reporter=tap",
+    "tests/unit/panel_super.test.mjs"
+  ],
+  "espera_codigo_no_cero": true,
+  "espera_fallan_tests": [
+    "PW2: el tablero del admin pinta SUS cifras y nunca un nombre ni un id del cliente, aunque el servidor los mandara"
+  ]
+}

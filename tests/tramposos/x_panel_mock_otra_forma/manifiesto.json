@@ -1,0 +1,16 @@
+{
+  "descripcion": "El doble del panel responde /admin/metricas con una clave que el backend real no tiene: las capturas con el doble mentirían.",
+  "archivos": {
+    "herramientas/mock/panel.mjs": "panel.mjs"
+  },
+  "comando": [
+    "node",
+    "--test",
+    "--test-reporter=tap",
+    "tests/contrato/panel_super.test.mjs"
+  ],
+  "espera_codigo_no_cero": true,
+  "espera_fallan_tests": [
+    "PC2: el doble responde con la MISMA forma que el backend real en las tres rutas"
+  ]
+}

@@ -56,7 +56,7 @@ test('íconos: la barra de los tres roles, el botón del sonido y las filas de M
     contenidoDelBoton(true).icono, contenidoDelBoton(false).icono,
     ...filasDeMovimientos({ wallet: { id: 'w' }, entries: ['attendance', 'challenge', 'live', 'cosa_nueva'].map((action) => ({ action, amount: 5, to_wallet_id: 'w', created_at: '2026-10-20T15:00:00Z' })) }).map((f) => f.icono),
   ];
-  assert.equal(usados.length, 4 + 3 + 2 + 2 + 4);
+  assert.equal(usados.length, 4 + 3 + 3 + 2 + 4); // panel del super admin: la barra del admin gana Tablero (declarado)
   for (const nombre of usados) assert.ok(ICONOS.includes(nombre), `"${nombre}" no es un ícono de ui/iconos.js`);
   assert.notEqual(contenidoDelBoton(true).icono, contenidoDelBoton(false).icono, 'con sonido y en silencio se dibujan distinto (no solo cambia el color)');
   for (const ruta of ['src/ui/nav_inferior.js', 'src/ui/boton_sonido.js', 'src/ui/movimientos.js', 'src/ui/iconos.js', 'src/vistas/estudiante/monedas.js']) {

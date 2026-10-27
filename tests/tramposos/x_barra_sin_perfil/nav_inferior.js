@@ -5,7 +5,7 @@
 // A propósito SIN data-testid (ver estilos/componentes.css): así no compite por especificidad con la regla que convierte cualquier
 // `a[data-testid]` en un chip de acción — esta es la barra fija, no una acción suelta. Son enlaces internos (un hash): funcionan sin red.
 // W68: el estudiante gana "Perfil" (ahí viven su cuenta y "Cerrar sesión"). W70: el profe (Mis grupos · Retos · Perfil) y el admin (Grupos ·
-// Perfil) tienen la suya, SOBRIA: el rebote del ícono activo es solo de las pantallas `.juego` del estudiante (estilos/juego.css).
+// Perfil; desde el panel, Grupos · Tablero · Perfil) tienen la suya, SOBRIA: el rebote del ícono activo es solo de las pantallas `.juego` del estudiante (estilos/juego.css).
 // Es la barra del sistema (`sx-barra`), con íconos propios (ui/iconos.js). El registro de juego (el valor por defecto, sin clase: píldora en la
 // activa) es SOLO del estudiante; el profe y el admin llevan `sx-sereno` (una marca arriba).
 import { h } from './dom.js';
@@ -31,6 +31,7 @@ const ENTRADAS = {
   // El admin puede abrir las pantallas del profe por la dirección (§5.8): ahí ve SU barra y ninguna pestaña queda activa.
   admin: [
     { id: 'grupos', camino: '/admin', texto: () => textos.nav.grupos, icono: 'grupos' },
+    { id: 'tablero', camino: '/admin/tablero', texto: () => textos.nav.tablero, icono: 'tablero' }, // panel: las cifras de su institución
     { id: 'perfil', camino: '/perfil', texto: () => textos.nav.perfil, icono: 'perfil' },
   ],
 };

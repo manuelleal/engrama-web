@@ -46,6 +46,9 @@ import { renderPuja } from '../../src/vistas/estudiante/puja.js';
 import { renderTiendaGrupo } from '../../src/vistas/profe/tienda_grupo.js';
 import { renderPujaProfe } from '../../src/vistas/profe/puja_profe.js';
 import { renderProfesores } from '../../src/vistas/admin/profesores.js';
+import { renderTablero } from '../../src/vistas/admin/tablero.js';
+import { renderSuper } from '../../src/vistas/super/clientes.js';
+import { renderCliente } from '../../src/vistas/super/cliente.js';
 
 const CODIGO = 'SINT-B1-01';
 const P = { gid: GID };
@@ -92,6 +95,9 @@ const PANTALLAS = /** @type {Record<string, (r: any) => unknown>} */ ({
   '/admin/asignar-docente/:gid': (r) => renderAsignarDocente(r, P, ctxAdmin()),
   '/admin/importar-csv/:gid': (r) => renderImportarCsv(r, P, ctxAdmin()),
   '/admin/profesores': (r) => renderProfesores(r, ctxAdmin()),
+  '/admin/tablero': (r) => renderTablero(r, ctxAdmin()), // panel del super admin (docs/ESPEC_panel_super_admin.md §4)
+  '/super': (r) => renderSuper(r, ctxAdmin()),
+  '/super/cliente/:tid': (r) => renderCliente(r, { ...P, tid: 't1' }, ctxAdmin()),
 });
 
 test('U62: esta prueba pinta TODAS las rutas de la tabla (menos el reto en curso, que no lleva barra ni volver)', () => {

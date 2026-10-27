@@ -70,6 +70,11 @@ export const RUTAS = [
   { patron: '/admin', roles: ['admin'], pestana: 'grupos', barra: true, vuelve: null, titulo: () => textos.admin.grupos.titulo },
   { patron: '/admin/profesores', roles: ['admin'], pestana: 'grupos', barra: true, vuelve: '/admin', titulo: () => textos.economiaNav.profesores },
   { patron: '/admin/asignar-docente/:gid', roles: ['admin'], pestana: 'grupos', barra: true, vuelve: '/admin', titulo: conGrupo(textos.admin.asignarDocente.titulo) },
+  // El panel (docs/ESPEC_panel_super_admin.md §4): el tablero de la institución es una pestaña del admin; #/super y el detalle de un cliente son
+  // del super admin, que en la web entra con su membresía de admin (la puerta de verdad es el backend: 403 para quien no es super admin).
+  { patron: '/admin/tablero', roles: ['admin'], pestana: 'tablero', barra: true, vuelve: null, titulo: () => textos.panelNav.institucion },
+  { patron: '/super', roles: ['admin'], pestana: 'tablero', barra: true, vuelve: '/admin/tablero', titulo: () => textos.panelNav.todo },
+  { patron: '/super/cliente/:tid', roles: ['admin'], pestana: 'tablero', barra: true, vuelve: '/super', titulo: (c) => c || textos.panelNav.cliente },
   { patron: '/admin/importar-csv/:gid', roles: ['admin'], pestana: 'grupos', barra: true, vuelve: '/admin', titulo: conGrupo(textos.admin.importarCsv.titulo) },
 ];
 

@@ -75,7 +75,10 @@ function exigirSinCallejones(rol, paginas) {
   // W80 (docs/ESPEC_practica_del_dia.md §3): como el reto en curso, el repaso solo se enlaza cuando la tanda de hoy trae repaso (desde "Tu práctica
   // de hoy"); con estas entradas no lo trae. Su barra y su volver los miden U62 (las cuatro pantallas) y el humo de navegación (por su dirección).
   // Lingo Coins (decisión 017): igual La Puja: solo se enlaza (la tarjeta "¡Hay una puja en vivo!" de Inicio) cuando hay una puja viva; la miden U62 y E-T3.
-  const deLaTabla = RUTAS.filter((r) => r.roles.includes(rol) && r.patron !== ES_RETO && r.patron !== '/repaso' && r.patron !== '/puja').map((r) => r.patron).sort();
+  // Panel del super admin (docs/ESPEC_panel_super_admin.md §4, declarado): #/super y el detalle de un cliente solo se enlazan para un super admin
+  // (`sesion.superAdmin`, desde su Tablero); el admin del doble no lo es. Sus barras y volver los miden U62 y PW3/PW5.
+  const SOLO_SUPER = ['/super', '/super/cliente/:tid'];
+  const deLaTabla = RUTAS.filter((r) => r.roles.includes(rol) && r.patron !== ES_RETO && r.patron !== '/repaso' && r.patron !== '/puja' && !SOLO_SUPER.includes(r.patron)).map((r) => r.patron).sort();
   assert.deepEqual([...paginas.keys()].filter((p) => deLaTabla.includes(p)).sort(), deLaTabla, `${rol}: toda ruta de la tabla para ese rol se alcanza por toques (huérfanas: ${deLaTabla.filter((p) => !paginas.has(p)).join(', ') || 'ninguna'})`);
   assert.deepEqual([...paginas.keys()].filter((p) => !deLaTabla.includes(p)), [], `${rol}: ningún enlace lleva a una pantalla que no es de su rol`);
 }
@@ -121,7 +124,9 @@ test('E30: el admin recorre tocando sus 7 pantallas (con Profesores): ninguna es
     try {
       const paginas = await recorrerTocando(sesion, 'admin');
       exigirSinCallejones('admin', paginas);
-      assert.equal(paginas.size, 7);
+      // Panel del super admin (docs/ESPEC_panel_super_admin.md §4, declarado): + Tablero (7 -> 8). #/super y su detalle no se alcanzan tocando
+      // para un admin que no es super admin (el enlace solo sale con `sesion.superAdmin`); el humo de navegación los lista como huérfanos.
+      assert.equal(paginas.size, 8);
       t.diagnostic(`admin: ${[...paginas].map(([p, x]) => `${p} (${x.camino.length})`).join(', ')}`);
     } finally { await sesion.cerrar(); }
   });

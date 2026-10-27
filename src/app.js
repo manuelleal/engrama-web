@@ -377,6 +377,10 @@ function rutasDelPanel() {
   ruta('/admin/profesores', conCtx(panel.vista('/admin/profesores', (m, raiz, params, query, ctx) => m.renderProfesores(raiz, ctx)))); // Lingo Coins
   ruta('/admin/asignar-docente/:gid', conCtx(panel.vista('/admin/asignar-docente/:gid', (m, raiz, params, query, ctx) => m.renderAsignarDocente(raiz, params, ctx))));
   ruta('/admin/importar-csv/:gid', conCtx(panel.vista('/admin/importar-csv/:gid', (m, raiz, params, query, ctx) => m.renderImportarCsv(raiz, params, ctx))));
+  // El panel del super admin y el tablero del admin (docs/ESPEC_panel_super_admin.md §4 y su adenda 1): por el mismo panel diferido.
+  ruta('/admin/tablero', conCtx(panel.vista('/admin/tablero', (m, raiz, params, query, ctx) => m.renderTablero(raiz, ctx))));
+  ruta('/super', conCtx(panel.vista('/super', (m, raiz, params, query, ctx) => m.renderSuper(raiz, ctx))));
+  ruta('/super/cliente/:tid', conCtx(panel.vista('/super/cliente/:tid', (m, raiz, params, query, ctx) => m.renderCliente(raiz, params, ctx))));
 }
 
 iniciarApp();

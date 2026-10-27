@@ -15,6 +15,10 @@ Copias de **solo lectura** del contrato de `engrama-backend` contra las que el m
   `/auth/me` gana `confirmed_level`.
   Que el mock y el contrato coincidan no prueba que el backend real responda así en el piloto: eso es W39 (humo `--contra local`), que espera el proyecto desechable de D7.
 
+- `panel_super_053e38a.json`: **respuestas reales** (no OpenAPI) de las tres rutas del panel del super admin (`GET /super/clientes`, `GET /super/clientes/{id}`,
+  `GET /admin/metricas`) del backend `panel/super-admin` en `053e38a`, que escribe su humo `tests/integ/test_humo_panel_super.py` contra Postgres local con
+  datos sintéticos (los nombres de cliente son de mentira). Contra ellas se pintan las pantallas y se compara la forma del doble (`tests/contrato/panel_super.test.mjs`).
+
 ## Pendiente (anotado, no hecho)
 
 Exportar el OpenAPI real del backend final y reemplazar la adenda. La instrucción de la espec (§9.2) es, con el `.venv`

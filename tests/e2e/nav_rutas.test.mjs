@@ -86,7 +86,7 @@ test('E32: el admin que escribe /inicio queda en Grupos; una pantalla del profe 
       const r = await escribir(sesion, '#/profe/grupos');
       assert.equal(r.hash, '#/profe/grupos', 'el admin puede abrir las pantallas del profe por la dirección (PROVISIONAL, C6)');
       const m = await sesion.evaluar(MEDIR_NAV);
-      assert.deepEqual(m.barra, ['Grupos', 'Perfil'], 'con SU barra');
+      assert.deepEqual(m.barra, ['Grupos', 'Tablero', 'Perfil'], 'con SU barra'); // panel del super admin: + Tablero (declarado)
       assert.deepEqual(m.activas, [], 'y ninguna pestaña activa');
       assert.equal(m.titulo, 'Mis grupos');
     } finally { await sesion.cerrar(); }

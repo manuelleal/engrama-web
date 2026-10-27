@@ -248,7 +248,7 @@ test('R9: lo que W70 declara cambió de verdad: cada escena del profe y del admi
     assert.equal(barras(CRUDA.vistas[nombre]).length, 0, `${nombre}: la línea base no traía barra`);
     assert.equal(barras(hoy[nombre]).length, 1, `${nombre}: hoy trae una`);
     assert.ok((DECLARADAS_NAV[nombre] || []).includes(BARRA), `${nombre}: la barra está declarada`);
-    assert.deepEqual(entradas(hoy[nombre]), nombre.startsWith('profe_') ? ['#/profe/grupos', '#/profe/retos', '#/perfil'] : ['#/admin', '#/perfil'], `${nombre}: las entradas de su rol`);
+    assert.deepEqual(entradas(hoy[nombre]), nombre.startsWith('profe_') ? ['#/profe/grupos', '#/profe/retos', '#/perfil'] : ['#/admin', '#/admin/tablero', '#/perfil'], `${nombre}: las entradas de su rol`); // panel del super admin: + Tablero (declarado)
     assert.ok(!hoy[nombre].some((l) => l.includes('class="barra-rol"') || l.includes('boton-cerrar-sesion"') && !nombre.startsWith('profe_asistencia')), `${nombre}: sin barra de arriba ni "Cerrar sesión" de la cuenta`);
   }
   for (const nombre of ['admin_grupos', 'admin_grupos_vacio', 'admin_grupos_error']) assert.ok(CRUDA.vistas[nombre].some((l) => l.includes('class="barra-rol"')), `${nombre}: la línea base traía la barra de arriba`);

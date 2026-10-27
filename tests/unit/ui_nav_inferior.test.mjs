@@ -60,14 +60,15 @@ test('U60: el profe tiene 3 entradas (Mis grupos · Retos · Perfil) y el admin 
   const profe = entradasNav('teacher', '/profe/grupos');
   assert.deepEqual((profe || []).map((x) => [x.texto, x.href]), [['Mis grupos', '#/profe/grupos'], ['Retos', '#/profe/retos'], ['Perfil', '#/perfil']]);
   const admin = entradasNav('admin', '/admin');
-  assert.deepEqual((admin || []).map((x) => [x.texto, x.href]), [['Grupos', '#/admin'], ['Perfil', '#/perfil']]);
+  // Panel del super admin (docs/ESPEC_panel_super_admin.md §4, declarado): el admin gana la pestaña Tablero.
+  assert.deepEqual((admin || []).map((x) => [x.texto, x.href]), [['Grupos', '#/admin'], ['Tablero', '#/admin/tablero'], ['Perfil', '#/perfil']]);
   const delEstudiante = ['#/inicio', '#/retos', '#/asistencia'];
   for (const r of RUTAS) {
     for (const rol of ['teacher', 'admin']) {
       const e = entradasNav(rol, r.patron);
       if (!e) continue;
       assert.deepEqual(e.map((x) => x.href).filter((h) => delEstudiante.includes(h)), [], `${rol} en ${r.patron}: una entrada del estudiante`);
-      assert.equal(e.length, rol === 'teacher' ? 3 : 2, `${rol} en ${r.patron}: sus entradas, siempre las mismas`);
+      assert.equal(e.length, rol === 'teacher' ? 3 : 3, `${rol} en ${r.patron}: sus entradas, siempre las mismas`);
       for (const x of e) assert.ok(x.icono && x.texto, `${rol}: cada entrada con ícono y texto`);
     }
   }
@@ -81,7 +82,8 @@ test('U60: en las pantallas del profe queda activa Mis grupos (Retos en sus reto
     '/profe/grupo/:gid/tienda': 'misGrupos', '/profe/grupo/:gid/puja': 'misGrupos', // Lingo Coins (decisión 017)
     '/perfil': 'perfil', '/datos': 'perfil', '/datos/solicitudes': 'perfil',
   };
-  const DEL_ADMIN = { '/admin': 'grupos', '/admin/asignar-docente/:gid': 'grupos', '/admin/importar-csv/:gid': 'grupos', '/admin/profesores': 'grupos', '/perfil': 'perfil', '/datos': 'perfil', '/datos/solicitudes': 'perfil' };
+  const DEL_ADMIN = { '/admin': 'grupos', '/admin/asignar-docente/:gid': 'grupos', '/admin/importar-csv/:gid': 'grupos', '/admin/profesores': 'grupos', '/perfil': 'perfil', '/datos': 'perfil', '/datos/solicitudes': 'perfil',
+    '/admin/tablero': 'tablero', '/super': 'tablero', '/super/cliente/:tid': 'tablero' }; // panel del super admin (declarado)
   for (const [patron, esperada] of Object.entries(DEL_PROFE)) assert.deepEqual(activas(entradasNav('teacher', patron)), [esperada], `profe en ${patron}`);
   for (const [patron, esperada] of Object.entries(DEL_ADMIN)) assert.deepEqual(activas(entradasNav('admin', patron)), [esperada], `admin en ${patron}`);
   const deTabla = RUTAS.filter((r) => r.roles.includes('teacher')).map((r) => r.patron).sort();
@@ -95,7 +97,7 @@ test('U60: el admin que abre una pantalla del profe por la dirección ve SU barr
   assert.equal(porDireccion.length, 9, 'las 9 pantallas del profe (7 y la tienda y la puja del grupo)');
   for (const r of porDireccion) {
     const e = entradasNav('admin', r.patron);
-    assert.deepEqual(ids(e), ['grupos', 'perfil'], `${r.patron}: la barra del admin`);
+    assert.deepEqual(ids(e), ['grupos', 'tablero', 'perfil'], `${r.patron}: la barra del admin`); // panel: + Tablero (declarado)
     assert.deepEqual(activas(e), [], `${r.patron}: ninguna activa`);
   }
 });

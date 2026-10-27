@@ -10,7 +10,8 @@
 //
 // Súbelo un número cada vez que cambie la lista de precarga o la estrategia; la `activate`
 // borra cualquier caché con otro nombre.
-const VERSION = 'engrama-shell-v80';
+// salida/web (E6) sube a v81: une la fluidez (v80) y el panel del super admin (v80); la v79 la toma cuentas/invitar-profe.
+const VERSION = 'engrama-shell-v81';
 
 // Cada encargo agrega los suyos en su propio commit (W7: Inicio + api/cliente,core,retos + los
 // SVG de Drako que usa el estudiante; W10: profe/grupos,grupo,sesion_asistencia + api/profe). El
@@ -212,6 +213,15 @@ const DIFERIDOS = [
   '/src/vistas/recuperar.js',
   '/src/textos_recuperar.js',
   '/src/auth/cambio_contrasena.js', // lo importa recuperar.js (POST /api/auth/contrasena con la sesión del enlace)
+  // El panel del super admin y el tablero del admin (docs/ESPEC_panel_super_admin.md §4): app.js los carga con import() solo al abrir sus rutas.
+  '/estilos/panel.css',
+  '/src/textos_panel.js',
+  '/src/api/panel.js',
+  '/src/ui/graficas.js',
+  '/src/vistas/panel/bloques.js',
+  '/src/vistas/admin/tablero.js',
+  '/src/vistas/super/clientes.js',
+  '/src/vistas/super/cliente.js',
 ];
 
 // Cuánto se espera a CADA recurso de la precarga. Antes era `cache.addAll(PRECARGA)`: todo o nada, sin límite de tiempo. Un solo recurso

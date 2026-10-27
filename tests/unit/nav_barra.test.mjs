@@ -122,6 +122,9 @@ const { renderCrearGrupo } = await import('../../src/vistas/admin/crear_grupo.js
 const { renderAsignarDocente } = await import('../../src/vistas/admin/asignar_docente.js');
 const { renderImportarCsv } = await import('../../src/vistas/admin/importar_csv.js');
 const { renderPerfil } = await import('../../src/vistas/perfil.js');
+const { renderTablero } = await import('../../src/vistas/admin/tablero.js');
+const { renderSuper } = await import('../../src/vistas/super/clientes.js');
+const { renderCliente } = await import('../../src/vistas/super/cliente.js');
 
 const SERVIDOR_PROFE = { ...SERVIDOR, 'GET /teachers/groups/g2/solicitudes': [] };
 const ESTADOS_PROFE = {
@@ -169,13 +172,16 @@ test('U62 (la barra): cada pantalla del admin trae UNA barra (Grupos · Perfil) 
     ['asignar docente', 'Grupos', (r) => renderAsignarDocente(r, p, ctxAdmin())],
     ['importar estudiantes', 'Grupos', (r) => renderImportarCsv(r, p, ctxAdmin())],
     ['perfil del admin', 'Perfil', (r) => renderPerfil(r, ctxAdmin())],
+    ['tablero del admin', 'Tablero', (r) => renderTablero(r, ctxAdmin())], // panel del super admin (declarado)
+    ['todo ENGRAMA (super admin)', 'Tablero', (r) => renderSuper(r, ctxAdmin())],
+    ['un cliente (super admin)', 'Tablero', (r) => renderCliente(r, { tid: 't1' }, ctxAdmin())],
     ['grupo del profe, visto por el admin', null, (r) => renderGrupo(r, p, ctxAdmin())],
     ['retos del profe, vistos por el admin', null, (r) => renderRetosProfe(r, ctxAdmin())],
   ];
   for (const [nombre, activa, fn] of vistas) {
     for (const [estado, rutas] of Object.entries(ESTADOS_PROFE)) {
       const { raiz, cerrar } = await pintar(rutas, fn);
-      try { exigirBarraDe(raiz, ['Grupos', 'Perfil'], activa, `${nombre} (${estado})`); } finally { cerrar(); }
+      try { exigirBarraDe(raiz, ['Grupos', 'Tablero', 'Perfil'], activa, `${nombre} (${estado})`); } finally { cerrar(); } // panel: + Tablero (declarado)
     }
   }
 });

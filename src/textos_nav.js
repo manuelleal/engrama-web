@@ -14,6 +14,7 @@ export const textosNav = {
     // W70 (§5.6): las entradas de la barra del profe y del admin. Cada una dice lo mismo que el título de su pantalla.
     misGrupos: 'Mis grupos',
     grupos: 'Grupos',
+    tablero: 'Tablero', // panel (docs/ESPEC_panel_super_admin.md §4): la pestaña del admin con las cifras de su institución
     retos: 'Retos',
     barra: 'Navegación principal', // el nombre accesible de la barra de abajo
     // "Sesión" es SOLO la cuenta (§5.5): este es el único "Cerrar sesión" de la app.
@@ -45,6 +46,13 @@ export const textosNav = {
     roles: { student: 'Estudiante', teacher: 'Docente', admin: 'Administración' },
     /** @param {string} nombre */
     institucion: (nombre) => `Institución: ${nombre}`,
+  },
+  // El panel del super admin y el tablero del admin (docs/ESPEC_panel_super_admin.md §4): los títulos de sus tres pantallas. Un cliente se titula
+  // por su código neutro ("Cliente 03"), nunca por su nombre.
+  panelNav: {
+    institucion: 'Tu institución',
+    todo: 'Todo ENGRAMA',
+    cliente: 'Un cliente',
   },
   // W65 (§5.4): el bloque de Inicio del estudiante que dice qué hacer primero. PROVISIONAL (pedagogo, ERR-16).
   ahora: {
