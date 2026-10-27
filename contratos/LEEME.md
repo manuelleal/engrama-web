@@ -19,6 +19,11 @@ Copias de **solo lectura** del contrato de `engrama-backend` contra las que el m
   `GET /admin/metricas`) del backend `panel/super-admin` en `053e38a`, que escribe su humo `tests/integ/test_humo_panel_super.py` contra Postgres local con
   datos sintéticos (los nombres de cliente son de mentira). Contra ellas se pintan las pantallas y se compara la forma del doble (`tests/contrato/panel_super.test.mjs`).
 
+- `openapi_tres_intentos_3fc7826.json`: **exportación real** del OpenAPI del backend `retos/tres-intentos` en `3fc7826` (decisión 018), con el `.venv`
+  del backend y `SUPABASE_JWT_SECRET`/`DATABASE_URL` de mentira solo en el entorno del proceso. R10 (`tests/contrato/apoyo_practica.mjs`) toma de aquí
+  SOLO `RespuestaDeIntentoOut`, `RespuestaOut` y `ExplicacionOut` y deja lo demás contra `openapi_f7f7aeb.json`. Su nombre empieza por `t`: R2 sigue
+  tomando el primero por orden alfabético (`openapi_03c9c0a.json`).
+
 ## Pendiente (anotado, no hecho)
 
 Exportar el OpenAPI real del backend final y reemplazar la adenda. La instrucción de la espec (§9.2) es, con el `.venv`

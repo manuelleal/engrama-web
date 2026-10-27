@@ -6,6 +6,7 @@
 import test from 'node:test';
 import assert from 'node:assert/strict';
 import { existsSync } from 'node:fs';
+import { hastaResolver } from '../../herramientas/humo/guion_banda.mjs';
 import { abrirSesion } from '../../herramientas/cdp.mjs';
 import { conAppCompleta } from './ayudante_servidor.mjs';
 import { sembrarRetosPractica } from '../../herramientas/humo/entradas_practica.mjs';
@@ -70,7 +71,7 @@ test('E38: un 409 en /finish (el intento se cerró en otra pestaña) deja el avi
         assert.ok(await esperarTestid(sesion, 'boton-comprobar'), `pregunta ${i + 1}`);
         await clic(sesion, 'opcion-B'); await esperar(120);
         await clic(sesion, 'boton-comprobar');
-        assert.ok(await esperarTestid(sesion, 'explicacion'), 'la banda');
+        assert.ok(await hastaResolver(sesion), 'la banda (decisión 018: si falla, otro intento hasta resolver)');
         if (i < 2) { await clic(sesion, 'boton-siguiente'); await esperar(250); }
       }
       const { cuerpo } = arrancarIntento(estado, reqEst, g1.id); // el mismo intento en curso (lo reusa)

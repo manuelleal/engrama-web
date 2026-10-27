@@ -69,9 +69,9 @@ export function enviarIntento(estado, req, attemptId, body) {
  * Califica, paga (una vez, con la llave) y cierra el intento: el MISMO camino para /submit y para /finish de L1 (mock/por_pregunta.mjs), como
  * `attempts.cerrar_intento` del backend. Devuelve el AttemptSubmitOut.
  */
-export function cerrarIntento(estado, auth, intento, challenge, respuestas) {
+export function cerrarIntento(estado, auth, intento, challenge, respuestas, pagaPorPregunta = null) {
   const { dadas, score_percent, is_correct } = calificar(challenge, respuestas);
-  const pago = pagarSiCorresponde(estado, auth, challenge, is_correct);
+  const pago = pagarSiCorresponde(estado, auth, challenge, is_correct, pagaPorPregunta);
 
   Object.assign(intento, { status: 'completed', completed_at: new Date(estado.reloj.ahora()).toISOString(), is_correct, score_percent, answers: dadas, coins_earned: pago.coins_earned, xp_earned: pago.xp_earned });
   anotarFallos(estado, auth, challenge, dadas); // lo fallado entra a la cola de repaso (mock/practica.mjs), como el gancho del refuerzo del backend
@@ -90,19 +90,22 @@ export function cerrarIntento(estado, auth, intento, challenge, respuestas) {
 
 // BUG-13 (adoptada): llave `challenge:<reto>:<estudiante>` — una segunda victoria no vuelve a
 // pagar ni a gastar cupo de `max_winners` (§1.1 de ESPEC_bug13a15.md, "Solo si entrada is not None").
-function pagarSiCorresponde(estado, auth, challenge, esCorrecta) {
-  if (!esCorrecta || challenge.current_winners >= challenge.max_winners) return { coins_earned: 0, xp_earned: 0 };
+// Decisión 018: `/finish` pasa `pagaPorPregunta(base)` (la paga por intento); sin ella (`/submit`), todo o nada. El XP solo con el intento correcto.
+function pagarSiCorresponde(estado, auth, challenge, esCorrecta, pagaPorPregunta = null) {
+  const base = recompensaDelReto(challenge.coins_reward, estado.economia.topeDelReto); // W43: un reto guardado por encima del tope paga el tope
+  const paga = pagaPorPregunta ? pagaPorPregunta(base) : esCorrecta ? base : 0;
+  if (paga <= 0 || challenge.current_winners >= challenge.max_winners) return { coins_earned: 0, xp_earned: 0 };
   const llave = `challenge:${challenge.id}:${auth.profileId}`;
-  const paga = recompensaDelReto(challenge.coins_reward, estado.economia.topeDelReto); // W43: un reto guardado por encima del tope paga el tope
   const entrada = otorgarMonedas(estado, {
     tenantId: auth.tenantId, profileId: auth.profileId, amount: paga,
     action: 'challenge', metadata: { challenge_id: challenge.id }, idempotencyKey: llave,
   });
   if (!entrada) return { coins_earned: 0, xp_earned: 0 };
   challenge.current_winners += 1;
+  const xp = esCorrecta ? challenge.xp_reward : 0;
   const perfil = estado.profiles.get(auth.profileId);
-  perfil.xp += challenge.xp_reward;
-  return { coins_earned: paga, xp_earned: challenge.xp_reward };
+  perfil.xp += xp;
+  return { coins_earned: paga, xp_earned: xp };
 }
 
 // GET /challenges/attempts/history

@@ -29,6 +29,13 @@ export const textosPractica = {
     noContestableApoyo: 'Puedes seguir con el reto: esta queda sin responder.',
     // Tanda visual 2 (compuerta 18, hallazgo 3): tras comprobar, la opción que elegiste y no era. La correcta dice "Correcta" (textos.revision).
     tuRespuesta: 'Tu respuesta',
+    // Decisión 018 (docs/ESPEC_tres_intentos.md, adenda 1): al fallar con intentos restantes, sin la clave y sin cuenta regresiva.
+    incorrectoOtraVez: 'Incorrecto, inténtalo otra vez',
+    eligeOtra: 'Elige otra opción.',
+    escribeOtra: 'Escríbela de nuevo.',
+    descartada: 'Descartada',
+    /** @param {string[]} lista */
+    yaProbaste: (lista) => `Ya probaste: ${lista.join(', ')}`,
     // W91 (docs/ESPEC_camino_y_tu_palabra.md §2): la pregunta que se responde escribiendo (PROVISIONALES).
     campoRotulo: 'Tu respuesta',
     escribePlaceholder: 'Escribe aquí',
