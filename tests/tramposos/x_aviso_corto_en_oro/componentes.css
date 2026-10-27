@@ -266,6 +266,7 @@ nav {
 }
 #vista .admin-crear-grupo form {
   margin: 12px 0 0;
+  max-width: 40rem; /* adenda 1 (H-6): la columna de lectura del registro sereno (34 a 44 rem); a 1280 los campos ya no miden 1.035 px */
 }
 #vista .admin-crear-grupo form > p {
   margin: 0;
