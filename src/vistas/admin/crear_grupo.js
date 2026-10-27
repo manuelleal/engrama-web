@@ -15,10 +15,15 @@ import { crearNavInferior } from '../../ui/nav_inferior.js';
 // W70 (docs/ESPEC_navegacion.md §5.6): la barra de abajo del admin (Grupos activa). La de arriba salió: el aviso y "Cerrar sesión" viven en Perfil.
 const barra = (ctx) => crearNavInferior('/admin', ctx.sesion?.rol);
 
+// E7 (docs/ESPEC_visual_pulido_salida.md §3): bajo el nombre, cuántos estudiantes tiene (`student_count`, que `GET /teachers/groups` ya trae). El docente
+// NO viene en esa respuesta: no se inventa ni se pide grupo por grupo (pedido al backend en la espec, §5).
 function filaDeGrupo(grupo) {
+  const cuantos = Number.isInteger(grupo.student_count) ? textos.profe.grupos.estudiantes(grupo.student_count) : null;
   return h(
     'li', { class: 'fila', 'data-testid': `admin-grupo-${grupo.id}` },
-    h('span', { class: 'fila-titulo' }, grupo.group_code),
+    h('div', { class: 'fila-texto' },
+      h('span', { class: 'fila-titulo' }, grupo.group_code),
+      cuantos ? h('span', { class: 'texto-apoyo', 'data-testid': `admin-grupo-${grupo.id}-meta` }, cuantos) : null),
     h('div', { class: 'fila-acciones' },
       h('a', { href: `#/admin/asignar-docente/${grupo.id}`, class: 'boton-chico', 'data-testid': `admin-grupo-${grupo.id}-docente` }, textos.admin.grupos.irAAsignarDocente),
       h('a', { href: `#/admin/importar-csv/${grupo.id}`, class: 'boton-chico', 'data-testid': `admin-grupo-${grupo.id}-csv` }, textos.admin.grupos.irAImportarCsv)),
@@ -73,19 +78,22 @@ async function pintarVista(raiz, ctx, mensajePrevio) {
   const { form, cancelarRed } = crearFormulario(
     (campoCodigo, campoCupo, boton, zonaMensaje) => manejarCrear(raiz, ctx, crearUnaVez, campoCodigo, campoCupo, boton, zonaMensaje, cancelarRed),
   );
+  // E7 (docs/ESPEC_visual_pulido_salida.md §3): el formulario de crear grupo va en su tarjeta blanca (sx-tarjeta), con su título.
+  const tarjeta = h('section', { class: 'sx-tarjeta admin-crear-grupo', 'aria-labelledby': 'crear-grupo-titulo' },
+    h('h2', { id: 'crear-grupo-titulo' }, textos.admin.crearGrupo.titulo), form);
   const vista = h(
     'div', { 'data-testid': 'vista-admin-crear-grupo' },
     h('h1', {}, textos.admin.grupos.titulo),
     crearSelectorColegio(ctx), // en su propio renglón; solo con más de una institución
-    form,
+    tarjeta,
     listaDeGrupos(grupos),
     barra(ctx),
   );
   montar(raiz, vista);
   // Lingo Coins (decisión 017): el enlace a "Profesores" (presupuestos y recarga), de un módulo diferido; solo aparece si el backend trae los presupuestos.
-  import('./profesores.js').then((m) => m.agregarEnlaceDeProfesores(vista, form, ctx)).catch((e) => console.warn('vistas/admin/crear_grupo: sin el enlace a Profesores', e));
+  import('./profesores.js').then((m) => m.agregarEnlaceDeProfesores(vista, tarjeta, ctx)).catch((e) => console.warn('vistas/admin/crear_grupo: sin el enlace a Profesores', e));
   // Invitar profes por correo (engrama-backend ESPEC_invitar_profe §5): el enlace solo aparece si el backend responde la lista de invitaciones.
-  import('./invitar.js').then((m) => m.agregarEnlaceDeInvitar(vista, form, ctx)).catch((e) => console.warn('vistas/admin/crear_grupo: sin el enlace a invitar', e));
+  import('./invitar.js').then((m) => m.agregarEnlaceDeInvitar(vista, tarjeta, ctx)).catch((e) => console.warn('vistas/admin/crear_grupo: sin el enlace a invitar', e));
   if (mensajePrevio) { const z = form.querySelector('[data-testid="crear-grupo-mensaje"]'); if (z) z.textContent = mensajePrevio; }
   document.body.dataset.listo = '1';
   window.addEventListener('hashchange', cancelarRed, { once: true });

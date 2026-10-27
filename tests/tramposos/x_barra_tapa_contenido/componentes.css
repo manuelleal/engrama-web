@@ -255,6 +255,22 @@ nav {
   gap: 8px;
 }
 
+/* E7 (docs/ESPEC_visual_pulido_salida.md §3): en Grupos del admin, "Crear grupo" va en su tarjeta blanca (sx-tarjeta), separada de la lista. Sobria. */
+#vista .admin-crear-grupo {
+  margin: 12px 0 20px;
+}
+/* (1,2,1): le gana a `#vista section:not(.aviso-seccion) > h2` de cara.css (1,1,2), que le ponía 28 px arriba dentro de la tarjeta. */
+#vista .sx-tarjeta.admin-crear-grupo > h2 {
+  margin: 0;
+  font-size: 1.25rem;
+}
+#vista .admin-crear-grupo form {
+  margin: 12px 0 0;
+}
+#vista .admin-crear-grupo form > p {
+  margin: 0;
+}
+
 /* Una etiqueta + su campo fuera de un <form> (p. ej. "Asignar a" + el <select> de grupo, dentro
    de una fila de la lista de retos del profe): mismo espacio que formularios.css, sin depender
    de estar dentro de un <form>. */

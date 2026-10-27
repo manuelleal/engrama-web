@@ -155,7 +155,16 @@ const GLIFOS_B1 = { solicitudes: ['solicitud-7-estado'], retos: ['reto-reto-0-es
 // (`div.hero-fichas`: Aciertos, con su ícono y la palabra, y Monedas). Cambia SOLO esa fila (que ahora contiene `puntaje` y `div.medalla-monedas`, ya declarados).
 const FICHAS_FLUIDEZ = { revision: [{ etiqueta: 'div', clase: 'hero-fichas' }] };
 
-const CAPAS = [HASTA_W70, VOLVER_W71, SALIR_W73, SONIDO_S1, NUMEROS_S1, CABECERA_S1, RETO_T2, RESULTADO_B1, GLIFOS_B1, FICHAS_FLUIDEZ];
+// El pulido de salida (docs/ESPEC_visual_pulido_salida.md §3, E7): en Grupos del admin, el formulario de crear grupo entra en su tarjeta (`section.admin-crear-grupo`
+// con su `h2`; en la línea base, el `form` suelto) y el nombre de cada grupo va en un `div.fila-texto` con su línea "N estudiantes" (antes, el `span.fila-titulo`
+// suelto). Cambian SOLO esos nodos.
+const TARJETA_E7 = { etiqueta: 'section', clase: 'admin-crear-grupo' };
+const PULIDO_E7 = {
+  admin_grupos: [TARJETA_E7, 'form-crear-grupo', { etiqueta: 'div', clase: 'fila-texto' }, { etiqueta: 'span', clase: 'fila-titulo' }],
+  admin_grupos_vacio: [TARJETA_E7, 'form-crear-grupo'],
+};
+
+const CAPAS = [HASTA_W70, VOLVER_W71, SALIR_W73, SONIDO_S1, NUMEROS_S1, CABECERA_S1, RETO_T2, RESULTADO_B1, GLIFOS_B1, FICHAS_FLUIDEZ, PULIDO_E7];
 /** @type {Record<string, Array<string|{etiqueta: string, clase?: string}>>} */
 export const DECLARADAS_NAV = Object.fromEntries([...new Set(CAPAS.flatMap((c) => Object.keys(c)))].map((nombre) => [nombre, [...new Set(CAPAS.flatMap((c) => c[nombre] || []))]]));
 
