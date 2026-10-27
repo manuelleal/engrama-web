@@ -1,0 +1,16 @@
+{
+  "descripcion": "WI9 (H-8b): con un grupo nuevo, si la invitación falla no se releen los grupos: el reintento crea el grupo otra vez (409).",
+  "archivos": {
+    "src/vistas/admin/invitar.js": "invitar.js"
+  },
+  "comando": [
+    "node",
+    "--test",
+    "--test-reporter=tap",
+    "tests/unit/vista_invitar.test.mjs"
+  ],
+  "espera_codigo_no_cero": true,
+  "espera_fallan_tests": [
+    "WI9: con un grupo nuevo, si la invitación falla se releen los grupos y el nuevo queda elegido (no se crea dos veces)"
+  ]
+}

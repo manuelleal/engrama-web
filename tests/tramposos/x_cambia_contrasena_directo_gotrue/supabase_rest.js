@@ -258,9 +258,20 @@ export async function pedirEnlaceDeRecuperacion(correo) {
  * Lanza `ErrorAuth` con el status de GoTrue (403 si venció, se usó o se alteró; 429 por límite; 0 sin red).
  * @param {string} tokenHash @returns {Promise<string>} */
 export async function canjearEnlaceDeRecuperacion(tokenHash) {
+  return canjearEnlace('recovery', tokenHash);
+}
+
+/** Canjea el enlace del correo de INVITACIÓN (engrama-backend docs/ESPEC_invitar_profe.md §5): igual, con `type: invite`. Medido en GoTrue
+ * v2.196.0: el token de una invitación con `type: recovery` da 403 (P4b). @param {string} tokenHash @returns {Promise<string>} */
+export async function canjearEnlaceDeInvitacion(tokenHash) {
+  return canjearEnlace('invite', tokenHash);
+}
+
+/** @param {'recovery'|'invite'} tipo @param {string} tokenHash @returns {Promise<string>} */
+async function canjearEnlace(tipo, tokenHash) {
   let datos;
   try {
-    datos = await peticionAuth('/auth/v1/verify', { cuerpo: { type: 'recovery', token_hash: tokenHash }, contexto: 'recuperar' });
+    datos = await peticionAuth('/auth/v1/verify', { cuerpo: { type: tipo, token_hash: tokenHash }, contexto: 'recuperar' });
   } catch (e) {
     if (e instanceof ErrorAuth) throw e;
     throw new ErrorAuth(502, textos.auth.errorCambiarContrasena); // una respuesta que no es JSON (p. ej. el 404 de texto de Caddy si la ruta no está abierta)

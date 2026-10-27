@@ -1,0 +1,16 @@
+{
+  "descripcion": "WI11 (H-8b): con sesión, el token del enlace del correo se queda en la dirección y en el historial.",
+  "archivos": {
+    "src/app.js": "app.js"
+  },
+  "comando": [
+    "node",
+    "--test",
+    "--test-reporter=tap",
+    "tests/e2e/invitar_hash.test.mjs"
+  ],
+  "espera_codigo_no_cero": true,
+  "espera_fallan_tests": [
+    "WI11: con sesión, el token del enlace del correo sale de la dirección (invitación y recuperar)"
+  ]
+}

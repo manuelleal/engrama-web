@@ -41,6 +41,7 @@ import {
 } from './mock/tienda.mjs';
 import { leerPujaActiva, crearPuja, pujarPor, cerrarPuja } from './mock/subastas.mjs';
 import { metricasDelAdmin, listarClientes, verCliente } from './mock/panel.mjs';
+import { listarInvitaciones, invitarProfe, reenviarInvitacion, cancelarInvitacion } from './mock/invitaciones.mjs';
 
 const RUTAS = construirRutas();
 
@@ -122,6 +123,16 @@ function rutasDelPanel(r) {
   ];
 }
 
+/** Invitar profes por correo (engrama-backend ESPEC_invitar_profe §3 y §11; mock/invitaciones.mjs). */
+function rutasDeInvitar(r) {
+  return [
+    r('GET', '/admin/invitaciones', (estado, req) => listarInvitaciones(estado, req)),
+    r('POST', '/admin/invitaciones', (estado, req, p, body) => invitarProfe(estado, req, body)),
+    r('POST', '/admin/invitaciones/:id/reenviar', (estado, req, p) => reenviarInvitacion(estado, req, p.id)),
+    r('DELETE', '/admin/invitaciones/:id', (estado, req, p) => cancelarInvitacion(estado, req, p.id)),
+  ];
+}
+
 function construirRutas() {
   const r = (metodo, patron, manejador, { textoCrudo = false } = {}) => ({ metodo, patron: compilar(patron), manejador, textoCrudo });
   return [
@@ -136,6 +147,7 @@ function construirRutas() {
     r('POST', '/admin/groups/:gid/teachers', (estado, req, p, body) => asignarDocente(estado, req, p.gid, body)),
     r('POST', '/admin/groups/:gid/students', (estado, req, p, body) => inscribirUnEstudiante(estado, req, p.gid, body)),
     r('POST', '/admin/groups/:gid/students/import', (estado, req, p, body) => importarCsv(estado, req, p.gid, body), { textoCrudo: true }),
+    ...rutasDeInvitar(r),
 
     r('GET', '/teachers/groups', (estado, req) => listarGrupos(estado, req)),
     r('GET', '/teachers/groups/:gid/students', (estado, req, p) => listarEstudiantes(estado, req, p.gid)),

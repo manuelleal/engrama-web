@@ -118,7 +118,7 @@ test('E30: el profe recorre tocando sus 12 pantallas (con la tienda y la puja de
   });
 });
 
-test('E30: el admin recorre tocando sus 7 pantallas (con Profesores): ninguna es un callejón y Grupos queda a 2 toques o menos', { skip: OMITIR, timeout: 240_000 }, async (t) => {
+test('E30: el admin recorre tocando sus 9 pantallas (con Profesores, Profes: invitar y Tablero): ninguna es un callejón y Grupos queda a 2 toques o menos', { skip: OMITIR, timeout: 240_000 }, async (t) => {
   await conNavegacion(async (url) => {
     const sesion = await abrirComo(url, 'admin');
     try {
@@ -126,7 +126,8 @@ test('E30: el admin recorre tocando sus 7 pantallas (con Profesores): ninguna es
       exigirSinCallejones('admin', paginas);
       // Panel del super admin (docs/ESPEC_panel_super_admin.md §4, declarado): + Tablero (7 -> 8). #/super y su detalle no se alcanzan tocando
       // para un admin que no es super admin (el enlace solo sale con `sesion.superAdmin`); el humo de navegación los lista como huérfanos.
-      assert.equal(paginas.size, 8);
+      // Invitar profes (engrama-backend ESPEC_invitar_profe §5, declarado): + Profes: invitar (8 -> 9).
+      assert.equal(paginas.size, 9);
       t.diagnostic(`admin: ${[...paginas].map(([p, x]) => `${p} (${x.camino.length})`).join(', ')}`);
     } finally { await sesion.cerrar(); }
   });

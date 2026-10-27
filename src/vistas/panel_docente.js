@@ -20,3 +20,4 @@ export { renderProfesores } from './admin/profesores.js';
 export { renderTablero } from './admin/tablero.js';
 export { renderSuper } from './super/clientes.js';
 export { renderCliente } from './super/cliente.js';
+export { renderInvitar } from './admin/invitar.js'; // invitar profes por correo (engrama-backend ESPEC_invitar_profe)

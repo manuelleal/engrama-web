@@ -10,7 +10,7 @@
 //
 // Súbelo un número cada vez que cambie la lista de precarga o la estrategia; la `activate`
 // borra cualquier caché con otro nombre.
-// salida/web (E6) sube a v81: une la fluidez (v80) y el panel del super admin (v80); la v79 la toma cuentas/invitar-profe.
+// salida/web (E6) sube a v81: une la fluidez (v80), el panel del super admin (v80) e invitar profes (v79).
 const VERSION = 'engrama-shell-v81';
 
 // Cada encargo agrega los suyos en su propio commit (W7: Inicio + api/cliente,core,retos + los
@@ -225,6 +225,11 @@ const DIFERIDOS = [
   '/src/vistas/admin/tablero.js',
   '/src/vistas/super/clientes.js',
   '/src/vistas/super/cliente.js',
+  // Invitar profes por correo (engrama-backend docs/ESPEC_invitar_profe.md §5): "Profes: invitar" del admin (en el panel) y los textos que
+  // también usa `#/invitacion` (el enlace del correo, que pinta recuperar.js).
+  '/src/vistas/admin/invitar.js',
+  '/src/api/invitaciones.js',
+  '/src/textos_invitar.js',
 ];
 
 // Cuánto se espera a CADA recurso de la precarga. Antes era `cache.addAll(PRECARGA)`: todo o nada, sin límite de tiempo. Un solo recurso
