@@ -120,8 +120,9 @@ Registro sereno. Una cosa cambia: **crear un grupo es una tarjeta, y cada grupo 
 ## 4. Aire inferior a 375 (`estilos/componentes.css`)
 
 - `#vista:has(.nav-inferior)` pasa de `calc(88px + env(safe-area-inset-bottom))` a `calc(7rem + env(safe-area-inset-bottom))`: 88 px de la barra
-  más 24 de aire a 16 px, y en `rem` para que crezca con la letra del teléfono (con la letra grande de Android la barra crece y 88 px fijos la
-  dejaban morder lo último). Medido antes en el doble: 22 px de aire en Inicio (tarjeta de racha), La Puja, Tienda, Insignias e Invitar.
+  más 24 de aire a 16 px; en `rem`, el aire crece con la letra del teléfono. Medido antes en el doble (Edge sin barra de Safari ni zona segura): lo
+  último de Inicio (tarjeta de racha), La Puja, Tienda, Insignias, Grupos del admin e Invitar quedaba a 22 px del borde de la barra, nada tapado al
+  bajar del todo; el "mordido" no se reprodujo aquí (ver la entrega). Después: 46 px a 16 px de letra, 74 px a 20 px.
 - Bytes al shell: ~0.
 
 ## 5. Para el backend (no se hace aquí)

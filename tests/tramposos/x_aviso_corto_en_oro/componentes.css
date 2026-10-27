@@ -562,10 +562,11 @@ nav {
   margin: 0;
   z-index: 10;
 }
-/* El espacio que la nav fija le quita al final del scroll — para toda vista del estudiante que la
-   use (Inicio, Retos, Asistencia, Revisión), sin tocar cada vista.js uno por uno. */
+/* El espacio que la nav fija le quita al final del scroll — para toda vista que la use (los tres roles), sin tocar cada vista.js uno por uno.
+   E7 (docs/ESPEC_visual_pulido_salida.md §4): 7rem = los 88 px de antes + 24 de aire a 16 px (lo último quedaba a 22 px del borde de la barra, que
+   se leía como mordido: la tarjeta de racha de Inicio, los +5/+10/+25 de La Puja); en rem, el aire crece con la letra del teléfono. */
 #vista:has(.nav-inferior) {
-  padding-bottom: calc(88px + env(safe-area-inset-bottom));
+  padding-bottom: calc(7rem + env(safe-area-inset-bottom));
 }
 /* W68 (docs/ESPEC_navegacion.md §5.6): con "Perfil" son hasta 4 entradas, del mismo ancho (la rejilla del sistema), sin partir ningún texto. */
 .nav-inferior a {
