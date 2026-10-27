@@ -118,7 +118,9 @@ test('TI-W2: fallar sin clave con la descartada inhabilitada, acertar al segundo
     humo.retomar = { antes, tocarLaDescartada: { comprobarDormido: deshabilitado(buscar(r.raiz, 'boton-comprobar')), enviados: [...retomado.vistos] } };
   } finally { r.cerrar(); }
   mkdirSync(new URL('../../salida/', import.meta.url), { recursive: true });
-  writeFileSync(new URL('../../salida/humo_tres_intentos_web.json', import.meta.url), JSON.stringify(humo, null, 1));
+  // El humo se escribe ANTES de afirmar (`.ultimo.json`, también con un tramposo puesto) y pasa a `humo_tres_intentos_web.json` solo si la
+  // prueba pasa: un tramposo no pisa el humo del código bueno (como pasó en el backend, commit 589d33a).
+  writeFileSync(new URL('../../salida/humo_tres_intentos_web.ultimo.json', import.meta.url), JSON.stringify(humo, null, 1));
   const pendiente = (descartadas, labels) => ({ panel: 'Incorrecto, inténtalo otra vezElige otra opción.', panelIncorrecto: true, descartadas, inhabilitadas: descartadas, banda: null,
     comprobar: 'dormido', siguiente: false, aciertos: '0', claveALaVista: false, ...(labels ? {} : {}) });
   const resuelta = (banda, descartadas, aciertos, inhabilitadas) => ({ panel: '', panelIncorrecto: false, descartadas, inhabilitadas, banda, comprobar: 'ausente', siguiente: true, aciertos, claveALaVista: true });
@@ -128,6 +130,7 @@ test('TI-W2: fallar sin clave con la descartada inhabilitada, acertar al segundo
     replica_vwxyz_acierta_al_3: { fotos: [pendiente(['V']), pendiente(['V', 'W']), resuelta('¡Bien hecho!', ['V', 'W'], '1', ['V', 'W', 'X', 'Y', 'Z'])], enviados: ['V', 'W', 'Z'] },
     retomar: { antes: pendiente(['B']), tocarLaDescartada: { comprobarDormido: true, enviados: [] } },
   });
+  writeFileSync(new URL('../../salida/humo_tres_intentos_web.json', import.meta.url), JSON.stringify(humo, null, 1));
 });
 
 test('TI-W3: el repaso falla sin clave con la descartada inhabilitada y, al acertar, la banda; nunca monedas', async () => {
