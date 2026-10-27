@@ -295,8 +295,8 @@
 .estacion-camino.estacion--sin_empezar:not(.es-recomendada):not(.acceso--bloqueada) .estacion-camino__marca {
   box-shadow: inset 0 0 0 2px var(--sx-borde-3), 0 5px 0 var(--labio-nodo);
 }
-/* Solo el nodo que se toca se hunde (va a la misma acción que su botón, ver camino.js): presionar es bajar el alto del canto, solo con transform.
-   El que no tiene acción conserva su volumen pero no responde: ni se hunde ni cambia el cursor (aria-disabled). */
+/* Solo el nodo que se toca tiene canto y se hunde (va a la misma acción que su botón, ver camino.js): presionar es bajar el alto del canto, solo con
+   transform. El que no tiene acción va YA HUNDIDO, como el deshabilitado del sistema: sin canto y 5 px abajo (adenda 1, H-2). */
 #vista .estacion-camino__marca.es-enlace {
   text-decoration: none;
   transition: transform var(--sx-dur-1) var(--sx-curva);
@@ -309,8 +309,10 @@
   outline: 3px solid var(--sx-foco-color);
   outline-offset: 2px;
 }
-.estacion-camino__marca[aria-disabled="true"] {
+#vista .estacion-camino__marca[aria-disabled="true"] {
   cursor: default;
+  box-shadow: var(--brillo-nodo);
+  transform: translateY(5px);
 }
 .estacion-camino__cuerpo {
   scroll-margin-bottom: 96px; /* al traer la ficha de la recomendada a la vista (camino.js), que quede entera sobre la barra de abajo */
@@ -403,12 +405,15 @@
   --labio-nodo: var(--sx-oro-labio);
   --brillo-nodo: var(--sx-brillo);
 }
-/* Bloqueada: candado sobre gris, con un canto gris; no se toca (camino.js no le da enlace). */
+/* Bloqueada: candado en un hueco cerrado (cara gris, hundida, con el contorno interior de 3:1 del sistema); no se toca (camino.js no le da enlace). */
 .estacion-camino.acceso--bloqueada .estacion-camino__marca {
   --cara-nodo: var(--sx-pozo);
   --tinta-nodo: var(--sx-tinta-2);
-  --labio-nodo: color-mix(in srgb, var(--sx-pozo) 80%, black);
   --brillo-nodo: 0 0 0 transparent;
+}
+#vista .estacion-camino.acceso--bloqueada .estacion-camino__marca[aria-disabled="true"] {
+  /* El contorno del 3:1 del sistema (`--sx-borde-3` = 52 % de la tinta), con la tinta plena: con `currentColor` (aquí `--sx-tinta-2`) quedaba en 2,8:1. */
+  box-shadow: inset 0 0 0 2px color-mix(in srgb, var(--texto) 52%, transparent);
 }
 .estacion-camino.acceso--bloqueada .estacion-camino__cuerpo {
   background: var(--sx-superficie-alta);
