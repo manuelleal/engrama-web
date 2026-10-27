@@ -35,15 +35,16 @@ function estacion(e, i) {
 }
 
 /**
- * El nodo de la estación (docs/ESPEC_visual_fluidez.md §3): lleva el ÍCONO del estado (la recomendada, la estrella); el número va en el nombre
- * ("Unidad N") y, sin SVG en el entorno, el nodo cae al número. Si la estación tiene acción, el nodo es un ENLACE a esa misma acción (56 px o más
- * de toque, con su nombre accesible y el foco del sistema); si no la tiene (bloqueada, o nada que jugar), es un dibujo plano y `aria-hidden`.
- * Sin `data-testid`: la acción que miran las pruebas sigue siendo el botón (`camino-accion-N`).
+ * El nodo de la estación (docs/ESPEC_visual_fluidez.md §3 y docs/ESPEC_visual_pulido_salida.md §1): lleva el ÍCONO del estado (la recomendada y la
+ * que va en curso, la estrella); el número va en el nombre ("Unidad N") y, sin SVG en el entorno, el nodo cae al número. Todos tienen volumen (su
+ * canto). Si la estación tiene acción, el nodo es un ENLACE a esa misma acción (56 px o más de toque, con su nombre accesible y el foco del sistema)
+ * y se hunde al presionar; si no la tiene (bloqueada, o nada que jugar), no se hunde: es una imagen con su estado como nombre y `aria-disabled`
+ * (compuerta 30, punto 3: lo que parece botón se puede tocar). Sin `data-testid`: la acción que miran las pruebas sigue siendo el botón.
  * @param {import('../../ui/camino.js').EstacionVista} e @param {number} i
  */
 function nodoDe(e, i) {
-  const dibujo = crearIcono(e.recomendada ? 'estrella' : e.icono) ?? String(i + 1);
-  if (!e.accion) return h('span', { class: 'estacion-camino__marca', 'aria-hidden': 'true' }, dibujo);
+  const dibujo = crearIcono(e.recomendada || e.estado === 'en_curso' ? 'estrella' : e.icono) ?? String(i + 1);
+  if (!e.accion) return h('span', { class: 'estacion-camino__marca', role: 'img', 'aria-label': e.texto, 'aria-disabled': 'true' }, dibujo);
   return h('a', { href: e.accion.href, class: 'estacion-camino__marca es-enlace', 'aria-label': `${e.accion.texto}: ${e.nombre}` }, dibujo);
 }
 
@@ -64,15 +65,15 @@ export async function renderCamino(raiz, ctx) {
   if (r.tipo === 'sin_ruta') { aviso(raiz, ctx, T.noDisponible, false); return; }
   if (r.tipo === 'error') { aviso(raiz, ctx, T.noSePudo, true); return; }
   const plan = planDeCamino(r.camino);
-  // docs/ESPEC_visual_fluidez.md §3: el camino primero; las reglas, debajo (antes empujaban la recomendada fuera de la pantalla a 375 px).
+  // docs/ESPEC_visual_pulido_salida.md §1 (Christiam, 26-oct): las reglas (el 70 %) van ARRIBA, en la cabecera, debajo del nivel; el camino después.
   pintar(raiz, ctx,
     h('section', { class: 'camino-cabecera', 'data-testid': 'camino-cabecera' },
       h('p', { class: 'sx-t-tarjeta', 'data-testid': 'camino-nivel' }, plan.titulo),
-      ...plan.avisos.map((a) => h('p', { class: 'sx-t-apoyo' }, a))),
+      ...plan.avisos.map((a) => h('p', { class: 'sx-t-apoyo' }, a)),
+      h('p', { class: 'sx-t-apoyo camino-reglas', 'data-testid': 'camino-reglas' }, plan.reglas)),
     plan.estaciones.length
       ? h('ol', { class: 'lista-camino', 'data-testid': 'camino-lista', 'aria-label': T.lista }, ...plan.estaciones.map(estacion))
-      : h('p', { class: 'sx-vacio', role: 'status', 'data-testid': 'camino-vacio' }, T.vacio),
-    h('p', { class: 'sx-t-apoyo camino-reglas', 'data-testid': 'camino-reglas' }, plan.reglas));
+      : h('p', { class: 'sx-vacio', role: 'status', 'data-testid': 'camino-vacio' }, T.vacio));
   globalThis.requestAnimationFrame?.(() => mostrarElSiguiente(raiz));
 }
 

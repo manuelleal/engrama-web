@@ -214,17 +214,19 @@
 .respuesta-escrita.es-correcta .opcion-estado { color: var(--sx-ok); }
 .respuesta-escrita.es-incorrecta .opcion-estado { color: var(--sx-mal); }
 
-/* W92 (docs/ESPEC_camino_y_tu_palabra.md §3) con la forma de docs/ESPEC_visual_fluidez.md §3: `#/camino` es un CAMINO. Las estaciones van en una lista
-   ordenada sobre una vía punteada que baja por el centro; cada una es un nodo redondo con el ícono de su estado (que se mece a izquierda y derecha) y,
-   debajo, su ficha con el nombre, el estado con ícono y texto (nunca solo color) y su acción. La recomendada es el nodo grande, en el color de acción,
-   con su anillo (el único momento animado); el oro, SOLO para Dominada; lo bloqueado, gris con su candado y su texto. */
+/* W92 (docs/ESPEC_camino_y_tu_palabra.md §3) con la forma de docs/ESPEC_visual_fluidez.md §3 y docs/ESPEC_visual_pulido_salida.md §1: `#/camino` es
+   un CAMINO. Las reglas (el 70 %) arriba, en la cabecera; las estaciones, en una lista ordenada sobre una vía punteada que baja por el centro. Cada una
+   es un nodo redondo CON VOLUMEN (su canto: el labio del sistema) con el ícono de su estado, centrado sobre la vía, y debajo su ficha clara con el
+   nombre, el estado con ícono y texto (nunca solo color) y su acción. Dominada: corona sobre oro (el único oro: es el logro). Completada: ✓ sobre
+   verde. Recomendada o en curso: estrella sobre navy con su anillo (el de la recomendada entra al llegar: el único momento animado). Bloqueada:
+   candado sobre gris, con su texto y su fecha. */
 .camino-cabecera {
   margin: 12px 0 16px;
   display: grid;
   gap: 4px;
 }
 .camino-reglas {
-  margin: 0 0 24px;
+  margin: 0;
 }
 .lista-camino {
   position: relative;
@@ -244,17 +246,17 @@
   transform: translateX(-50%);
 }
 .estacion-camino {
-  --x: 0px;
   position: relative;
   display: grid;
   justify-items: center;
-  gap: 8px;
+  gap: 10px;
   text-align: center;
 }
-/* El nodo se mece 24 px: menos que su radio, así la vía del centro siempre lo atraviesa. */
-.estacion-camino:nth-child(4n + 2) { --x: 24px; }
-.estacion-camino:nth-child(4n + 4) { --x: -24px; }
+/* El nodo: cara, ícono y canto salen de tres variables que pone cada estado. El canto es el labio del sistema (5 px abajo, sin difuminar): el
+   volumen de una ficha de juego. Va centrado sobre la vía (antes se mecía ±24 px y el ✓ quedaba corrido de la línea). */
 .estacion-camino__marca {
+  --cara-nodo: var(--sx-superficie);
+  --tinta-nodo: var(--sx-tinta-2);
   --labio-nodo: var(--sx-labio-neutro);
   --brillo-nodo: 0 0 0 transparent;
   position: relative;
@@ -264,30 +266,35 @@
   display: grid;
   place-items: center;
   font: 800 1.25rem/1 var(--fuente-titulos);
-  background: var(--sx-superficie);
-  color: var(--sx-tinta-2);
-  border: 3px solid var(--sx-borde-3);
-  transform: translateX(var(--x));
+  background: var(--cara-nodo);
+  color: var(--tinta-nodo);
+  box-shadow: var(--brillo-nodo), 0 5px 0 var(--labio-nodo);
   scroll-margin-bottom: 96px; /* al traerla a la vista, que quede sobre la barra de abajo */
 }
 .estacion-camino__marca .sx-icono {
   width: 26px;
   height: 26px;
 }
-/* Solo el nodo que se toca lleva labio (va a la misma acción que su botón, ver camino.js); el que no, es plano: no promete un toque. Presionar es
-   hundirse el alto del labio (solo transform); el foco, el del sistema. */
+/* Sin empezar o abierta con apoyo: ficha blanca con su borde (como el botón secundario del sistema). */
+.estacion-camino.estacion--sin_empezar:not(.es-recomendada):not(.acceso--bloqueada) .estacion-camino__marca {
+  box-shadow: inset 0 0 0 2px var(--sx-borde-3), 0 5px 0 var(--labio-nodo);
+}
+/* Solo el nodo que se toca se hunde (va a la misma acción que su botón, ver camino.js): presionar es bajar el alto del canto, solo con transform.
+   El que no tiene acción conserva su volumen pero no responde: ni se hunde ni cambia el cursor (aria-disabled). */
 #vista .estacion-camino__marca.es-enlace {
-  box-shadow: var(--brillo-nodo), 0 5px 0 var(--labio-nodo);
   text-decoration: none;
   transition: transform var(--sx-dur-1) var(--sx-curva);
 }
 #vista .estacion-camino__marca.es-enlace:active {
-  transform: translateX(var(--x)) translateY(5px);
-  box-shadow: var(--brillo-nodo);
+  transform: translateY(5px);
+  box-shadow: var(--brillo-nodo), 0 0 0 transparent;
 }
 #vista .estacion-camino__marca.es-enlace:focus-visible {
   outline: 3px solid var(--sx-foco-color);
   outline-offset: 2px;
+}
+.estacion-camino__marca[aria-disabled="true"] {
+  cursor: default;
 }
 .estacion-camino__cuerpo {
   display: grid;
@@ -326,25 +333,31 @@
   font-size: 0.8125rem;
   letter-spacing: 0.04em;
 }
-.estacion-camino.es-recomendada .estacion-camino__marca {
+/* Recomendada o en curso: estrella sobre navy con su anillo. La recomendada es la grande y su anillo entra al llegar. */
+.estacion-camino.es-recomendada .estacion-camino__marca,
+.estacion-camino.estacion--en_curso .estacion-camino__marca {
+  --cara-nodo: var(--sx-accion);
+  --tinta-nodo: var(--sx-sobre-accion);
   --labio-nodo: var(--sx-accion-labio);
   --brillo-nodo: var(--sx-brillo);
+}
+.estacion-camino.es-recomendada .estacion-camino__marca::after,
+.estacion-camino.estacion--en_curso .estacion-camino__marca::after {
+  content: "";
+  position: absolute;
+  inset: -9px;
+  border-radius: 50%;
+  border: 4px solid var(--sx-accion-borde);
+}
+.estacion-camino.es-recomendada .estacion-camino__marca {
   width: 68px;
   height: 68px;
-  background: var(--sx-accion);
-  color: var(--sx-sobre-accion);
-  border-color: var(--sx-accion);
 }
 .estacion-camino.es-recomendada .estacion-camino__marca .sx-icono {
   width: 32px;
   height: 32px;
 }
 .estacion-camino.es-recomendada .estacion-camino__marca::after {
-  content: "";
-  position: absolute;
-  inset: -9px;
-  border-radius: 50%;
-  border: 4px solid var(--sx-accion-borde);
   animation: camino-anillo var(--sx-dur-3) var(--sx-curva-rebote) 200ms backwards;
 }
 @keyframes camino-anillo {
@@ -353,12 +366,14 @@
 .estacion-camino.es-recomendada .estacion-camino__cuerpo {
   box-shadow: 0 0 0 2px var(--sx-accion-borde), var(--sx-elev-2);
 }
+/* Completada: ✓ sobre verde. */
 .estacion-camino.estacion--completada .estacion-camino__marca {
+  --cara-nodo: var(--sx-ok-cara);
+  --tinta-nodo: var(--sx-sobre-ok);
   --labio-nodo: color-mix(in srgb, var(--sx-ok-cara) 60%, black);
-  background: var(--sx-ok-cara);
-  color: var(--sx-sobre-ok);
-  border-color: var(--sx-ok-cara);
+  --brillo-nodo: var(--sx-brillo);
 }
+/* Dominada: corona sobre oro (el logro). */
 .estado-camino.es-oro {
   color: var(--oro-texto);
 }
@@ -366,15 +381,17 @@
   background: var(--sx-oro-suave);
 }
 .estacion-camino.estacion--dominada .estacion-camino__marca {
+  --cara-nodo: var(--sx-oro);
+  --tinta-nodo: var(--sx-sobre-oro);
   --labio-nodo: var(--sx-oro-labio);
   --brillo-nodo: var(--sx-brillo);
-  background: var(--sx-oro);
-  border-color: var(--sx-oro);
-  color: var(--sx-sobre-oro);
 }
+/* Bloqueada: candado sobre gris, con un canto gris; no se toca (camino.js no le da enlace). */
 .estacion-camino.acceso--bloqueada .estacion-camino__marca {
-  background: var(--sx-pozo);
-  border-color: var(--sx-pozo);
+  --cara-nodo: var(--sx-pozo);
+  --tinta-nodo: var(--sx-tinta-2);
+  --labio-nodo: color-mix(in srgb, var(--sx-pozo) 80%, black);
+  --brillo-nodo: 0 0 0 transparent;
 }
 .estacion-camino.acceso--bloqueada .estacion-camino__cuerpo {
   background: var(--sx-superficie-alta);
