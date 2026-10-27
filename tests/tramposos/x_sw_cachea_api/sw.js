@@ -11,7 +11,8 @@
 // Súbelo un número cada vez que cambie la lista de precarga o la estrategia; la `activate`
 // borra cualquier caché con otro nombre.
 // salida/web (E6) sube a v81: une la fluidez (v80), el panel del super admin (v80) e invitar profes (v79).
-const VERSION = 'engrama-shell-v81';
+// retos/tres-intentos sube a v83 (la v82 es del pulido visual): reto_l1.js, repaso.js y api/practica.js cambian (decisión 018).
+const VERSION = 'engrama-shell-v83';
 
 // Cada encargo agrega los suyos en su propio commit (W7: Inicio + api/cliente,core,retos + los
 // SVG de Drako que usa el estudiante; W10: profe/grupos,grupo,sesion_asistencia + api/profe). El

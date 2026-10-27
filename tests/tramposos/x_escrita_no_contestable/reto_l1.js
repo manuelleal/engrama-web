@@ -7,7 +7,10 @@
 //   - lo de una pregunta (la oración, la explicación, cuál era la correcta) aparece SOLO después de que el servidor la califica (regla 3);
 //   - gana la primera respuesta: lo que se muestra es lo que el servidor guardó (`answer`);
 //   - retomar: lo ya respondido llega en `GET …/answers`; se abre en la primera sin responder;
-//   - "Ver resultado" cierra con `/finish` (una vez) y muestra la revisión de siempre.
+//   - "Ver resultado" cierra con `/finish` (una vez) y muestra la revisión de siempre;
+//   - tres intentos (decisión 018, docs/ESPEC_tres_intentos.md): si el servidor dice que la pregunta sigue SIN resolver (`resuelta: false`), la web dice
+//     "Incorrecto, inténtalo otra vez" con ícono y texto, sin la clave; las descartadas quedan inhabilitadas y marcadas, y se vuelve a comprobar. La
+//     pregunta pendiente NO cuenta como respondida (avance, aciertos, "Siguiente"). La web no cuenta intentos ni decide monedas: lo dice el servidor.
 import { h, montar, texto as nodoDeTexto } from '../../ui/dom.js';
 import { textos } from '../../textos.js';
 import { textosPractica } from '../../textos_practica.js';
@@ -20,13 +23,14 @@ import { crearIcono } from '../../ui/iconos.js';
 import { marcarCargando } from '../../ui/boton.js';
 import { senal } from '../../ui/sonido.js';
 import { accionUnica, ErrorApi } from '../../api/cliente.js';
-import { retomarIntento, responderPregunta, terminarIntento, ErrorTransitorio } from '../../api/practica.js';
+import { retomarIntento, responderPregunta, terminarIntento, ErrorTransitorio, sinResolver } from '../../api/practica.js';
 import { planDeExplicacion, crearBanda } from '../../ui/explicacion.js';
 import { preguntaContestable, preguntaEscrita } from '../../ui/practica.js';
 import { crearCampoEscrito, hayTexto } from '../../ui/respuesta_escrita.js';
 import { crearLectura } from '../../ui/lectura.js';
 import { despejarBanda } from '../../ui/despejar_banda.js';
 import { renderRevision, textoDeOpcion } from './revision.js';
+import { retitularFranja, aciertosDe, crearChipAciertos, celebrarAcierto } from '../../ui/fluidez.js';
 import { crearSalir, nodoOpciones, pintarErrorFlujo, nodoRevisando } from './reto_flujo.js';
 
 const T = textosPractica.l1;
@@ -62,9 +66,12 @@ export async function intentarL1(raiz, datos) {
   if (!retomado) return false;
   const preguntas = datos.challenge.questions;
   const ids = new Set(preguntas.map((/** @type {any} */ q) => q.id));
-  // Solo lo de ESTE intento: una respuesta de una pregunta que no está en lo que trajo /attempt no se usa.
-  const respondidas = new Map(retomado.respondidas.filter((r) => ids.has(r.question_id)).map((r) => [r.question_id, r]));
-  const estado = { ...datos, rol: datos.ctx.sesion?.rol, respondidas, elegidas: /** @type {Record<string, string>} */ ({}), indice: indiceInicial(preguntas, respondidas), avanceMostrado: 0 };
+  // Solo lo de ESTE intento: una respuesta de una pregunta que no está en lo que trajo /attempt no se usa. Las SIN resolver (decisión 018) van aparte.
+  const deEste = retomado.respondidas.filter((r) => ids.has(r.question_id));
+  const respondidas = new Map(deEste.filter((r) => !sinResolver(r)).map((r) => [r.question_id, r]));
+  const pendientes = new Map(deEste.filter(sinResolver).map((r) => [r.question_id, r]));
+  const estado = { ...datos, rol: datos.ctx.sesion?.rol, respondidas, pendientes, recienDescartada: /** @type {string|null} */ (null),
+    elegidas: /** @type {Record<string, string>} */ ({}), indice: indiceInicial(preguntas, respondidas), avanceMostrado: 0 };
   estado.comprobar = accionUnica((qid, label) => responderPregunta(datos.attemptId, qid, label, datos.ctx));
   estado.terminar = accionUnica(() => terminarIntento(datos.attemptId, datos.ctx));
   pintar(raiz, estado);
@@ -113,19 +120,47 @@ function marcarResultado(lista, r) {
   }
 }
 
-/** Las opciones de la pregunta; ya respondida, quietas (la que quedó guardada, marcada con el resultado). */
+/**
+ * Decisión 018: las opciones que el servidor dice descartadas quedan inhabilitadas, con "Descartada" y su ícono (nunca solo color); la recién
+ * descartada tiembla una vez (la clase `tiembla` de magia.css; con reduced-motion no se mueve). Nada dice cuál es la correcta. @param {any} lista
+ * @param {string[]} descartadas @param {string|null} recien
+ */
+export function marcarDescartadas(lista, descartadas, recien) {
+  for (const li of lista?.children ?? []) {
+    const b = li.children?.[0];
+    const label = String(b?.getAttribute?.('data-testid') ?? '').slice('opcion-'.length);
+    if (!b || !descartadas.includes(label)) continue;
+    b.disabled = true;
+    b.className = `${b.className || ''} es-incorrecta es-descartada${label === recien ? ' tiembla' : ''}`.trim();
+    b.appendChild(h('span', { class: 'opcion-estado' }, crearIcono('equis'), T.descartada));
+  }
+}
+
+/** Las opciones de la pregunta; ya respondida, quietas (la que quedó guardada, marcada con el resultado); pendiente, con sus descartadas quietas. */
 function opcionesDe(raiz, estado, pregunta, respuesta) {
   const elegida = respuesta ? respuesta.answer : estado.elegidas[pregunta.id];
+  const descartadas = respuesta ? [] : estado.pendientes.get(pregunta.id)?.descartadas ?? [];
   const alElegir = (/** @type {string} */ label) => {
-    if (respuesta || estado.enVuelo) return; // H-6: con "Comprobar" en vuelo no se reelige (ni repinta ni suena)
+    if (respuesta || estado.enVuelo || descartadas.includes(label)) return; // H-6: con "Comprobar" en vuelo no se reelige; una descartada, nunca
     estado.elegidas[pregunta.id] = label;
     senal(senalDeSeleccion()); // neutra: elegir no dice nada de la clave
     pintar(raiz, estado, 'quieta', label);
   };
   const lista = nodoOpciones(pregunta, { [pregunta.id]: elegida }, alElegir, null);
-  if (respuesta) { quietas(lista); marcarResultado(lista, respuesta); }
+  if (respuesta) { // resuelta: el resultado, y las que descartó antes siguen dichas "Descartada"
+    quietas(lista); marcarResultado(lista, respuesta);
+    marcarDescartadas(lista, (Array.isArray(respuesta.descartadas) ? respuesta.descartadas : []).filter((l) => l !== respuesta.answer), null);
+  } else if (descartadas.length) marcarDescartadas(lista, descartadas, estado.recienDescartada);
   estado.opciones = lista;
   return lista;
+}
+
+/** Decisión 018: lo que dice el panel de una pregunta pendiente, sin la clave. Pura. @param {any} pendiente @param {boolean} escrita */
+export function avisoDeOtroIntento(pendiente, escrita) {
+  if (!pendiente) return null;
+  if (!escrita) return { titulo: T.incorrectoOtraVez, detalle: T.eligeOtra };
+  const probadas = Array.isArray(pendiente.descartadas) ? pendiente.descartadas : [];
+  return { titulo: T.incorrectoOtraVez, detalle: [T.escribeOtra, probadas.length ? T.yaProbaste(probadas) : null].filter(Boolean).join(' ') };
 }
 
 /** Antes de comprobar: el panel neutro de siempre ("Elegiste B: …") y el botón Comprobar, que despierta al elegir. */
@@ -137,6 +172,11 @@ function barraComprobar(raiz, estado, pregunta, recien) {
     onClick: () => comprobar(raiz, estado, pregunta, boton),
   }, T.comprobar);
   estado.botonComprobar = boton;
+  // Decisión 018: pendiente y sin una opción nueva elegida (o escrita), el panel dice "Incorrecto, inténtalo otra vez" con su ícono.
+  const otra = avisoDeOtroIntento(estado.pendientes.get(pregunta.id), escrita);
+  if (otra && (escrita || !elegida)) return h('div', { class: 'barra-accion' }, crearPanelResultado({
+    tipo: 'incorrecto', visible: true, sube: estado.recienDescartada !== null, testid: 'panel-respuesta', texto: otra.titulo, detalle: estado.error ?? otra.detalle,
+  }), boton);
   if (escrita) return h('div', { class: 'barra-accion' }, h('p', { class: 'texto-apoyo', 'data-testid': 'panel-respuesta' }, estado.error ?? T.antesDeComprobarEscrita), boton);
   const panel = crearPanelResultado({
     tipo: 'neutro', visible: Boolean(elegida), sube: Boolean(recien), testid: 'panel-respuesta',
@@ -215,7 +255,7 @@ function pintar(raiz, estado, entrada = 'desliza', recien = null) {
   const nodo = h(
     'div', { 'data-testid': 'vista-reto-flujo', 'data-modo': 'por-pregunta', class: `juego juego-${entrada}${respuesta ? ' con-banda' : ''}` },
     estado.encabezado = crearCabecera({ piezas: [estado.salir, h('h1', { class: 'titulo-reto' }, tituloLegible(challenge.title))], sonido: true }),
-    barra,
+    h('div', { class: 'fila-avance' }, barra, crearChipAciertos(aciertosDe(estado.respondidas))), // la barra y el chip de aciertos
     estado.esRepaso ? h('p', { role: 'status', class: 'aviso-corto', 'data-testid': 'banner-repaso' }, textos.retoFlujo.bannerRepaso) : null,
     crearLectura(challenge), // W84: el texto de un reto de Lectura, arriba de la afirmación (null si no es de Lectura)
     h('div', { class: 'presenta-pregunta' },
@@ -225,6 +265,8 @@ function pintar(raiz, estado, entrada = 'desliza', recien = null) {
     ...cuerpoDeLaPregunta(raiz, estado, pregunta, respuesta, recien),
   );
   montar(raiz, nodo);
+  // Sprint de la magia (docs/ESPEC_avatar_fluidez.md §1): la franja dice "¡Bien hecho!" o "La correcta: …", con el mismo ícono de siempre.
+  if (respuesta) retitularFranja(nodo, respuesta, respuesta.correct_answer ? textoDeOpcion(pregunta, respuesta.correct_answer) : null);
   document.body.dataset.listo = '1';
   // Adenda 1 de ESPEC_visual_reto_tanda2: con la banda puesta, la app deja ver juntos el enunciado, lo marcado y la banda (un cuadro después: ya con su alto).
   if (respuesta) globalThis.requestAnimationFrame?.(() => despejarBanda(nodo));
@@ -241,9 +283,12 @@ async function comprobar(raiz, estado, pregunta, boton) {
     const r = await estado.comprobar(pregunta.id, label); // la label que guardó nodoOpciones (valorAlGuardar), nunca el texto
     estado.enVuelo = false;
     estado.error = null;
+    if (sinResolver(r)) { otroIntento(raiz, estado, pregunta, r); return; } // decisión 018: falló y le quedan intentos
+    estado.pendientes.delete(pregunta.id);
     estado.respondidas.set(pregunta.id, r);
     senal(r.is_correct ? 'acierto' : 'fallo');
     pintar(raiz, estado, 'quieta');
+    if (r.is_correct) celebrarAcierto(raiz, { esRepaso: estado.esRepaso }); // solo recién comprobada: al retomar no se celebra de nuevo
   } catch (e) {
     estado.enVuelo = false;
     console.warn('reto_l1: no se pudo comprobar', e);
@@ -252,6 +297,16 @@ async function comprobar(raiz, estado, pregunta, boton) {
     estado.error = T.noSePudo; // sin red o un 500: se puede volver a tocar Comprobar
     pintar(raiz, estado, 'quieta');
   }
+}
+
+/** Decisión 018: falló y le quedan intentos. Sin la clave: la descartada queda quieta, la elección se limpia y "Comprobar" duerme hasta elegir otra. */
+function otroIntento(raiz, estado, pregunta, r) {
+  estado.pendientes.set(pregunta.id, r);
+  delete estado.elegidas[pregunta.id];
+  estado.recienDescartada = r.answer;
+  senal('fallo'); // el sonido suave de siempre: sin castigo ni vidas
+  pintar(raiz, estado, 'quieta');
+  estado.recienDescartada = null; // solo tiembla una vez
 }
 
 /**
@@ -284,7 +339,8 @@ async function terminar(raiz, estado, boton) {
   raiz.querySelector('.barra-accion')?.before(nodoRevisando());
   try {
     const resultado = await estado.terminar();
-    const respuestasDadas = Object.fromEntries([...estado.respondidas].map(([qid, r]) => [qid, r.answer]));
+    // Decisión 018: de una pendiente (quedó sin resolver al cerrar) se muestra su última descartada como "tu respuesta".
+    const respuestasDadas = Object.fromEntries([...estado.pendientes, ...estado.respondidas].map(([qid, r]) => [qid, r.answer]));
     // W91: el acierto de cada pregunta es el que YA dijo el servidor (con lo escrito, "Family" acierta aunque no sea igual a "family").
     const aciertos = Object.fromEntries([...estado.respondidas].map(([qid, r]) => [qid, r.is_correct]));
     renderRevision(raiz, { challenge: estado.challenge, resultado, respuestasDadas, aciertos, rol: estado.rol, esRepaso: estado.esRepaso, historialPrevio: estado.historialPrevio,

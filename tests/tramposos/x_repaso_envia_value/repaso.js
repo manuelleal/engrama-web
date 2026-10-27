@@ -5,7 +5,9 @@
 //   - tras responder, la misma banda del reto (ui/explicacion.js): veredicto con ícono y texto, la oración, la regla, "por qué no la tuya" solo si
 //     falló y el ejemplo. El repaso paga 0: nunca se muestran monedas ni "+0";
 //   - "Siguiente" vuelve a pedir la tanda (lo respondido ya no sale hoy); sin más, "Repaso al día.". Sin tanda o sin la ruta: "No hay repaso por ahora.";
-//   - sin mascota (está en revisión: no entra a pantallas nuevas). La acción va en el flujo, no fija: abajo está la barra.
+//   - sin mascota (está en revisión: no entra a pantallas nuevas). La acción va en el flujo, no fija: abajo está la barra;
+//   - tres intentos (decisión 018, docs/ESPEC_tres_intentos.md §1.3): si el servidor dice `resuelta: false`, "Incorrecto, inténtalo otra vez" con
+//     ícono y texto, sin la clave; la descartada queda inhabilitada y marcada; se vuelve a elegir y a comprobar. Nunca monedas.
 import { h, montar } from '../../ui/dom.js';
 import { textos } from '../../textos.js';
 import { textosPractica } from '../../textos_practica.js';
@@ -16,11 +18,12 @@ import { marcarCargando } from '../../ui/boton.js';
 import { senal } from '../../ui/sonido.js';
 import { senalDeSeleccion } from '../../ui/progreso.js';
 import { accionUnica, ErrorApi } from '../../api/cliente.js';
-import { verTanda, responderRepaso } from '../../api/practica.js';
+import { verTanda, responderRepaso, sinResolver } from '../../api/practica.js';
 import { planDeExplicacion, crearBanda } from '../../ui/explicacion.js';
 import { preguntaContestable } from '../../ui/practica.js';
 import { textoDeOpcion } from './revision.js';
 import { nodoOpciones } from './reto_flujo.js';
+import { marcarDescartadas, avisoDeOtroIntento } from './reto_l1.js';
 
 const RUTA = '/repaso';
 const T = textosPractica.repaso;
@@ -55,7 +58,8 @@ export async function renderRepaso(raiz, ctx, saltadas = new Set()) {
   const entradas = tanda.tanda.repaso.filter((/** @type {any} */ e) => preguntaContestable(e.pregunta)); // H-3: lo que no se puede contestar aquí, se salta
   const quedan = entradas.filter((/** @type {any} */ e) => !saltadas.has(e.entrada_id));
   if (quedan.length === 0) { pintar(raiz, ctx, finDelRepaso(T.alDia, 'repaso-al-dia')); return; }
-  const estado = { ctx, saltadas, entrada: quedan[0], quedan: quedan.length, elegida: /** @type {string|null} */ (null), respuesta: null, error: null };
+  const estado = { ctx, saltadas, entrada: quedan[0], quedan: quedan.length, elegida: /** @type {string|null} */ (null), respuesta: null, error: null,
+    pendiente: /** @type {any} */ (null), recien: /** @type {string|null} */ (null) };
   estado.enviar = accionUnica((label) => responderRepaso(estado.entrada.entrada_id, estado.entrada.pregunta.id, label, ctx));
   pintarPregunta(raiz, estado);
 }
@@ -73,6 +77,8 @@ function accion(raiz, estado) {
     return crearBanda(planDeExplicacion(estado.respuesta, { opciones: pregunta.options_json }), { accion: siguiente });
   }
   const boton = h('button', { type: 'button', class: 'boton-principal', 'data-testid': 'boton-comprobar', disabled: !estado.elegida, onClick: () => comprobar(raiz, estado, boton) }, textosPractica.l1.comprobar);
+  const otra = estado.elegida ? null : avisoDeOtroIntento(estado.pendiente, false); // decisión 018: pendiente y sin una nueva elegida
+  if (otra) return h('div', { class: 'repaso-accion' }, crearPanelResultado({ tipo: 'incorrecto', visible: true, sube: estado.recien !== null, testid: 'panel-respuesta', texto: otra.titulo, detalle: estado.error ?? otra.detalle }), boton);
   const panel = crearPanelResultado({
     tipo: 'neutro', visible: Boolean(estado.elegida), testid: 'panel-respuesta', detalle: estado.error ?? textosPractica.l1.antesDeComprobar,
     texto: estado.elegida ? textos.retoFlujo.elegiste(estado.elegida, textoDeOpcion(pregunta, estado.elegida)) : '',
@@ -84,13 +90,16 @@ function pintarPregunta(raiz, estado) {
   const pregunta = estado.entrada.pregunta;
   // H-6: RespuestaOut no trae `answer`: tras responder se marca la ENVIADA (fijada al lanzar), nunca la última que se tocó.
   const elegida = estado.respuesta ? estado.respuesta.answer ?? estado.enviada : estado.elegida;
+  const descartadas = estado.respuesta ? [] : estado.pendiente?.descartadas ?? [];
   const opciones = nodoOpciones(pregunta, { [pregunta.id]: elegida }, (/** @type {string} */ label) => {
-    if (estado.respuesta || estado.enVuelo) return; // H-6: con "Comprobar" en vuelo no se reelige
+    if (estado.respuesta || estado.enVuelo || descartadas.includes(label)) return; // H-6: con "Comprobar" en vuelo no se reelige; una descartada, nunca
     estado.elegida = label;
     senal(senalDeSeleccion());
     pintarPregunta(raiz, estado);
   }, null);
   if (estado.respuesta) quietas(opciones);
+  else if (descartadas.length) marcarDescartadas(opciones, descartadas, estado.recien);
+  estado.recien = null; // la recién descartada tiembla una sola vez
   estado.opciones = opciones;
   pintar(raiz, estado.ctx,
     h('p', { class: 'aviso-corto', role: 'status', 'data-testid': 'banner-repaso' }, T.banner),
@@ -107,9 +116,15 @@ async function comprobar(raiz, estado, boton) {
   boton.disabled = true; marcarCargando(boton, true); boton.textContent = textosPractica.l1.comprobando;
   estado.enviada = label; estado.enVuelo = true; quietas(estado.opciones); // H-6: lo que se marca después es lo que se envió
   try {
-    estado.respuesta = await estado.enviar(textoDeOpcion(estado.entrada.pregunta, label));
+    const r = await estado.enviar(textoDeOpcion(estado.entrada.pregunta, label));
     estado.error = null;
-    senal(estado.respuesta.is_correct ? 'acierto' : 'fallo');
+    if (sinResolver(r)) { // decisión 018: falló y le quedan intentos; nada de la clave
+      estado.pendiente = r; estado.recien = r.answer ?? label; estado.elegida = null;
+      senal('fallo');
+    } else {
+      estado.respuesta = r;
+      senal(r.is_correct ? 'acierto' : 'fallo');
+    }
   } catch (e) {
     console.warn('repaso: no se pudo comprobar', e);
     if (e instanceof ErrorApi && [404, 409, 422].includes(e.status)) { // la forma cambió o ya no toca: se vuelve a pedir, sin ESTA entrada (H-9: tope)
