@@ -40,6 +40,8 @@ export async function cargar(ctx) {
   const [tanda, racha] = await Promise.all([verTanda(ctx), leerRacha(ctx)]);
   const practica = {
     tanda,
+    /** E7, adenda 1 (H-4): la línea del nivel lleva el botón al examen (lo pone `tarjeta`); entonces Inicio no pinta la tarjeta "Examen de nivel". */
+    llevaAlExamen: false,
     /** W81: la racha semanal para Inicio, o null (la constancia y la semana de siempre). */
     racha: racha ? rachaParaInicio(racha) : null,
     /**
@@ -52,6 +54,7 @@ export async function cargar(ctx) {
       // Con el feed vacío no hay con qué armar una tanda nueva: no se invita a "Jugar" a nada (queda lo de siempre).
       if (plan.tipo === 'respaldo' || (plan.tipo === 'empezar' && o.numRetos === 0)) return null;
       practica.aviso = crearNivel(plan, ctx);
+      practica.llevaAlExamen = alExamen(plan, ctx); // adenda 1 (H-4): con este botón, Inicio no pinta la tarjeta "Examen de nivel" (una sola entrada a #/nivel)
       return crearTarjeta(ctx, plan, o);
     },
     /** Lo que va después de "Ahora": el nivel de práctica (con la protagonista) o, si hoy no hay práctica de su nivel, la línea neutra. */
@@ -110,6 +113,9 @@ function crearAvance(plan) {
   return h('div', { class: 'sx-progreso', role: 'progressbar', 'aria-valuemin': 0, 'aria-valuemax': plan.pasos, 'aria-valuenow': hechos, 'aria-label': T.avance(hechos, plan.pasos), 'data-testid': 'practica-avance' }, relleno);
 }
 
+/** ¿La línea del nivel lleva el botón al examen? Sin nivel de SET y con el destino `set_examen`. @param {any} plan @param {any} ctx */
+const alExamen = (plan, ctx) => Boolean(plan.nivel) && !plan.nivel.conSet && destinosDeLaSesion(ctx).some((d) => d.destino === 'set_examen');
+
 /**
  * "Practicas en: A2" y, sin SET, "Todavía no es tu nivel…", junto a la práctica de hoy (dictamen 04 §1.3). E7 (docs/ESPEC_visual_pulido_salida.md §2):
  * si el estudiante tiene el destino `set_examen` (la misma regla que la tarjeta "Examen de nivel"), "Confírmalo…" es un ENLACE a `#/nivel`, donde se
@@ -117,11 +123,11 @@ function crearAvance(plan) {
  */
 function crearNivel(plan, ctx) {
   if (!plan.nivel) return null;
-  const alExamen = !plan.nivel.conSet && destinosDeLaSesion(ctx).some((d) => d.destino === 'set_examen');
+  const conBoton = alExamen(plan, ctx);
   const linea = h('p', { class: 'sx-t-apoyo practica-nivel', 'data-testid': 'practica-nivel' },
     h('strong', {}, T.nivel(plan.nivel.nivel)),
-    plan.nivel.conSet ? null : h('span', { 'data-testid': 'practica-sin-set' }, ` ${alExamen ? T.sinSetCorto : T.sinSet}`));
-  if (!alExamen) return linea;
+    plan.nivel.conSet ? null : h('span', { 'data-testid': 'practica-sin-set' }, ` ${conBoton ? T.sinSetCorto : T.sinSet}`));
+  if (!conBoton) return linea;
   return h('div', { class: 'practica-nivel-bloque' }, linea,
     h('a', { href: '#/nivel', class: 'sx-btn sx-btn--fantasma practica-ir-examen', 'data-testid': 'practica-ir-examen' }, T.irAlExamen, crearIcono('chevron')));
 }

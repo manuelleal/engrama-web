@@ -120,6 +120,7 @@ test('U81: sin tanda pedida, la protagonista es la primera de "Ahora" (la única
     assert.equal(textoDe(buscar(raiz, 'practica-nivel')), 'Practicas en: A2 Todavía no es tu nivel.');
     const alExamen = buscar(raiz, 'practica-ir-examen');
     assert.deepEqual([alExamen?.tagName, alExamen?.getAttribute('href'), textoDe(alExamen)], ['a', '#/nivel', 'Confírmalo haciendo el examen de nivel']);
+    assert.equal(buscar(raiz, 'tarjeta-set_examen'), null, 'E7, adenda 1 (H-4): una sola entrada a #/nivel; con el botón no va la tarjeta "Examen de nivel"');
     assert.ok(enOrden(raiz).indexOf(buscar(raiz, 'practica-nivel')) > enOrden(raiz).indexOf(buscar(raiz, 'tarjeta-eva_celular')), 'el nivel va después de las tarjetas de "Ahora" (E31)');
     assert.equal(posts(llamadas), 0, 'pintar no pide la tanda (gastaría el tope)');
   } finally { cerrar(); }
@@ -138,6 +139,8 @@ test('U81: con nivel de SET no hay aviso; con "listo por hoy" no hay botón y se
   try {
     assert.equal(textoDe(buscar(conSet.raiz, 'practica-nivel')), 'Practicas en: B1');
     assert.equal(buscar(conSet.raiz, 'practica-sin-set'), null);
+    assert.ok(buscar(conSet.raiz, 'tarjeta-set_examen'), 'con nivel de SET no hay botón en la línea: la tarjeta "Examen de nivel" queda (H-4)');
+    assert.equal(buscar(conSet.raiz, 'practica-ir-examen'), null);
   } finally { conSet.cerrar(); }
   const hecha = tanda({ completa: true, retos: [enTanda('ganado', 0, reto('r1', 'uno'))] });
   const listo = await abrirInicio(base({ 'GET /challenges/tanda': tandaDeHoy({ tanda: hecha, listo: true }) }));

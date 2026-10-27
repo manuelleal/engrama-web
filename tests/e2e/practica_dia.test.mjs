@@ -48,8 +48,7 @@ async function aInicio(sesion, url) {
 const MEDIR_AHORA = `(() => {
   window.scrollTo(0, 0);
   const barra = document.querySelector('nav.nav-inferior').getBoundingClientRect().top;
-  // E7 (docs/ESPEC_visual_pulido_salida.md §2, declarado): "Confírmalo haciendo el examen de nivel" es un enlace de la línea del nivel, no una acción de "Ahora".
-  const botones = [...document.querySelectorAll('[data-testid="ahora"] a:not([data-testid="practica-ir-examen"])')].map((a) => ({ texto: a.textContent, abajo: Math.round(a.getBoundingClientRect().bottom), alto: Math.round(a.getBoundingClientRect().height) }));
+  const botones = [...document.querySelectorAll('[data-testid="ahora"] a')].map((a) => ({ texto: a.textContent, abajo: Math.round(a.getBoundingClientRect().bottom), alto: Math.round(a.getBoundingClientRect().height) }));
   return { barra: Math.round(barra), botones, invitan: document.querySelectorAll('.fila-invitacion').length };
 })()`;
 

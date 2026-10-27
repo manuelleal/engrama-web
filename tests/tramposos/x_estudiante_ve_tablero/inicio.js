@@ -229,10 +229,13 @@ const TARJETAS_DEL_ANILLO = {
   set_revisar: { href: '#/profe/grupos', titulo: () => textos.anillo.revisar, texto: () => textos.anillo.revisar, ir: () => textos.anillo.revisar },
 };
 
-/** @param {any} ctx @param {boolean} invitaLaPrimera si no hay reto pendiente, la primera de estas es la primera de "Ahora" y es la que late */
-function tarjetasDelAnillo(ctx, invitaLaPrimera) {
+/**
+ * @param {any} ctx @param {boolean} invitaLaPrimera si no hay reto pendiente, la primera de estas es la primera de "Ahora" y es la que late
+ * @param {boolean} [sinExamen] la línea del nivel ya lleva el botón al examen (E7, adenda 1, H-4): una sola entrada a #/nivel
+ */
+function tarjetasDelAnillo(ctx, invitaLaPrimera, sinExamen) {
   const tarjetas = [...destinosVisibles('student', ctx.config, tenantActivo(ctx)), ...destinosVisibles('teacher', ctx.config, tenantActivo(ctx))] // el error: los dos roles
-    .filter(({ destino }) => destino in TARJETAS_DEL_ANILLO)
+    .filter(({ destino }) => destino in TARJETAS_DEL_ANILLO && !(sinExamen && destino === 'set_examen'))
     .map(({ destino }, i) => {
       const t = TARJETAS_DEL_ANILLO[destino];
       return h(
@@ -252,7 +255,7 @@ function seccionAhora({ pendiente, numRetos, practica: p, economia }, ctx) {
     h('h2', { id: 'ahora-titulo' }, textos.ahora.titulo),
     economia?.puja, // una puja en vivo es lo más urgente: va arriba (solo cuando la hay)
     hoy || tarjetaRetoDeHoy(pendiente),
-    tarjetasDelAnillo(ctx, !pendiente && !hoy),
+    tarjetasDelAnillo(ctx, !pendiente && !hoy, p?.llevaAlExamen),
     p?.aviso,
   );
 }

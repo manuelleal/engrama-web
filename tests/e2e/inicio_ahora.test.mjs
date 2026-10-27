@@ -36,12 +36,11 @@ const MEDIR = `(async () => {
   const esperar = (ms) => new Promise((r) => setTimeout(r, ms));
   window.scrollTo(0, 0); await esperar(100);
   const barra = document.querySelector('nav.nav-inferior').getBoundingClientRect();
-  // E7 (docs/ESPEC_visual_pulido_salida.md §2, declarado): "Confírmalo haciendo el examen de nivel" es un enlace de la línea del nivel, no una acción de "Ahora".
-  const botones = [...document.querySelectorAll('[data-testid="ahora"] a:not([data-testid="practica-ir-examen"])')].map((a) => { const r = a.getBoundingClientRect(); return { texto: a.textContent, arriba: Math.round(r.top), abajo: Math.round(r.bottom), alto: Math.round(r.height), derecha: Math.round(r.right) }; });
+  const botones = [...document.querySelectorAll('[data-testid="ahora"] a')].map((a) => { const r = a.getBoundingClientRect(); return { texto: a.textContent, arriba: Math.round(r.top), abajo: Math.round(r.bottom), alto: Math.round(r.height), derecha: Math.round(r.right) }; });
   const invitan = document.querySelectorAll('.fila-invitacion').length;
   window.scrollTo(0, document.documentElement.scrollHeight); await esperar(150);
   const tope = document.querySelector('nav.nav-inferior').getBoundingClientRect().top;
-  const tapados = [...document.querySelectorAll('[data-testid="ahora"] a:not([data-testid="practica-ir-examen"])')].filter((a) => { const r = a.getBoundingClientRect(); return r.bottom > tope + 1 && r.top < innerHeight; }).length;
+  const tapados = [...document.querySelectorAll('[data-testid="ahora"] a')].filter((a) => { const r = a.getBoundingClientRect(); return r.bottom > tope + 1 && r.top < innerHeight; }).length;
   window.scrollTo(0, 0);
   return { barraArriba: Math.round(barra.top), botones, invitan, tapados, ancho: innerWidth, scrollAncho: document.documentElement.scrollWidth };
 })()`;
@@ -58,7 +57,8 @@ test('E31 (Inicio): a 375×812, con reto, clase y examen, los tres botones de "A
       assert.ok(await esperarVista(sesion, 'ahora'), 'Inicio con su sección "Ahora"');
       await esperar(900); // el conteo del saldo y el saludo de Drako terminan de asentarse
       const m = await sesion.evaluar(MEDIR);
-      assert.deepEqual(m.botones.map((b) => b.texto), ['Jugar', 'Ir a la clase', 'Ir al examen']);
+      // E7, adenda 1 (H-4, declarado): sin nivel de SET, la entrada al examen es el botón de la línea del nivel y la tarjeta "Examen de nivel" no se pinta.
+      assert.deepEqual(m.botones.map((b) => b.texto), ['Jugar', 'Ir a la clase', 'Confírmalo haciendo el examen de nivel']);
       for (const b of m.botones) {
         assert.ok(b.abajo <= m.barraArriba, `"${b.texto}" termina en y=${b.abajo} y la barra empieza en y=${m.barraArriba}: quedó tapado`);
         assert.ok(b.alto >= 44, `"${b.texto}" mide ${b.alto} px de alto (mínimo 44)`);
