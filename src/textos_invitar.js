@@ -41,6 +41,8 @@ export const textosInvitar = {
     cancelarSeguro: '¿Seguro? Toca otra vez para cancelar',
     cancelando: 'Cancelando…',
     cancelada: (nombre) => `Listo: cancelamos la invitación de ${nombre}.`,
+    noSePudoCancelar: 'No se pudo cancelar la invitación ahora. Intenta de nuevo en unos minutos.',
+    yaAceptadaNoSeCancela: 'Ese profe ya aceptó la invitación: ya no se puede cancelar.',
     accesoCancelar: (nombre) => `Cancelar la invitación de ${nombre}`,
     reenviando: 'Reenviando…',
     reenviada: (nombre) => `Listo: le reenviamos la invitación a ${nombre}.`,

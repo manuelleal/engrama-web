@@ -259,3 +259,23 @@ test('WI10: el correo se valida estricto, con el mismo criterio que el backend',
   assert.deepEqual(buenos.filter((c) => !correoValido(c)), [], 'ningún correo real se rechaza');
   assert.deepEqual(malos.filter((c) => correoValido(c)), [], 'ningún error de tecleo pasa');
 });
+
+test('WI12: el error de cancelar dice lo de cancelar, nunca el texto de reenviar', async () => {
+  const e = (status, detail) => new ErrorApi(status, 'x', detail ? { detail } : null);
+  assert.equal(mensajeDeRechazo(e(409, 'ya_aceptada'), 'cancelar'), T.yaAceptadaNoSeCancela);
+  assert.equal(mensajeDeRechazo(e(502, 'gotrue_no_disponible'), 'cancelar'), T.noSePudoCancelar);
+  assert.equal(mensajeDeRechazo(e(404, 'invitacion_no_encontrada'), 'cancelar'), T.noSePudoCancelar);
+  const s = servidor({
+    'GET /teachers/groups': () => GRUPOS,
+    'GET /admin/invitaciones': () => [inv(5, 'enviada')],
+    'DELETE /admin/invitaciones/5': () => json(502, { detail: 'gotrue_no_disponible' }),
+  });
+  try {
+    const raiz = crearRaiz();
+    await renderInvitar(raiz, CTX);
+    const boton = buscar(buscar(raiz, 'invitacion-5'), 'invitacion-cancelar');
+    await Promise.all(boton.disparar('click'));
+    await callado(async () => { await Promise.all(boton.disparar('click')); await reposar(); });
+    assert.equal(textoDe(buscar(raiz, 'inv-lista-error')), T.noSePudoCancelar);
+  } finally { s.entorno.restaurar(); }
+});
