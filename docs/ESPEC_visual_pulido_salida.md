@@ -129,3 +129,20 @@ Registro sereno. Una cosa cambia: **crear un grupo es una tarjeta, y cada grupo 
 
 - `GET /teachers/groups` (`GroupSummaryOut`) no trae el docente del grupo. Para la línea "X estudiantes · Docente: [Nombre / Sin asignar]" haría
   falta un campo como `teacher_names: list[str]` (vacío = "Sin asignar") en la misma respuesta, sin una petición por grupo.
+
+## Adenda 1 · Compuerta 32 (NO LISTO por H-1) · 2026-10-27
+
+Informe: `investigacion/diseno/32-compuerta-pulido-salida.md`. Se corrige en la misma rama, un cambio por commit, `sw.js` sigue en v82. Lo que no
+cambia: cero peticiones nuevas, el pase y la CSP intactos, las reglas del 70 % siguen ARRIBA (pedido de Christiam).
+
+| # | Corrección | Predicción (medida en el navegador después) |
+|---|---|---|
+| H-1 [Alta] | Arriba queda UNA línea: "Completas una unidad con 70 % de aciertos." La frase de las monedas ("Completarla no da monedas extra…") baja al pie de la lista. `mostrarElSiguiente` mira la FICHA de la recomendada (`.estacion-camino__cuerpo`, con su botón): si su borde de abajo pasa de `innerHeight − 96`, se trae con `scrollIntoView({block: 'nearest'})` (`scroll-margin-bottom: 96px` en la ficha), sin animar | Borde de abajo de «Seguir aquí» ≤ tope de la barra a 375×812, 375×667 y 1280×800. A 375×812 y 1280×800 sin desplazar (la línea sola devuelve unos 75 px); a 375×667 con el desplazamiento mínimo |
+| H-2 [Media] | Un nodo SIN acción va "ya hundido": sin canto y bajado 5 px (`transform`), como el deshabilitado del sistema. El candado se lee como hueco cerrado: cara `--sx-pozo` con contorno interior de 2 px `--sx-borde-3` (el 3:1 del sistema) | Ningún nodo `aria-disabled` tiene sombra de canto; el contorno del candado contra el fondo ≥ 3:1 |
+| H-3 [Media] | Solo la recomendada lleva estrella y anillo. Una "en curso" que no es la recomendada (la variante con apoyo) va en navy con el ícono `en_curso`, sin anillo | En la variante con apoyo hay exactamente UN anillo |
+| H-9 [Nit] | La recomendada separa su ficha de su anillo (18 px entre nodo y ficha en vez de 10) | Distancia anillo–ficha ≥ 8 px |
+| H-4 [Media] | Una sola entrada a `#/nivel` en Inicio: cuando la línea del nivel lleva su botón "Confírmalo haciendo el examen de nivel ›", la tarjeta "Examen de nivel" de "Ahora" no se pinta (la práctica avisa con `llevaAlExamen`). Con nivel de SET, o sin la línea del nivel, la tarjeta queda como antes. El botón vuelve a contar como una de las tres acciones de "Ahora" (E31) | Un solo `a[href="#/nivel"]` en Inicio; las tres acciones de "Ahora" (Jugar, Ir a la clase, Confírmalo…) sobre la barra sin desplazar a 375×812 |
+| H-5 [Media] | El texto del botón a 16 px (1rem) | `font-size` calculado ≥ 16 px; alto ≥ 44 px |
+| H-6 [Media] | El formulario de la tarjeta "Crear grupo" con ancho máximo de 40 rem | A 1280 los campos miden ≤ 640 px |
+| H-8 [Nit] | El título de la tarjeta dice "Nuevo grupo" (el botón sigue "Crear grupo"); "N estudiantes" con `sx-t-apoyo` (16 px) | `font-size` de la línea = 16 px |
+| H-7 [Media] | Fotos `despues/` del camino, Inicio y admin rehechas desde el HEAD final | — |
