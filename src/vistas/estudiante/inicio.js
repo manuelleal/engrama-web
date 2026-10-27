@@ -282,7 +282,7 @@ function pintarContenido(raiz, ctx, datos) {
       h('h1', {}, textos.inicio.saludo(ctx.sesion.nombre)),
       avatar),
     crearSelectorColegio(ctx), // login piloto (B): solo si el estudiante está en más de una institución
-    crearEscudo({ nivelConfirmado: datos.nivelConfirmado, animar: nivel.animar }), // W30: el de /auth/me; sin él, "Por confirmar"
+    crearEscudo({ nivelConfirmado: datos.nivelConfirmado, animar: nivel.animar, nivelDePractica: datos.practica?.tanda?.practica?.nivel }), // W30 y E7: sin nivel confirmado, el de práctica (tanda)
     nivel.aviso,
     seccionAhora(datos, ctx),
     // W92: el camino de nivel, justo después de "Ahora" (fuera de ella: "Ahora" son las tres acciones que caben sin desplazar, E31).

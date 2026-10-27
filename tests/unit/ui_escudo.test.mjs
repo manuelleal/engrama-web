@@ -7,7 +7,7 @@
 // E2E, que sí corren en un navegador de verdad (tests/e2e/entrada.test.mjs).
 import test from 'node:test';
 import assert from 'node:assert/strict';
-import { textoDelEscudo, crearEscudo, detalleDelNivel, fechaCorta, valorDeNivel } from '../../src/ui/escudo.js';
+import { textoDelEscudo, crearEscudo, detalleDelNivel, fechaCorta, valorDeNivel, pildoraPorConfirmar } from '../../src/ui/escudo.js';
 import { entornoDeFotos, buscar, textoDe, elementos, ponerSvgFalso, iconosDe } from './foto_vistas.mjs';
 
 test('U8: sin nivel confirmado, el escudo dice "Por confirmar" aunque level y monedas sean altos', () => {
@@ -94,4 +94,22 @@ test('U15: la fecha se dice en hora de Colombia, abreviada, y los niveles se ord
   assert.equal(fechaCorta('basura'), null);
   assert.deepEqual(['A1', 'A2', 'B1', 'B2', 'C1', 'C2'].map(valorDeNivel), [1, 2, 3, 4, 5, 6]);
   assert.equal(valorDeNivel('Z9'), 0);
+});
+
+// E7 (docs/ESPEC_visual_pulido_salida.md §2): sin nivel confirmado, la píldora dice el nivel de práctica del servidor y que falta confirmarlo;
+// algo que no es un nivel del MCER no se muestra, y con un nivel confirmado el de práctica no cuenta.
+test('E7: sin nivel confirmado la píldora dice "Nivel A2 · Por confirmar" con el nivel de práctica; sin él, o si no es un nivel, "Por confirmar"', () => {
+  assert.deepEqual(pildoraPorConfirmar('A2'), { texto: 'Nivel A2 · Por confirmar', aria: 'Nivel A2, por confirmar' });
+  for (const malo of [undefined, null, '', 'Z9', 7, 'a2']) assert.equal(pildoraPorConfirmar(malo).texto, 'Por confirmar', String(malo));
+  const entorno = entornoDeFotos();
+  ponerSvgFalso();
+  try {
+    const sin = crearEscudo({ nivelConfirmado: null, nivelDePractica: 'A2' });
+    assert.equal(textoDe(sin), 'Nivel A2 · Por confirmar');
+    assert.equal(sin.getAttribute('aria-label'), 'Nivel A2, por confirmar');
+    const def = crearEscudo({ nivelConfirmado: DEFINITIVO, nivelDePractica: 'A2' });
+    assert.equal(textoDe(buscar(def, 'escudo')), 'B1', 'con nivel confirmado, el de práctica no se usa');
+  } finally {
+    entorno.restaurar();
+  }
 });

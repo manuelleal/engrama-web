@@ -77,9 +77,10 @@ test('E13: sin nivel el escudo dice "Por confirmar" (y nada más); con uno provi
     // Sin nivel: el estado de siempre.
     let sesion = await entrarAInicio(url, CORREOS_PILOTO.estudiante);
     try {
-      assert.equal(await texto(sesion, 'escudo'), 'Por confirmar');
+      // E7 (docs/ESPEC_visual_pulido_salida.md §2, declarado): sin nivel confirmado, la píldora dice el nivel de práctica del servidor (A2 en el doble).
+      assert.equal(await texto(sesion, 'escudo'), 'Nivel A2 · Por confirmar');
       assert.equal(await hay(sesion, 'escudo-etiqueta'), false, 'sin nivel no hay etiqueta ni fecha que inventar');
-      assert.equal(await sesion.evaluar('document.querySelector(\'[data-testid="escudo"]\').getAttribute("aria-label")'), 'Nivel: Por confirmar');
+      assert.equal(await sesion.evaluar('document.querySelector(\'[data-testid="escudo"]\').getAttribute("aria-label")'), 'Nivel A2, por confirmar');
     } finally { await sesion.cerrar(); }
 
     // Provisional: el nivel, el estado con ícono y texto, la ayuda del dictamen y la fuente con su fecha. Sin celebración.
@@ -142,8 +143,9 @@ test('E13: una persona en dos instituciones ve el nivel de la institución activ
         s.dispatchEvent(new Event('change', { bubbles: true }));
       })()`);
       const fin = Date.now() + 7000;
-      while (Date.now() < fin && (await texto(sesion, 'escudo')) !== 'Por confirmar') await esperar(100);
-      assert.equal(await texto(sesion, 'escudo'), 'Por confirmar', 'en SENA no hay nivel: el de UIS no se cuela');
+      // E7 (declarado): en SENA no hay nivel confirmado; la píldora dice el de PRÁCTICA de SENA (A2 del doble), nunca el B2 de UIS.
+      while (Date.now() < fin && (await texto(sesion, 'escudo')) !== 'Nivel A2 · Por confirmar') await esperar(100);
+      assert.equal(await texto(sesion, 'escudo'), 'Nivel A2 · Por confirmar', 'en SENA no hay nivel: el de UIS no se cuela');
       assert.equal(await hay(sesion, 'escudo-fuente'), false);
       // Y de vuelta: el de UIS otra vez.
       await sesion.evaluar(`(() => {

@@ -48,6 +48,11 @@ export const textosAnillo = {
     /** @param {string} cefr @param {boolean} provisional @param {string} detalle lo que se ve debajo (ayuda, o fuente y fecha) */
     aria: (cefr, provisional, detalle) => `Nivel ${cefr}, ${provisional ? 'provisional' : 'confirmado'}. ${detalle}${detalle.endsWith('.') ? '' : '.'}`,
     ariaPorConfirmar: 'Nivel: Por confirmar',
+    // E7 (Christiam, 26-oct): sin nivel confirmado, la píldora dice el nivel en que practica según el servidor, y que falta confirmarlo.
+    /** @param {string} nivel */
+    porConfirmarConNivel: (nivel) => `Nivel ${nivel} · Por confirmar`,
+    /** @param {string} nivel */
+    ariaPorConfirmarConNivel: (nivel) => `Nivel ${nivel}, por confirmar`,
     // G2: el nivel no se celebra; si el definitivo BAJA, un aviso informativo único (texto exacto del dictamen §A.2, caso "Baja").
     /** @param {string} definitivo @param {string} provisional */
     avisoBaja: (definitivo, provisional) => `Tu nivel confirmado es ${definitivo}. El provisional (${provisional}) salía solo de lectura, escucha, gramática y vocabulario; con tu escritura calificada, el resultado completo es ${definitivo}. Tus monedas y tu racha no cambian. Tu práctica se ajusta a ${definitivo} para que avances desde ahí.`,

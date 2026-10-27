@@ -43,6 +43,18 @@ export function textoDelEscudo(datos) {
 }
 
 /**
+ * E7 (docs/ESPEC_visual_pulido_salida.md §2): sin nivel confirmado, la píldora dice "Nivel A2 · Por confirmar" con el nivel de PRÁCTICA que mandó el
+ * servidor (`practica.nivel` de /challenges/tanda), nunca uno sacado de `level`, `xp` ni monedas (X7). Sin ese dato, "Por confirmar" como siempre. Pura.
+ * @param {unknown} nivelDePractica
+ * @returns {{texto: string, aria: string}}
+ */
+export function pildoraPorConfirmar(nivelDePractica) {
+  if (!nivelValido(/** @type {any} */ (nivelDePractica))) return { texto: textos.escudo.porConfirmar, aria: textos.escudo.ariaPorConfirmar };
+  const n = /** @type {string} */ (nivelDePractica);
+  return { texto: textos.escudo.porConfirmarConNivel(n), aria: textos.escudo.ariaPorConfirmarConNivel(n) };
+}
+
+/**
  * Lo que se dice DEBAJO del escudo (U15). Pura. `null` si no hay nivel confirmado ("Por confirmar" no dice nada más).
  * @param {{cefr: string, provisional: boolean, fuente?: string|null, evaluadoEn?: string|null}|null|undefined} nivel
  * @returns {{estado: 'nivel_confirmado'|'nivel_provisional', linea: string, ayuda: string|null, aria: string}|null}
@@ -60,8 +72,10 @@ export function detalleDelNivel(nivel) {
 }
 
 /**
- * @param {{nivelConfirmado?: {cefr: string, provisional: boolean, fuente?: string|null, evaluadoEn?: string|null}|string|null, animar?: boolean}} [datos]
- *   `animar`: la animación sobria de "llegó tu nivel" (decide inicio.js con ui/ultimo_visto.js; nunca con un provisional ni si el nivel bajó)
+ * @param {{nivelConfirmado?: {cefr: string, provisional: boolean, fuente?: string|null, evaluadoEn?: string|null}|string|null, animar?: boolean,
+ *   nivelDePractica?: string|null}} [datos]
+ *   `animar`: la animación sobria de "llegó tu nivel" (decide inicio.js con ui/ultimo_visto.js; nunca con un provisional ni si el nivel bajó);
+ *   `nivelDePractica`: el del servidor, solo para la píldora sin nivel confirmado (`pildoraPorConfirmar`)
  */
 export function crearEscudo(datos) {
   const texto = textoDelEscudo(datos);
@@ -69,7 +83,8 @@ export function crearEscudo(datos) {
   const detalle = detalleDelNivel(nivel);
   // `escudo-brillo`: un destello que cruza al aparecer (juego.css).
   if (!nivel || !detalle) {
-    return h('div', { class: 'escudo escudo-brillo', 'data-testid': 'escudo', role: 'img', 'aria-label': textos.escudo.ariaPorConfirmar }, texto);
+    const pildora = nivelValido(texto) ? { texto, aria: textos.escudo.ariaPorConfirmar } : pildoraPorConfirmar(datos?.nivelDePractica);
+    return h('div', { class: 'escudo escudo-brillo', 'data-testid': 'escudo', role: 'img', 'aria-label': pildora.aria }, pildora.texto);
   }
   const clases = ['escudo', 'escudo-brillo', nivel.provisional ? 'escudo-provisional' : null, datos?.animar ? 'escudo-sube' : null].filter(Boolean).join(' ');
   return h(
