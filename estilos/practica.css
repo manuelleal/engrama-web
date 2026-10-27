@@ -357,7 +357,8 @@
   font-size: 0.8125rem;
   letter-spacing: 0.04em;
 }
-/* Recomendada o en curso: estrella sobre navy con su anillo. La recomendada es la grande y su anillo entra al llegar. */
+/* Recomendada o en curso: navy. SOLO la recomendada lleva la estrella (camino.js) y el anillo, es la grande y su anillo entra al llegar (adenda 1, H-3):
+   una "en curso" que no es la recomendada (la variante con apoyo) va en navy con su ícono, sin anillo. */
 .estacion-camino.es-recomendada .estacion-camino__marca,
 .estacion-camino.estacion--en_curso .estacion-camino__marca {
   --cara-nodo: var(--sx-accion);
@@ -365,8 +366,7 @@
   --labio-nodo: var(--sx-accion-labio);
   --brillo-nodo: var(--sx-brillo);
 }
-.estacion-camino.es-recomendada .estacion-camino__marca::after,
-.estacion-camino.estacion--en_curso .estacion-camino__marca::after {
+.estacion-camino.es-recomendada .estacion-camino__marca::after {
   content: "";
   position: absolute;
   inset: -9px;
@@ -376,6 +376,10 @@
 .estacion-camino.es-recomendada .estacion-camino__marca {
   width: 68px;
   height: 68px;
+}
+/* El anillo (9 px fuera del nodo) no se pega a la ficha (adenda 1, H-9). */
+.estacion-camino.es-recomendada {
+  gap: 20px;
 }
 .estacion-camino.es-recomendada .estacion-camino__marca .sx-icono {
   width: 32px;

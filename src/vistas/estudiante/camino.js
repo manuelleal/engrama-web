@@ -35,15 +35,15 @@ function estacion(e, i) {
 }
 
 /**
- * El nodo de la estación (docs/ESPEC_visual_fluidez.md §3 y docs/ESPEC_visual_pulido_salida.md §1): lleva el ÍCONO del estado (la recomendada y la
- * que va en curso, la estrella); el número va en el nombre ("Unidad N") y, sin SVG en el entorno, el nodo cae al número. Todos tienen volumen (su
+ * El nodo de la estación (docs/ESPEC_visual_fluidez.md §3 y docs/ESPEC_visual_pulido_salida.md §1): lleva el ÍCONO del estado (SOLO la recomendada,
+ * la estrella: una "en curso" que no lo es lleva el suyo, adenda 1, H-3); el número va en el nombre ("Unidad N") y, sin SVG en el entorno, el nodo cae al número. Todos tienen volumen (su
  * canto). Si la estación tiene acción, el nodo es un ENLACE a esa misma acción (56 px o más de toque, con su nombre accesible y el foco del sistema)
  * y se hunde al presionar; si no la tiene (bloqueada, o nada que jugar), no se hunde: es una imagen con su estado como nombre y `aria-disabled`
  * (compuerta 30, punto 3: lo que parece botón se puede tocar). Sin `data-testid`: la acción que miran las pruebas sigue siendo el botón.
  * @param {import('../../ui/camino.js').EstacionVista} e @param {number} i
  */
 function nodoDe(e, i) {
-  const dibujo = crearIcono(e.recomendada || e.estado === 'en_curso' ? 'estrella' : e.icono) ?? String(i + 1);
+  const dibujo = crearIcono(e.recomendada ? 'estrella' : e.icono) ?? String(i + 1);
   if (!e.accion) return h('span', { class: 'estacion-camino__marca', role: 'img', 'aria-label': e.texto, 'aria-disabled': 'true' }, dibujo);
   return h('a', { href: e.accion.href, class: 'estacion-camino__marca es-enlace', 'aria-label': `${e.accion.texto}: ${e.nombre}` }, dibujo);
 }
