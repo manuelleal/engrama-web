@@ -1,0 +1,16 @@
+{
+  "descripcion": "WI12 (delta H-6): el error de cancelar usa los textos de reenviar.",
+  "archivos": {
+    "src/vistas/admin/invitar.js": "invitar.js"
+  },
+  "comando": [
+    "node",
+    "--test",
+    "--test-reporter=tap",
+    "tests/unit/vista_invitar.test.mjs"
+  ],
+  "espera_codigo_no_cero": true,
+  "espera_fallan_tests": [
+    "WI12: el error de cancelar dice lo de cancelar, nunca el texto de reenviar"
+  ]
+}

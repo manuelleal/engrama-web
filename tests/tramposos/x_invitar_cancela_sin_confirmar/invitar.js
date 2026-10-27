@@ -26,12 +26,13 @@ function mensaje(icono, texto, testid) {
     h('span', { 'aria-hidden': 'true' }, crearIcono(icono)), h('span', {}, texto));
 }
 
-/** Lo que dice la pantalla para un rechazo del servidor (WI4). Pura. @param {any} e @param {'invitar'|'reenviar'|'grupo'} que */
+/** Lo que dice la pantalla para un rechazo del servidor (WI4). Pura. @param {any} e @param {'invitar'|'reenviar'|'cancelar'|'grupo'} que */
 export function mensajeDeRechazo(e, que) {
   if (!(e instanceof ErrorApi)) return T.error;
   const detalle = e.cuerpo?.detail;
   if (e.status === 0) return T.sinRed;
   if (e.status === 503) return T.noConfigurado;
+  if (que === 'cancelar') return e.status === 409 ? T.yaAceptadaNoSeCancela : T.noSePudoCancelar; // sus propios textos, nunca los de reenviar
   if (e.status === 409) return que === 'grupo' ? T.grupoRepetido : detalle === 'ya_aceptada' ? T.yaAceptada : T.yaInvitado;
   if (e.status === 429 && detalle === 'espera_para_reenviar') return T.esperaReenvio(e.reintentarEn ?? 60);
   if (e.status === 429) return T.demasiadas(Math.max(1, Math.ceil((e.reintentarEn ?? 3600) / 60)));
@@ -196,7 +197,7 @@ function alCancelarCon(aviso, ctx, alTerminar) {
       await cancelarInvitacion(inv.id, ctx);
     } catch (e) {
       console.warn('vistas/admin/invitar: no se pudo cancelar', e instanceof ErrorApi ? e.status : e);
-      aviso.appendChild(mensaje('equis', mensajeDeRechazo(e, 'reenviar'), 'inv-lista-error'));
+      aviso.appendChild(mensaje('equis', mensajeDeRechazo(e, 'cancelar'), 'inv-lista-error'));
       boton.disabled = false; boton.textContent = T.cancelar;
       return;
     }

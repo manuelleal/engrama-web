@@ -67,6 +67,12 @@ const TRAMPOSOS = {
       "export const correoValido = (correo) => /^[^@\\s]+@[^@\\s]+\\.[^@\\s]+$/.test(correo);"),
     fallan: ['WI10: el correo se valida estricto, con el mismo criterio que el backend'],
   },
+  x_invitar_cancelar_con_texto_de_reenviar: {
+    descripcion: 'WI12 (delta H-6): el error de cancelar usa los textos de reenviar.',
+    destino: 'src/vistas/admin/invitar.js', archivo: 'invitar.js',
+    texto: cambiar(invitar, "aviso.appendChild(mensaje('equis', mensajeDeRechazo(e, 'cancelar'), 'inv-lista-error'));", "aviso.appendChild(mensaje('equis', mensajeDeRechazo(e, 'reenviar'), 'inv-lista-error'));"),
+    fallan: ['WI12: el error de cancelar dice lo de cancelar, nunca el texto de reenviar'],
+  },
   x_invitar_hash_con_sesion: {
     descripcion: 'WI11 (H-8b): con sesión, el token del enlace del correo se queda en la dirección y en el historial.',
     destino: 'src/app.js', archivo: 'app.js', comando: TEST_E2E,
