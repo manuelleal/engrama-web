@@ -130,7 +130,7 @@
   gap: 4px;
   margin: 0 0 0 -12px;
   padding-inline: 12px;
-  font-size: 0.9375rem;
+  font-size: 1rem; /* adenda 1 (H-5): el piso de 16 px */
   text-align: left;
 }
 .practica-ir-examen .sx-icono {
