@@ -18,6 +18,7 @@ import { planDeSemanaServidor, planDeRachaSemanal, crearTarjetaRacha, esSemanaNu
 import { leerUltimo, guardarUltimo } from '../../ui/ultimo_visto.js';
 import { leerSemanaCelebrada } from '../../ui/semana.js';
 import { planDePractica, destinoDelPaso } from '../../ui/practica.js';
+import { destinosDeLaSesion } from '../../anillo/abrir.js';
 import { textosPractica } from '../../textos_practica.js';
 
 const T = textosPractica.practica;
@@ -50,7 +51,7 @@ export async function cargar(ctx) {
       const plan = planDeHoy(ctx, tanda);
       // Con el feed vacío no hay con qué armar una tanda nueva: no se invita a "Jugar" a nada (queda lo de siempre).
       if (plan.tipo === 'respaldo' || (plan.tipo === 'empezar' && o.numRetos === 0)) return null;
-      practica.aviso = crearNivel(plan);
+      practica.aviso = crearNivel(plan, ctx);
       return crearTarjeta(ctx, plan, o);
     },
     /** Lo que va después de "Ahora": el nivel de práctica (con la protagonista) o, si hoy no hay práctica de su nivel, la línea neutra. */
@@ -109,12 +110,20 @@ function crearAvance(plan) {
   return h('div', { class: 'sx-progreso', role: 'progressbar', 'aria-valuemin': 0, 'aria-valuemax': plan.pasos, 'aria-valuenow': hechos, 'aria-label': T.avance(hechos, plan.pasos), 'data-testid': 'practica-avance' }, relleno);
 }
 
-/** "Practicas en: A2" y, sin SET, "Todavía no es tu nivel…": junto a la práctica de hoy, nunca en el escudo (dictamen 04 §1.3). */
-function crearNivel(plan) {
+/**
+ * "Practicas en: A2" y, sin SET, "Todavía no es tu nivel…", junto a la práctica de hoy (dictamen 04 §1.3). E7 (docs/ESPEC_visual_pulido_salida.md §2):
+ * si el estudiante tiene el destino `set_examen` (la misma regla que la tarjeta "Examen de nivel"), "Confírmalo…" es un ENLACE a `#/nivel`, donde se
+ * escribe el código y el pase se pide al tocar (anillo/abrir.js); aquí no hay pase ni base. Sin ese destino, la frase de siempre.
+ */
+function crearNivel(plan, ctx) {
   if (!plan.nivel) return null;
-  return h('p', { class: 'sx-t-apoyo practica-nivel', 'data-testid': 'practica-nivel' },
+  const alExamen = !plan.nivel.conSet && destinosDeLaSesion(ctx).some((d) => d.destino === 'set_examen');
+  const linea = h('p', { class: 'sx-t-apoyo practica-nivel', 'data-testid': 'practica-nivel' },
     h('strong', {}, T.nivel(plan.nivel.nivel)),
-    plan.nivel.conSet ? null : h('span', { 'data-testid': 'practica-sin-set' }, ` ${T.sinSet}`));
+    plan.nivel.conSet ? null : h('span', { 'data-testid': 'practica-sin-set' }, ` ${alExamen ? T.sinSetCorto : T.sinSet}`));
+  if (!alExamen) return linea;
+  return h('div', { class: 'practica-nivel-bloque' }, linea,
+    h('a', { href: '#/nivel', class: 'sx-btn sx-btn--fantasma practica-ir-examen', 'data-testid': 'practica-ir-examen' }, T.irAlExamen, crearIcono('chevron')));
 }
 
 /** @param {any} ctx @param {import('../../ui/practica.js').PlanDePractica} plan @param {{pendiente: any, numRetos: number, respaldo: () => Node}} o */

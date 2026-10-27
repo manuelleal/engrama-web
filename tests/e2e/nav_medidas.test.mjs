@@ -43,7 +43,8 @@ const MEDIR = `(async () => {
   const fueraDelAncho = [...vista.querySelectorAll('a[href], button, input, select, textarea, h1')].filter(visible).filter((e) => { const r = e.getBoundingClientRect(); return r.right > innerWidth + 1 || r.left < -1; }).map(nombre);
   const scrollAncho = document.documentElement.scrollWidth;
   const barraArriba = barra ? Math.round(barra.getBoundingClientRect().top) : null;
-  const sinDesplazar = [...vista.querySelectorAll('[data-testid="ahora"] a')].map((a) => Math.round(a.getBoundingClientRect().bottom));
+  // E7 (docs/ESPEC_visual_pulido_salida.md §2, declarado): "Confírmalo haciendo el examen de nivel" es un enlace de la línea del nivel, no una acción de "Ahora".
+  const sinDesplazar = [...vista.querySelectorAll('[data-testid="ahora"] a:not([data-testid="practica-ir-examen"])')].map((a) => Math.round(a.getBoundingClientRect().bottom));
   window.scrollTo(0, document.documentElement.scrollHeight); await esperar(140);
   const tope = barra ? barra.getBoundingClientRect().top : innerHeight;
   const tapados = barra ? [...vista.querySelectorAll('a[href], button, input, select, textarea')].filter((e) => !e.closest('nav.nav-inferior') && visible(e)).filter((e) => { const r = e.getBoundingClientRect(); return r.bottom > tope + 1 && r.top < innerHeight; }).map(nombre) : [];

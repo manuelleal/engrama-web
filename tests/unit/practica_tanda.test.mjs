@@ -116,9 +116,20 @@ test('U81: sin tanda pedida, la protagonista es la primera de "Ahora" (la única
     assert.deepEqual(conClase(raiz, 'fila-invitacion').map((e) => e.getAttribute('data-testid')), ['tarjeta-reto-hoy'], 'una sola invitación');
     const jugar = buscar(raiz, 'jugar-reto-hoy');
     assert.deepEqual([jugar.tagName, textoDe(jugar)], ['a', 'Jugar']);
-    assert.equal(textoDe(buscar(raiz, 'practica-nivel')), 'Practicas en: A2 Todavía no es tu nivel. Confírmalo con el examen.');
+    // E7 (docs/ESPEC_visual_pulido_salida.md §2, declarado): con el examen de nivel configurado, "Confírmalo…" es un enlace a #/nivel (sin pase ni base).
+    assert.equal(textoDe(buscar(raiz, 'practica-nivel')), 'Practicas en: A2 Todavía no es tu nivel.');
+    const alExamen = buscar(raiz, 'practica-ir-examen');
+    assert.deepEqual([alExamen?.tagName, alExamen?.getAttribute('href'), textoDe(alExamen)], ['a', '#/nivel', 'Confírmalo haciendo el examen de nivel']);
     assert.ok(enOrden(raiz).indexOf(buscar(raiz, 'practica-nivel')) > enOrden(raiz).indexOf(buscar(raiz, 'tarjeta-eva_celular')), 'el nivel va después de las tarjetas de "Ahora" (E31)');
     assert.equal(posts(llamadas), 0, 'pintar no pide la tanda (gastaría el tope)');
+  } finally { cerrar(); }
+});
+
+test('E7: sin el examen de nivel configurado, la línea sin SET queda como antes y no hay enlace a #/nivel', async () => {
+  const { raiz, cerrar } = await abrirInicio(base({ 'GET /challenges/tanda': tandaDeHoy() }), ctxEstudiante({ config: { ...CONFIG_NAV, SET_URL: undefined } }));
+  try {
+    assert.equal(textoDe(buscar(raiz, 'practica-nivel')), 'Practicas en: A2 Todavía no es tu nivel. Confírmalo con el examen.');
+    assert.equal(buscar(raiz, 'practica-ir-examen'), null);
   } finally { cerrar(); }
 });
 

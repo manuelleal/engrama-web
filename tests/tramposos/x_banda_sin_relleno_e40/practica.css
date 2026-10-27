@@ -120,6 +120,24 @@
 .practica-nivel {
   margin: 4px 2px 0;
 }
+/* E7: "Confírmalo haciendo el examen de nivel ›", un enlace claro (botón fantasma del sistema: tinta de acción, 48 px de toque), pegado a su línea y
+   sin competir con "Jugar" ni con "Ir al examen". */
+.practica-nivel-bloque .practica-ir-examen {
+  display: inline-flex;
+  width: auto;
+  max-width: calc(100% + 12px);
+  min-height: 44px;
+  gap: 4px;
+  margin: 0 0 0 -12px;
+  padding-inline: 12px;
+  font-size: 0.9375rem;
+  text-align: left;
+}
+.practica-ir-examen .sx-icono {
+  flex: none;
+  width: 20px;
+  height: 20px;
+}
 
 /* W81: "Tu semana" con la racha semanal (sx-racha y sx-semana del sistema). La llama es la de siempre (juego.css), grande y QUIETA: solo parpadea la
    de la cabecera (como el aviso de constancia, por fluidez). */

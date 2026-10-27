@@ -81,6 +81,9 @@ export const textosPractica = {
     /** @param {string} nivel */
     nivel: (nivel) => `Practicas en: ${nivel}`,
     sinSet: 'Todavía no es tu nivel. Confírmalo con el examen.',
+    // E7 (Christiam, 26-oct): si el estudiante puede ir al examen de nivel, la invitación es un enlace a #/nivel (la flecha es el ícono chevron).
+    sinSetCorto: 'Todavía no es tu nivel.',
+    irAlExamen: 'Confírmalo haciendo el examen de nivel',
     protegida: 'Hoy no hay práctica nueva de tu nivel. Esta semana tu racha queda como está.',
     /** @param {number} hechos @param {number} total */
     avance: (hechos, total) => `Llevas ${hechos} de ${total} retos de hoy`,
