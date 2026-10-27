@@ -73,3 +73,6 @@ En `src/textos_practica.js`: `l1.incorrectoOtraVez`, `l1.quedanIntentos(n)`, `l1
 
 ## 6. Réplica
 `TI-W2` repite W3 a W5 con una pregunta de 5 opciones y labels que no son A–E ("V", "W", "X", "Y", "Z"), que no se usaron al desarrollar.
+
+## Adenda 1 (antes del código, 2026-10-27)
+Al leer `src/textos_practica.js` antes de codificar: la casa prohíbe "una pérdida ni una cuenta regresiva" en esos textos (cabecera del archivo; U85 vigila las palabras). "Te quedan N intentos" es una cuenta regresiva. **Se reemplaza** en §1.2, §1.5 y W3: el detalle del panel dice **"Elige otra opción."** (escrita: **"Escríbela de nuevo."** y "Ya probaste: …"). Los textos nuevos: `l1.incorrectoOtraVez`, `l1.eligeOtra`, `l1.escribeOtra`, `l1.yaProbaste(lista)`, `l1.descartada`. W3 cambia "Te quedan 2 intentos." por "Elige otra opción.". Nada más cambia.
