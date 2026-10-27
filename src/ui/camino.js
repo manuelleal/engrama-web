@@ -35,7 +35,11 @@ function accionDe(u) {
   return { texto, href: `#/retos/${encodeURIComponent(u.siguiente_reto)}` };
 }
 
-/** @param {any} c el CaminoOut ya validado @returns {{titulo: string, avisos: string[], reglas: string, estaciones: EstacionVista[]}} */
+/**
+ * @param {any} c el CaminoOut ya validado
+ * @returns {{titulo: string, avisos: string[], reglas: string, reglasCorta: string, notaMonedas: string, estaciones: EstacionVista[]}}
+ *   `reglas`: la regla completa; `reglasCorta` (arriba) y `notaMonedas` (al pie) la reparten en la pantalla (E7, adenda 1)
+ */
 export function planDeCamino(c) {
   const avisos = [c.prestado ? T.prestado : null, c.con_nivel_de_set ? null : T.sinSet].filter((x) => x !== null);
   const estaciones = c.unidades.map((/** @type {any} */ u, /** @type {number} */ i) => {
@@ -43,5 +47,6 @@ export function planDeCamino(c) {
     return { topic: u.topic, nombre: T.unidad(u.numero, u.titulo ?? null), ...e, oro: u.estado === 'dominada', recomendada: u.recomendada === true,
       accion: accionDe(u), estado: u.estado, acceso: u.acceso };
   });
-  return { titulo: T.nivel(c.nivel), avisos: /** @type {string[]} */ (avisos), reglas: T.reglas(c.umbral_completada), estaciones };
+  return { titulo: T.nivel(c.nivel), avisos: /** @type {string[]} */ (avisos), reglas: T.reglas(c.umbral_completada),
+    reglasCorta: T.reglasCorta(c.umbral_completada), notaMonedas: T.sinMonedasExtra, estaciones };
 }

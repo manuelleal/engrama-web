@@ -65,26 +65,28 @@ export async function renderCamino(raiz, ctx) {
   if (r.tipo === 'sin_ruta') { aviso(raiz, ctx, T.noDisponible, false); return; }
   if (r.tipo === 'error') { aviso(raiz, ctx, T.noSePudo, true); return; }
   const plan = planDeCamino(r.camino);
-  // docs/ESPEC_visual_pulido_salida.md §1 (Christiam, 26-oct): las reglas (el 70 %) van ARRIBA, en la cabecera, debajo del nivel; el camino después.
+  // docs/ESPEC_visual_pulido_salida.md §1 y adenda 1 (H-1): la regla del 70 % va ARRIBA (Christiam, 26-oct) en UNA línea; la de las monedas, al pie.
   pintar(raiz, ctx,
     h('section', { class: 'camino-cabecera', 'data-testid': 'camino-cabecera' },
       h('p', { class: 'sx-t-tarjeta', 'data-testid': 'camino-nivel' }, plan.titulo),
       ...plan.avisos.map((a) => h('p', { class: 'sx-t-apoyo' }, a)),
-      h('p', { class: 'sx-t-apoyo camino-reglas', 'data-testid': 'camino-reglas' }, plan.reglas)),
+      h('p', { class: 'sx-t-apoyo camino-reglas', 'data-testid': 'camino-reglas' }, plan.reglasCorta)),
     plan.estaciones.length
       ? h('ol', { class: 'lista-camino', 'data-testid': 'camino-lista', 'aria-label': T.lista }, ...plan.estaciones.map(estacion))
-      : h('p', { class: 'sx-vacio', role: 'status', 'data-testid': 'camino-vacio' }, T.vacio));
+      : h('p', { class: 'sx-vacio', role: 'status', 'data-testid': 'camino-vacio' }, T.vacio),
+    h('p', { class: 'sx-t-apoyo camino-nota-monedas', 'data-testid': 'camino-nota-monedas' }, plan.notaMonedas));
   globalThis.requestAnimationFrame?.(() => mostrarElSiguiente(raiz));
 }
 
 /**
- * El siguiente paso, a la vista: SOLO si el nodo de la recomendada no se ve (queda bajo la barra de abajo), se trae con `block: 'nearest'` (lo
- * mínimo; `scroll-margin-bottom` lo deja sobre la barra) y sin animar. Si ya se ve, no se mueve nada y la cabecera queda arriba.
+ * El siguiente paso, a la vista: SOLO si la FICHA de la recomendada (con su botón «Seguir aquí») no se ve entera (queda bajo la barra de abajo), se trae
+ * con `block: 'nearest'` (lo mínimo; su `scroll-margin-bottom` la deja sobre la barra) y sin animar. Antes miraba solo el nodo y el botón quedaba
+ * tapado (compuerta 32, H-1). Si ya se ve, no se mueve nada y la cabecera queda arriba.
  * @param {HTMLElement} raiz
  */
 function mostrarElSiguiente(raiz) {
-  const nodo = raiz.querySelector?.('[aria-current="step"] .estacion-camino__marca');
+  const ficha = raiz.querySelector?.('[aria-current="step"] .estacion-camino__cuerpo');
   const alto = globalThis.innerHeight ?? 0;
-  if (!alto || !nodo?.getBoundingClientRect) return;
-  if (nodo.getBoundingClientRect().bottom > alto - 96) nodo.scrollIntoView({ block: 'nearest' });
+  if (!alto || !ficha?.getBoundingClientRect) return;
+  if (ficha.getBoundingClientRect().bottom > alto - 96) ficha.scrollIntoView({ block: 'nearest' });
 }

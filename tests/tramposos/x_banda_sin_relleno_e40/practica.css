@@ -246,6 +246,10 @@
 .camino-reglas {
   margin: 0;
 }
+/* Adenda 1 (H-1): la frase de las monedas va al pie, después del camino. */
+.camino-nota-monedas {
+  margin: 0 0 24px;
+}
 .lista-camino {
   position: relative;
   list-style: none;
@@ -287,7 +291,6 @@
   background: var(--cara-nodo);
   color: var(--tinta-nodo);
   box-shadow: var(--brillo-nodo), 0 5px 0 var(--labio-nodo);
-  scroll-margin-bottom: 96px; /* al traerla a la vista, que quede sobre la barra de abajo */
 }
 .estacion-camino__marca .sx-icono {
   width: 26px;
@@ -315,6 +318,7 @@
   cursor: default;
 }
 .estacion-camino__cuerpo {
+  scroll-margin-bottom: 96px; /* al traer la ficha de la recomendada a la vista (camino.js), que quede entera sobre la barra de abajo */
   display: grid;
   justify-items: center;
   gap: 6px;

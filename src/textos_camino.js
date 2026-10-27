@@ -13,6 +13,10 @@ export const textosCamino = {
   prestado: 'Tu nivel aún no tiene retos; te mostramos el más cercano.',
   /** @param {number} umbral */
   reglas: (umbral) => `Una unidad se completa al jugar todas sus estaciones con ${umbral} % de aciertos. Completarla no da monedas extra: las monedas salen de cada acierto.`,
+  // E7, adenda 1 (compuerta 32, H-1): arriba va UNA línea (la regla del umbral); la de las monedas, al pie de la lista. Así «Seguir aquí» se ve al abrir.
+  /** @param {number} umbral */
+  reglasCorta: (umbral) => `Completas una unidad con ${umbral} % de aciertos.`,
+  sinMonedasExtra: 'Completar una unidad no da monedas extra: las monedas salen de cada acierto.',
   /** @param {number} n @param {string|null} titulo */
   unidad: (n, titulo) => (titulo ? `Unidad ${n} · ${titulo}` : `Unidad ${n}`),
   recomendada: 'Recomendada',
