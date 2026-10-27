@@ -121,6 +121,8 @@ async function iniciarApp() {
   }
   const sesion = await authActivo.iniciar();
   if (bloqueoActual) return; // una pantalla obligatoria ya tomó la vista mientras se recuperaba la sesión
+  // H-8b: con sesión, el enlace del correo no se usa, pero su token no se queda en la dirección ni en el historial.
+  if (sesion && (esHash(HASH_INVITACION) || esHash(HASH_RECUPERAR))) history.replaceState(null, '', location.pathname + location.search);
   if (sesion) { entrarConSesion(sesion); return; }
   arrancarSinSesion(modo);
 }

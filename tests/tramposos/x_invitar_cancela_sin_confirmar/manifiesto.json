@@ -1,0 +1,16 @@
+{
+  "descripcion": "WI8 (H-4): \"Cancelar\" borra al primer toque, sin el segundo que lo confirma.",
+  "archivos": {
+    "src/vistas/admin/invitar.js": "invitar.js"
+  },
+  "comando": [
+    "node",
+    "--test",
+    "--test-reporter=tap",
+    "tests/unit/vista_invitar.test.mjs"
+  ],
+  "espera_codigo_no_cero": true,
+  "espera_fallan_tests": [
+    "WI8: \"Cancelar\" solo en las enviadas, pide un segundo toque (el primero no pide nada) y cancela una vez"
+  ]
+}

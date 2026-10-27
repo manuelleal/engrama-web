@@ -18,3 +18,8 @@ export const listarInvitaciones = (ctx) => pedirJson('/admin/invitaciones', ctx)
 export function reenviarInvitacion(id, ctx) {
   return pedirJson(`/admin/invitaciones/${encodeURIComponent(String(id))}/reenviar`, { ...ctx, metodo: 'POST' });
 }
+
+/** DELETE /admin/invitaciones/{id} → 204 (la no aceptada se cancela; 409 si ya se aceptó). @param {number} id @param {Ctx} ctx */
+export function cancelarInvitacion(id, ctx) {
+  return pedirJson(`/admin/invitaciones/${encodeURIComponent(String(id))}`, { ...ctx, metodo: 'DELETE' });
+}

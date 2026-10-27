@@ -22,3 +22,10 @@ La primera suite completa de la rama dio rojos que la lista de arriba no declara
 - E30 (`tests/e2e/nav_sin_callejones.test.mjs`): el admin recorre 8 pantallas (antes 7).
 - W75 (`tests/e2e/humo_navegacion.test.mjs`): las rutas del admin en la tabla del humo, 7 → 8.
 - `tests/e2e/admin.test.mjs`: el enlace pedía `GET /admin/invitaciones` al doble, que respondía 404 (la prueba no admite errores HTTP en la consola) → el doble (`herramientas/mock/invitaciones.mjs`) imita las tres rutas del contrato.
+
+## Correcciones de la auditoría (2026-10-26; manda la adenda 11 de la espec del backend)
+- **Cancelar** (H-4): botón "Cancelar" en las enviadas, con un segundo toque que confirma (el primero no pide nada); `DELETE /admin/invitaciones/{id}`. WI8, tramposo `x_invitar_cancela_sin_confirmar`.
+- **Grupo nuevo** (H-8b): si la invitación falla después de crear el grupo, se releen los grupos y el nuevo queda elegido; el reintento no lo crea otra vez. WI9, `x_invitar_grupo_nuevo_sin_recargar`.
+- **Correo estricto** (H-8a): el mismo criterio que el backend (`correoValido`). WI10, `x_invitar_correo_flojo`.
+- **El hash del correo con sesión** (H-8b): `app.js` lo borra con `replaceState` también con sesión. WI11 (E2E con una cuenta de contraseña temporal: con una normal, la guardia de rutas ya reemplazaba el hash), `x_invitar_hash_con_sesion`.
+- El doble suma `DELETE /admin/invitaciones/:id`.

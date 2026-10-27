@@ -45,3 +45,12 @@ export function reenviarInvitacion(estado, req, id) {
   inv.ultimo = Date.now(); inv.envios += 1;
   return { status: 202, cuerpo: salida(estado, inv) };
 }
+
+export function cancelarInvitacion(estado, req, id) {
+  const auth = autenticar(estado, req); exigirAdmin(auth);
+  const i = lista(estado).findIndex((x) => String(x.id) === String(id) && x.tenant_id === auth.tenantId);
+  if (i < 0) fallar(404, 'invitacion_no_encontrada');
+  if (lista(estado)[i].aceptada) fallar(409, 'ya_aceptada');
+  lista(estado).splice(i, 1);
+  return { status: 204, cuerpo: null };
+}

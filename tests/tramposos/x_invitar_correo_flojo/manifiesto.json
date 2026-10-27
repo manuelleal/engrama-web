@@ -1,0 +1,16 @@
+{
+  "descripcion": "WI10 (H-8a): el correo con la regex floja de antes (a..b@x.co pasa).",
+  "archivos": {
+    "src/vistas/admin/invitar.js": "invitar.js"
+  },
+  "comando": [
+    "node",
+    "--test",
+    "--test-reporter=tap",
+    "tests/unit/vista_invitar.test.mjs"
+  ],
+  "espera_codigo_no_cero": true,
+  "espera_fallan_tests": [
+    "WI10: el correo se valida estricto, con el mismo criterio que el backend"
+  ]
+}

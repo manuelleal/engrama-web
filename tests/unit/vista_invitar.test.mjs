@@ -13,7 +13,7 @@
 import test from 'node:test';
 import assert from 'node:assert/strict';
 import { entornoDeFotos, crearRaiz, buscar, textoDe, elementos, ponerSvgFalso, iconosDe } from './foto_vistas.mjs';
-import { renderInvitar, agregarEnlaceDeInvitar, mensajeDeRechazo, GRUPO_NUEVO } from '../../src/vistas/admin/invitar.js';
+import { renderInvitar, agregarEnlaceDeInvitar, mensajeDeRechazo, GRUPO_NUEVO, correoValido } from '../../src/vistas/admin/invitar.js';
 import { renderRecuperar } from '../../src/vistas/recuperar.js';
 import { pedirEnlaceDeRecuperacion, canjearEnlaceDeInvitacion, cerrarSesionDeRecuperacion } from '../../src/auth/supabase_rest.js';
 import { ErrorApi } from '../../src/api/cliente.js';
@@ -202,4 +202,60 @@ test('WI7: el enlace "Profes: invitar" solo aparece si el backend responde la li
       if (debe) assert.equal(buscar(contenedor, 'ir-a-invitar').getAttribute('href'), '#/admin/invitar');
     } finally { s.entorno.restaurar(); }
   }
+});
+
+test('WI8: "Cancelar" solo en las enviadas, pide un segundo toque (el primero no pide nada) y cancela una vez', async () => {
+  let lista = [inv(5, 'enviada'), inv(6, 'aceptada')];
+  const s = servidor({
+    'GET /teachers/groups': () => GRUPOS,
+    'GET /admin/invitaciones': () => lista,
+    'DELETE /admin/invitaciones/5': () => { lista = [inv(6, 'aceptada')]; return new Response(null, { status: 204 }); },
+  });
+  try {
+    const raiz = crearRaiz();
+    await renderInvitar(raiz, CTX);
+    assert.equal(buscar(buscar(raiz, 'invitacion-6'), 'invitacion-cancelar'), null, 'la aceptada no se cancela');
+    const boton = buscar(buscar(raiz, 'invitacion-5'), 'invitacion-cancelar');
+    await Promise.all(boton.disparar('click'));
+    assert.equal(s.de('DELETE /admin/invitaciones/5').length, 0, 'el primer toque no pide nada');
+    assert.equal(textoDe(boton), T.cancelarSeguro);
+    await Promise.all([...boton.disparar('click'), ...boton.disparar('click')]);
+    await reposar();
+    assert.equal(s.de('DELETE /admin/invitaciones/5').length, 1, 'el segundo toque cancela, una vez');
+    assert.equal(textoDe(buscar(raiz, 'inv-hecho')), T.cancelada('Profe 5'));
+    assert.equal(buscar(raiz, 'invitacion-5'), null, 'la lista nueva, del servidor');
+  } finally { s.entorno.restaurar(); }
+});
+
+test('WI9: con un grupo nuevo, si la invitación falla se releen los grupos y el nuevo queda elegido (no se crea dos veces)', async () => {
+  let grupos = GRUPOS;
+  let invitaciones = 0;
+  const s = servidor({
+    'GET /teachers/groups': () => grupos,
+    'GET /admin/invitaciones': () => [],
+    'POST /admin/groups': () => { grupos = [...GRUPOS, { id: 'g9', group_code: 'NUEVO-1' }]; return json(201, { id: 'g9', group_code: 'NUEVO-1', max_capacity: null }); },
+    'POST /admin/invitaciones': () => { invitaciones += 1; return invitaciones === 1 ? json(429, { detail: 'demasiadas_invitaciones' }) : json(201, inv(9, 'enviada')); },
+  });
+  try {
+    const raiz = crearRaiz();
+    await renderInvitar(raiz, CTX);
+    await callado(() => llenarYEnviar(raiz, { nombre: 'Luis', correo: 'luis@sintetico.test', grupo: GRUPO_NUEVO, grupoNuevo: 'NUEVO-1' }));
+    const select = buscar(raiz, 'inv-grupo');
+    assert.equal(select.value, 'g9', 'el grupo recién creado queda elegido');
+    assert.ok(elementos(select).some((n) => n.tagName === 'option' && n.getAttribute('value') === 'g9'), 'y está en la lista');
+    assert.ok(buscar(raiz, 'inv-fila-grupo-nuevo').getAttribute('hidden') !== null, 'la fila del grupo nuevo se esconde');
+    assert.ok(buscar(raiz, 'inv-grupo-creado'), 'lo dice');
+    await Promise.all(buscar(raiz, 'form-invitar').disparar('submit'));
+    await reposar();
+    assert.equal(s.de('POST /admin/groups').length, 1, 'el reintento NO crea el grupo otra vez');
+    assert.deepEqual(s.de('POST /admin/invitaciones').map((r) => r.cuerpo.group_id), ['g9', 'g9']);
+  } finally { s.entorno.restaurar(); }
+});
+
+test('WI10: el correo se valida estricto, con el mismo criterio que el backend', () => {
+  const buenos = ['profe@uis.edu.co', 'nombre.apellido+clase@colegio.edu.co', 'a_b-c@sub-dominio.ejemplo.org', 'X9@EJEMPLO.COM'];
+  const malos = ['a..b@uis.edu.co', '.ana@uis.edu.co', 'ana.@uis.edu.co', 'ana@uis', 'ana@uis.c', 'ana@-uis.co', 'ana@uis-.co', 'ana@uis..co',
+    'ana b@uis.co', 'ana@@uis.co', 'ana@uis.co.', `${'a'.repeat(65)}@uis.co`, 'ana@uis.c0m'];
+  assert.deepEqual(buenos.filter((c) => !correoValido(c)), [], 'ningún correo real se rechaza');
+  assert.deepEqual(malos.filter((c) => correoValido(c)), [], 'ningún error de tecleo pasa');
 });
