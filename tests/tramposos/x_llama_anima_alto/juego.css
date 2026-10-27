@@ -196,15 +196,14 @@
 body {
   overflow-x: clip;
 }
+/* docs/ESPEC_visual_fluidez.md §4: la pantalla llega en 220 ms con la curva que frena (sin rebote), 12 px, y un escalón de 30 ms con tope de 90:
+   quieta a los ~310 ms (antes, 520 ms de rebote y 70 ms por pieza: la última llegaba a los 940). */
 .juego > :not(.nav-inferior) {
-  animation: entra-sube 520ms cubic-bezier(0.2, 1.3, 0.4, 1) backwards;
+  animation: entra-sube 220ms cubic-bezier(0.22, 1, 0.36, 1) backwards;
 }
-.juego > :nth-child(2) { animation-delay: 70ms; }
-.juego > :nth-child(3) { animation-delay: 140ms; }
-.juego > :nth-child(4) { animation-delay: 210ms; }
-.juego > :nth-child(5) { animation-delay: 280ms; }
-.juego > :nth-child(6) { animation-delay: 350ms; }
-.juego > :nth-child(n+7) { animation-delay: 420ms; }
+.juego > :nth-child(2) { animation-delay: 30ms; }
+.juego > :nth-child(3) { animation-delay: 60ms; }
+.juego > :nth-child(n+4) { animation-delay: 90ms; }
 .juego-desliza > :not(.nav-inferior) {
   animation-name: entra-desliza;
 }
@@ -212,10 +211,10 @@ body {
   animation: none;
 }
 @keyframes entra-sube {
-  from { opacity: 0; transform: translateY(28px) scale(0.97); }
+  from { opacity: 0; transform: translateY(12px); }
 }
 @keyframes entra-desliza {
-  from { opacity: 0; transform: translateX(56px); }
+  from { opacity: 0; transform: translateX(32px); }
 }
 
 /* ---------- Botones con resorte: al soltar rebotan; al presionar bajan rápido. ---------- */
@@ -552,21 +551,38 @@ body {
   margin: 0;
   max-width: 34ch;
 }
+/* El resumen (docs/ESPEC_visual_fluidez.md §2): una fila de fichas del sistema (`sx-dato`), Aciertos y Monedas, del mismo ancho. */
+.hero-fichas {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 11rem));
+  justify-content: center;
+  gap: 12px;
+  width: 100%;
+  margin-top: 10px;
+}
+.hero-fichas--una {
+  grid-template-columns: minmax(0, 11rem);
+}
+.hero-fichas .sx-dato__rotulo {
+  min-height: 30px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 4px;
+}
+.ficha-aciertos .sx-icono {
+  width: 16px;
+  height: 16px;
+}
 .hero-puntaje {
-  margin: 4px 0 0;
-  font-family: var(--fuente-titulos);
-  font-weight: 800;
-  font-size: 2.4rem;
-  color: var(--primario);
+  margin: 0;
+  color: var(--sx-ok);
 }
 .hero-puntaje-num {
   display: inline-block;
   transform-origin: center;
 }
-/* La medalla es la tarjeta-dato del sistema (`sx-dato`): acá solo su ancho y su entrada. */
 .medalla-monedas {
-  min-width: 11rem;
-  margin-top: 8px;
   animation: medalla-pop 700ms cubic-bezier(0.2, 1.9, 0.4, 1) 450ms backwards;
 }
 .medalla-num {

@@ -8,6 +8,7 @@
 // pregunta (decisión 010; el E2E de reto_flujo lo vigila). Lo que se celebra no depende del tiempo que
 // tardó ni de ningún azar: solo de cuántas respondió bien y de lo que mandó el servidor.
 import { h } from './dom.js';
+import { crearIcono } from './iconos.js';
 import { textos } from '../textos.js';
 import { crearDrako } from './drako.js';
 import { controladorDe } from './drako_animado.js';
@@ -53,17 +54,23 @@ export function crearHeroResultado(d) {
   const puntaje = h('span', { class: 'hero-puntaje-num', 'aria-hidden': 'true' }, `0 / ${d.total}`);
   const medallaNum = d.monedas > 0 ? h('span', { class: 'medalla-num' }, '+0') : null;
   const sello = d.merito ? crearSelloDeMerito(d.merito, { enEspera: !reducirMovimiento() }) : null;
+  // docs/ESPEC_visual_fluidez.md §2: el resumen es UNA fila de fichas del sistema: Aciertos (verde, con el ícono y la palabra: nunca solo color) y,
+  // si el servidor pagó, Monedas (oro = logro). Las clases que miran las pruebas (`hero-puntaje`, `hero-puntaje-num`, `medalla-*`) siguen ahí.
+  const fichaAciertos = h('div', { class: 'ficha-aciertos sx-dato sx-dato--ok' },
+    h('span', { class: 'sx-dato__rotulo', 'aria-hidden': 'true' }, crearIcono('visto'), textos.finDeReto.aciertos),
+    h('p', { class: 'sx-dato__valor hero-puntaje', 'data-testid': 'puntaje' },
+      puntaje, h('span', { class: 'solo-lectores' }, textos.celebracion.puntaje(d.aciertos, d.total))));
   const nodo = h(
     'section', { class: `hero-resultado hero-${d.nivel}`, 'data-testid': 'hero-resultado' },
     h('div', { class: 'hero-drako' }, drako),
     h('h1', { class: 'hero-titulo' }, textosNivel.titulo),
     h('p', { class: 'hero-mensaje' }, textosNivel.mensaje),
-    h('p', { class: 'hero-puntaje', 'data-testid': 'puntaje' },
-      puntaje, h('span', { class: 'solo-lectores' }, textos.celebracion.puntaje(d.aciertos, d.total))),
-    // Las monedas ganadas son un DATO (la tarjeta-dato del sistema), no un bloque navy con cara de botón.
-    medallaNum ? h('div', { class: 'medalla-monedas sx-dato', 'aria-hidden': 'true' },
-      h('span', { class: 'sx-dato__rotulo' }, textos.inicio.monedas),
-      h('span', { class: 'sx-dato__valor' }, h('span', { class: 'sx-moneda' }), medallaNum)) : null,
+    h('div', { class: `hero-fichas${medallaNum ? '' : ' hero-fichas--una'}` },
+      fichaAciertos,
+      // Las monedas ganadas son un DATO (la tarjeta-dato del sistema), no un bloque navy con cara de botón.
+      medallaNum ? h('div', { class: 'medalla-monedas sx-dato', 'aria-hidden': 'true' },
+        h('span', { class: 'sx-dato__rotulo' }, textos.inicio.monedas),
+        h('span', { class: 'sx-dato__valor' }, h('span', { class: 'sx-moneda' }), medallaNum)) : null),
     sello,
   );
   return { nodo, drako, puntaje, medallaNum, sello };

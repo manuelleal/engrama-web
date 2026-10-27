@@ -180,3 +180,240 @@
   max-height: none;
   overflow: visible;
 }
+
+/* W91 (docs/ESPEC_camino_y_tu_palabra.md §2): la pregunta que se responde ESCRIBIENDO (retos "Escríbela"). El campo es `sx-entrada` del sistema; ya
+   respondida, el resultado va con ícono y palabra (`.opcion-estado`), y el borde lo acompaña (nunca solo color). */
+.respuesta-escrita {
+  margin: 12px 0 16px;
+}
+.respuesta-escrita__fila {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+.respuesta-escrita .campo-escrito {
+  flex: 1 1 auto;
+  min-width: 0;
+  font-size: 1.25rem;
+}
+.respuesta-escrita.es-correcta .campo-escrito {
+  border-color: var(--sx-ok-borde);
+  background: var(--sx-ok-fondo);
+  color: var(--sx-ok);
+}
+.respuesta-escrita.es-incorrecta .campo-escrito {
+  border-color: var(--sx-mal-borde);
+  background: var(--sx-mal-fondo);
+  color: var(--sx-mal);
+}
+.respuesta-escrita.es-correcta .opcion-estado { color: var(--sx-ok); }
+.respuesta-escrita.es-incorrecta .opcion-estado { color: var(--sx-mal); }
+
+/* W92 (docs/ESPEC_camino_y_tu_palabra.md §3) con la forma de docs/ESPEC_visual_fluidez.md §3: `#/camino` es un CAMINO. Las estaciones van en una lista
+   ordenada sobre una vía punteada que baja por el centro; cada una es un nodo redondo con el ícono de su estado (que se mece a izquierda y derecha) y,
+   debajo, su ficha con el nombre, el estado con ícono y texto (nunca solo color) y su acción. La recomendada es el nodo grande, en el color de acción,
+   con su anillo (el único momento animado); el oro, SOLO para Dominada; lo bloqueado, gris con su candado y su texto. */
+.camino-cabecera {
+  margin: 12px 0 16px;
+  display: grid;
+  gap: 4px;
+}
+.camino-reglas {
+  margin: 0 0 24px;
+}
+.lista-camino {
+  position: relative;
+  list-style: none;
+  margin: 0 0 24px;
+  padding: 8px 0 0;
+  display: grid;
+  gap: 20px;
+}
+.lista-camino::before {
+  content: "";
+  position: absolute;
+  left: 50%;
+  top: 40px;
+  bottom: 48px;
+  border-left: 4px dotted var(--sx-borde-3);
+  transform: translateX(-50%);
+}
+.estacion-camino {
+  --x: 0px;
+  position: relative;
+  display: grid;
+  justify-items: center;
+  gap: 8px;
+  text-align: center;
+}
+/* El nodo se mece 24 px: menos que su radio, así la vía del centro siempre lo atraviesa. */
+.estacion-camino:nth-child(4n + 2) { --x: 24px; }
+.estacion-camino:nth-child(4n + 4) { --x: -24px; }
+.estacion-camino__marca {
+  --labio-nodo: var(--sx-labio-neutro);
+  --brillo-nodo: 0 0 0 transparent;
+  position: relative;
+  width: 56px;
+  height: 56px;
+  border-radius: 50%;
+  display: grid;
+  place-items: center;
+  font: 800 1.25rem/1 var(--fuente-titulos);
+  background: var(--sx-superficie);
+  color: var(--sx-tinta-2);
+  border: 3px solid var(--sx-borde-3);
+  transform: translateX(var(--x));
+  scroll-margin-bottom: 96px; /* al traerla a la vista, que quede sobre la barra de abajo */
+}
+.estacion-camino__marca .sx-icono {
+  width: 26px;
+  height: 26px;
+}
+/* Solo el nodo que se toca lleva labio (va a la misma acción que su botón, ver camino.js); el que no, es plano: no promete un toque. Presionar es
+   hundirse el alto del labio (solo transform); el foco, el del sistema. */
+#vista .estacion-camino__marca.es-enlace {
+  box-shadow: var(--brillo-nodo), 0 5px 0 var(--labio-nodo);
+  text-decoration: none;
+  transition: transform var(--sx-dur-1) var(--sx-curva);
+}
+#vista .estacion-camino__marca.es-enlace:active {
+  transform: translateX(var(--x)) translateY(5px);
+  box-shadow: var(--brillo-nodo);
+}
+#vista .estacion-camino__marca.es-enlace:focus-visible {
+  outline: 3px solid var(--sx-foco-color);
+  outline-offset: 2px;
+}
+.estacion-camino__cuerpo {
+  display: grid;
+  justify-items: center;
+  gap: 6px;
+  min-width: 0;
+  width: min(100%, 20rem);
+  padding: 12px 14px;
+  border-radius: var(--radio-md);
+  background: var(--sx-superficie);
+  box-shadow: var(--sx-elev-1);
+}
+.estacion-camino__nombre {
+  margin: 0;
+  font: 800 1.0625rem/1.25 var(--fuente-titulos);
+  color: var(--sx-tinta);
+}
+.estado-camino,
+.camino-recomendada {
+  margin: 0;
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  font-weight: 700;
+  color: var(--sx-tinta-2);
+}
+.estado-camino .sx-icono,
+.camino-recomendada .sx-icono {
+  width: 20px;
+  height: 20px;
+  flex: none;
+}
+.camino-recomendada {
+  color: var(--sx-accion-tinta);
+  text-transform: uppercase;
+  font-size: 0.8125rem;
+  letter-spacing: 0.04em;
+}
+.estacion-camino.es-recomendada .estacion-camino__marca {
+  --labio-nodo: var(--sx-accion-labio);
+  --brillo-nodo: var(--sx-brillo);
+  width: 68px;
+  height: 68px;
+  background: var(--sx-accion);
+  color: var(--sx-sobre-accion);
+  border-color: var(--sx-accion);
+}
+.estacion-camino.es-recomendada .estacion-camino__marca .sx-icono {
+  width: 32px;
+  height: 32px;
+}
+.estacion-camino.es-recomendada .estacion-camino__marca::after {
+  content: "";
+  position: absolute;
+  inset: -9px;
+  border-radius: 50%;
+  border: 4px solid var(--sx-accion-borde);
+  animation: camino-anillo var(--sx-dur-3) var(--sx-curva-rebote) 200ms backwards;
+}
+@keyframes camino-anillo {
+  from { opacity: 0; transform: scale(0.6); }
+}
+.estacion-camino.es-recomendada .estacion-camino__cuerpo {
+  box-shadow: 0 0 0 2px var(--sx-accion-borde), var(--sx-elev-2);
+}
+.estacion-camino.estacion--completada .estacion-camino__marca {
+  --labio-nodo: color-mix(in srgb, var(--sx-ok-cara) 60%, black);
+  background: var(--sx-ok-cara);
+  color: var(--sx-sobre-ok);
+  border-color: var(--sx-ok-cara);
+}
+.estado-camino.es-oro {
+  color: var(--oro-texto);
+}
+.estacion-camino.estacion--dominada .estacion-camino__cuerpo {
+  background: var(--sx-oro-suave);
+}
+.estacion-camino.estacion--dominada .estacion-camino__marca {
+  --labio-nodo: var(--sx-oro-labio);
+  --brillo-nodo: var(--sx-brillo);
+  background: var(--sx-oro);
+  border-color: var(--sx-oro);
+  color: var(--sx-sobre-oro);
+}
+.estacion-camino.acceso--bloqueada .estacion-camino__marca {
+  background: var(--sx-pozo);
+  border-color: var(--sx-pozo);
+}
+.estacion-camino.acceso--bloqueada .estacion-camino__cuerpo {
+  background: var(--sx-superficie-alta);
+  box-shadow: none;
+}
+.estacion-camino.acceso--bloqueada .estacion-camino__nombre {
+  color: var(--sx-tinta-2);
+}
+.enlace-camino {
+  display: inline-block;
+  margin: 8px 0 4px;
+  font-weight: 700;
+  color: var(--sx-accion-tinta);
+}
+/* docs/ESPEC_visual_fluidez.md §3: con su dibujo (ui/magia_inicio.js), el enlace es una tarjeta-enlace a lo ancho: secundaria (no compite con "Seguir").
+   Especificidad 1,4,1 (id, dos clases y dos atributos: es EL enlace del camino y es un enlace de verdad): tiene que ganarle a la regla general de los
+   enlaces con data-testid de componentes.css (1,2,1, que lo volvía un chip de 14,7 px) y a la de cara.css (1,3,1, que carga después). */
+#vista a.enlace-camino.con-dibujo[data-testid="ir-a-camino"][href] {
+  display: flex;
+  box-sizing: border-box;
+  width: 100%;
+  align-items: center;
+  gap: 12px;
+  margin: 12px 0 8px;
+  padding: 10px 14px;
+  border: 2px solid var(--sx-borde-2);
+  border-bottom-width: 4px;
+  border-radius: var(--radio-md);
+  background: var(--sx-superficie);
+  color: var(--sx-accion-tinta);
+  font: 800 1.0625rem/1.25 var(--fuente-titulos);
+  text-decoration: none;
+}
+.dibujo-camino {
+  flex: none;
+  width: 72px;
+  height: 40px;
+}
+.enlace-camino__texto {
+  flex: 1 1 auto;
+  min-width: 0;
+}
+.enlace-camino.con-dibujo > .sx-icono {
+  flex: none;
+  width: 22px;
+  height: 22px;
+}

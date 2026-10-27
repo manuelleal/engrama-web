@@ -25,13 +25,26 @@ function estacion(e, i) {
     class: `estacion-camino estacion--${e.estado} acceso--${e.acceso}${e.recomendada ? ' es-recomendada' : ''}`,
     'data-testid': `camino-unidad-${i + 1}`, 'data-estado': e.estado, 'data-acceso': e.acceso, 'aria-current': e.recomendada ? 'step' : null,
   },
-  h('span', { class: 'estacion-camino__marca', 'aria-hidden': 'true' }, String(i + 1)),
+  nodoDe(e, i),
   h('div', { class: 'estacion-camino__cuerpo' },
     e.recomendada ? h('p', { class: 'camino-recomendada', 'data-testid': 'camino-recomendada' }, crearIcono('estrella'), T.recomendada) : null,
     h('h2', { class: 'estacion-camino__nombre' }, e.nombre),
     h('p', { class: `estado-camino${e.oro ? ' es-oro' : ''}`, 'data-testid': `camino-estado-${i + 1}` }, crearIcono(e.icono), e.texto),
     e.nota ? h('p', { class: 'sx-t-apoyo', 'data-testid': `camino-nota-${i + 1}` }, e.nota) : null,
     e.accion ? h('a', { href: e.accion.href, class: e.recomendada ? 'sx-btn' : 'boton-chico', 'data-testid': `camino-accion-${i + 1}` }, e.accion.texto) : null));
+}
+
+/**
+ * El nodo de la estación (docs/ESPEC_visual_fluidez.md §3): lleva el ÍCONO del estado (la recomendada, la estrella); el número va en el nombre
+ * ("Unidad N") y, sin SVG en el entorno, el nodo cae al número. Si la estación tiene acción, el nodo es un ENLACE a esa misma acción (56 px o más
+ * de toque, con su nombre accesible y el foco del sistema); si no la tiene (bloqueada, o nada que jugar), es un dibujo plano y `aria-hidden`.
+ * Sin `data-testid`: la acción que miran las pruebas sigue siendo el botón (`camino-accion-N`).
+ * @param {import('../../ui/camino.js').EstacionVista} e @param {number} i
+ */
+function nodoDe(e, i) {
+  const dibujo = crearIcono(e.recomendada ? 'estrella' : e.icono) ?? String(i + 1);
+  if (!e.accion) return h('span', { class: 'estacion-camino__marca', 'aria-hidden': 'true' }, dibujo);
+  return h('a', { href: e.accion.href, class: 'estacion-camino__marca es-enlace', 'aria-label': `${e.accion.texto}: ${e.nombre}` }, dibujo);
 }
 
 /** Sin camino (backend anterior o error): lo dice (y "Reintentar" si fue un error). La vuelta a Inicio es la del encabezado (un solo volver, V8). */
@@ -51,12 +64,26 @@ export async function renderCamino(raiz, ctx) {
   if (r.tipo === 'sin_ruta') { aviso(raiz, ctx, T.noDisponible, false); return; }
   if (r.tipo === 'error') { aviso(raiz, ctx, T.noSePudo, true); return; }
   const plan = planDeCamino(r.camino);
+  // docs/ESPEC_visual_fluidez.md §3: el camino primero; las reglas, debajo (antes empujaban la recomendada fuera de la pantalla a 375 px).
   pintar(raiz, ctx,
     h('section', { class: 'camino-cabecera', 'data-testid': 'camino-cabecera' },
       h('p', { class: 'sx-t-tarjeta', 'data-testid': 'camino-nivel' }, plan.titulo),
-      ...plan.avisos.map((a) => h('p', { class: 'sx-t-apoyo' }, a)),
-      h('p', { class: 'sx-t-apoyo', 'data-testid': 'camino-reglas' }, plan.reglas)),
+      ...plan.avisos.map((a) => h('p', { class: 'sx-t-apoyo' }, a))),
     plan.estaciones.length
       ? h('ol', { class: 'lista-camino', 'data-testid': 'camino-lista', 'aria-label': T.lista }, ...plan.estaciones.map(estacion))
-      : h('p', { class: 'sx-vacio', role: 'status', 'data-testid': 'camino-vacio' }, T.vacio));
+      : h('p', { class: 'sx-vacio', role: 'status', 'data-testid': 'camino-vacio' }, T.vacio),
+    h('p', { class: 'sx-t-apoyo camino-reglas', 'data-testid': 'camino-reglas' }, plan.reglas));
+  globalThis.requestAnimationFrame?.(() => mostrarElSiguiente(raiz));
+}
+
+/**
+ * El siguiente paso, a la vista: SOLO si el nodo de la recomendada no se ve (queda bajo la barra de abajo), se trae con `block: 'nearest'` (lo
+ * mínimo; `scroll-margin-bottom` lo deja sobre la barra) y sin animar. Si ya se ve, no se mueve nada y la cabecera queda arriba.
+ * @param {HTMLElement} raiz
+ */
+function mostrarElSiguiente(raiz) {
+  const nodo = raiz.querySelector?.('[aria-current="step"] .estacion-camino__marca');
+  const alto = globalThis.innerHeight ?? 0;
+  if (!alto || !nodo?.getBoundingClientRect) return;
+  if (nodo.getBoundingClientRect().bottom > alto - 96) nodo.scrollIntoView({ block: 'nearest' });
 }

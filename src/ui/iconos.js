@@ -24,6 +24,7 @@ const FORMAS = {
   // B1 (compuerta 24, H1): los que antes eran glifos de texto (reloj de arena, flecha, alerta, info, sobre, estrella, pausa), ahora de la misma familia.
   reloj: [[12, 12, 8.5], 'M12 7.5V12l3 2'],
   flecha_externa: ['M7 17L17 7M9 7h8v8'],
+  chevron: ['M9 6l6 6-6 6'], // docs/ESPEC_visual_fluidez.md §3: "sigue por aquí" (la tarjeta-enlace de Tu camino)
   alerta: ['M12 4l9 16H3z', 'M12 10v4M12 17h.01'],
   info: [[12, 12, 8.5], 'M12 11v5.5M12 7.8h.01'],
   sobre: [[3, 5.5, 18, 13, 2.5], 'M3.5 7.5l8.5 6 8.5-6'],
