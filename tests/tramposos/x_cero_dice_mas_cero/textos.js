@@ -354,7 +354,7 @@ export const textos = {
       irAImportarCsv: 'Importar estudiantes',
     },
     crearGrupo: {
-      titulo: 'Crear grupo',
+      titulo: 'Crear grupo', tarjeta: 'Nuevo grupo', // E7, adenda 1 (H-8): la tarjeta no repite el botón "Crear grupo"
       etiquetaCodigo: 'Nombre del grupo', // W67: es el NOMBRE del grupo; "código de grupo" es el de inscribirse
       etiquetaCupo: 'Cupo máximo (opcional)',
       crear: 'Crear grupo',

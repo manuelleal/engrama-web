@@ -23,7 +23,7 @@ function filaDeGrupo(grupo) {
     'li', { class: 'fila', 'data-testid': `admin-grupo-${grupo.id}` },
     h('div', { class: 'fila-texto' },
       h('span', { class: 'fila-titulo' }, grupo.group_code),
-      cuantos ? h('span', { class: 'texto-apoyo', 'data-testid': `admin-grupo-${grupo.id}-meta` }, cuantos) : null),
+      cuantos ? h('span', { class: 'sx-t-apoyo', 'data-testid': `admin-grupo-${grupo.id}-meta` }, cuantos) : null), // 16 px (adenda 1, H-8)
     h('div', { class: 'fila-acciones' },
       h('a', { href: `#/admin/asignar-docente/${grupo.id}`, class: 'boton-chico', 'data-testid': `admin-grupo-${grupo.id}-docente` }, textos.admin.grupos.irAAsignarDocente),
       h('a', { href: `#/admin/importar-csv/${grupo.id}`, class: 'boton-chico', 'data-testid': `admin-grupo-${grupo.id}-csv` }, textos.admin.grupos.irAImportarCsv)),
@@ -80,7 +80,7 @@ async function pintarVista(raiz, ctx, mensajePrevio) {
   );
   // E7 (docs/ESPEC_visual_pulido_salida.md §3): el formulario de crear grupo va en su tarjeta blanca (sx-tarjeta), con su título.
   const tarjeta = h('section', { class: 'sx-tarjeta admin-crear-grupo', 'aria-labelledby': 'crear-grupo-titulo' },
-    h('h2', { id: 'crear-grupo-titulo' }, textos.admin.crearGrupo.titulo), form);
+    h('h2', { id: 'crear-grupo-titulo' }, textos.admin.crearGrupo.tarjeta), form);
   const vista = h(
     'div', { 'data-testid': 'vista-admin-crear-grupo' },
     h('h1', {}, textos.admin.grupos.titulo),
