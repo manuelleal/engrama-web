@@ -160,3 +160,16 @@ Informe: `investigacion/diseno/33-recompuerta-pulido-salida.md`. Misma rama, un 
 | R-4 [Nit] | La nota de las monedas solo va si hay unidades | En el estado vacío no aparece `camino-nota-monedas` |
 | R-5 [Nit] | La tarjeta «Nuevo grupo» se ajusta al formulario: `max-width: calc(40rem + 32px)` | A 1280 la tarjeta mide 672 px |
 | R-6 [Nit] | El foco del botón fantasma va en navy (`--primario`), como el resto | `outline-color` = navy |
+
+## Adenda 3 · Compuerta 34 (LISTO CON CORRECCIONES) · 2026-10-28
+
+Informe: `investigacion/diseno/34-tercera-compuerta-pulido-salida.md`. Misma rama, un cambio por commit, `sw.js` en v82. Si una predicción falla, el commit
+lo dice.
+
+| # | Corrección | Predicción (medida en el navegador, 9 combinaciones: 375×812, 375×667, 1280×800 × normal / con apoyo / sin reto) |
+|---|---|---|
+| T-1 [Media] | Cuando haga falta desplazar, `mostrarElSiguiente` no baja la diferencia exacta: baja hasta el primer CORTE LIMPIO que deje «Seguir aquí» entero sobre la barra (tope − 8 px). Cortes: el final de la cabecera (empieza la lista) y el final de cada estación anterior a la recomendada (empieza la siguiente), + 2 px. Es decir, el borde de arriba cae siempre en un hueco vacío. Si ningún corte alcanza, la diferencia exacta | En las 9: ningún nodo, ficha, anillo ni renglón de la cabecera cruza el borde de arriba (y = 0), y el botón queda entero sobre la barra. 375×812, 1280×800 normal y sin reto: siguen sin desplazar (scrollY = 0) |
+| T-2 [Nit] | Nodo–ficha de 8 a 12 px (el nodo hundido ya no toca su ficha: 7 px de aire) y entre estaciones de 12 a 14 px. Los 3 puntos de la vía por tramo NO caben sin empujar el botón a 1280×800 (quedan 15 px de margen): se dan ~1,5 a 2 por tramo | 375×812 y 1280×800 normal: sin desplazar, botón ≤ tope − 8 |
+| T-3 [Nit] | El comentario del anillo dice 8 px | — |
+| T-4 [Nit] | El foco del nodo recomendado se separa del anillo: `outline-offset` de 10 px (el anillo termina a 8 px) | El contorno del foco empieza fuera del anillo (≥ 2 px de luz) |
+| T-5 [Nit] | «Practicar», «Empezar» y «Seguir aquí» del camino a 16 px | `font-size` = 16 px; las fichas no cambian de renglones |
