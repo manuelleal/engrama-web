@@ -325,6 +325,10 @@
   outline: 3px solid var(--sx-foco-color);
   outline-offset: 2px;
 }
+/* Adenda 3 (T-4): en la recomendada, el foco va por FUERA de su anillo (que termina a 8 px), con 2 px de luz; encima del anillo apenas se notaba. */
+#vista .estacion-camino.es-recomendada .estacion-camino__marca.es-enlace:focus-visible {
+  outline-offset: 10px;
+}
 #vista .estacion-camino__marca[aria-disabled="true"] {
   cursor: default;
   box-shadow: var(--brillo-nodo);
