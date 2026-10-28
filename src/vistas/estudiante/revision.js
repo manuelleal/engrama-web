@@ -17,23 +17,30 @@ export function textoDeOpcion(pregunta, label) {
   return opcion ? opcion.value : label;
 }
 
-/** ¿La pregunta `pregunta.id` se respondió bien? Pura: compara lo dado contra `correct_answers`. */
+/** La clave de esa pregunta que trajo el cierre, o null. Desde la auditoría 22 (H-1) el servidor solo trae las de las preguntas resueltas. */
+export function claveDe(preguntaId, correctAnswers) {
+  const correcta = (Array.isArray(correctAnswers) ? correctAnswers : []).find((c) => c?.question_id === preguntaId)?.correct_answer;
+  return typeof correcta === 'string' ? correcta : null;
+}
+
+/** ¿La pregunta `pregunta.id` se respondió bien? Pura: compara lo dado contra `correct_answers`. Sin clave (sin resolver o en blanco), no acertó. */
 export function acertoPregunta(preguntaId, respuestasDadas, correctAnswers) {
-  const correcta = correctAnswers.find((c) => c.question_id === preguntaId)?.correct_answer;
-  return respuestasDadas[preguntaId] === correcta;
+  const correcta = claveDe(preguntaId, correctAnswers);
+  return correcta !== null && respuestasDadas[preguntaId] === correcta;
 }
 
 function filaDeRevision(pregunta, respuestasDadas, correctAnswers, i, aciertos) {
   // W91: si el servidor ya dijo el acierto de esa pregunta (`/answers`), manda él (lo escrito se normaliza allá).
   const acerto = aciertos && typeof aciertos[pregunta.id] === 'boolean' ? aciertos[pregunta.id] : acertoPregunta(pregunta.id, respuestasDadas, correctAnswers);
-  const correcta = correctAnswers.find((c) => c.question_id === pregunta.id)?.correct_answer;
+  const correcta = claveDe(pregunta.id, correctAnswers);
   // Las filas entran una tras otra; la correcta rebota y la que no, tiembla apenas (corto, suave,
   // siempre con ícono y texto — juego.css). El orden y el retraso son de lectura, no de tiempo del estudiante.
   const fila = h(
     'li', { class: `tarjeta fila-revision ${acerto ? 'revision-ok' : 'revision-mal'}`, 'data-testid': `revision-${pregunta.id}` },
     h('p', { class: 'fila-titulo' }, pregunta.question_text),
     crearResultado({ ok: acerto, texto: acerto ? textos.revision.correcta : textos.revision.incorrecta, testid: `revision-${pregunta.id}-resultado` }),
-    acerto ? null : h('p', { 'data-testid': `revision-${pregunta.id}-correcta` }, textos.revision.laCorrectaEra(textoDeOpcion(pregunta, correcta))),
+    // Sin clave (la pregunta quedó sin resolver o en blanco), no se dice "La correcta era": el servidor no la reveló (decisión 018).
+    acerto || correcta === null ? null : h('p', { 'data-testid': `revision-${pregunta.id}-correcta` }, textos.revision.laCorrectaEra(textoDeOpcion(pregunta, correcta))),
   );
   fila.style.setProperty('--i', String(i));
   return fila;

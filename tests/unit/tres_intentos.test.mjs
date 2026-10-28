@@ -6,7 +6,9 @@
 import test from 'node:test';
 import assert from 'node:assert/strict';
 import { mkdirSync, writeFileSync } from 'node:fs';
-import { buscar, textoDe, elementos } from './foto_vistas.mjs';
+import { buscar, textoDe, elementos, entornoDeFotos, crearRaiz } from './foto_vistas.mjs';
+import { renderRevision } from '../../src/vistas/estudiante/revision.js';
+import { cancelarCelebraciones } from '../../src/ui/celebraciones.js';
 import { ctxEstudiante, asentar } from './fotos_de_navegacion.mjs';
 import { pintar } from './apoyo_nav.mjs';
 import { renderRetoFlujo } from '../../src/vistas/estudiante/reto_flujo.js';
@@ -158,4 +160,21 @@ test('TI-W3: el repaso falla sin clave con la descartada inhabilitada y, al acer
       fin: { banda: 'Correcta', monedas: false },
     });
   } finally { cerrar(); }
+});
+
+test('TI-W4: la revisión sin la clave de una pregunta (sin resolver o en blanco) no dice "La correcta era" ni la cuenta acertada (auditoría 22, H-1)', () => {
+  const entorno = entornoDeFotos({});
+  const raiz = crearRaiz();
+  const reto = { id: 'r1', title: 'Reto', questions: ['q1', 'q2', 'q3'].map((id) => ({ id, question_text: `¿${id}?`, options_json: [{ label: 'A', value: 'uno' }, { label: 'B', value: 'dos' }] })) };
+  const resultado = { attempt_id: 'i', is_correct: false, score_percent: 33.3, coins_earned: 3, xp_earned: 0, streak_bonus: 0, drako_feedback: null, total_attempts_used: 1, attempts_remaining: 1,
+    correct_answers: [{ question_id: 'q1', correct_answer: 'A' }] }; // q2 sin resolver, q3 en blanco: el servidor no trae su clave
+  try {
+    renderRevision(raiz, { challenge: reto, resultado, respuestasDadas: { q1: 'A', q2: 'B' }, rol: 'student' });
+    const texto = textoDe(raiz);
+    assert.deepEqual({
+      sinIndefinido: !texto.includes('undefined'),
+      laCorrectaEra: ['q1', 'q2', 'q3'].map((id) => Boolean(buscar(raiz, `revision-${id}-correcta`))),
+      resultado: ["q1", "q2", "q3"].map((id) => textoDe(buscar(raiz, `revision-${id}-resultado`)).trim()),
+    }, { sinIndefinido: true, laCorrectaEra: [false, false, false], resultado: ['Correcta', 'Esta vez no', 'Esta vez no'] });
+  } finally { cancelarCelebraciones(); entorno.restaurar(); }
 });
