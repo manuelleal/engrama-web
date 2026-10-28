@@ -74,7 +74,8 @@ export async function renderCamino(raiz, ctx) {
     plan.estaciones.length
       ? h('ol', { class: 'lista-camino', 'data-testid': 'camino-lista', 'aria-label': T.lista }, ...plan.estaciones.map(estacion))
       : h('p', { class: 'sx-vacio', role: 'status', 'data-testid': 'camino-vacio' }, T.vacio),
-    h('p', { class: 'sx-t-apoyo camino-nota-monedas', 'data-testid': 'camino-nota-monedas' }, plan.notaMonedas));
+    // Adenda 2 (R-4): la nota de las monedas habla de unidades: sin unidades, no va.
+    plan.estaciones.length ? h('p', { class: 'sx-t-apoyo camino-nota-monedas', 'data-testid': 'camino-nota-monedas' }, plan.notaMonedas) : null);
   globalThis.requestAnimationFrame?.(() => mostrarElSiguiente(raiz));
 }
 
