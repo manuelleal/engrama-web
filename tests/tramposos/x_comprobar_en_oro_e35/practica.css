@@ -256,7 +256,7 @@
   margin: 0 0 24px;
   padding: 4px 0 0;
   display: grid;
-  gap: 12px; /* adenda 2 (R-1): el camino más compacto, para que «Seguir aquí» se vea sin desplazar */
+  gap: 14px; /* adenda 2 (R-1) y 3 (T-2): compacto, para que «Seguir aquí» se vea sin desplazar; 14 deja ver la vía entre estaciones */
 }
 .lista-camino::before {
   content: "";
@@ -271,7 +271,7 @@
   position: relative;
   display: grid;
   justify-items: center;
-  gap: 8px;
+  gap: 12px; /* adenda 3 (T-2): el nodo hundido (5 px abajo) no toca su ficha: 7 px de aire */
   text-align: center;
 }
 /* El nodo: cara, ícono y canto salen de tres variables que pone cada estado. El canto es el labio del sistema (5 px abajo, sin difuminar): el
