@@ -234,7 +234,7 @@
    verde. Recomendada o en curso: estrella sobre navy con su anillo (el de la recomendada entra al llegar: el único momento animado). Bloqueada:
    candado sobre gris, con su texto y su fecha. */
 .camino-cabecera {
-  margin: 12px 0 16px;
+  margin: 8px 0 12px;
   display: grid;
   gap: 4px;
 }
@@ -249,15 +249,15 @@
   position: relative;
   list-style: none;
   margin: 0 0 24px;
-  padding: 8px 0 0;
+  padding: 4px 0 0;
   display: grid;
-  gap: 20px;
+  gap: 12px; /* adenda 2 (R-1): el camino más compacto, para que «Seguir aquí» se vea sin desplazar */
 }
 .lista-camino::before {
   content: "";
   position: absolute;
   left: 50%;
-  top: 40px;
+  top: 36px;
   bottom: 48px;
   border-left: 4px dotted var(--sx-borde-3);
   transform: translateX(-50%);
@@ -266,7 +266,7 @@
   position: relative;
   display: grid;
   justify-items: center;
-  gap: 10px;
+  gap: 8px;
   text-align: center;
 }
 /* El nodo: cara, ícono y canto salen de tres variables que pone cada estado. El canto es el labio del sistema (5 px abajo, sin difuminar): el
@@ -277,8 +277,8 @@
   --labio-nodo: var(--sx-labio-neutro);
   --brillo-nodo: 0 0 0 transparent;
   position: relative;
-  width: 56px;
-  height: 56px;
+  width: 48px;
+  height: 48px;
   border-radius: 50%;
   display: grid;
   place-items: center;
@@ -288,8 +288,8 @@
   box-shadow: var(--brillo-nodo), 0 5px 0 var(--labio-nodo);
 }
 .estacion-camino__marca .sx-icono {
-  width: 26px;
-  height: 26px;
+  width: 24px;
+  height: 24px;
 }
 /* Sin empezar o abierta con apoyo: ficha blanca con su borde (como el botón secundario del sistema). */
 .estacion-camino.estacion--sin_empezar:not(.es-recomendada):not(.acceso--bloqueada) .estacion-camino__marca {
@@ -321,7 +321,7 @@
   gap: 6px;
   min-width: 0;
   width: min(100%, 20rem);
-  padding: 12px 14px;
+  padding: 10px 14px;
   border-radius: var(--radio-md);
   background: var(--sx-superficie);
   box-shadow: var(--sx-elev-1);
@@ -364,21 +364,21 @@
 .estacion-camino.es-recomendada .estacion-camino__marca::after {
   content: "";
   position: absolute;
-  inset: -9px;
+  inset: -8px;
   border-radius: 50%;
   border: 4px solid var(--sx-accion-borde);
 }
 .estacion-camino.es-recomendada .estacion-camino__marca {
-  width: 68px;
-  height: 68px;
+  width: 60px;
+  height: 60px;
 }
 /* El anillo (9 px fuera del nodo) no se pega a la ficha (adenda 1, H-9). */
 .estacion-camino.es-recomendada {
-  gap: 20px;
+  gap: 18px;
 }
 .estacion-camino.es-recomendada .estacion-camino__marca .sx-icono {
-  width: 32px;
-  height: 32px;
+  width: 28px;
+  height: 28px;
 }
 .estacion-camino.es-recomendada .estacion-camino__marca::after {
   animation: camino-anillo var(--sx-dur-3) var(--sx-curva-rebote) 200ms backwards;

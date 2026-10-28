@@ -37,7 +37,7 @@ function estacion(e, i) {
 /**
  * El nodo de la estación (docs/ESPEC_visual_fluidez.md §3 y docs/ESPEC_visual_pulido_salida.md §1): lleva el ÍCONO del estado (SOLO la recomendada,
  * la estrella: una "en curso" que no lo es lleva el suyo, adenda 1, H-3); el número va en el nombre ("Unidad N") y, sin SVG en el entorno, el nodo cae al número. Todos tienen volumen (su
- * canto). Si la estación tiene acción, el nodo es un ENLACE a esa misma acción (56 px o más de toque, con su nombre accesible y el foco del sistema)
+ * canto). Si la estación tiene acción, el nodo es un ENLACE a esa misma acción (48 px o más de toque, con su nombre accesible y el foco del sistema)
  * y se hunde al presionar; si no la tiene (bloqueada, o nada que jugar), no se hunde: es una imagen con su estado como nombre y `aria-disabled`
  * (compuerta 30, punto 3: lo que parece botón se puede tocar). Sin `data-testid`: la acción que miran las pruebas sigue siendo el botón.
  * @param {import('../../ui/camino.js').EstacionVista} e @param {number} i
@@ -78,15 +78,23 @@ export async function renderCamino(raiz, ctx) {
   globalThis.requestAnimationFrame?.(() => mostrarElSiguiente(raiz));
 }
 
+/** Aire entre «Seguir aquí» y el tope de la barra de abajo. */
+const AIRE_SOBRE_LA_BARRA = 8;
+
 /**
- * El siguiente paso, a la vista: SOLO si la FICHA de la recomendada (con su botón «Seguir aquí») no se ve entera (queda bajo la barra de abajo), se trae
- * con `block: 'nearest'` (lo mínimo; su `scroll-margin-bottom` la deja sobre la barra) y sin animar. Antes miraba solo el nodo y el botón quedaba
- * tapado (compuerta 32, H-1). Si ya se ve, no se mueve nada y la cabecera queda arriba.
+ * El siguiente paso, a la vista (docs/ESPEC_visual_pulido_salida.md, adenda 2, R-1): SOLO si el botón de la recomendada («Seguir aquí») queda tapado por
+ * la barra de abajo REAL (su tope medido, menos 8 px de aire), la página baja exactamente esa diferencia, sin animar: lo mínimo, así la cabecera (el
+ * nivel y la regla del 70 %) se pierde lo menos posible. Si ya se ve, no se mueve nada. Antes el umbral era fijo (96 px) y el camino abría desplazado
+ * 83 px a 375×812 aunque el botón cupiera (compuerta 33).
  * @param {HTMLElement} raiz
  */
 function mostrarElSiguiente(raiz) {
-  const ficha = raiz.querySelector?.('[aria-current="step"] .estacion-camino__cuerpo');
-  const alto = globalThis.innerHeight ?? 0;
-  if (!alto || !ficha?.getBoundingClientRect) return;
-  if (ficha.getBoundingClientRect().bottom > alto - 96) ficha.scrollIntoView({ block: 'nearest' });
+  const paso = raiz.querySelector?.('[aria-current="step"]');
+  const boton = paso?.querySelector?.('[data-testid^="camino-accion-"]') ?? paso?.querySelector?.('.estacion-camino__cuerpo');
+  if (!boton?.getBoundingClientRect) return;
+  const barra = raiz.querySelector?.('nav.nav-inferior');
+  const tope = barra?.getBoundingClientRect ? barra.getBoundingClientRect().top : (globalThis.innerHeight ?? 0);
+  if (!tope) return;
+  const falta = boton.getBoundingClientRect().bottom - (tope - AIRE_SOBRE_LA_BARRA);
+  if (falta > 0) globalThis.scrollBy?.({ top: Math.ceil(falta), behavior: 'instant' });
 }
