@@ -258,6 +258,7 @@ nav {
 /* E7 (docs/ESPEC_visual_pulido_salida.md §3): en Grupos del admin, "Crear grupo" va en su tarjeta blanca (sx-tarjeta), separada de la lista. Sobria. */
 #vista .admin-crear-grupo {
   margin: 12px 0 20px;
+  max-width: calc(40rem + 32px); /* adenda 2 (R-5): la tarjeta se ajusta a su formulario de 40 rem (más sus 16 px de cada lado) */
 }
 /* (1,2,1): le gana a `#vista section:not(.aviso-seccion) > h2` de cara.css (1,1,2), que le ponía 28 px arriba dentro de la tarjeta. */
 #vista .sx-tarjeta.admin-crear-grupo > h2 {
