@@ -291,6 +291,7 @@
   background: var(--cara-nodo);
   color: var(--tinta-nodo);
   box-shadow: var(--brillo-nodo), 0 5px 0 var(--labio-nodo);
+  scroll-margin-bottom: 96px; /* adenda 2 (R-2): al llegarle el foco, el nodo queda sobre la barra de abajo */
 }
 .estacion-camino__marca .sx-icono {
   width: 24px;
