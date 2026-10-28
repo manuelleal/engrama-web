@@ -76,17 +76,25 @@ export async function renderCamino(raiz, ctx) {
       : h('p', { class: 'sx-vacio', role: 'status', 'data-testid': 'camino-vacio' }, T.vacio),
     // Adenda 2 (R-4): la nota de las monedas habla de unidades: sin unidades, no va.
     plan.estaciones.length ? h('p', { class: 'sx-t-apoyo camino-nota-monedas', 'data-testid': 'camino-nota-monedas' }, plan.notaMonedas) : null);
-  globalThis.requestAnimationFrame?.(() => mostrarElSiguiente(raiz));
+  // Se mide con la pantalla QUIETA (adenda 3): la entrada de la vista (`entra-sube`, juego.css) sube cada bloque 12 px con transform, y medir a mitad
+  // de ella corría el corte 12 px (se veía un nodo partido arriba).
+  globalThis.requestAnimationFrame?.(() => trasLaEntrada(raiz).then(() => mostrarElSiguiente(raiz)));
+}
+
+/** Espera a que terminen las animaciones de entrada de la vista (solo las `entra-*`, finitas); nunca falla. @param {HTMLElement} raiz */
+function trasLaEntrada(raiz) {
+  const entradas = (raiz.getAnimations?.({ subtree: true }) ?? []).filter((a) => String(/** @type {any} */ (a).animationName ?? '').startsWith('entra-'));
+  return Promise.all(entradas.map((a) => a.finished.catch(() => null)));
 }
 
 /** Aire entre «Seguir aquí» y el tope de la barra de abajo. */
 const AIRE_SOBRE_LA_BARRA = 8;
 
 /**
- * El siguiente paso, a la vista (docs/ESPEC_visual_pulido_salida.md, adenda 2, R-1): SOLO si el botón de la recomendada («Seguir aquí») queda tapado por
- * la barra de abajo REAL (su tope medido, menos 8 px de aire), la página baja exactamente esa diferencia, sin animar: lo mínimo, así la cabecera (el
- * nivel y la regla del 70 %) se pierde lo menos posible. Si ya se ve, no se mueve nada. Antes el umbral era fijo (96 px) y el camino abría desplazado
- * 83 px a 375×812 aunque el botón cupiera (compuerta 33).
+ * El siguiente paso, a la vista (docs/ESPEC_visual_pulido_salida.md, adendas 2 y 3): SOLO si el botón de la recomendada («Seguir aquí») queda tapado por
+ * la barra de abajo REAL (su tope medido, menos 8 px de aire), la página baja, sin animar, hasta el primer CORTE LIMPIO que lo deja entero (`corteLimpio`):
+ * el borde de arriba cae en un hueco vacío, nunca a mitad de un renglón o de un nodo (compuerta 34). Si ya se ve, no se mueve nada y la cabecera (el
+ * nivel y la regla del 70 %) queda arriba.
  * @param {HTMLElement} raiz
  */
 function mostrarElSiguiente(raiz) {
@@ -97,5 +105,18 @@ function mostrarElSiguiente(raiz) {
   const tope = barra?.getBoundingClientRect ? barra.getBoundingClientRect().top : (globalThis.innerHeight ?? 0);
   if (!tope) return;
   const falta = boton.getBoundingClientRect().bottom - (tope - AIRE_SOBRE_LA_BARRA);
-  if (falta > 0) globalThis.scrollBy?.({ top: Math.ceil(falta), behavior: 'instant' });
+  if (falta > 0) globalThis.scrollBy?.({ top: corteLimpio(raiz, paso, falta), behavior: 'instant' });
+}
+
+/**
+ * Cuánto bajar: el primer corte limpio que alcance `falta`. Los cortes (en px desde la vista actual) son el final de la cabecera (ahí empieza la lista) y
+ * el final de cada estación ANTERIOR a la recomendada (ahí empieza la siguiente), + 2 px: el borde de arriba queda en el hueco entre dos bloques. Nunca
+ * pasa de la recomendada; si ningún corte alcanza (una ficha más alta que la pantalla), la diferencia exacta.
+ * @param {HTMLElement} raiz @param {Element} paso la estación recomendada @param {number} falta
+ */
+function corteLimpio(raiz, paso, falta) {
+  const antes = [raiz.querySelector?.('.camino-cabecera')];
+  for (const e of raiz.querySelectorAll?.('.estacion-camino') ?? []) { if (e === paso) break; antes.push(e); }
+  const cortes = antes.filter((e) => e?.getBoundingClientRect).map((e) => Math.ceil(/** @type {Element} */ (e).getBoundingClientRect().bottom) + 2);
+  return cortes.find((c) => c >= falta) ?? Math.ceil(falta);
 }
