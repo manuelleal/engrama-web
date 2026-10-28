@@ -133,6 +133,11 @@
   font-size: 1rem; /* adenda 1 (H-5): el piso de 16 px */
   text-align: left;
 }
+/* Adenda 2 (R-6): el foco en navy, como el resto (el fantasma del sistema lo hereda y aquí heredaba el teal del foco de base.css). */
+#vista .practica-nivel-bloque .practica-ir-examen:focus-visible {
+  outline: 3px solid var(--primario);
+  outline-offset: 2px;
+}
 .practica-ir-examen .sx-icono {
   flex: none;
   width: 20px;
