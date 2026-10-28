@@ -146,3 +146,17 @@ cambia: cero peticiones nuevas, el pase y la CSP intactos, las reglas del 70 % s
 | H-6 [Media] | El formulario de la tarjeta "Crear grupo" con ancho máximo de 40 rem | A 1280 los campos miden ≤ 640 px |
 | H-8 [Nit] | El título de la tarjeta dice "Nuevo grupo" (el botón sigue "Crear grupo"); "N estudiantes" con `sx-t-apoyo` (16 px) | `font-size` de la línea = 16 px |
 | H-7 [Media] | Fotos `despues/` del camino, Inicio y admin rehechas desde el HEAD final | — |
+
+## Adenda 2 · Compuerta 33 (LISTO CON CORRECCIONES) · 2026-10-28
+
+Informe: `investigacion/diseno/33-recompuerta-pulido-salida.md`. Misma rama, un cambio por commit, `sw.js` en v82. **Predicción que falló en la adenda 1
+(se declara aquí porque `e851af5` no lo dijo):** "sin desplazar a 375×812 y 1280×800"; el camino abría desplazado 83 y 99 px (umbral fijo de 96 px).
+
+| # | Corrección | Predicción (medida en el navegador después) |
+|---|---|---|
+| R-1 [Media] | `mostrarElSiguiente` mide la barra REAL (`nav.nav-inferior`) y solo si el borde de abajo de «Seguir aquí» pasa de su tope − 8 px desplaza, con `scrollBy` de exactamente esa diferencia (lo mínimo, sin animar). Para que a 375×812 y 1280×800 no haga falta, el camino se compacta: nodos de 48 px (la recomendada 60), separación entre estaciones de 12 px, nodo-ficha 8 px (la recomendada 18), ficha con 10 px arriba y abajo, cabecera y lista con menos margen (unos 65 px menos hasta el botón) | 375×812 y 1280×800: `scrollY = 0` y el botón entero (borde de abajo ≤ tope de la barra − 8). 375×667: el botón entero, desplazado lo mínimo (≤ 120 px), con la cabecera navy fuera pero el nivel visible si cabe. Con apoyo (la recomendada es la 4.ª): desplaza lo mínimo y el botón queda entero en los tres tamaños |
+| R-2 [Media] | `scroll-margin-bottom: 96px` vuelve a `.estacion-camino__marca` (además de la ficha) | Al llevar el foco con Tab al nodo recomendado a 375×667, el nodo queda entero sobre la barra |
+| R-3 [Media] | Una unidad abierta SIN reto (sin acción) conserva su contorno: el `[aria-disabled]` ya no lo pisa. El contorno de los nodos blancos pasa a 52 % de `--texto` (con `currentColor` = `--sx-tinta-2` daba 2,8:1) | Contorno del nodo blanco ≥ 3:1 contra el fondo, con y sin acción |
+| R-4 [Nit] | La nota de las monedas solo va si hay unidades | En el estado vacío no aparece `camino-nota-monedas` |
+| R-5 [Nit] | La tarjeta «Nuevo grupo» se ajusta al formulario: `max-width: calc(40rem + 32px)` | A 1280 la tarjeta mide 672 px |
+| R-6 [Nit] | El foco del botón fantasma va en navy (`--primario`), como el resto | `outline-color` = navy |
