@@ -383,7 +383,7 @@
   width: 60px;
   height: 60px;
 }
-/* El anillo (9 px fuera del nodo) no se pega a la ficha (adenda 1, H-9). */
+/* El anillo (8 px fuera del nodo: `inset: -8px`) no se pega a la ficha (adenda 1, H-9). */
 .estacion-camino.es-recomendada {
   gap: 18px;
 }
