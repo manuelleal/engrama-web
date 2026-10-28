@@ -103,5 +103,6 @@ export function terminarIntento(estado, req, attemptId) {
   const respuestas = reto.questions.map((q) => ({ question_id: q.id, answer: guardadas.get(q.id)?.answer ?? '' }));
   // Decisión 018: la paga por pregunta y por intento (el puntaje sigue con la PRIMERA respuesta). La base: el valor del reto con su tope.
   const aciertosEn = reto.questions.map((q) => (guardadas.has(q.id) ? acertadaEn(guardadas.get(q.id)) : null));
-  return cerrarIntento(estado, auth, intento, reto, respuestas, (base) => pagaPorIntentos(base, aciertosEn));
+  const reveladas = new Set(reto.questions.filter((q) => guardadas.has(q.id) && resuelta(guardadas.get(q.id), q)).map((q) => q.id)); // H-1
+  return cerrarIntento(estado, auth, intento, reto, respuestas, (base) => pagaPorIntentos(base, aciertosEn), reveladas);
 }
