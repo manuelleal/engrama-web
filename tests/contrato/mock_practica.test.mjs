@@ -14,16 +14,24 @@ test('R10: /answers responde RespuestaDeIntentoOut: veredicto, la correcta, la o
     const g1 = reto(retos, 'Rutina diaria · Gramática 1');
     const { json: inicio } = await api('POST', `/challenges/${g1.id}/attempt`);
     const [q1, q2] = inicio.challenge.questions;
-    const mal = await api('POST', `/challenges/attempts/${inicio.attempt_id}/answers`, { question_id: q1.id, answer: 'A' });
+    // Decisión 018 (docs/ESPEC_tres_intentos.md): 3 opciones = 2 intentos. El primer fallo NO trae la clave; el segundo la agota y la explica
+    // (antes, gana la primera: el primer fallo ya traía la correcta; se declara).
+    const mal = await api('POST', `/challenges/attempts/${inicio.attempt_id}/answers`, { question_id: q1.id, answer: 'C' });
     assert.equal(mal.status, 200);
     validarEstricto('RespuestaDeIntentoOut', mal.json);
-    assert.equal(mal.json.is_correct, false);
-    assert.equal(mal.json.correct_answer, 'B');
-    assert.equal(mal.json.oracion_correcta, 'She goes to school every day.');
-    assert.deepEqual(mal.json.explanation, { idioma: 'es', regla: 'Con he, she o it, el verbo en presente lleva -s.', por_opcion: 'Go es para I, you, we y they.', ejemplo: 'He plays football on Sundays.' });
-    assert.deepEqual([mal.json.repetida, mal.json.respondidas, mal.json.total], [false, 1, 3]);
+    assert.deepEqual([mal.json.is_correct, mal.json.correct_answer, mal.json.oracion_correcta, mal.json.explanation], [false, null, null, null], 'sin resolver: nada de la clave');
+    assert.deepEqual([mal.json.resuelta, mal.json.intento, mal.json.intentos_max, mal.json.descartadas, mal.json.respondidas], [false, 1, 2, ['C'], 0]);
+    const igual = await api('POST', `/challenges/attempts/${inicio.attempt_id}/answers`, { question_id: q1.id, answer: 'C' });
+    assert.deepEqual([igual.json.repetida, igual.json.intento], [true, 1], 'la descartada no gasta intento');
+    const agota = await api('POST', `/challenges/attempts/${inicio.attempt_id}/answers`, { question_id: q1.id, answer: 'A' });
+    validarEstricto('RespuestaDeIntentoOut', agota.json);
+    assert.equal(agota.json.is_correct, false);
+    assert.equal(agota.json.correct_answer, 'B');
+    assert.equal(agota.json.oracion_correcta, 'She goes to school every day.');
+    assert.deepEqual(agota.json.explanation, { idioma: 'es', regla: 'Con he, she o it, el verbo en presente lleva -s.', por_opcion: 'Go es para I, you, we y they.', ejemplo: 'He plays football on Sundays.' });
+    assert.deepEqual([agota.json.repetida, agota.json.respondidas, agota.json.total, agota.json.resuelta, agota.json.descartadas], [false, 1, 3, true, ['C', 'A']]);
     const otra = await api('POST', `/challenges/attempts/${inicio.attempt_id}/answers`, { question_id: q1.id, answer: 'B' });
-    assert.deepEqual([otra.json.answer, otra.json.is_correct, otra.json.repetida, otra.json.respondidas], ['A', false, true, 1], 'gana la primera');
+    assert.deepEqual([otra.json.answer, otra.json.is_correct, otra.json.repetida, otra.json.respondidas], ['A', false, true, 1], 'agotada: lo guardado');
     const bien = await api('POST', `/challenges/attempts/${inicio.attempt_id}/answers`, { question_id: q2.id, answer: 'B' });
     assert.equal(bien.json.is_correct, true);
     assert.equal(bien.json.explanation.por_opcion, null, 'al acertar no hay "por qué no la tuya"');
@@ -61,7 +69,8 @@ test('R10: la explicación de un reto B1 sale en inglés (sin idioma sembrado); 
   await conMockPractica(async ({ api, retos, estado }) => {
     const b1 = reto(retos, 'Trabajo · Gramática 1');
     const { json: inicio } = await api('POST', `/challenges/${b1.id}/attempt`);
-    const r = await api('POST', `/challenges/attempts/${inicio.attempt_id}/answers`, { question_id: inicio.challenge.questions[0].id, answer: 'A' });
+    // Decisión 018: se acierta (B) para ver la explicación al instante; un fallo con intentos restantes no la trae.
+    const r = await api('POST', `/challenges/attempts/${inicio.attempt_id}/answers`, { question_id: inicio.challenge.questions[0].id, answer: 'B' });
     assert.equal(r.json.explanation.idioma, 'en');
     assert.equal(r.json.oracion_correcta, 'I have worked here since 2020.');
     estado.backend.l1 = false;
@@ -137,6 +146,10 @@ test('R10: lo fallado vuelve al día siguiente como repaso (antes que los retos)
     assert.equal(entrada.pregunta.question_text, 'She ___ to school every day.');
     assert.ok(!('correct_answer' in entrada.pregunta));
     const saldo = estado.balances.get(estado.tokens.get(EST)) ?? 0;
+    // Decisión 018: el primer fallo del repaso sale sin la clave; el segundo (agota, 3 opciones = 2 intentos) la trae (antes, el primero; se declara).
+    const primero = await api('POST', `/challenges/refuerzo/${entrada.entrada_id}/respuestas`, { question_id: entrada.pregunta.id, answer: 'C' });
+    validarEstricto('RespuestaOut', primero.json);
+    assert.deepEqual([primero.json.is_correct, primero.json.correct_answer, primero.json.resuelta, primero.json.descartadas, primero.json.coins_earned], [false, null, false, ['C'], 0]);
     const r = await api('POST', `/challenges/refuerzo/${entrada.entrada_id}/respuestas`, { question_id: entrada.pregunta.id, answer: 'A' });
     assert.equal(r.status, 200);
     validarEstricto('RespuestaOut', r.json);

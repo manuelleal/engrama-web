@@ -1,0 +1,16 @@
+{
+  "descripcion": "TI-W4 (auditoría 22, H-1): la revisión supone que toda clave viene (dice \"La correcta era: undefined\" y cuenta acertada la que quedó en blanco)",
+  "archivos": {
+    "src/vistas/estudiante/revision.js": "revision.js"
+  },
+  "comando": [
+    "node",
+    "--test",
+    "--test-reporter=tap",
+    "tests/unit/tres_intentos.test.mjs"
+  ],
+  "espera_codigo_no_cero": true,
+  "espera_fallan_tests": [
+    "TI-W4: la revisión sin la clave de una pregunta"
+  ]
+}

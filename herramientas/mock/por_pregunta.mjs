@@ -2,7 +2,8 @@
 // mock/por_pregunta.mjs · L1 en el doble: responder pregunta por pregunta (`POST /challenges/attempts/:id/answers`), retomar (`GET` de la misma
 // ruta) y cerrar con lo guardado (`POST …/finish`). Espejo simplificado de `engrama-backend` `f7f7aeb` (docs/ESPEC_l1_correccion_por_pregunta.md
 // §10.2 y §10.3; formas: RespuestaDeIntentoOut, EstadoDeIntentoOut y AttemptSubmitOut). Reglas que el doble respeta:
-//   - GANA LA PRIMERA: otra respuesta a la misma pregunta devuelve la guardada con `repetida: true`;
+//   - TRES INTENTOS (decisión 018, mock/intentos.mjs): al fallar con intentos restantes, la respuesta sale SIN la clave (`resuelta: false`); una
+//     descartada o una pregunta resuelta devuelven lo guardado con `repetida: true`; `/finish` paga por pregunta y por intento;
 //   - solo se habla de la pregunta respondida: nada de las otras (la clave no sale antes de responder ESA pregunta);
 //   - `/finish` cierra por el MISMO camino de `/submit` (rutas_intentos.mjs `cerrarIntento`): una paga, con su llave;
 //   - la oración correcta: la del sembrador o el enunciado con el hueco (`___`) relleno con el texto de la correcta;
@@ -13,6 +14,7 @@ import { autenticar } from './auth.mjs';
 import { fallar } from './errores.mjs';
 import { cerrarIntento } from './rutas_intentos.mjs';
 import { oracionCorrecta, explicacionPara } from './explicar.mjs';
+import { primerIntento, otroIntento, camposDeIntentos, ultima, acertadaEn, resuelta, pagaPorIntentos } from './intentos.mjs';
 
 const NO_ENCONTRADO = 'Attempt not found';
 const YA_CERRADO = 'Attempt already completed or abandoned';
@@ -33,16 +35,23 @@ function tomar(estado, auth, attemptId, { abierto = true } = {}) {
 
 const retoDe = (estado, intento) => estado.challenges.get(intento.challenge_id);
 
-/** Lo que se dice de UNA pregunta ya respondida. */
+/** Cuántas preguntas del intento están resueltas (acertadas o agotadas). */
+function resueltas(reto, guardadas) {
+  return reto.questions.filter((q) => guardadas.has(q.id) && resuelta(guardadas.get(q.id), q)).length;
+}
+
+/** Lo que se dice de UNA pregunta respondida. Sin resolver: nada de la clave (decisión 018). */
 function salida(estado, intento, pregunta, guardada, repetida) {
   const reto = retoDe(estado, intento);
+  const { revela, campos } = camposDeIntentos(guardada, pregunta);
+  const acerto = acertadaEn(guardada) !== null;
+  const base = { question_id: pregunta.id, is_correct: acerto, answer: ultima(guardada), repetida, respondidas: resueltas(reto, intento.porPregunta), total: reto.questions.length, ...campos };
+  if (!revela) return { ...base, correct_answer: null, oracion_correcta: null, explanation: null };
   const clave = reto.correct_answers[pregunta.id];
   const explicacion = reto.explicaciones?.[pregunta.id] ?? null;
   return {
-    question_id: pregunta.id, is_correct: guardada.is_correct, answer: guardada.answer, correct_answer: clave,
-    oracion_correcta: oracionCorrecta(pregunta, clave, explicacion),
-    explanation: explicacionPara(explicacion, { elegida: guardada.answer, acerto: guardada.is_correct, nivel: reto.cefr_level }),
-    repetida, respondidas: intento.porPregunta.size, total: reto.questions.length,
+    ...base, correct_answer: clave, oracion_correcta: oracionCorrecta(pregunta, clave, explicacion),
+    explanation: explicacionPara(explicacion, { elegida: ultima(guardada), acerto, nivel: reto.cefr_level }),
   };
 }
 
@@ -66,12 +75,11 @@ export function responderPregunta(estado, req, attemptId, body) {
   if (!pregunta) fallar(404, PREGUNTA_AJENA);
   intento.porPregunta ??= new Map();
   const previa = intento.porPregunta.get(pregunta.id);
-  if (!previa) {
-    intento.porPregunta.set(pregunta.id, {
-      answer: body.answer, is_correct: acierta(reto, pregunta, body.answer), answered_at: estado.reloj.ahora(),
-    });
-  }
-  return { status: 200, cuerpo: salida(estado, intento, pregunta, intento.porPregunta.get(pregunta.id), Boolean(previa)) };
+  const acierto = acierta(reto, pregunta, body.answer);
+  if (!previa) intento.porPregunta.set(pregunta.id, { ...primerIntento(body.answer, acierto), answered_at: estado.reloj.ahora() });
+  const misma = (a, b) => (pregunta.question_type === 'fill_blank' ? normalizar(a) === normalizar(b) : a === b);
+  const gasto = previa ? otroIntento(previa, pregunta, body.answer, acierto, misma) : true;
+  return { status: 200, cuerpo: salida(estado, intento, pregunta, intento.porPregunta.get(pregunta.id), !gasto) };
 }
 
 // GET /challenges/attempts/:attempt_id/answers — lo ya respondido (para retomar). No escribe ni revela lo no respondido.
@@ -93,5 +101,8 @@ export function terminarIntento(estado, req, attemptId) {
   const guardadas = intento.porPregunta ?? new Map();
   const reto = retoDe(estado, intento);
   const respuestas = reto.questions.map((q) => ({ question_id: q.id, answer: guardadas.get(q.id)?.answer ?? '' }));
-  return cerrarIntento(estado, auth, intento, reto, respuestas);
+  // Decisión 018: la paga por pregunta y por intento (el puntaje sigue con la PRIMERA respuesta). La base: el valor del reto con su tope.
+  const aciertosEn = reto.questions.map((q) => (guardadas.has(q.id) ? acertadaEn(guardadas.get(q.id)) : null));
+  const reveladas = new Set(reto.questions.filter((q) => guardadas.has(q.id) && resuelta(guardadas.get(q.id), q)).map((q) => q.id)); // H-1
+  return cerrarIntento(estado, auth, intento, reto, respuestas, (base) => pagaPorIntentos(base, aciertosEn), reveladas);
 }

@@ -10,6 +10,7 @@ import { abrirSesion } from '../../herramientas/cdp.mjs';
 import { conAppCompleta } from './ayudante_servidor.mjs';
 import { sembrarRetoLectura, sembrarRetosPractica } from '../../herramientas/humo/entradas_practica.mjs';
 import { MEDIR_LECTURA } from '../../herramientas/humo/medir_lectura.mjs';
+import { hastaResolver } from '../../herramientas/humo/guion_banda.mjs';
 
 const HAY_NAVEGADOR = [
   process.env.EDGE_PATH, 'C:/Program Files (x86)/Microsoft/Edge/Application/msedge.exe', 'C:/Program Files/Microsoft/Edge/Application/msedge.exe',
@@ -54,7 +55,7 @@ async function recorrer({ ancho, alto }, { conGramatica = false } = {}) {
 
       await clic(sesion, 'opcion-V'); await esperar(150);
       await clic(sesion, 'boton-comprobar');
-      assert.ok(await esperarTestid(sesion, 'explicacion'), 'la banda');
+      assert.ok(await hastaResolver(sesion), 'la banda (decisión 018: si falla, otro intento hasta resolver)');
       await clic(sesion, 'boton-siguiente'); await esperar(700);
       const dos = await medir(sesion);
       assert.equal(dos.contador, 'Pregunta 2 de 4');
@@ -68,6 +69,7 @@ async function recorrer({ ancho, alto }, { conGramatica = false } = {}) {
       for (let i = 1; i < reto.questions.length; i++) {
         await clic(sesion, 'opcion-V'); await esperar(150);
         await clic(sesion, 'boton-comprobar');
+        assert.ok(await hastaResolver(sesion), 'resuelta (decisión 018)');
         assert.ok(await esperarTestid(sesion, i < reto.questions.length - 1 ? 'boton-siguiente' : 'boton-terminar'));
         await esperar(300);
         if (i < reto.questions.length - 1) { await clic(sesion, 'boton-siguiente'); await esperar(500); }

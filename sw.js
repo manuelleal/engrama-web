@@ -13,7 +13,9 @@
 // salida/web (E6) sube a v81: une la fluidez (v80), el panel del super admin (v80) e invitar profes (v79).
 // diseno/pulido-salida (E7) sube a v82: cambian escudo.js, inicio.js, textos_anillo.js y componentes.css (shell) y practica.css, camino.js,
 // inicio_practica.js, textos_practica.js y admin/crear_grupo.js (diferidos). La lista no cambia.
-const VERSION = 'engrama-shell-v82';
+// retos/tres-intentos sube a v83 (la v82 es del pulido visual): reto_l1.js, repaso.js y api/practica.js cambian (decisión 018).
+// integra/2026-11-02-web sube a v84: une el pulido (v82) y los tres intentos (v83) en una sola entrega; el celular que ya tiene la app recibe la lista nueva.
+const VERSION = 'engrama-shell-v84';
 
 // Cada encargo agrega los suyos en su propio commit (W7: Inicio + api/cliente,core,retos + los
 // SVG de Drako que usa el estudiante; W10: profe/grupos,grupo,sesion_asistencia + api/profe). El

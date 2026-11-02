@@ -17,6 +17,7 @@ import { diaLocal, recompensaDelReto } from './economia.mjs';
 import { challengeOutPublico } from './rutas_challenges.mjs';
 import { oracionCorrecta, explicacionPara } from './explicar.mjs';
 import { pagarBonoSiCumplio } from './racha.mjs';
+import { primerIntento, otroIntento, camposDeIntentos, acertadaEn, ultima } from './intentos.mjs';
 
 
 const DIA_MS = 86_400_000;
@@ -187,18 +188,26 @@ export function responderRepaso(estado, req, entradaId, body) {
   const pregunta = reto.questions.find((q) => q.id === entrada.question_id);
   const correcta = reto.correct_answers[entrada.question_id];
   const acierto = body.answer === correcta;
-  const repetida = estado.repaso.respuestas.some((r) => r.entrada_id === entrada.id && diaLocal(r.en, estado.economia.desfaseHoras) === hoy);
-  if (!repetida) moverEntrada(estado, entrada, acierto, ahora);
-  estado.repaso.respuestas.push({ entrada_id: entrada.id, tenant_id: auth.tenantId, profile_id: auth.profileId, question_id: entrada.question_id, is_correct: acierto, en: ahora, repetida });
-  pagarBonoSiCumplio(estado, auth.tenantId, auth.profileId); // el repaso cuenta para el día activo (mock/racha.mjs)
+  // Decisión 018 (mock/intentos.mjs): el PRIMER intento del día mueve la entrada y cuenta para la racha; los intentos 2 y 3 son práctica.
+  const registro = entrada.intentos?.dia === hoy ? entrada.intentos : null;
+  let repetida = false;
+  if (!registro) {
+    moverEntrada(estado, entrada, acierto, ahora);
+    entrada.intentos = { ...primerIntento(body.answer, acierto), dia: hoy };
+    estado.repaso.respuestas.push({ entrada_id: entrada.id, tenant_id: auth.tenantId, profile_id: auth.profileId, question_id: entrada.question_id, is_correct: acierto, en: ahora, repetida: false });
+    pagarBonoSiCumplio(estado, auth.tenantId, auth.profileId); // el repaso cuenta para el día activo (mock/racha.mjs)
+  } else repetida = !otroIntento(registro, pregunta, body.answer, acierto, (a, b) => a === b);
+  const g = entrada.intentos;
+  const { revela, campos } = camposDeIntentos(g, pregunta);
+  const base = { entrada_id: entrada.id, question_id: entrada.question_id, is_correct: acertadaEn(g) !== null, estado: entrada.estado,
+    proxima_fecha: entrada.toca === null ? null : new Date(entrada.toca).toISOString(), repetida, coins_earned: 0, ...campos };
+  if (!revela) return { status: 200, cuerpo: { ...base, correct_answer: null, oracion_correcta: null, explanation: null } };
   const explicacion = reto.explicaciones?.[pregunta.id] ?? null;
   return {
     status: 200,
     cuerpo: {
-      entrada_id: entrada.id, question_id: entrada.question_id, is_correct: acierto, correct_answer: correcta,
-      oracion_correcta: oracionCorrecta(pregunta, correcta, explicacion),
-      explanation: explicacionPara(explicacion, { elegida: body.answer, acerto: acierto, nivel: reto.cefr_level }),
-      estado: entrada.estado, proxima_fecha: entrada.toca === null ? null : new Date(entrada.toca).toISOString(), repetida, coins_earned: 0,
+      ...base, correct_answer: correcta, oracion_correcta: oracionCorrecta(pregunta, correcta, explicacion),
+      explanation: explicacionPara(explicacion, { elegida: ultima(g), acerto: acertadaEn(g) !== null, nivel: reto.cefr_level }),
     },
   };
 }

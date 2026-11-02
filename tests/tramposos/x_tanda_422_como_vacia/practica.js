@@ -28,12 +28,29 @@ const textoONulo = (/** @type {unknown} */ v) => v === null || v === undefined |
 const camposDe = (/** @type {unknown} */ v) => (esObjeto(v) ? Object.keys(/** @type {object} */ (v)) : Array.isArray(v) ? 'una lista' : typeof v);
 
 /**
- * ¿Una respuesta de `/answers` (RespuestaDeIntentoOut) trae lo que la banda usa, con su tipo? Pura; nunca lanza.
+ * Decisión 018 (docs/ESPEC_tres_intentos.md §1.1): ¿la pregunta sigue SIN resolver (falló y le quedan intentos)? Sin el campo `resuelta` (un backend
+ * anterior a los tres intentos) la respuesta se toma como resuelta, como siempre. Pura. @param {any} r
+ */
+export const sinResolver = (r) => esObjeto(r) && r.resuelta === false;
+
+/**
+ * Una respuesta SIN resolver bien formada: `descartadas` es una lista de textos, `intento` e `intentos_max` son enteros y NO trae nada de la clave
+ * (la correcta, la oración ni la explicación): si los trae, es mal formada y no se usa (defensa en profundidad, regla 3). Pura. @param {any} r
+ */
+function pendienteValida(r) {
+  return Array.isArray(r.descartadas) && r.descartadas.every(esTexto) && Number.isInteger(r.intento) && Number.isInteger(r.intentos_max)
+    && r.correct_answer == null && r.oracion_correcta == null && r.explanation == null;
+}
+
+/**
+ * ¿Una respuesta de `/answers` (RespuestaDeIntentoOut) trae lo que la banda usa, con su tipo? Pura; nunca lanza. Sin resolver: lo de `pendienteValida`.
  * @param {any} r
  */
 export function respuestaValida(r) {
-  if (!esObjeto(r) || !esTexto(r.question_id) || typeof r.is_correct !== 'boolean' || !esTexto(r.answer) || !esTexto(r.oracion_correcta)) return false;
+  if (!esObjeto(r) || !esTexto(r.question_id) || typeof r.is_correct !== 'boolean' || !esTexto(r.answer)) return false;
   if (!Number.isInteger(r.respondidas) || !Number.isInteger(r.total)) return false;
+  if (sinResolver(r)) return pendienteValida(r);
+  if (!esTexto(r.oracion_correcta)) return false;
   const e = r.explanation;
   return e === null || e === undefined || (esObjeto(e) && (e.idioma === 'es' || e.idioma === 'en') && [e.regla, e.por_opcion, e.ejemplo].every(textoONulo));
 }
@@ -176,10 +193,11 @@ export async function pedirTanda({ token, tenantId }) {
   return tandaSinClave(datos);
 }
 
-/** ¿Una respuesta del repaso (RespuestaOut) trae lo que la banda usa? Pura. @param {any} r */
+/** ¿Una respuesta del repaso (RespuestaOut) trae lo que la banda usa? Sin resolver: lo de `pendienteValida` (nada de la clave). Pura. @param {any} r */
 export function respuestaDeRepasoValida(r) {
-  return esObjeto(r) && Number.isInteger(r.entrada_id) && typeof r.is_correct === 'boolean' && esTexto(r.correct_answer)
-    && textoONulo(r.oracion_correcta) && (r.explanation === null || r.explanation === undefined || esObjeto(r.explanation));
+  if (!esObjeto(r) || !Number.isInteger(r.entrada_id) || typeof r.is_correct !== 'boolean') return false;
+  if (sinResolver(r)) return pendienteValida(r);
+  return esTexto(r.correct_answer) && textoONulo(r.oracion_correcta) && (r.explanation === null || r.explanation === undefined || esObjeto(r.explanation));
 }
 
 /**

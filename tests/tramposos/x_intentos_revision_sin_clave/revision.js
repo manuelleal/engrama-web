@@ -1,0 +1,82 @@
+// @ts-check
+// vistas/estudiante/revision.js · W9: revisión al final, con la correcta de cada pregunta
+// (hito 1 — la explicación por pregunta es L1/W18, hito 2, todavía no existe). Drako presenta
+// arriba de todo; NUNCA dentro del bloque de resultado de una pregunta (010, X11: "Drako
+// presenta y nunca califica" — un Drako ahí adentro sería la mascota calificando al estudiante).
+import { h, montar } from '../../ui/dom.js';
+import { crearResultado } from '../../ui/retro.js';
+import { crearCabecera } from '../../ui/cabecera.js';
+import { nivelDeCelebracion, crearHeroResultado, celebrarFinDeReto } from '../../ui/celebracion.js';
+import { crearNavInferior } from '../../ui/nav_inferior.js';
+import { meritoDelReto } from '../../ui/merito.js';
+import { textos } from '../../textos.js';
+
+/** Texto legible de una opción por su label ("A" -> su `value`); si no hay opciones, la label tal cual. */
+export function textoDeOpcion(pregunta, label) {
+  const opcion = (pregunta.options_json || []).find((o) => o.label === label);
+  return opcion ? opcion.value : label;
+}
+
+/** ¿La pregunta `pregunta.id` se respondió bien? Pura: compara lo dado contra `correct_answers`. */
+export function acertoPregunta(preguntaId, respuestasDadas, correctAnswers) {
+  const correcta = correctAnswers.find((c) => c.question_id === preguntaId)?.correct_answer;
+  return respuestasDadas[preguntaId] === correcta;
+}
+
+function filaDeRevision(pregunta, respuestasDadas, correctAnswers, i, aciertos) {
+  // W91: si el servidor ya dijo el acierto de esa pregunta (`/answers`), manda él (lo escrito se normaliza allá).
+  const acerto = aciertos && typeof aciertos[pregunta.id] === 'boolean' ? aciertos[pregunta.id] : acertoPregunta(pregunta.id, respuestasDadas, correctAnswers);
+  const correcta = correctAnswers.find((c) => c.question_id === pregunta.id)?.correct_answer;
+  // Las filas entran una tras otra; la correcta rebota y la que no, tiembla apenas (corto, suave,
+  // siempre con ícono y texto — juego.css). El orden y el retraso son de lectura, no de tiempo del estudiante.
+  const fila = h(
+    'li', { class: `tarjeta fila-revision ${acerto ? 'revision-ok' : 'revision-mal'}`, 'data-testid': `revision-${pregunta.id}` },
+    h('p', { class: 'fila-titulo' }, pregunta.question_text),
+    crearResultado({ ok: acerto, texto: acerto ? textos.revision.correcta : textos.revision.incorrecta, testid: `revision-${pregunta.id}-resultado` }),
+    acerto ? null : h('p', { 'data-testid': `revision-${pregunta.id}-correcta` }, textos.revision.laCorrectaEra(textoDeOpcion(pregunta, correcta))),
+  );
+  fila.style.setProperty('--i', String(i));
+  return fila;
+}
+
+/**
+ * @param {HTMLElement} raiz
+ * @param {{challenge: object, resultado: object, respuestasDadas: Record<string,string>, aciertos?: Record<string, boolean>, rol?: string, esRepaso?: boolean, historialPrevio?: unknown, lectura?: Node|null}} datos
+ *   `rol`: el de la sesión, para la barra; `esRepaso` e `historialPrevio` (W50): lo que se sabía ANTES de jugar, para el sello de mérito
+ */
+export function renderRevision(raiz, datos) {
+  const { challenge, resultado, respuestasDadas } = datos;
+  const delServidor = datos.aciertos;
+  const filas = challenge.questions.map((q, i) => filaDeRevision(q, respuestasDadas, resultado.correct_answers, i, delServidor));
+  const aciertos = challenge.questions.filter((q) => (delServidor && typeof delServidor[q.id] === 'boolean' ? delServidor[q.id]
+    : acertoPregunta(q.id, respuestasDadas, resultado.correct_answers))).length;
+  const total = challenge.questions.length;
+  const monedas = resultado.coins_earned;
+  const nivel = nivelDeCelebracion(aciertos, total);
+  // W50: el sello de mérito sale de lo que dice el servidor (`is_correct`, `score_percent`) y del historial leído antes de jugar; sin historial, ninguno.
+  const merito = meritoDelReto({ resultado, challengeId: /** @type {any} */ (challenge).id, historialPrevio: datos.historialPrevio, esRepaso: datos.esRepaso === true });
+  const hero = crearHeroResultado({ nivel, aciertos, total, monedas, merito });
+  // El texto de las monedas es el del servidor, tal cual (un repaso NUNCA muestra "+N"). Con monedas, la
+  // medalla animada del hero es lo que se ve; este aviso queda para lectores de pantalla.
+  const banner = h(
+    'p', { role: 'status', class: monedas > 0 ? 'solo-lectores' : 'aviso-corto', 'data-testid': 'revision-monedas' },
+    monedas > 0 ? textos.revision.gananciaMonedas(monedas) : textos.revision.sinGanancia,
+  );
+  // La salida es EL botón de la pantalla: primario del sistema, a todo el ancho (antes, un chip chico).
+  const volver = h('a', { href: '#/retos', class: 'sx-btn sx-btn--ancho', 'data-testid': 'revision-volver' }, textos.revision.volver);
+  const nodo = h(
+    'div', { 'data-testid': 'vista-revision', class: 'juego' },
+    crearCabecera({ piezas: [h('p', { class: 'cabecera-rotulo' }, textos.retos.titulo)], sonido: true }), // de la pestaña Retos
+    hero.nodo,
+    banner,
+    h('h2', { class: 'subtitulo-revision' }, textos.revision.titulo),
+    datos.lectura, // W84
+    h('ul', {}, ...filas),
+    volver,
+    crearNavInferior('/retos', datos.rol), // la revisión es de la pestaña Retos (§5.6)
+  );
+  montar(raiz, nodo);
+  // La línea de tiempo del fin de reto revela las filas y el botón en su momento (ui/linea_fin_reto.js).
+  celebrarFinDeReto({ nivel, aciertos, total, monedas, hero, filas, boton: volver, merito });
+  document.body.dataset.listo = '1';
+}

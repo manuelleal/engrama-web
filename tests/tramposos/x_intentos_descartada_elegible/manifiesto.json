@@ -1,0 +1,16 @@
+{
+  "descripcion": "TI-W2 (decisión 018): la opción descartada no queda inhabilitada",
+  "archivos": {
+    "src/vistas/estudiante/reto_l1.js": "reto_l1.js"
+  },
+  "comando": [
+    "node",
+    "--test",
+    "--test-reporter=tap",
+    "tests/unit/tres_intentos.test.mjs"
+  ],
+  "espera_codigo_no_cero": true,
+  "espera_fallan_tests": [
+    "TI-W2: fallar sin clave con la descartada inhabilitada"
+  ]
+}

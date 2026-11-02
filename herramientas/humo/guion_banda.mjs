@@ -32,7 +32,8 @@ export const ESCENARIOS = [
   { nombre: 'vocabA2', reto: 'Rutina diaria · Vocabulario 1', elegir: ['B', 'C'] },
 ];
 /** Aparte: una explicación MUY larga (la banda llega a su tope de 78 vh y se desplaza por dentro) con la correcta y la tuya al final de las opciones. */
-export const ESCENARIO_LARGO = { nombre: 'larga', reto: 'larga', elegir: ['C'] };
+// Decisión 018: B y después C agota la pregunta (3 opciones = 2 intentos): la banda trae el "por qué no la tuya" largo de C, como antes con un solo fallo.
+export const ESCENARIO_LARGO = { nombre: 'larga', reto: 'larga', elegir: ['B>C'] };
 
 const PARRAFO = 'Use the present perfect with since or for when something started in the past and continues now, and keep the verb form have plus the past participle. '
   + 'It is not the same as the simple past, which closes the action in a finished time, and it is not the continuous, which stresses the activity itself. ';
@@ -63,6 +64,26 @@ export const tocar = (sesion, testid) => sesion.evaluar(`(async () => {
 })()`);
 
 /**
+ * Decisión 018 (docs/ESPEC_tres_intentos.md): tras "Comprobar", si la pregunta queda SIN resolver ("Incorrecto, inténtalo otra vez", sin la clave),
+ * elige la primera opción que sigue habilitada y vuelve a comprobar, hasta que sale la banda (acierta o agota). Devuelve si salió la banda.
+ * Los guiones que miden la banda la necesitan resuelta; antes un solo fallo ya la mostraba.
+ * @param {any} sesion
+ */
+export const hastaResolver = (sesion) => sesion.evaluar(`(async () => {
+  const q = (s) => document.querySelector(s);
+  const pausa = (ms) => new Promise((r) => setTimeout(r, ms));
+  for (let vuelta = 0; vuelta < 6; vuelta++) {
+    for (let k = 0; k < 160 && !q('[data-testid="explicacion"]') && !q('[data-testid="panel-respuesta"].panel-incorrecto'); k++) await pausa(50);
+    if (q('[data-testid="explicacion"]')) return true;
+    const libre = [...document.querySelectorAll('[data-testid^="opcion-"]')].find((b) => !b.disabled);
+    if (!libre) return false;
+    libre.click(); await pausa(250);
+    q('[data-testid="boton-comprobar"]')?.click(); await pausa(120);
+  }
+  return Boolean(q('[data-testid="explicacion"]'));
+})()`);
+
+/**
  * Recorre un escenario en una ventana: tras cada Comprobar espera a que la pantalla se asiente, mide y llama `alMedir(paso, medida, sesion)` (para capturar o afirmar).
  * @param {{ancho: number, alto: number}} ventana
  * @param {{nombre: string, reto: string, elegir: string[]}} escenario
@@ -86,9 +107,18 @@ export async function recorrerEscenario(ventana, escenario, alMedir, { reducido 
       await esperar(900); // la entrada de la pregunta
       let scrollAlEntrar = null;
       for (let i = 0; i < escenario.elegir.length; i++) {
-        await tocar(sesion, `opcion-${escenario.elegir[i]}`); await esperar(250);
+        // Decisión 018: "B>C" = falla con B (queda "inténtalo otra vez", sin la clave) y después elige C; la banda sale con la última.
+        const [...antes] = escenario.elegir[i].split('>');
+        const final = antes.pop();
+        for (const otra of antes) {
+          await tocar(sesion, `opcion-${otra}`); await esperar(250);
+          await tocar(sesion, 'boton-comprobar');
+          if (!(await tocar(sesion, 'panel-respuesta'))) throw new Error('guion_banda: no apareció el aviso de otro intento');
+          await esperar(400);
+        }
+        await tocar(sesion, `opcion-${final}`); await esperar(250);
         await tocar(sesion, 'boton-comprobar');
-        if (!(await tocar(sesion, 'explicacion-veredicto'))) throw new Error('guion_banda: no apareció la banda');
+        if (!(await hastaResolver(sesion)) || !(await tocar(sesion, 'explicacion-veredicto'))) throw new Error('guion_banda: no apareció la banda');
         await esperarAsentado(sesion);
         const medida = await sesion.evaluar(MEDIR_BANDA);
         medida.scrollAlEntrar = scrollAlEntrar; // dónde abrió ESTA pregunta (null en la primera)

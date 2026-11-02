@@ -22,9 +22,26 @@ async function esperarTestid(sesion, testid, limiteMs = 9000) {
   while (Date.now() < fin) { if (await sesion.evaluar(`Boolean(document.querySelector('[data-testid="${testid}"]'))`)) return true; await esperar(80); }
   return false;
 }
+async function esperarSelector(sesion, selector, limiteMs = 9000) {
+  const fin = Date.now() + limiteMs;
+  while (Date.now() < fin) { if (await sesion.evaluar(`Boolean(document.querySelector('${selector}'))`)) return true; await esperar(80); }
+  return false;
+}
 const clic = (sesion, testid) => sesion.evaluar(`document.querySelector('[data-testid="${testid}"]').click()`);
-/** Elige, comprueba y devuelve lo que dice la banda (y dónde queda su botón). */
-async function responder(sesion, label) {
+/**
+ * Elige, comprueba y devuelve lo que dice la banda (y dónde queda su botón). Decisión 018: `antes` son los intentos fallidos previos (cada uno deja
+ * "Incorrecto, inténtalo otra vez" sin la clave); la banda sale con la ÚLTIMA respuesta. @param {any} sesion @param {string} label @param {string[]} [antes]
+ */
+async function responder(sesion, label, antes = []) {
+  for (const otra of antes) {
+    await clic(sesion, `opcion-${otra}`);
+    await esperar(120);
+    await clic(sesion, 'boton-comprobar');
+    assert.ok(await esperarSelector(sesion, '[data-testid="panel-respuesta"].panel-incorrecto'), 'falla sin la clave: inténtalo otra vez');
+    const sinClave = await sesion.evaluar('!document.querySelector(\'[data-testid="explicacion"]\') && !document.body.textContent.includes("La correcta")');
+    assert.ok(sinClave, 'al fallar con intentos restantes no sale la correcta');
+    await esperar(200);
+  }
   await clic(sesion, `opcion-${label}`);
   await esperar(120);
   await clic(sesion, 'boton-comprobar');
@@ -74,11 +91,12 @@ test('E35: un reto A2 pregunta por pregunta: nada antes de Comprobar, la banda e
       const antes = await sesion.evaluar('document.body.textContent');
       for (const clave of ['She goes to school every day.', 'Con he, she o it', 'Esta vez no', 'La correcta', '¡Bien hecho!']) assert.ok(!antes.includes(clave), `antes de comprobar se ve "${clave}"`);
 
-      const mal = await responder(sesion, 'A');
+      const mal = await responder(sesion, 'A', ['C']); // decisión 018: C y después A (3 opciones = 2 intentos); la banda con la última, A
       // Sprint de la magia (docs/ESPEC_avatar_fluidez.md §1): en el reto, la franja dice "La correcta: <la opción>" y "¡Bien hecho!" (antes "Esta vez no" / "Correcta"; se declara).
       assert.equal(mal.veredicto, 'La correcta: goes');
       assert.equal(mal.icono, 'equis', 'el veredicto con su ícono SVG (tanda visual 2: antes, el glifo ✗)');
-      assert.deepEqual(mal.estados, [['opcion-A', 'Tu respuesta', 'equis'], ['opcion-B', 'Correcta', 'visto'], ['opcion-C', null, null]], 'tras comprobar, las opciones dicen el resultado con ícono y palabra');
+      // Decisión 018: la que se descartó antes sigue dicha "Descartada" con su ícono (antes, sin intentos, C quedaba sin marca; se declara).
+      assert.deepEqual(mal.estados, [['opcion-A', 'Tu respuesta', 'equis'], ['opcion-B', 'Correcta', 'visto'], ['opcion-C', 'Descartada', 'equis']], 'tras comprobar, las opciones dicen el resultado con ícono y palabra');
       // H-4 (docs/ESPEC_correcciones_practica.md): la oración y el ejemplo son frases en inglés (lang="en"); la regla y el "por qué", en español.
       // Antes esta línea fijaba las cuatro en "es", el defecto que encontró la auditoría 05 (se declara: la espec de H-4 no nombró a E35).
       assert.deepEqual(mal.partes.map(([p, lang]) => [p, lang]), [['oracion', 'en'], ['regla', 'es'], ['porQue', 'es'], ['ejemplo', 'en']]);
@@ -108,7 +126,9 @@ test('E35: un reto A2 pregunta por pregunta: nada antes de Comprobar, la banda e
       await clic(sesion, 'boton-terminar');
       assert.ok(await esperarTestid(sesion, 'vista-revision'), 'la revisión de siempre');
       await esperar(600);
-      assert.match(await sesion.evaluar('document.querySelector(\'[data-testid="revision-monedas"]\').textContent'), /No sumaste monedas/, 'falló una: no paga');
+      // Decisión 018: la paga es por pregunta (antes, todo o nada: "No sumaste monedas"; se declara). Agotó la 1 (0) y acertó al primero la 2 y la 3
+      // (2 + 2 medios): ⌊10 × 4 / 6⌋ = 6. Lo dice el servidor (el doble); la web solo lo muestra.
+      assert.match(await sesion.evaluar('document.querySelector(\'[data-testid="revision-monedas"]\').textContent'), /\+6 monedas/, 'paga por pregunta');
       assert.deepEqual(sesion.errores, []);
     } finally { await sesion.cerrar(); }
   });
@@ -125,7 +145,7 @@ test('E35: un reto B1: la explicación y sus rótulos en inglés (lang="en"), co
       await sesion.navegar(`${url}#/retos/${b1.id}`);
       await sesion.recargar();
       assert.ok(await esperarTestid(sesion, 'enunciado'));
-      const mal = await responder(sesion, 'A');
+      const mal = await responder(sesion, 'A', ['C']); // decisión 018: C y después A
       assert.equal(mal.veredicto, 'La correcta: have worked'); // sprint de la magia (antes "Esta vez no"; se declara)
       assert.deepEqual(mal.partes.map(([p, lang]) => [p, lang]), [['oracion', 'en'], ['regla', 'en'], ['porQue', 'en'], ['ejemplo', 'en']]);
       assert.match(mal.partes[0][2], /The right answer: I have worked here since 2020\./);

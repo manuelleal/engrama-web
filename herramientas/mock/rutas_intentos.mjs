@@ -9,6 +9,7 @@ import { recompensaDelReto } from './economia.mjs';
 import { otorgarMonedas } from './monedas.mjs';
 import { anotarFallos } from './practica.mjs';
 import { pagarBonoSiCumplio } from './racha.mjs';
+import { intentosDe as intentosDePregunta } from './intentos.mjs';
 
 /** El 409 de /submit sobre un intento con respuestas guardadas por /answers (backend f7f7aeb, `attempts.CON_RESPUESTAS`). */
 export const CON_RESPUESTAS = 'intento_con_respuestas';
@@ -69,9 +70,15 @@ export function enviarIntento(estado, req, attemptId, body) {
  * Califica, paga (una vez, con la llave) y cierra el intento: el MISMO camino para /submit y para /finish de L1 (mock/por_pregunta.mjs), como
  * `attempts.cerrar_intento` del backend. Devuelve el AttemptSubmitOut.
  */
-export function cerrarIntento(estado, auth, intento, challenge, respuestas) {
+export function cerrarIntento(estado, auth, intento, challenge, respuestas, pagaPorPregunta = null, reveladas = null) {
   const { dadas, score_percent, is_correct } = calificar(challenge, respuestas);
-  const pago = pagarSiCorresponde(estado, auth, challenge, is_correct);
+  const pago = pagarSiCorresponde(estado, auth, challenge, is_correct, pagaPorPregunta, intento.id);
+  // Auditoría 22, H-1: el cierre solo revela las claves de lo resuelto. `/finish` pasa las resueltas; `/submit` (sin intentos), la acertada y la
+  // fallada que tenía un solo intento (una V/F); la en blanco, nunca.
+  const claves = reveladas ?? new Set(challenge.questions.filter((q) => {
+    const dada = dadas[q.id];
+    return typeof dada === 'string' && dada.trim() !== '' && (dada === challenge.correct_answers[q.id] || intentosDePregunta(q) <= 1);
+  }).map((q) => q.id));
 
   Object.assign(intento, { status: 'completed', completed_at: new Date(estado.reloj.ahora()).toISOString(), is_correct, score_percent, answers: dadas, coins_earned: pago.coins_earned, xp_earned: pago.xp_earned });
   anotarFallos(estado, auth, challenge, dadas); // lo fallado entra a la cola de repaso (mock/practica.mjs), como el gancho del refuerzo del backend
@@ -83,26 +90,34 @@ export function cerrarIntento(estado, auth, intento, challenge, respuestas) {
     cuerpo: {
       attempt_id: intento.id, is_correct, score_percent, coins_earned: pago.coins_earned, xp_earned: pago.xp_earned,
       streak_bonus: 0, drako_feedback: null, total_attempts_used: usados, attempts_remaining: Math.max(0, challenge.max_attempts - usados),
-      correct_answers: challenge.questions.map((q) => ({ question_id: q.id, correct_answer: challenge.correct_answers[q.id] })),
+      correct_answers: challenge.questions.filter((q) => claves.has(q.id)).map((q) => ({ question_id: q.id, correct_answer: challenge.correct_answers[q.id] })),
     },
   };
 }
 
 // BUG-13 (adoptada): llave `challenge:<reto>:<estudiante>` — una segunda victoria no vuelve a
 // pagar ni a gastar cupo de `max_winners` (§1.1 de ESPEC_bug13a15.md, "Solo si entrada is not None").
-function pagarSiCorresponde(estado, auth, challenge, esCorrecta) {
-  if (!esCorrecta || challenge.current_winners >= challenge.max_winners) return { coins_earned: 0, xp_earned: 0 };
-  const llave = `challenge:${challenge.id}:${auth.profileId}`;
-  const paga = recompensaDelReto(challenge.coins_reward, estado.economia.topeDelReto); // W43: un reto guardado por encima del tope paga el tope
+// Decisión 018: `/finish` pasa `pagaPorPregunta(base)` (la paga por intento); sin ella (`/submit`), todo o nada.
+// Auditoría 22, H-2: tras una paga parcial, un intento mejor paga la diferencia (llave por intento, sin cupo); el XP, la primera vez que un intento
+// del reto sale correcto (sin depender de la paga ni del cupo).
+function pagarSiCorresponde(estado, auth, challenge, esCorrecta, pagaPorPregunta = null, intentoId = null) {
+  const base = recompensaDelReto(challenge.coins_reward, estado.economia.topeDelReto); // W43: un reto guardado por encima del tope paga el tope
+  const paga = pagaPorPregunta ? pagaPorPregunta(base) : esCorrecta ? base : 0;
+  const cobrado = estado.ledger.filter((e) => e.action === 'challenge' && e.to_wallet_id === auth.profileId && e.metadata?.challenge_id === challenge.id)
+    .reduce((s, e) => s + e.amount, 0);
+  const yaGano = intentosDe(estado, auth.profileId, challenge.id).some((a) => a.status === 'completed' && a.is_correct === true);
+  const xp = esCorrecta && !yaGano ? challenge.xp_reward : 0;
+  if (xp) estado.profiles.get(auth.profileId).xp += xp;
+  const monedas = Math.max(0, paga - cobrado);
+  if (monedas <= 0 || (cobrado === 0 && challenge.current_winners >= challenge.max_winners)) return { coins_earned: 0, xp_earned: xp };
+  const llave = cobrado === 0 ? `challenge:${challenge.id}:${auth.profileId}` : `challenge:${challenge.id}:${auth.profileId}:${intentoId}`;
   const entrada = otorgarMonedas(estado, {
-    tenantId: auth.tenantId, profileId: auth.profileId, amount: paga,
+    tenantId: auth.tenantId, profileId: auth.profileId, amount: monedas,
     action: 'challenge', metadata: { challenge_id: challenge.id }, idempotencyKey: llave,
   });
-  if (!entrada) return { coins_earned: 0, xp_earned: 0 };
-  challenge.current_winners += 1;
-  const perfil = estado.profiles.get(auth.profileId);
-  perfil.xp += challenge.xp_reward;
-  return { coins_earned: paga, xp_earned: challenge.xp_reward };
+  if (!entrada) return { coins_earned: 0, xp_earned: xp };
+  if (cobrado === 0) challenge.current_winners += 1;
+  return { coins_earned: monedas, xp_earned: xp };
 }
 
 // GET /challenges/attempts/history

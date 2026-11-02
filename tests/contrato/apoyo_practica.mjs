@@ -1,6 +1,6 @@
 // @ts-check
 // apoyo_practica.mjs · Lo que comparten las pruebas de contrato de la práctica del día (R10): un mock con la siembra de la práctica y la validación
-// ESTRICTA contra `contratos/openapi_f7f7aeb.json`. No es un archivo de test (no termina en .test.mjs).
+// ESTRICTA contra `contratos/openapi_f7f7aeb.json` (con las dos formas de los tres intentos de `openapi_tres_intentos_3fc7826.json`). No es un archivo de test (no termina en .test.mjs).
 import assert from 'node:assert/strict';
 import { join, dirname } from 'node:path';
 import { fileURLToPath } from 'node:url';
@@ -11,6 +11,11 @@ import { cargarOpenapi, validarContraEsquema } from './validador_openapi.mjs';
 
 const RAIZ = join(dirname(fileURLToPath(import.meta.url)), '..', '..');
 const openapi = cargarOpenapi(join(RAIZ, 'contratos', 'openapi_f7f7aeb.json'));
+// Decisión 018 (docs/ESPEC_tres_intentos.md): de la práctica del día cambian SOLO dos formas, la respuesta por pregunta y la del repaso (la clave en
+// null hasta resolver, y `intento`, `intentos_max`, `resuelta`, `descartadas`). Se toman de la exportación real del backend `retos/tres-intentos`
+// (`3fc7826`); lo demás sigue contra f7f7aeb.
+const tresIntentos = cargarOpenapi(join(RAIZ, 'contratos', 'openapi_tres_intentos_3fc7826.json'));
+for (const forma of ['RespuestaDeIntentoOut', 'RespuestaOut', 'ExplicacionOut']) openapi.components.schemas[forma] = tresIntentos.components.schemas[forma];
 export const EST = 'prac-1';
 
 /** Un mock con la siembra de la práctica y un cliente HTTP mínimo. */
